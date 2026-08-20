@@ -1,0 +1,12 @@
+{
+  "name": "smart-travel-backend",
+  "version": "1.0.0",
+  "description": "Smart Travel Platform Backend Spring Boot API",
+  "scripts": {
+    "dev": "cross-env JAVA_HOME=C:\\JDK17 mvn spring-boot:run",
+    "start": "cross-env JAVA_HOME=C:\\JDK17 mvn spring-boot:run"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}

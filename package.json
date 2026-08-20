@@ -1,0 +1,9 @@
+{
+  "name": "smart-travel-root",
+  "version": "1.0.0",
+  "description": "Smart Travel & Itinerary Planner Monorepo Runner",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
+  }
+}
