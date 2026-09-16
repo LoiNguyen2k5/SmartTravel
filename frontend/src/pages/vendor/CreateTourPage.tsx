@@ -40,12 +40,12 @@ export const CreateTourPage: React.FC = () => {
         durationNights,
         departureLocation: departureLocation.trim(),
         thumbnailUrl: thumbnailUrl.trim(),
-        category,
+        category: category as any,
         remainingSeats: 40,
-      });
+      } as any);
 
-      alert('Tạo Tour du lịch mới thành công và đã lưu trực tiếp vào Database!');
-      navigate('/vendor/dashboard');
+      alert('Tạo Tour du lịch mới thành công! Tour đã được gửi lên hệ thống.');
+      navigate('/vendor/tours');
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Không thể tạo tour. Vui lòng kiểm tra lại.');
     } finally {

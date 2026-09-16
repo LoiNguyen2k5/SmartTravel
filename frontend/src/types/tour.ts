@@ -1,7 +1,10 @@
 export enum TourStatus {
   DRAFT = 'DRAFT',
+  PENDING_APPROVAL = 'PENDING_APPROVAL',
+  APPROVED = 'APPROVED',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
+  REJECTED = 'REJECTED',
   FULL = 'FULL',
 }
 
@@ -69,4 +72,7 @@ export interface TourCreateRequest {
   thumbnailUrl?: string;
   destinationId?: number;
   category?: TourCategory;
+  tourCode?: string;
+  remainingSeats?: number;
 }
+

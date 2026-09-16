@@ -8,19 +8,12 @@ import { Review } from '../../types/review';
 import { MOCK_TOURS, findMockTourById } from '../../data/mockTours';
 import { 
   Star, Clock, Calendar, MapPin, 
-  HelpCircle, ShieldCheck, Tag, ChevronRight, PhoneCall, 
-  Send, UserCheck, AlertCircle, Image as ImageIcon
+  HelpCircle, ShieldCheck, Tag, ChevronRight, ChevronLeft, PhoneCall, 
+  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2
 } from 'lucide-react';
+import { tourScheduleService, formatScheduleDate } from '../../services/tourScheduleService';
 
 const MOCK_DETAIL_TOUR: Tour = MOCK_TOURS[0]; // Default fallback = first tour
-
-
-const AVAILABLE_SCHEDULES = [
-  { id: 1, startDate: '30-08-2026', endDate: '02-09-2026', seats: 28, note: 'Lễ Quốc Khánh 2/9 (Phổ biến)' },
-  { id: 2, startDate: '15-09-2026', endDate: '18-09-2026', seats: 35, note: 'Giữa tháng 9 (Chỗ trống nhiều)' },
-  { id: 3, startDate: '01-10-2026', endDate: '04-10-2026', seats: 40, note: 'Đầu tháng 10 (Mùa thu đẹp)' },
-  { id: 4, startDate: '15-10-2026', endDate: '18-10-2026', seats: 40, note: 'Giữa tháng 10 (Ngắm hoa Đà Lạt)' },
-];
 
 export const TourDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,32 +23,67 @@ export const TourDetailPage: React.FC = () => {
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Lightbox Modal State
+  const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+
   // Active Tab
   const [activeTab, setActiveTab] = useState<'itinerary' | 'policy' | 'faq' | 'reviews'>('itinerary');
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [isPolicyExpanded, setIsPolicyExpanded] = useState<boolean>(false);
 
-  // Schedule selection state
+  // Synchronized schedules state from tourScheduleService
+  const [schedulesWithDynamicSeats, setSchedulesWithDynamicSeats] = useState<Array<{
+    id: number;
+    startDate: string;
+    endDate: string;
+    seats: number;
+    note: string;
+  }>>([]);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number>(1);
-  const [seatCounts, setSeatCounts] = useState<Record<number, number>>({ 1: 28, 2: 35, 3: 40, 4: 40 });
+
+  const loadSchedules = (tourId: number) => {
+    const active = tourScheduleService.getUpcomingSchedulesForUser(tourId);
+    const mapped = active.map((s) => ({
+      id: s.id,
+      startDate: formatScheduleDate(s.startDate),
+      endDate: formatScheduleDate(s.endDate),
+      seats: Math.max(0, s.maxParticipants - s.bookedCount),
+      note: s.note || 'Lịch mở bán',
+    }));
+    setSchedulesWithDynamicSeats(mapped);
+    if (mapped.length > 0) {
+      setSelectedScheduleId(mapped[0].id);
+    }
+  };
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('schedule_seat_counts');
-      if (stored) {
-        setSeatCounts(JSON.parse(stored));
-      }
-    } catch (e) {
-      console.error(e);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    const targetId = tour?.id || (id ? Number(id) : null);
+    if (targetId) {
+      loadSchedules(targetId);
     }
-  }, []);
+  }, [tour?.id, id]);
 
-  const schedulesWithDynamicSeats = AVAILABLE_SCHEDULES.map((s) => ({
-    ...s,
-    seats: seatCounts[s.id] !== undefined ? seatCounts[s.id] : s.seats,
-  }));
+  // Listen to schedule updates from Vendor or booking
+  useEffect(() => {
+    const handleUpdate = (e: any) => {
+      const targetId = tour?.id || (id ? Number(id) : null);
+      if (targetId && (!e.detail?.tourId || e.detail?.tourId === targetId)) {
+        loadSchedules(targetId);
+      }
+    };
+    window.addEventListener('tour_schedules_updated', handleUpdate);
+    return () => window.removeEventListener('tour_schedules_updated', handleUpdate);
+  }, [tour?.id, id]);
 
-  const selectedSchedule = schedulesWithDynamicSeats.find(s => s.id === selectedScheduleId) || schedulesWithDynamicSeats[0];
+  const selectedSchedule = schedulesWithDynamicSeats.find(s => s.id === selectedScheduleId) || schedulesWithDynamicSeats[0] || {
+    id: 0,
+    startDate: 'Hết đợt khởi hành',
+    endDate: 'N/A',
+    seats: 0,
+    note: 'Đã hết hạn',
+  };
 
   // Read URL query parameter for active tab
   useEffect(() => {
@@ -79,6 +107,66 @@ export const TourDetailPage: React.FC = () => {
   const [newComment, setNewComment] = useState<string>('');
   const [newImageUrl, setNewImageUrl] = useState<string>('');
   const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+
+  // Gallery images list (Deduplicated & Ordered)
+  const galleryImages = React.useMemo(() => {
+    if (!tour) return [];
+    const list: string[] = [];
+    if (tour.gallery && tour.gallery.length > 0) {
+      tour.gallery.forEach((img) => {
+        if (img && !list.includes(img)) list.push(img);
+      });
+    }
+    if (tour.thumbnailUrl && !list.includes(tour.thumbnailUrl)) {
+      list.unshift(tour.thumbnailUrl);
+    }
+    return list.length > 0 ? list : [
+      'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=1200&q=80'
+    ];
+  }, [tour]);
+
+  const openLightbox = (index: number) => {
+    const validIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
+    setActiveImageIndex(validIndex);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+  };
+
+  const nextImage = () => {
+    if (galleryImages.length <= 1) return;
+    setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const prevImage = () => {
+    if (galleryImages.length <= 1) return;
+    setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
+  // Keyboard navigation & body scroll locking for Lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      } else if (e.key === 'ArrowLeft') {
+        prevImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [lightboxOpen, galleryImages.length]);
 
   useEffect(() => {
     fetchTourData();
@@ -148,10 +236,21 @@ export const TourDetailPage: React.FC = () => {
 
   const handleBookNow = () => {
     if (!tour) return;
+    if (selectedSchedule.seats <= 0) {
+      alert('Lịch khởi hành này hiện đã hết chỗ. Vui lòng chọn ngày khởi hành khác!');
+      return;
+    }
+    const totalGuests = adults + children;
+    if (selectedSchedule.seats < totalGuests) {
+      alert(`Lịch khởi hành này chỉ còn ${selectedSchedule.seats} chỗ trống, không đủ cho ${totalGuests} người đặt. Vui lòng chọn lịch khác hoặc giảm số lượng khách!`);
+      return;
+    }
+
     const childP = tour.childPrice || Math.round(tour.price * 0.7);
     navigate('/checkout', {
       state: {
         tourId: tour.id,
+        scheduleId: selectedSchedule.id,
         tourTitle: tour.title,
         tourThumbnailUrl: tour.thumbnailUrl || (tour.gallery && tour.gallery[0]),
         tourCode: tour.tourCode || 'CHAU-DOC-AN-GIANG-1N1D',
@@ -166,6 +265,7 @@ export const TourDetailPage: React.FC = () => {
         departureDate: selectedSchedule.startDate,
         endDate: selectedSchedule.endDate,
         scheduleNote: selectedSchedule.note,
+        availableSeats: selectedSchedule.seats,
       }
     });
   };
@@ -233,7 +333,9 @@ export const TourDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-medium text-slate-500">
           <span className="hover:text-sky-600 cursor-pointer" onClick={() => navigate('/')}>Trang Chủ</span>
           <ChevronRight className="h-3 w-3" />
-          <span className="hover:text-sky-600 cursor-pointer" onClick={() => navigate('/tours')}>Nước Ngoài</span>
+          <span className="hover:text-sky-600 cursor-pointer" onClick={() => navigate(`/tours?type=${tour.category}`)}>
+            {tour.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
+          </span>
           <ChevronRight className="h-3 w-3" />
           <span className="text-slate-900 font-bold line-clamp-1">{tour.title}</span>
         </div>
@@ -241,40 +343,66 @@ export const TourDetailPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
         
-        {/* Top Hero Image Gallery (1 Large + 4 Grid Thumbnails - dynamic per tour) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[380px]">
-          <div className="lg:col-span-2 rounded-2xl overflow-hidden bg-slate-200 h-full relative group">
+        {/* Top Hero Image Gallery (Click to open Lightbox & navigate) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[360px] sm:h-[400px] lg:h-[440px] rounded-2xl overflow-hidden relative z-0">
+          {/* Main Large Image */}
+          <div 
+            onClick={() => openLightbox(0)}
+            className="lg:col-span-2 rounded-2xl overflow-hidden bg-slate-200 h-full relative group cursor-pointer shadow-subtle hover:shadow-card transition"
+          >
             <img 
-              src={tour.gallery?.[0] || tour.thumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=800&q=80'} 
+              src={galleryImages[0]} 
               alt={tour.title} 
-              className="h-full w-full object-cover group-hover:scale-105 transition duration-500" 
+              className="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out" 
             />
+            <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span className="bg-slate-900/85 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg">
+                <Maximize2 className="h-4 w-4 text-accent-400" />
+                <span>Nhấn để xem & chuyển ảnh</span>
+              </span>
+            </div>
             <div className="absolute bottom-4 left-4 bg-slate-900/80 text-white text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-sm">
               Mã tour: {tour.tourCode || 'N/A'}
             </div>
+            <div className="absolute bottom-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg backdrop-blur-sm border border-white/15 flex items-center gap-1.5 transition">
+              <ImageIcon className="h-3.5 w-3.5 text-accent-400" />
+              <span>{galleryImages.length} hình ảnh</span>
+            </div>
           </div>
           
-          <div className="hidden lg:grid grid-cols-2 gap-4 h-full">
-            <div className="rounded-2xl overflow-hidden bg-slate-200">
-              <img src={tour.gallery?.[1] || tour.gallery?.[0] || tour.thumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=400&q=80'} alt="Gallery 1" className="h-full w-full object-cover hover:opacity-90 transition cursor-pointer" />
-            </div>
-            <div className="rounded-2xl overflow-hidden bg-slate-200">
-              <img src={tour.gallery?.[2] || tour.gallery?.[0] || tour.thumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=400&q=80'} alt="Gallery 2" className="h-full w-full object-cover hover:opacity-90 transition cursor-pointer" />
-            </div>
-            <div className="rounded-2xl overflow-hidden bg-slate-200">
-              <img src={tour.gallery?.[3] || tour.gallery?.[0] || tour.thumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=400&q=80'} alt="Gallery 3" className="h-full w-full object-cover hover:opacity-90 transition cursor-pointer" />
-            </div>
-            <div className="rounded-2xl overflow-hidden bg-slate-200 relative cursor-pointer group">
-              <img src={tour.gallery?.[4] || tour.gallery?.[3] || tour.gallery?.[0] || tour.thumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=400&q=80'} alt="Gallery 4" className="h-full w-full object-cover group-hover:scale-105 transition" />
-              <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center text-white font-bold text-sm">
-                + Xem tất cả
-              </div>
-            </div>
+          {/* 4 Small Side Thumbnails */}
+          <div className="hidden lg:grid grid-cols-2 grid-rows-2 gap-4 h-full">
+            {[1, 2, 3, 4].map((idx) => {
+              const imgUrl = galleryImages[idx] || galleryImages[idx % galleryImages.length];
+              const isLast = idx === 4;
+              return (
+                <div 
+                  key={idx}
+                  onClick={() => openLightbox(idx < galleryImages.length ? idx : 0)}
+                  className="rounded-2xl overflow-hidden bg-slate-200 relative cursor-pointer group shadow-subtle hover:shadow-card transition min-h-0 h-full"
+                >
+                  <img 
+                    src={imgUrl} 
+                    alt={`Gallery ${idx}`} 
+                    className="h-full w-full object-cover group-hover:scale-105 transition duration-500" 
+                  />
+                  <div className="absolute inset-0 bg-slate-950/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <Maximize2 className="h-5 w-5 text-white drop-shadow-md" />
+                  </div>
+                  {isLast && (
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold text-xs group-hover:bg-slate-950/70 transition">
+                      <ImageIcon className="h-5 w-5 mb-1 text-accent-400" />
+                      <span>+ Xem tất cả ({galleryImages.length})</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Main Grid: Left Detailed Tabs vs Right Summary Booking Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 pt-2">
           
           {/* Left Column: Details & Tabs */}
           <div className="lg:col-span-2 space-y-8">
@@ -679,7 +807,7 @@ export const TourDetailPage: React.FC = () => {
 
           {/* Right Column: Summary Card (Matching Screenshot 2) */}
           <aside className="lg:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg space-y-6 sticky top-24">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg space-y-6 lg:sticky lg:top-28 z-10">
               
               <div className="space-y-2 border-b border-slate-100 pb-4">
                 <h2 className="text-base font-extrabold text-slate-900 leading-snug uppercase">
@@ -701,17 +829,23 @@ export const TourDetailPage: React.FC = () => {
                   <label className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
                     <Calendar className="h-4 w-4 text-sky-600" /> Chọn Lịch Khởi Hành:
                   </label>
-                  <select
-                    value={selectedScheduleId}
-                    onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
-                    className="w-full rounded-xl border border-sky-300 bg-sky-50/70 p-2.5 text-xs font-bold text-sky-950 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer"
-                  >
-                    {schedulesWithDynamicSeats.map((sch) => (
-                      <option key={sch.id} value={sch.id}>
-                        📅 {sch.startDate} - {sch.endDate} ({sch.seats} chỗ) - {sch.note}
-                      </option>
-                    ))}
-                  </select>
+                  {schedulesWithDynamicSeats.length === 0 ? (
+                    <div className="rounded-xl bg-amber-50 p-3 border border-amber-200 text-xs font-semibold text-amber-800">
+                      ⚠️ Các đợt khởi hành của tour này đã kết thúc hoặc quá hạn.
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedScheduleId}
+                      onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
+                      className="w-full rounded-xl border border-sky-300 bg-sky-50/70 p-2.5 text-xs font-bold text-sky-950 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm cursor-pointer"
+                    >
+                      {schedulesWithDynamicSeats.map((sch) => (
+                        <option key={sch.id} value={sch.id} disabled={sch.seats <= 0}>
+                          📅 {sch.startDate} - {sch.endDate} ({sch.seats > 0 ? `${sch.seats} chỗ` : 'HẾT CHỖ'}) - {sch.note}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -724,7 +858,11 @@ export const TourDetailPage: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-1.5"><Tag className="h-4 w-4 text-sky-600" /> Số chỗ còn nhận:</span>
-                  <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">{selectedSchedule.seats} chỗ</span>
+                  <span className={`font-bold px-2 py-0.5 rounded ${
+                    selectedSchedule.seats > 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
+                  }`}>
+                    {selectedSchedule.seats > 0 ? `${selectedSchedule.seats} chỗ` : 'Hết chỗ (0 chỗ)'}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-sky-600" /> Mã tour:</span>
@@ -818,9 +956,14 @@ export const TourDetailPage: React.FC = () => {
               <div className="space-y-3 pt-2">
                 <button
                   onClick={handleBookNow}
-                  className="w-full rounded-xl bg-sky-900 hover:bg-sky-950 text-white py-3.5 text-sm font-extrabold transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  disabled={selectedSchedule.seats <= 0}
+                  className={`w-full rounded-xl py-3.5 text-sm font-extrabold transition shadow-md flex items-center justify-center gap-2 ${
+                    selectedSchedule.seats <= 0 
+                      ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                      : 'bg-sky-900 hover:bg-sky-950 text-white hover:shadow-lg'
+                  }`}
                 >
-                  Đặt ngay
+                  {selectedSchedule.seats <= 0 ? 'Lịch Này Đã Hết Chỗ' : 'Đặt ngay'}
                 </button>
                 
                 <button
@@ -940,6 +1083,106 @@ export const TourDetailPage: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Lightbox / Fullscreen Image Viewer Modal */}
+      {lightboxOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 select-none animate-fade-in"
+          onClick={closeLightbox}
+        >
+          {/* Top Header Bar */}
+          <div 
+            className="flex items-center justify-between z-10 w-full max-w-7xl mx-auto pb-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 text-white">
+              <span className="text-xs font-bold px-3 py-1 bg-white/10 rounded-full border border-white/20 text-accent-300">
+                Thư viện ảnh ({galleryImages.length} ảnh)
+              </span>
+              <span className="hidden sm:inline text-xs text-slate-300 font-medium truncate max-w-md">
+                {tour.title}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-200 bg-slate-900/80 px-3 py-1 rounded-full border border-white/15">
+                {activeImageIndex + 1} / {galleryImages.length}
+              </span>
+              <button
+                onClick={closeLightbox}
+                className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition border border-white/15"
+                title="Đóng (Esc)"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Main Large Image & Navigation Buttons */}
+          <div 
+            className="relative flex-1 flex items-center justify-center max-w-7xl mx-auto w-full my-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Prev Button */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={prevImage}
+                className="absolute left-1 sm:left-4 z-20 h-12 w-12 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center transition hover:scale-110 shadow-float border border-white/20 active:scale-95"
+                title="Ảnh trước (Mũi tên trái)"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+            )}
+
+            {/* Current Active Image with Smooth Zoom */}
+            <div className="h-full max-h-[66vh] sm:max-h-[72vh] flex items-center justify-center relative">
+              <img
+                key={activeImageIndex}
+                src={galleryImages[activeImageIndex]}
+                alt={`${tour.title} - Ảnh ${activeImageIndex + 1}`}
+                className="max-h-[66vh] sm:max-h-[72vh] max-w-[92vw] sm:max-w-[82vw] object-contain rounded-2xl shadow-2xl transition duration-300 select-none"
+              />
+            </div>
+
+            {/* Next Button */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={nextImage}
+                className="absolute right-1 sm:right-4 z-20 h-12 w-12 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center transition hover:scale-110 shadow-float border border-white/20 active:scale-95"
+                title="Ảnh tiếp theo (Mũi tên phải)"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Thumbnail Carousel Strip */}
+          {galleryImages.length > 1 && (
+            <div 
+              className="z-10 max-w-5xl mx-auto w-full overflow-x-auto pb-2 pt-1 flex items-center justify-center gap-2.5 px-4 scrollbar-thin"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`h-14 w-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                    activeImageIndex === idx
+                      ? 'border-accent-400 scale-105 shadow-md shadow-accent-400/30 opacity-100'
+                      : 'border-transparent opacity-50 hover:opacity-85 hover:scale-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

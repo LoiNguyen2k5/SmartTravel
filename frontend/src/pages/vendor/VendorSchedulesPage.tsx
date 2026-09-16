@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarDays, Plus, Users, Trash2, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { CalendarDays, Plus, Users, Trash2 } from 'lucide-react';
 import { tourService } from '../../services/tourService';
+import { tourScheduleService, isUpcomingSchedule, TourScheduleItem } from '../../services/tourScheduleService';
 import { Tour } from '../../types/tour';
-
-interface TourScheduleItem {
-  id: number;
-  startDate: string;
-  endDate: string;
-  maxParticipants: number;
-  bookedCount: number;
-  seasonalPriceMultiplier?: number;
-  note?: string;
-}
 
 export const VendorSchedulesPage: React.FC = () => {
   const [tours, setTours] = useState<Tour[]>([]);
@@ -27,11 +18,14 @@ export const VendorSchedulesPage: React.FC = () => {
 
   useEffect(() => {
     fetchTours();
+    const handleTourUpdate = () => fetchTours();
+    window.addEventListener('custom_tours_updated', handleTourUpdate);
+    return () => window.removeEventListener('custom_tours_updated', handleTourUpdate);
   }, []);
 
   useEffect(() => {
     if (selectedTourId) {
-      loadMockSchedulesForTour(selectedTourId);
+      loadSchedulesForTour(selectedTourId);
     }
   }, [selectedTourId]);
 
@@ -39,7 +33,7 @@ export const VendorSchedulesPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await tourService.getMyTours();
-      if (res.success && res.data && res.data.length > 0) {
+      if (res.data && res.data.length > 0) {
         setTours(res.data);
         setSelectedTourId(res.data[0].id);
       }
@@ -50,36 +44,32 @@ export const VendorSchedulesPage: React.FC = () => {
     }
   };
 
-  const loadMockSchedulesForTour = (tourId: number) => {
-    // Generate default/sample schedule slots
-    setSchedules([
-      { id: 1, startDate: '2026-08-30', endDate: '2026-09-02', maxParticipants: 40, bookedCount: 12, note: 'Lễ Quốc Khánh 2/9 (+15% giá)' },
-      { id: 2, startDate: '2026-09-15', endDate: '2026-09-18', maxParticipants: 35, bookedCount: 8, note: 'Khởi hành giữa tháng' },
-      { id: 3, startDate: '2026-10-01', endDate: '2026-10-04', maxParticipants: 40, bookedCount: 0, note: 'Mùa thu vàng' },
-    ]);
+  const loadSchedulesForTour = (tourId: number) => {
+    const items = tourScheduleService.getSchedulesForTour(tourId);
+    setSchedules(items);
   };
 
   const handleAddSchedule = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startDate || !endDate) return;
+    if (!startDate || !endDate || !selectedTourId) return;
 
-    const newSchedule: TourScheduleItem = {
-      id: Date.now(),
+    tourScheduleService.addSchedule(selectedTourId, {
       startDate,
       endDate,
       maxParticipants: maxSeats,
-      bookedCount: 0,
       note: seasonalNote,
-    };
+    });
 
-    setSchedules([newSchedule, ...schedules]);
+    loadSchedulesForTour(selectedTourId);
     setStartDate('');
     setEndDate('');
     setSeasonalNote('Khởi hành định kỳ');
   };
 
   const handleDeleteSchedule = (id: number) => {
-    setSchedules(schedules.filter((s) => s.id !== id));
+    if (!selectedTourId) return;
+    tourScheduleService.deleteSchedule(selectedTourId, id);
+    loadSchedulesForTour(selectedTourId);
   };
 
   const selectedTour = tours.find((t) => t.id === selectedTourId);
@@ -225,6 +215,15 @@ export const VendorSchedulesPage: React.FC = () => {
                             <span className="text-xs font-extrabold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">
                               📅 {s.startDate} ➔ {s.endDate}
                             </span>
+                            {isUpcomingSchedule(s.startDate) ? (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                Đang mở bán trên Web
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+                                Đã qua ngày (Tự ẩn bên khách)
+                              </span>
+                            )}
                             {s.note && (
                               <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                                 {s.note}

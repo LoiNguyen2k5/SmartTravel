@@ -16,6 +16,7 @@ export interface User {
   phone?: string;
   avatarUrl?: string;
   enabled: boolean;
+  createdAt?: string;
   roles: string[];
 }
 

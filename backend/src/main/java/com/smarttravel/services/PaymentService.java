@@ -8,4 +8,7 @@ import java.util.Map;
 public interface PaymentService {
     PaymentResponse createVNPayPayment(PaymentRequest request, String userEmail);
     PaymentResponse processVNPayCallback(Map<String, String> queryParams);
+    boolean processSepayWebhook(Map<String, Object> webhookData);
+    Map<String, Object> checkPaymentStatus(String bookingCode);
+    boolean markBookingAsPaid(String bookingCode);
 }

@@ -24,4 +24,12 @@ export const destinationService = {
   createDestination: async (data: Partial<Destination>): Promise<ApiResponse<Destination>> => {
     return await axiosClient.post('/destinations', data);
   },
+
+  updateDestination: async (id: number, data: Partial<Destination>): Promise<ApiResponse<Destination>> => {
+    return await axiosClient.put(`/destinations/${id}`, data);
+  },
+
+  deleteDestination: async (id: number): Promise<ApiResponse<void>> => {
+    return await axiosClient.delete(`/destinations/${id}`);
+  },
 };

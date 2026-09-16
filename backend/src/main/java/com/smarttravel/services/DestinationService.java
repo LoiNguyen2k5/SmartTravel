@@ -8,4 +8,6 @@ public interface DestinationService {
     List<Destination> getAllDestinations();
     Destination getDestinationById(Long id);
     Destination createDestination(Destination destination);
+    Destination updateDestination(Long id, Destination destination);
+    void deleteDestination(Long id);
 }

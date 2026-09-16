@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Compass, Save, ArrowLeft, Image, DollarSign, Calendar, Plus, Trash2 } from 'lucide-react';
+import { Compass, Save, ArrowLeft, Image, Plus, Trash2 } from 'lucide-react';
 import { tourService } from '../../services/tourService';
-import { Tour } from '../../types/tour';
 
 export const EditTourPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -38,20 +36,19 @@ export const EditTourPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await tourService.getTourById(tourId);
-      if (res.success && res.data) {
+      if (res.data) {
         const t = res.data;
-        setTour(t);
-        setTitle(t.title);
-        setTourCode(t.tourCode);
-        setPrice(t.price);
-        setChildPrice(t.childPrice || Math.round(t.price * 0.7));
-        setDurationDays(t.durationDays);
-        setDurationNights(t.durationNights);
-        setDepartureLocation(t.departureLocation);
-        setThumbnailUrl(t.thumbnailUrl);
-        setCategory(t.category as any || 'DOMESTIC');
+        setTitle(t.title || '');
+        setTourCode(t.tourCode || '');
+        setPrice(t.price || 0);
+        setChildPrice(t.childPrice || Math.round((t.price || 0) * 0.7));
+        setDurationDays(t.durationDays || 1);
+        setDurationNights(t.durationNights || 0);
+        setDepartureLocation(t.departureLocation || '');
+        setThumbnailUrl(t.thumbnailUrl || '');
+        setCategory((t.category as any) || 'DOMESTIC');
         setDescription(t.description || '');
-        setGalleryImages(t.gallery || [t.thumbnailUrl]);
+        setGalleryImages(t.gallery || (t.thumbnailUrl ? [t.thumbnailUrl] : []));
       }
     } catch (err) {
       console.error('Lỗi tải tour:', err);
@@ -85,19 +82,18 @@ export const EditTourPage: React.FC = () => {
     try {
       await tourService.updateTour(Number(id), {
         title: title.trim(),
-        tourCode: tourCode.trim(),
         price,
         childPrice,
         durationDays,
         durationNights,
         departureLocation: departureLocation.trim(),
         thumbnailUrl: thumbnailUrl.trim(),
-        category,
+        category: category as any,
         description: description.trim(),
       });
 
       setSuccessMsg('Đã cập nhật thông tin tour thành công!');
-      setTimeout(() => navigate('/vendor'), 1500);
+      setTimeout(() => navigate('/vendor/tours'), 1500);
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Không thể lưu thay đổi.');
     } finally {
@@ -127,10 +123,10 @@ export const EditTourPage: React.FC = () => {
         </div>
 
         <button
-          onClick={() => navigate('/vendor')}
+          onClick={() => navigate('/vendor/tours')}
           className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white px-4 py-2 rounded-xl border border-slate-200"
         >
-          <ArrowLeft className="h-4 w-4" /> Quay lại Dashboard
+          <ArrowLeft className="h-4 w-4" /> Quay lại Danh sách Tour
         </button>
       </div>
 
@@ -167,10 +163,9 @@ export const EditTourPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Mã Tour (Code) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Mã Tour (Code)</label>
                 <input
                   type="text"
-                  required
                   value={tourCode}
                   onChange={(e) => setTourCode(e.target.value.toUpperCase())}
                   className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-mono uppercase font-bold focus:border-emerald-500 focus:outline-none"
@@ -251,7 +246,7 @@ export const EditTourPage: React.FC = () => {
           </div>
         </div>
 
-        {/* THƯ VIỆN ẢNH QUALITY HIGH */}
+        {/* THƯ VIỆN ẢNH */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-6">
           <h3 className="font-extrabold text-slate-900 text-base border-b border-slate-100 pb-3 flex items-center gap-2">
             <Image className="h-5 w-5 text-emerald-600" /> 2. Ảnh Đại Diện & Thư Viện Ảnh Chất Lượng Cao

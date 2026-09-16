@@ -151,6 +151,30 @@ INSERT INTO tours (
   '• Tiền Tip và dịch vụ môtô nước cá nhân',
   '• Hủy trước 7 ngày hoàn tiền',
   '[{"day":1,"title":"ĐÊM 1: TP.HCM - PHÚ YÊN","content":"Khởi hành đi Phú Yên trên chuyến xe đêm sang trọng."},{"day":2,"title":"NGÀY 1: GÀNH ĐÁ ĐĨA - THÁP NGHINH PHONG","content":"Check-in Gành Đá Đĩa kỳ thú và tháp Nghinh Phong biểu tượng mới của Tuy Hòa."}]'
+),
+(
+  10, NOW(), NOW(), 'TL-BKK-PAT-5N4D',
+  'TOUR THÁI LAN 5N4Đ: BANGKOK - PATTAYA | THIÊN ĐƯỜNG XỨ SỞ CHÙA VÀNG',
+  'Khám phá Chùa Phật Vàng Wat Traimit, dạo thuyền sông Chaophraya, vui chơi Đảo San Hô Coral Pattaya và thưởng thức đại tiệc buffet Baiyoke Sky 86 tầng.',
+  6990000.00, 5590000.00, 5, 4, 'TP.Hồ Chí Minh',
+  'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=800&q=80',
+  'NUOC_NGOAI', 35, 460, 'ACTIVE', 2, 2,
+  '• Vé máy bay khứ hồi SGN - BKK - SGN (hành lý 20kg ký gửi + 7kg xách tay)\n• Khách sạn 4 sao tiêu chuẩn Thái Lan\n• Bữa ăn theo chương trình gồm Buffet 86 tầng Baiyoke Sky\n• Xe máy lạnh đưa đón tham quan suốt tuyến\n• Hướng dẫn viên Việt Nam và Thái Lan nhiệt tình\n• Bảo hiểm du lịch quốc tế',
+  '• Tiền Tip cho HDV và tài xế (5 USD/khách/ngày)\n• Chi phí cá nhân: giặt ủi, điện thoại, thức uống ngoài chương trình',
+  '• Hủy trước 20 ngày miễn phí\n• Hủy từ 10-19 ngày tính 50%\n• Hủy trong vòng 10 ngày tính 100%',
+  '[{"day":1,"title":"NGÀY 1: TP.HCM - BANGKOK - PATTAYA","content":"Đáp chuyến bay đi Bangkok, di chuyển về Pattaya, tham quan Chợ nổi 4 miền."},{"day":2,"title":"NGÀY 2: ĐẢO CORAL PATTAYA - TRÂN BẢO PHẬT SƠN","content":"Tắm biển Đảo San Hô Coral, chiêm bái tượng Phật dát vàng trên vách núi."}]'
+),
+(
+  11, NOW(), NOW(), 'DEMO-VIETQR-5K',
+  '[DEMO TEST] TOUR TRẢI NGHIỆM THỬ NGHIỆM THANH TOÁN VIETQR THỰC TẾ (5.000Đ)',
+  'Tour thử nghiệm quét mã VietQR chuyển khoản tiền thật (5.000đ) trực tiếp về tài khoản Agribank / MoMo. Phục vụ kiểm thử quy trình thanh toán trực tuyến và nhận vé điện tử E-Ticket QR Code ngay lập tức.',
+  5000.00, 5000.00, 1, 0, 'TP.Hồ Chí Minh',
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+  'DOMESTIC', 100, 999, 'ACTIVE', 2, 4,
+  '• Trải nghiệm thanh toán quét mã VietQR tự động\n• Nhận vé điện tử E-Ticket QR Code tức thì\n• Thử nghiệm quy trình check-in vé',
+  '• Không áp dụng cho chuyến đi thực tế (Chỉ dành cho thử nghiệm thanh toán)',
+  '• Hỗ trợ hoàn tiền test trực tiếp',
+  '[{"day":1,"title":"HÀNH TRÌNH TEST: QUÉT MÃ VIETQR VÀ NHẬN VÉ ĐIỆN TỬ","content":"Chọn tour test 5.000đ, quét mã QR Agribank/MoMo và trải nghiệm quy trình xác nhận tự động."}]'
 )
 ON DUPLICATE KEY UPDATE 
   title = VALUES(title),
@@ -169,7 +193,8 @@ INSERT IGNORE INTO tour_schedules (id, created_at, updated_at, tour_id, start_da
 (6, NOW(), NOW(), 6, '2026-08-20', '2026-08-23', 40, 0),
 (7, NOW(), NOW(), 7, '2026-08-20', '2026-08-23', 40, 0),
 (8, NOW(), NOW(), 8, '2026-08-22', '2026-08-22', 40, 0),
-(9, NOW(), NOW(), 9, '2026-09-01', '2026-09-04', 40, 0);
+(9, NOW(), NOW(), 9, '2026-09-01', '2026-09-04', 40, 0),
+(10, NOW(), NOW(), 10, '2026-09-05', '2026-09-09', 35, 0);
 
 -- 7. Insert Vouchers
 INSERT IGNORE INTO vouchers (id, created_at, updated_at, code, title, discount_percent, discount_amount, min_order_value, expiry_date, active) VALUES 

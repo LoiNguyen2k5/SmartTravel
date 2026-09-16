@@ -4,6 +4,7 @@ import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
+import { tourScheduleService } from '../../services/tourScheduleService';
 
 export const TourListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +21,19 @@ export const TourListPage: React.FC = () => {
   useEffect(() => {
     fetchTours();
   }, [departure, destination, durationFilter, categoryFilter, budgetFilter]);
+
+  // Listen to schedule and custom tour changes
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchTours();
+    };
+    window.addEventListener('tour_schedules_updated', handleUpdate);
+    window.addEventListener('custom_tours_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('tour_schedules_updated', handleUpdate);
+      window.removeEventListener('custom_tours_updated', handleUpdate);
+    };
+  }, []);
 
   const fetchTours = async () => {
     setLoading(true);
@@ -39,6 +53,9 @@ export const TourListPage: React.FC = () => {
         }
         return t;
       });
+
+      // Tự động loại bỏ các tour có tất cả ngày khởi hành đã qua theo thời gian thực
+      liveTours = liveTours.filter(t => tourScheduleService.hasUpcomingSchedule(t.id));
 
       // Apply client-side filter combinations
       if (departure !== 'Tất cả') {
@@ -307,7 +324,7 @@ export const TourListPage: React.FC = () => {
                         <div className="space-y-1.5 text-xs text-slate-600 pt-1">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5 text-sky-600 flex-shrink-0" />
-                            <span>Khởi hành: <strong className="text-slate-800">30-08-2026</strong></span>
+                            <span>Khởi hành: <strong className="text-slate-800">{tourScheduleService.getTourDepartureDateDisplay(tour.id)}</strong></span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5 text-sky-600 flex-shrink-0" />
@@ -326,9 +343,16 @@ export const TourListPage: React.FC = () => {
                             </span>
                             <span className="text-[10px] text-slate-400"> / Khách</span>
                           </div>
-                          <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                            Còn {tour.id === 6 ? 28 : (tour.remainingSeats ?? 40)} chỗ
-                          </span>
+                          {(() => {
+                            const avail = tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats ?? 40);
+                            return (
+                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                                avail > 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
+                              }`}>
+                                {avail > 0 ? `Còn ${avail} chỗ` : 'Hết chỗ'}
+                              </span>
+                            );
+                          })()}
                         </div>
 
                         <button 

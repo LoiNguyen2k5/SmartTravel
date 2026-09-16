@@ -38,4 +38,19 @@ public class DestinationController {
     public ResponseEntity<ApiResponse<Destination>> createDestination(@RequestBody Destination destination) {
         return ResponseEntity.status(201).body(ApiResponse.created("Tạo điểm đến thành công", destinationService.createDestination(destination)));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Cập nhật điểm đến du lịch (Admin)")
+    public ResponseEntity<ApiResponse<Destination>> updateDestination(@PathVariable Long id, @RequestBody Destination destination) {
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật điểm đến thành công", destinationService.updateDestination(id, destination)));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Xóa điểm đến du lịch (Admin)")
+    public ResponseEntity<ApiResponse<Void>> deleteDestination(@PathVariable Long id) {
+        destinationService.deleteDestination(id);
+        return ResponseEntity.ok(ApiResponse.success("Xóa điểm đến thành công", null));
+    }
 }

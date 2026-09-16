@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, CreditCard, ShieldCheck, Save, CheckCircle, Mail, Phone, MapPin } from 'lucide-react';
+import { Building2, CreditCard, ShieldCheck, Save, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const VendorProfilePage: React.FC = () => {

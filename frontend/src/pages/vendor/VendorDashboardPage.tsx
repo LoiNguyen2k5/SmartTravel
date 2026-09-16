@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Compass, 
   ShoppingBag, 
   Plus, 
   User, 
   Phone, 
-  Mail, 
   TrendingUp, 
   Users, 
   Award, 

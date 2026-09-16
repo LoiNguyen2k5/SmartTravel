@@ -46,6 +46,16 @@ public class BookingServiceImpl implements BookingService {
 
         int numAdults = request.getNumberOfAdults() != null ? request.getNumberOfAdults() : 1;
         int numChildren = request.getNumberOfChildren() != null ? request.getNumberOfChildren() : 0;
+        int totalGuests = numAdults + numChildren;
+
+        // Verify and deduct available slots/seats for the tour
+        if (tour.getRemainingSeats() != null) {
+            if (tour.getRemainingSeats() < totalGuests) {
+                throw new BadRequestException("Số chỗ còn lại của tour không đủ cho " + totalGuests + " khách (chỉ còn " + tour.getRemainingSeats() + " chỗ).");
+            }
+            tour.setRemainingSeats(tour.getRemainingSeats() - totalGuests);
+            tourRepository.save(tour);
+        }
 
         BigDecimal subtotal = adultPrice.multiply(BigDecimal.valueOf(numAdults))
                 .add(childPrice.multiply(BigDecimal.valueOf(numChildren)));
@@ -123,6 +133,15 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(BookingStatus.CANCELLED);
         Booking updated = bookingRepository.save(booking);
+
+        // Restore remaining seats when booking is cancelled
+        if (booking.getTour() != null && booking.getTour().getRemainingSeats() != null) {
+            int guests = booking.getNumberOfAdults() + (booking.getNumberOfChildren() != null ? booking.getNumberOfChildren() : 0);
+            Tour tour = booking.getTour();
+            tour.setRemainingSeats(tour.getRemainingSeats() + guests);
+            tourRepository.save(tour);
+        }
+
         return mapToResponse(updated);
     }
 

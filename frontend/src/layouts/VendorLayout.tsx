@@ -4,12 +4,10 @@ import {
   LayoutDashboard, 
   Compass, 
   CalendarDays, 
-  ShoppingBag, 
   Building2, 
   LogOut, 
   Globe, 
-  QrCode,
-  TrendingUp
+  QrCode
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 

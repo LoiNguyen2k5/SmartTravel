@@ -15,6 +15,7 @@ import java.util.List;
 public interface TourRepository extends JpaRepository<Tour, Long> {
     List<Tour> findByStatus(TourStatus status);
     List<Tour> findByVendorId(Long vendorId);
+    long countByStatus(TourStatus status);
 
     @Query("SELECT t FROM Tour t WHERE t.status = 'ACTIVE' " +
            "AND (:departure IS NULL OR LOWER(t.departureLocation) LIKE LOWER(CONCAT('%', :departure, '%'))) " +

@@ -23,7 +23,6 @@ export const AuthLayout: React.FC = () => {
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
             <Link to="/" className="hover:text-sky-600 transition">Trang chủ</Link>
             <Link to="/tours" className="hover:text-sky-600 transition">Tour du lịch</Link>
-            <Link to="/planner" className="hover:text-sky-600 transition">Lập kế hoạch</Link>
           </nav>
 
           {/* Action Buttons */}

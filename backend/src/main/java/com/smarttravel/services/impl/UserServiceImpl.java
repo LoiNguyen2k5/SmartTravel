@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +23,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
+        Set<String> roleNames = user.getRoles() != null
+                ? user.getRoles().stream().map(r -> r.getName().name()).collect(Collectors.toSet())
+                : Set.of();
+
         return UserResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
@@ -29,20 +34,30 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .avatarUrl(user.getAvatarUrl())
                 .enabled(user.getEnabled())
+                .createdAt(user.getCreatedAt())
+                .roles(roleNames)
                 .build();
     }
 
     @Override
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(u -> UserResponse.builder()
-                        .id(u.getId())
-                        .fullName(u.getFullName())
-                        .email(u.getEmail())
-                        .phone(u.getPhone())
-                        .avatarUrl(u.getAvatarUrl())
-                        .enabled(u.getEnabled())
-                        .build())
+                .map(u -> {
+                    Set<String> roleNames = u.getRoles() != null
+                            ? u.getRoles().stream().map(r -> r.getName().name()).collect(Collectors.toSet())
+                            : Set.of();
+
+                    return UserResponse.builder()
+                            .id(u.getId())
+                            .fullName(u.getFullName())
+                            .email(u.getEmail())
+                            .phone(u.getPhone())
+                            .avatarUrl(u.getAvatarUrl())
+                            .enabled(u.getEnabled())
+                            .createdAt(u.getCreatedAt())
+                            .roles(roleNames)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 }

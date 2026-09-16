@@ -30,4 +30,23 @@ public class DestinationServiceImpl implements DestinationService {
     public Destination createDestination(Destination destination) {
         return destinationRepository.save(destination);
     }
+
+    @Override
+    public Destination updateDestination(Long id, Destination updated) {
+        Destination destination = getDestinationById(id);
+        destination.setName(updated.getName());
+        destination.setDescription(updated.getDescription());
+        destination.setCity(updated.getCity());
+        destination.setCountry(updated.getCountry());
+        destination.setImageUrl(updated.getImageUrl());
+        destination.setLatitude(updated.getLatitude());
+        destination.setLongitude(updated.getLongitude());
+        return destinationRepository.save(destination);
+    }
+
+    @Override
+    public void deleteDestination(Long id) {
+        Destination destination = getDestinationById(id);
+        destinationRepository.delete(destination);
+    }
 }

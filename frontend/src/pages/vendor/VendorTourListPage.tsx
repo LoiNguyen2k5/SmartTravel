@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, Plus, Search, Edit, Eye, CalendarDays, Trash2, Filter } from 'lucide-react';
+import { Compass, Plus, Search, Edit, CalendarDays, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
@@ -19,7 +19,7 @@ export const VendorTourListPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await tourService.getMyTours();
-      if (res.success && res.data) {
+      if (res.data) {
         setTours(res.data);
       }
     } catch (err) {
@@ -42,12 +42,12 @@ export const VendorTourListPage: React.FC = () => {
   };
 
   const filteredTours = tours.filter((t) => {
-    const matchesCat = categoryFilter === 'ALL' || t.category === categoryFilter;
+    const matchesCat = categoryFilter === 'ALL' || (t.category as any) === categoryFilter;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       !q ||
       t.title.toLowerCase().includes(q) ||
-      t.tourCode.toLowerCase().includes(q) ||
+      (t.tourCode && t.tourCode.toLowerCase().includes(q)) ||
       (t.departureLocation && t.departureLocation.toLowerCase().includes(q));
 
     return matchesCat && matchesSearch;
@@ -137,7 +137,7 @@ export const VendorTourListPage: React.FC = () => {
                       {t.tourCode}
                     </span>
                     <span className="absolute top-3 right-3 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                      {t.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
+                      {(t.category as any) === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
                     </span>
                   </div>
 

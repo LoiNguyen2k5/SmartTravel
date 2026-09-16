@@ -1,42 +1,78 @@
-/* Import Google Fonts & Leaflet CSS (Must be at top) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base */
+/* Base layer & Quality Floor */
 @layer base {
   * {
     box-sizing: border-box;
   }
 
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
-  }
-
-  body {
-    @apply bg-white text-slate-900;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
   }
 
+  body {
+    background-color: #FAF9F6;
+    color: #0F172A;
+  }
+
+  /* Themed text selection */
+  ::selection {
+    background-color: rgba(3, 105, 161, 0.2);
+    color: #082f49;
+  }
+
+  /* Refined, modern custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-slate-100;
+    background: #F4F2EC;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    background: #CBD5E1;
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    background: #94A3B8;
+  }
+
+  /* Sharp, accessible keyboard focus rings */
+  :focus-visible {
+    outline: 2px solid #0284c7;
+    outline-offset: 2px;
+  }
+}
+
+/* Glassmorphism & Surface Utilities */
+@layer utilities {
+  .glass-surface {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-dark {
+    background: rgba(8, 47, 73, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 

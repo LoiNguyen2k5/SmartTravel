@@ -11,7 +11,6 @@ import { RoleBasedRoute } from './RoleBasedRoute';
 import { HomePage } from '../pages/client/HomePage';
 import { TourListPage } from '../pages/client/TourListPage';
 import { TourDetailPage } from '../pages/client/TourDetailPage';
-import { ItineraryPlannerPage } from '../pages/client/ItineraryPlannerPage';
 import { CheckoutPage } from '../pages/client/CheckoutPage';
 import { PaymentResultPage } from '../pages/client/PaymentResultPage';
 import { BookingHistoryPage } from '../pages/client/BookingHistoryPage';
@@ -30,6 +29,7 @@ import { TourManagementPage } from '../pages/admin/TourManagementPage';
 import { BookingManagementPage } from '../pages/admin/BookingManagementPage';
 import { DestinationManagementPage } from '../pages/admin/DestinationManagementPage';
 import { UserManagementPage } from '../pages/admin/UserManagementPage';
+import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
 
 // Vendor Pages
 import { VendorDashboardPage } from '../pages/vendor/VendorDashboardPage';
@@ -41,10 +41,12 @@ import { CreateTourPage } from '../pages/vendor/CreateTourPage';
 import { EditTourPage } from '../pages/vendor/EditTourPage';
 
 import { AboutPage } from '../pages/client/AboutPage';
+import { ScrollToTop } from '../components/common/ScrollToTop';
 
 export const AppRoutes: React.FC = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* === AUTH ROUTES (AuthLayout - centered form) === */}
         <Route element={<AuthLayout />}>
@@ -65,9 +67,8 @@ export const AppRoutes: React.FC = () => {
 
           {/* Protected: User phải đăng nhập */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/planner" element={<ItineraryPlannerPage />} />
-            <Route path="/itinerary" element={<ItineraryPlannerPage />} />
-            <Route path="/itinerary/share/:token" element={<ItineraryPlannerPage />} />
+            <Route path="/planner" element={<Navigate to="/tours" replace />} />
+            <Route path="/itinerary" element={<Navigate to="/tours" replace />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/my-bookings" element={<BookingHistoryPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
@@ -81,6 +82,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin/tours" element={<TourManagementPage />} />
             <Route path="/admin/bookings" element={<BookingManagementPage />} />
             <Route path="/admin/destinations" element={<DestinationManagementPage />} />
+            <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
           </Route>
         </Route>

@@ -39,4 +39,29 @@ public class PaymentController {
         PaymentResponse response = paymentService.processVNPayCallback(queryParams);
         return ResponseEntity.ok(ApiResponse.success("Xử lý thanh toán thành công", response));
     }
+
+    @PostMapping(value = {"/sepay-webhook", "/webhook"})
+    @Operation(summary = "Webhook tiếp nhận thông báo biến động số dư chuyển khoản thực tế (SePay / VietQR)")
+    public ResponseEntity<Map<String, Object>> sepayWebhook(@RequestBody Map<String, Object> webhookData) {
+        boolean processed = paymentService.processSepayWebhook(webhookData);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", processed);
+        response.put("message", processed ? "Xử lý giao dịch thành công" : "Không tìm thấy mã đơn hàng hợp lệ");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/check-status/{bookingCode}")
+    @Operation(summary = "Kiểm tra trạng thái thanh toán theo mã đơn hàng (phục vụ Polling tự động)")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> checkStatus(@PathVariable String bookingCode) {
+        Map<String, Object> status = paymentService.checkPaymentStatus(bookingCode);
+        return ResponseEntity.ok(ApiResponse.success(status));
+    }
+
+    @PostMapping("/mark-paid/{bookingCode}")
+    @Operation(summary = "Xác nhận đơn hàng đã thanh toán thành công (Test / Fallback)")
+    public ResponseEntity<ApiResponse<Boolean>> markPaid(@PathVariable String bookingCode) {
+        boolean ok = paymentService.markBookingAsPaid(bookingCode);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật thành công", ok));
+    }
 }
+
