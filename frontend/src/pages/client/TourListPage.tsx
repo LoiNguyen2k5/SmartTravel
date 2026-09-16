@@ -17,10 +17,11 @@ export const TourListPage: React.FC = () => {
   const [durationFilter, setDurationFilter] = useState<string>('ALL');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [budgetFilter, setBudgetFilter] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<string>('FEATURED');
 
   useEffect(() => {
     fetchTours();
-  }, [departure, destination, durationFilter, categoryFilter, budgetFilter]);
+  }, [departure, destination, durationFilter, categoryFilter, budgetFilter, sortBy]);
 
   // Listen to schedule and custom tour changes
   useEffect(() => {
@@ -82,6 +83,15 @@ export const TourListPage: React.FC = () => {
         liveTours = liveTours.filter(t => t.price >= 5000000 && t.price <= 10000000);
       } else if (budgetFilter === 'OVER_10M') {
         liveTours = liveTours.filter(t => t.price > 10000000);
+      }
+
+      // Xử lý sắp xếp
+      if (sortBy === 'PRICE_ASC') {
+        liveTours.sort((a, b) => a.price - b.price);
+      } else if (sortBy === 'PRICE_DESC') {
+        liveTours.sort((a, b) => b.price - a.price);
+      } else if (sortBy === 'VIEWS') {
+        liveTours.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
       }
 
       setTours(liveTours);
@@ -250,15 +260,19 @@ export const TourListPage: React.FC = () => {
           <main className="lg:col-span-3 space-y-6">
             <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
               <span className="text-sm font-semibold text-slate-600">
-                Showing <span className="font-bold text-slate-900">1–10</span> of 137 results
+                Hiển thị <span className="font-bold text-slate-900">{tours.length > 0 ? `1–${tours.length}` : 0}</span> trên tổng số <span className="font-bold text-slate-900">{tours.length}</span> tour
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-slate-500">Sắp xếp:</span>
-                <select className="text-xs font-semibold text-slate-800 border-none bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none">
-                  <option>Nổi bật nhất</option>
-                  <option>Giá tăng dần</option>
-                  <option>Giá giảm dần</option>
-                  <option>Lượt xem nhiều nhất</option>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="text-xs font-semibold text-slate-800 border-none bg-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
+                >
+                  <option value="FEATURED">Nổi bật nhất</option>
+                  <option value="PRICE_ASC">Giá tăng dần</option>
+                  <option value="PRICE_DESC">Giá giảm dần</option>
+                  <option value="VIEWS">Lượt xem nhiều nhất</option>
                 </select>
               </div>
             </div>
