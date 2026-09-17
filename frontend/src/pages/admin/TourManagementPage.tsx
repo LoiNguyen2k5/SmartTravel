@@ -178,7 +178,7 @@ export const TourManagementPage: React.FC = () => {
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70">
+            <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
               <tr>
                 <th className="py-3.5 px-4">Tour Du Lịch</th>
                 <th className="py-3.5 px-4">Nhà Cung Cấp (Vendor)</th>
@@ -287,30 +287,30 @@ export const TourManagementPage: React.FC = () => {
       {/* Tour Inspection & Moderation Modal */}
       {inspectTour && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in">
-          <div className="w-full max-w-2xl bg-white rounded-3xl p-6 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-2xl bg-[#0a111d] border border-white/10 rounded-3xl p-6 shadow-[0_24px_60px_rgba(0,0,0,0.8)] space-y-5 my-8 max-h-[90vh] overflow-y-auto text-white">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-start justify-between border-b border-white/10 pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300">
                     Mã: {inspectTour.tourCode || `TOUR-${inspectTour.id}`}
                   </span>
                   <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                    inspectTour.status === TourStatus.PENDING_APPROVAL ? 'bg-amber-100 text-amber-700' :
-                    inspectTour.status === TourStatus.ACTIVE ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                    inspectTour.status === TourStatus.PENDING_APPROVAL ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                    inspectTour.status === TourStatus.ACTIVE ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   }`}>
                     {inspectTour.status}
                   </span>
                 </div>
-                <h3 className="text-xl font-extrabold text-slate-900 mt-1">{inspectTour.title}</h3>
-                <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                  <Building2 className="h-3.5 w-3.5 text-indigo-600" />
-                  Đăng bởi Vendor: <strong>{inspectTour.vendorName || 'SmartTravel Partner'}</strong>
+                <h3 className="text-xl font-extrabold text-white mt-2">{inspectTour.title}</h3>
+                <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-1">
+                  <Building2 className="h-3.5 w-3.5 text-sky-400" />
+                  Đăng bởi Vendor: <strong className="text-slate-200">{inspectTour.vendorName || 'SmartTravel Partner'}</strong>
                 </p>
               </div>
               <button
                 onClick={() => setInspectTour(null)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition"
               >
                 <XCircle className="h-6 w-6" />
               </button>
@@ -321,37 +321,37 @@ export const TourManagementPage: React.FC = () => {
               <img
                 src={inspectTour.thumbnailUrl}
                 alt={inspectTour.title}
-                className="w-full h-48 rounded-2xl object-cover border border-slate-200 shadow-inner"
+                className="w-full h-48 rounded-2xl object-cover border border-white/10 shadow-inner"
               />
             )}
 
             {/* Quick Specs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/[0.04] border border-white/8 p-4 rounded-2xl text-xs">
               <div>
                 <span className="text-slate-400 block font-medium">Giá Người Lớn</span>
-                <span className="text-sm font-black text-slate-900">{formatCurrency(inspectTour.price)}</span>
+                <span className="text-sm font-black text-white">{formatCurrency(inspectTour.price)}</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Giá Trẻ Em</span>
-                <span className="text-sm font-black text-slate-900">{inspectTour.childPrice ? formatCurrency(inspectTour.childPrice) : 'Theo quy định'}</span>
+                <span className="text-sm font-black text-white">{inspectTour.childPrice ? formatCurrency(inspectTour.childPrice) : 'Theo quy định'}</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Thời Lượng</span>
-                <span className="text-sm font-black text-slate-900">{inspectTour.durationDays}N {inspectTour.durationNights}Đ</span>
+                <span className="text-sm font-black text-white">{inspectTour.durationDays}N {inspectTour.durationNights}Đ</span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Khởi Hành Tại</span>
-                <span className="text-sm font-black text-slate-900">{inspectTour.departureLocation}</span>
+                <span className="text-sm font-black text-white">{inspectTour.departureLocation}</span>
               </div>
             </div>
 
             {/* Description */}
-            <div className="space-y-1 text-sm">
-              <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
-                <FileText className="h-4 w-4 text-sky-600" />
+            <div className="space-y-1.5 text-sm">
+              <h4 className="font-bold text-white flex items-center gap-1.5">
+                <FileText className="h-4 w-4 text-sky-400" />
                 Mô Tả & Lịch Trình Tour
               </h4>
-              <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-line bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+              <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-line bg-white/[0.04] p-3.5 rounded-xl border border-white/8">
                 {inspectTour.description || inspectTour.itineraryDetails || 'Chưa có mô tả chi tiết.'}
               </p>
             </div>
@@ -360,15 +360,15 @@ export const TourManagementPage: React.FC = () => {
             {(inspectTour.includedServices || inspectTour.excludedServices) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {inspectTour.includedServices && (
-                  <div className="p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
-                    <span className="font-bold text-emerald-800 block mb-1">Dịch Vụ Bao Gồm:</span>
-                    <p className="text-slate-600">{inspectTour.includedServices}</p>
+                  <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25">
+                    <span className="font-bold text-emerald-400 block mb-1">Dịch Vụ Bao Gồm:</span>
+                    <p className="text-slate-300 leading-relaxed">{inspectTour.includedServices}</p>
                   </div>
                 )}
                 {inspectTour.excludedServices && (
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="font-bold text-slate-700 block mb-1">Không Bao Gồm:</span>
-                    <p className="text-slate-600">{inspectTour.excludedServices}</p>
+                  <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25">
+                    <span className="font-bold text-rose-400 block mb-1">Không Bao Gồm:</span>
+                    <p className="text-slate-300 leading-relaxed">{inspectTour.excludedServices}</p>
                   </div>
                 )}
               </div>
@@ -376,9 +376,9 @@ export const TourManagementPage: React.FC = () => {
 
             {/* Rejection input box */}
             {showRejectInput && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-2xl space-y-2 animate-in fade-in">
-                <label className="text-xs font-bold text-red-800 flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
+              <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl space-y-2 animate-in fade-in">
+                <label className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                  <AlertCircle className="h-4 w-4 text-rose-400" />
                   Lý do từ chối bài đăng tour (sẽ gửi thông báo cho Vendor):
                 </label>
                 <textarea
@@ -386,16 +386,16 @@ export const TourManagementPage: React.FC = () => {
                   placeholder="Ví dụ: Thiếu thông tin lịch trình chi tiết, hình ảnh không đúng quy chuẩn..."
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  className="w-full text-xs p-2.5 bg-white border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800"
+                  className="w-full text-xs p-2.5 bg-white/[0.05] border border-rose-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/30 text-white placeholder-slate-500"
                 />
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
               <button
                 onClick={() => setInspectTour(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/[0.06] transition"
               >
                 Đóng
               </button>
@@ -404,14 +404,14 @@ export const TourManagementPage: React.FC = () => {
                 <button
                   onClick={() => handleModerate(inspectTour.id, TourStatus.REJECTED, rejectionReason)}
                   disabled={actionLoadingId !== null || !rejectionReason.trim()}
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition active:scale-95 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   {actionLoadingId !== null ? 'Đang xử lý...' : 'Xác Nhận Từ Chối'}
                 </button>
               ) : (
                 <button
                   onClick={() => setShowRejectInput(true)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition active:scale-95"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 transition active:scale-95 cursor-pointer"
                 >
                   <XCircle className="h-4 w-4 inline mr-1" />
                   Từ Chối Tour
@@ -421,7 +421,7 @@ export const TourManagementPage: React.FC = () => {
               <button
                 onClick={() => handleModerate(inspectTour.id, TourStatus.ACTIVE)}
                 disabled={actionLoadingId !== null}
-                className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <CheckCircle2 className="h-4 w-4 inline mr-1" />
                 {actionLoadingId !== null ? 'Đang duyệt...' : 'Phê Duyệt & Mở Bán'}

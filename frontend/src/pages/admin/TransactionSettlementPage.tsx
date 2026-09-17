@@ -180,7 +180,7 @@ export const TransactionSettlementPage: React.FC = () => {
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70">
+              <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
                 <tr>
                   <th className="py-3.5 px-4">Nhà Cung Cấp (Vendor)</th>
                   <th className="py-3.5 px-4">Tổng Tour & Đơn</th>
@@ -279,7 +279,7 @@ export const TransactionSettlementPage: React.FC = () => {
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70">
+              <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
                 <tr>
                   <th className="py-3.5 px-4">Mã Giao Dịch</th>
                   <th className="py-3.5 px-4">Mã Đơn Booking</th>

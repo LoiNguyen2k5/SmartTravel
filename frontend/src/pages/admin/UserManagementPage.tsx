@@ -117,34 +117,50 @@ export const UserManagementPage: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div 
           onClick={() => { setSelectedRole('ALL'); setSelectedStatus('ALL'); }}
-          className={`cursor-pointer rounded-xl border p-4 transition ${selectedRole === 'ALL' && selectedStatus === 'ALL' ? 'border-sky-500 bg-sky-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+          className={`cursor-pointer rounded-xl border p-4 transition ${
+            selectedRole === 'ALL' && selectedStatus === 'ALL' 
+              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-white' 
+              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+          }`}
         >
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tổng Tài Khoản</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{users.length}</div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tổng Tài Khoản</div>
+          <div className="text-2xl font-black text-white mt-1">{users.length}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ROLE_USER'); setSelectedStatus('ALL'); }}
-          className={`cursor-pointer rounded-xl border p-4 transition ${selectedRole === 'ROLE_USER' ? 'border-sky-500 bg-sky-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+          className={`cursor-pointer rounded-xl border p-4 transition ${
+            selectedRole === 'ROLE_USER' 
+              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-white' 
+              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+          }`}
         >
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Khách Hàng</div>
-          <div className="text-2xl font-black text-sky-600 mt-1">{countCustomers}</div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Khách Hàng</div>
+          <div className="text-2xl font-black text-sky-400 mt-1">{countCustomers}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ROLE_VENDOR'); setSelectedStatus('ALL'); }}
-          className={`cursor-pointer rounded-xl border p-4 transition ${selectedRole === 'ROLE_VENDOR' ? 'border-sky-500 bg-sky-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+          className={`cursor-pointer rounded-xl border p-4 transition ${
+            selectedRole === 'ROLE_VENDOR' 
+              ? 'border-emerald-500/80 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-white' 
+              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+          }`}
         >
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nhà Cung Cấp (Vendor)</div>
-          <div className="text-2xl font-black text-indigo-600 mt-1">{countVendors}</div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nhà Cung Cấp (Vendor)</div>
+          <div className="text-2xl font-black text-emerald-400 mt-1">{countVendors}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ALL'); setSelectedStatus('BANNED'); }}
-          className={`cursor-pointer rounded-xl border p-4 transition ${selectedStatus === 'BANNED' ? 'border-red-500 bg-red-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+          className={`cursor-pointer rounded-xl border p-4 transition ${
+            selectedStatus === 'BANNED' 
+              ? 'border-rose-500/80 bg-rose-500/15 shadow-[0_0_15px_rgba(244,63,94,0.2)] text-white' 
+              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+          }`}
         >
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bị Khóa (Blacklist)</div>
-          <div className="text-2xl font-black text-red-600 mt-1">{countBanned}</div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bị Khóa (Blacklist)</div>
+          <div className="text-2xl font-black text-rose-400 mt-1">{countBanned}</div>
         </div>
       </div>
 
@@ -189,7 +205,7 @@ export const UserManagementPage: React.FC = () => {
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70">
+            <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
               <tr>
                 <th className="py-3.5 px-4">Người Dùng</th>
                 <th className="py-3.5 px-4">Liên Hệ</th>

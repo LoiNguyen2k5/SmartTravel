@@ -222,12 +222,12 @@ export const DestinationManagementPage: React.FC = () => {
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between px-5 py-3.5 bg-slate-50/70 border-t border-slate-100">
+              <div className="flex items-center justify-between px-5 py-3.5 bg-white/[0.03] border-t border-white/8">
                 <span className="text-xs text-slate-400 font-mono">ID: #{dest.id}</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleOpenEditModal(dest)}
-                    className="p-1.5 rounded-lg text-slate-600 hover:text-sky-600 hover:bg-sky-50 transition"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-white/[0.06] transition"
                     title="Chỉnh sửa"
                   >
                     <Edit3 className="h-4 w-4" />

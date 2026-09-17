@@ -234,16 +234,10 @@ export const DashboardPage: React.FC = () => {
         {/* Top Điểm Đến Xu Hướng */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-indigo-600" />
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-sky-400" />
               Điểm Đến Xu Hướng
             </h2>
-            <Link
-              to="/admin/destinations"
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
-            >
-              Quản lý <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
 
           <div className="space-y-3.5 flex-1">
@@ -307,7 +301,7 @@ export const DashboardPage: React.FC = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/50">
+            <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
               <tr>
                 <th className="py-3 px-4">Mã Booking</th>
                 <th className="py-3 px-4">Tour</th>

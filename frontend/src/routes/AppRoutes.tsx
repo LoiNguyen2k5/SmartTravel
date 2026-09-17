@@ -27,7 +27,6 @@ import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
 import { DashboardPage } from '../pages/admin/DashboardPage';
 import { TourManagementPage } from '../pages/admin/TourManagementPage';
 import { BookingManagementPage } from '../pages/admin/BookingManagementPage';
-import { DestinationManagementPage } from '../pages/admin/DestinationManagementPage';
 import { UserManagementPage } from '../pages/admin/UserManagementPage';
 import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
 
@@ -41,6 +40,9 @@ import { CreateTourPage } from '../pages/vendor/CreateTourPage';
 import { EditTourPage } from '../pages/vendor/EditTourPage';
 
 import { AboutPage } from '../pages/client/AboutPage';
+import { ServicesPage } from '../pages/client/ServicesPage';
+import { BlogsPage } from '../pages/client/BlogsPage';
+import { ContactPage } from '../pages/client/ContactPage';
 import { ScrollToTop } from '../components/common/ScrollToTop';
 
 export const AppRoutes: React.FC = () => {
@@ -63,6 +65,9 @@ export const AppRoutes: React.FC = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/tours" element={<TourListPage />} />
           <Route path="/tours/:id" element={<TourDetailPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
 
           {/* Protected: User phải đăng nhập */}
@@ -81,7 +86,6 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin" element={<DashboardPage />} />
             <Route path="/admin/tours" element={<TourManagementPage />} />
             <Route path="/admin/bookings" element={<BookingManagementPage />} />
-            <Route path="/admin/destinations" element={<DestinationManagementPage />} />
             <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
           </Route>

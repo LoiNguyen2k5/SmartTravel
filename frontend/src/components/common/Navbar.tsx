@@ -6,7 +6,6 @@ import {
   User as UserIcon, 
   Phone, 
   Clock, 
-  Search, 
   ChevronDown, 
   CalendarDays, 
   Building2, 
@@ -22,6 +21,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
@@ -35,6 +35,13 @@ export const Navbar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Scroll effect
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -44,74 +51,164 @@ export const Navbar: React.FC = () => {
   const isAdmin = user?.roles?.includes('ROLE_ADMIN');
 
   const navLinks = [
-    { path: '/', label: 'Trang chủ' },
-    { path: '/about', label: 'Giới thiệu' },
-    { path: '/tours', label: 'Tour du lịch' },
-    { path: '/services', label: 'Dịch vụ' },
-    { path: '/blogs', label: 'Cẩm nang' },
-    { path: '/contact', label: 'Liên hệ' },
+    { path: '/', label: 'Trang chu' },
+    { path: '/about', label: 'Gioi thieu' },
+    { path: '/tours', label: 'Tour du lich' },
+    { path: '/services', label: 'Dich vu' },
+    { path: '/blogs', label: 'Cam nang' },
+    { path: '/contact', label: 'Lien he' },
   ];
 
+  const navLabels: Record<string, string> = {
+    '/': 'Trang chủ',
+    '/about': 'Giới thiệu',
+    '/tours': 'Tour du lịch',
+    '/services': 'Dịch vụ',
+    '/contact': 'Liên hệ',
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full">
       
-      {/* 1. Top Announcement & Support Bar */}
-      <div className="bg-primary-950 text-white text-[11px] font-medium py-2 px-4 sm:px-6 lg:px-8 border-b border-primary-900/80">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <a 
-              href="tel:0941899554" 
-              className="flex items-center gap-1.5 font-bold text-accent-400 hover:text-accent-300 transition"
+
+      {/* 2. Main Navigation Bar */}
+      <div
+        className="border-b transition-all duration-300"
+        style={{
+          background: scrolled ? 'rgba(2,2,8,0.94)' : 'rgba(4,6,14,0.88)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderColor: scrolled ? 'rgba(56,189,248,0.10)' : 'rgba(255,255,255,0.06)',
+          boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(56,189,248,0.06)' : 'none',
+        }}
+      >
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+          
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+            <div
+              className="text-cyan-300 p-2.5 rounded-2xl group-hover:scale-105 transition-transform duration-200"
+              style={{
+                background: 'linear-gradient(135deg, #0a2a37 0%, #04465a 100%)',
+                boxShadow: '0 0 16px rgba(34,211,238,0.18), inset 0 1px 0 rgba(255,255,255,0.08)',
+              }}
             >
-              <Phone className="h-3.5 w-3.5" /> 0941 899 554
-            </a>
-            <span className="hidden sm:flex items-center gap-1 text-slate-300/80">
-              <Clock className="h-3.5 w-3.5 text-primary-300" /> 8:00 — 17:30 (Thứ 2 - Thứ 7)
-            </span>
+              <Compass className="h-6 w-6" />
+            </div>
+            <div className="flex flex-col">
+              <span
+                className="font-display text-xl font-extrabold text-white tracking-tight leading-none group-hover:text-cyan-200 transition-colors"
+                style={{ textShadow: '0 0 20px rgba(34,211,238,0.15)' }}
+              >
+                SMART TRAVEL
+              </span>
+              <span className="text-[10px] tracking-wider text-sky-400/70 font-semibold mt-0.5 uppercase">
+                Khám phá thông minh
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-0.5 text-[13px] font-semibold text-slate-400">
+            {Object.entries(navLabels).map(([path, label]) => {
+              const isActive = location.pathname === path;
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all duration-150 relative ${
+                    isActive ? 'text-white font-bold' : 'hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {label}
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-3.5 right-3.5 h-[2px] rounded-full"
+                      style={{ background: 'linear-gradient(90deg, rgba(34,211,238,0) 0%, rgba(34,211,238,0.9) 50%, rgba(34,211,238,0) 100%)' }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Contact Info & User Auth Section */}
+          <div className="hidden sm:flex items-center gap-4">
+            {/* Phone */}
+            <a
+              href="tel:0941899554"
+              className="hidden xl:flex items-center gap-2 group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500/25 transition">
+                <Phone className="h-4 w-4 text-amber-400" />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Hotline</span>
+                <span className="text-xs font-extrabold text-amber-400 group-hover:text-amber-300 transition tracking-wide">0941 899 554</span>
+              </div>
+            </a>
+
+            {/* Divider */}
+            <div className="hidden xl:block w-px h-7 bg-white/10" />
+
+            {/* Hours */}
+            <div className="hidden md:flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-sky-500/15 flex items-center justify-center flex-shrink-0">
+                <Clock className="h-4 w-4 text-sky-400" />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Giờ làm việc</span>
+                <span className="text-xs font-extrabold text-sky-300 tracking-wide">8:00 — 17:30</span>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="hidden md:block w-px h-7 bg-white/10" />
+
+            {/* User Profile / Auth State */}
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 font-semibold hover:text-primary-200 transition py-0.5 focus:outline-none"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 hover:text-white transition focus:outline-none cursor-pointer"
                   aria-expanded={dropdownOpen}
                 >
-                  <div className="h-6 w-6 rounded-full bg-primary-800 text-primary-100 border border-primary-600 flex items-center justify-center text-[10px] font-bold uppercase shadow-sm">
+                  <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center text-xs font-bold uppercase shadow-[0_0_10px_rgba(56,189,248,0.4)]">
                     {user?.fullName?.charAt(0) || 'U'}
                   </div>
-                  <span className="max-w-[120px] sm:max-w-[160px] truncate">{user?.fullName}</span>
-                  <ChevronDown className={`h-3.5 w-3.5 text-primary-300 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="max-w-[110px] truncate text-xs font-bold">{user?.fullName}</span>
+                  <ChevronDown className={`h-3.5 w-3.5 text-sky-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* User Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-card border border-slate-200/80 py-2 text-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                    
+                  <div 
+                    className="absolute right-0 mt-2 w-64 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.8)] border border-white/10 py-2 text-slate-200 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                    style={{ background: 'rgba(10,17,29,0.98)', backdropFilter: 'blur(20px)' }}
+                  >
                     {/* Header info */}
-                    <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 rounded-t-2xl">
-                      <div className="text-xs font-bold text-slate-900 truncate">{user?.fullName}</div>
-                      <div className="text-[10px] text-slate-500 truncate mt-0.5">{user?.email}</div>
+                    <div className="px-4 py-3 border-b border-white/8 bg-white/[0.03] rounded-t-2xl">
+                      <div className="text-xs font-bold text-white truncate">{user?.fullName}</div>
+                      <div className="text-[11px] text-slate-400 truncate mt-0.5">{user?.email}</div>
                     </div>
 
                     {/* Menu items */}
-                    <div className="py-1">
+                    <div className="py-1.5 space-y-0.5 px-1.5">
                       <Link
                         to="/profile"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-primary-50/80 hover:text-primary-900 transition"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-sky-500/10 hover:text-sky-300 transition"
                       >
-                        <UserIcon className="h-4 w-4 text-primary-600" />
+                        <UserIcon className="h-4 w-4 text-sky-400" />
                         <span>Thông tin cá nhân</span>
                       </Link>
 
                       <Link
                         to="/my-bookings"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-primary-50/80 hover:text-primary-900 transition"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition"
                       >
-                        <CalendarDays className="h-4 w-4 text-emerald-600" />
+                        <CalendarDays className="h-4 w-4 text-emerald-400" />
                         <span>Lịch sử đặt tour</span>
                       </Link>
 
@@ -119,9 +216,9 @@ export const Navbar: React.FC = () => {
                         <Link
                           to="/vendor"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-accent-700 hover:bg-accent-50 transition border-t border-slate-100 my-1 pt-2"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition border-t border-white/8 mt-1 pt-2"
                         >
-                          <Building2 className="h-4 w-4 text-accent-600" />
+                          <Building2 className="h-4 w-4 text-amber-400" />
                           <span>Kênh Nhà Cung Cấp</span>
                         </Link>
                       )}
@@ -130,25 +227,25 @@ export const Navbar: React.FC = () => {
                         <Link
                           to="/admin"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition border-t border-slate-100 my-1 pt-2"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-violet-300 hover:bg-violet-500/10 transition border-t border-white/8 mt-1 pt-2"
                         >
-                          <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                          <ShieldCheck className="h-4 w-4 text-violet-400" />
                           <span>Trang Quản Trị Admin</span>
                         </Link>
                       )}
                     </div>
 
                     {/* Logout */}
-                    <div className="pt-1 border-t border-slate-100">
+                    <div className="pt-1.5 border-t border-white/8 px-1.5">
                       <button
                         onClick={() => {
                           setDropdownOpen(false);
                           logout();
                           navigate('/login');
                         }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition text-left cursor-pointer"
                       >
-                        <LogOut className="h-4 w-4 text-rose-600" />
+                        <LogOut className="h-4 w-4 text-rose-400" />
                         <span>Đăng xuất</span>
                       </button>
                     </div>
@@ -156,124 +253,156 @@ export const Navbar: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-3 font-semibold">
-                <Link to="/login" className="hover:text-primary-200 transition">Đăng nhập</Link>
-                <span className="text-slate-500">|</span>
-                <Link to="/register" className="hover:text-primary-200 transition">Đăng ký</Link>
+              <div className="flex items-center gap-2 text-xs font-bold">
+                <Link 
+                  to="/login" 
+                  className="px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/[0.06] transition"
+                >
+                  Đăng nhập
+                </Link>
+                <span className="text-white/20">|</span>
+                <Link 
+                  to="/register" 
+                  className="px-3.5 py-1.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-300 hover:bg-sky-500/25 transition shadow-[0_0_12px_rgba(56,189,248,0.2)]"
+                >
+                  Đăng ký
+                </Link>
               </div>
             )}
-          </div>
-        </div>
-      </div>
 
-      {/* 2. Main Navigation Bar with Glassmorphic Backdrop */}
-      <div className="glass-surface border-b border-slate-200/80 shadow-subtle">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-          
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="bg-gradient-to-br from-primary-900 to-primary-700 text-accent-400 p-2.5 rounded-2xl shadow-sm group-hover:scale-105 transition-transform duration-200">
-              <Compass className="h-6 w-6" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display text-xl font-extrabold text-primary-950 tracking-tight leading-none group-hover:text-primary-700 transition-colors">
-                SMART TRAVEL
-              </span>
-              <span className="text-[10px] tracking-wider text-slate-500 font-semibold mt-0.5 uppercase">
-                Khám phá thông minh
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-1 text-[13px] font-semibold text-slate-700">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all duration-150 relative ${
-                    isActive
-                      ? 'text-primary-900 font-bold bg-primary-50/80 shadow-sm'
-                      : 'hover:text-primary-700 hover:bg-slate-100/70'
-                  }`}
-                >
-                  {link.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-primary-600 rounded-full" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Header Action Items */}
-          <div className="flex items-center gap-2.5">
-            {/* Quick Search */}
-            <div className="hidden sm:flex items-center gap-2 bg-slate-100/90 hover:bg-white focus-within:bg-white focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-100 px-3.5 py-2 rounded-full border border-slate-200 text-xs transition-all duration-200">
-              <Search className="h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Tìm tour, địa danh..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    navigate(`/tours?keyword=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
-                  }
-                }}
-                className="bg-transparent focus:outline-none w-28 md:w-40 text-xs text-slate-800 placeholder:text-slate-400 font-medium"
-              />
-            </div>
-
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-white/8 hover:text-white transition"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
 
+          {/* Mobile Hamburger only (small screens) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 rounded-xl text-slate-400 hover:bg-white/8 hover:text-white transition"
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+
         </nav>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200/80 bg-white/95 backdrop-blur-md px-4 pt-3 pb-6 space-y-2 shadow-lg animate-in slide-in-from-top-3 duration-200">
-            <div className="sm:hidden mb-3">
-              <div className="flex items-center gap-2 bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200 text-xs">
-                <Search className="h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm chuyến đi..."
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+          <div
+            className="lg:hidden border-t border-white/8 px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-3 duration-200"
+            style={{ background: 'rgba(4,6,14,0.98)', backdropFilter: 'blur(20px)' }}
+          >
+            {/* User status in mobile drawer */}
+            <div className="p-3 mb-2 rounded-2xl bg-white/[0.04] border border-white/8">
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center text-sm font-bold uppercase shadow-[0_0_10px_rgba(56,189,248,0.4)]">
+                      {user?.fullName?.charAt(0) || 'U'}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-white">{user?.fullName}</span>
+                      <span className="text-[11px] text-slate-400">{user?.email}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/8">
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.04] text-xs font-semibold text-slate-300 text-center hover:bg-sky-500/15 hover:text-sky-300 transition"
+                    >
+                      Hồ sơ
+                    </Link>
+                    <Link
+                      to="/my-bookings"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.04] text-xs font-semibold text-slate-300 text-center hover:bg-emerald-500/15 hover:text-emerald-300 transition"
+                    >
+                      Đơn đặt
+                    </Link>
+                  </div>
+                  {isVendor && (
+                    <Link
+                      to="/vendor"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-1.5 rounded-xl bg-amber-500/10 text-xs font-semibold text-amber-300 text-center hover:bg-amber-500/20 transition"
+                    >
+                      Kênh Nhà Cung Cấp
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-1.5 rounded-xl bg-violet-500/10 text-xs font-semibold text-violet-300 text-center hover:bg-violet-500/20 transition"
+                    >
+                      Trang Quản Trị Admin
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
                       setMobileMenuOpen(false);
-                      navigate(`/tours?keyword=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
-                    }
-                  }}
-                  className="bg-transparent focus:outline-none w-full text-xs text-slate-800"
-                />
-              </div>
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="w-full px-3 py-1.5 rounded-xl bg-rose-500/10 text-xs font-bold text-rose-400 hover:bg-rose-500/20 transition"
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 py-2 rounded-xl text-center text-xs font-bold text-slate-200 bg-white/[0.06] hover:bg-white/[0.1] transition"
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 py-2 rounded-xl text-center text-xs font-bold text-sky-300 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 transition"
+                  >
+                    Đăng ký
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
+            {/* Nav links */}
+            {Object.entries(navLabels).map(([path, label]) => {
+              const isActive = location.pathname === path;
               return (
                 <Link
-                  key={link.path}
-                  to={link.path}
+                  key={path}
+                  to={path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
                     isActive
-                      ? 'bg-primary-50 text-primary-900 font-bold border-l-4 border-primary-600'
-                      : 'text-slate-700 hover:bg-slate-100'
+                      ? 'bg-sky-500/10 text-cyan-300 font-bold border-l-2 border-cyan-400'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  {link.label}
+                  {label}
                 </Link>
               );
             })}
+
+            {/* Hotline on mobile */}
+            <div className="pt-3 border-t border-white/8 flex items-center justify-between text-xs px-2 text-slate-400">
+              <a href="tel:0941899554" className="flex items-center gap-1.5 text-amber-400 font-bold">
+                <Phone className="h-3.5 w-3.5" /> 0941 899 554
+              </a>
+              <span className="flex items-center gap-1 text-slate-500 text-[11px]">
+                <Clock className="h-3.5 w-3.5" /> 8:00 — 17:30
+              </span>
+            </div>
           </div>
         )}
       </div>

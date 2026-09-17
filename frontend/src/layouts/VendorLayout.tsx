@@ -29,13 +29,22 @@ export const VendorLayout: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800">
+    <div className="flex h-screen bg-[#020204] text-slate-100 overflow-hidden font-sans portal-dark relative">
+      {/* Background Ambient Glow */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[350px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[300px] bg-teal-600/10 rounded-full blur-[140px] pointer-events-none" />
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl flex-shrink-0 z-20">
+      <aside className="w-64 bg-[#070c18] border-r border-white/10 text-white flex flex-col justify-between p-4 shadow-2xl flex-shrink-0 z-20">
         <div>
           {/* Logo & Portal Name */}
-          <div className="flex items-center gap-3 px-3 py-4 border-b border-slate-800 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-white text-xl shadow-lg">
+          <div className="flex items-center gap-3 px-2 py-3 border-b border-white/10 mb-6">
+            <div 
+              className="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-white text-xl"
+              style={{
+                boxShadow: '0 0 20px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+              }}
+            >
               V
             </div>
             <div>
@@ -45,7 +54,7 @@ export const VendorLayout: React.FC = () => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -54,10 +63,10 @@ export const VendorLayout: React.FC = () => {
                   to={item.path}
                   end={item.end}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
+                    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       isActive
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-                        : 'text-slate-400 hover:bg-slate-800/80 hover:text-white'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+                        : 'text-slate-400 hover:bg-white/[0.06] hover:text-white border border-transparent'
                     }`
                   }
                 >
@@ -70,12 +79,12 @@ export const VendorLayout: React.FC = () => {
         </div>
 
         {/* User Info & Footer Actions */}
-        <div className="border-t border-slate-800 pt-4 space-y-3">
-          <div className="flex items-center gap-3 px-2">
+        <div className="border-t border-white/10 pt-4 space-y-3">
+          <div className="p-2.5 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center gap-3">
             <img
               src={user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
               alt={user?.fullName}
-              className="h-9 w-9 rounded-full object-cover border-2 border-emerald-500"
+              className="h-9 w-9 rounded-full object-cover border-2 border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
             />
             <div className="overflow-hidden">
               <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Nhà Cung Cấp Tour'}</p>
@@ -83,16 +92,16 @@ export const VendorLayout: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60">
+          <div className="grid grid-cols-2 gap-2 pt-1">
             <a
               href="/"
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-slate-800 text-[11px] font-bold text-slate-300 hover:bg-slate-700 transition"
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-white/[0.06] border border-white/8 text-[11px] font-bold text-slate-300 hover:text-white hover:bg-white/[0.1] transition"
             >
               <Globe className="h-3.5 w-3.5" /> Trang chủ
             </a>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-rose-950/60 text-[11px] font-bold text-rose-300 hover:bg-rose-900 transition"
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-rose-500/15 border border-rose-500/25 text-[11px] font-bold text-rose-300 hover:bg-rose-500/25 hover:text-rose-200 transition cursor-pointer"
             >
               <LogOut className="h-3.5 w-3.5" /> Đăng xuất
             </button>
@@ -101,7 +110,7 @@ export const VendorLayout: React.FC = () => {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
         <Outlet />
       </main>
     </div>
