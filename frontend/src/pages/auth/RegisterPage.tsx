@@ -44,6 +44,11 @@ export const RegisterPage: React.FC = () => {
     setError('');
     setSuccessMsg('');
 
+    if (password.length < 8) {
+      setError('Mật khẩu phải có tối thiểu 8 ký tự.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Mật khẩu xác nhận không khớp.');
       return;
@@ -200,15 +205,35 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-300">Password</label>
+                <span className={`text-[11px] font-semibold ${
+                  password.length === 0 
+                    ? 'text-slate-500' 
+                    : password.length >= 8 
+                    ? 'text-emerald-400' 
+                    : 'text-rose-400'
+                }`}>
+                  {password.length === 0 
+                    ? 'Tối thiểu 8 ký tự' 
+                    : password.length >= 8 
+                    ? '✓ Đạt chuẩn (≥ 8 ký tự)' 
+                    : `Mới có ${password.length}/8 ký tự`}
+                </span>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter Your password"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] pl-4 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:border-rose-400 focus:bg-white/[0.08] focus:outline-none transition"
+                  placeholder="Nhập tối thiểu 8 ký tự"
+                  className={`w-full rounded-xl border bg-white/[0.05] pl-4 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:bg-white/[0.08] focus:outline-none transition ${
+                    password.length > 0 && password.length < 8
+                      ? 'border-rose-500/50 focus:border-rose-400'
+                      : 'border-white/10 focus:border-rose-400'
+                  }`}
                 />
                 <button
                   type="button"
@@ -221,13 +246,23 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Xác nhận mật khẩu</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-300">Xác nhận mật khẩu</label>
+                {confirmPassword.length > 0 && (
+                  <span className={`text-[11px] font-semibold ${
+                    confirmPassword === password ? 'text-emerald-400' : 'text-rose-400'
+                  }`}>
+                    {confirmPassword === password ? '✓ Mật khẩu khớp' : '✕ Chưa khớp'}
+                  </span>
+                )}
+              </div>
               <input
                 type="password"
                 required
+                minLength={8}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Nhập lại mật khẩu (tối thiểu 8 ký tự)"
                 className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-rose-400 focus:bg-white/[0.08] focus:outline-none transition"
               />
             </div>

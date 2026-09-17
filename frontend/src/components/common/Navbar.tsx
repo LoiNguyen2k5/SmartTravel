@@ -11,24 +11,54 @@ import {
   Building2, 
   ShieldCheck,
   Menu,
-  X
+  X,
+  Bell,
+  Headphones,
+  CheckCheck,
+  Trash2,
+  Mail,
+  Sparkles
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import { notificationService, NotificationItem } from '../../services/notificationService';
 
 export const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [selectedNotif, setSelectedNotif] = useState<NotificationItem | null>(null);
 
-  // Close dropdown on click outside
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load notifications
+  const loadNotifications = () => {
+    const list = notificationService.getNotifications(user?.email);
+    setNotifications(list);
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    const handleUpdate = () => loadNotifications();
+    window.addEventListener('smarttravel_notification_updated', handleUpdate);
+    return () => window.removeEventListener('smarttravel_notification_updated', handleUpdate);
+  }, [user?.email]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node)) {
+        setNotifDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -167,90 +197,228 @@ export const Navbar: React.FC = () => {
 
             {/* User Profile / Auth State */}
             {isAuthenticated ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 hover:text-white transition focus:outline-none cursor-pointer"
-                  aria-expanded={dropdownOpen}
-                >
-                  <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center text-xs font-bold uppercase shadow-[0_0_10px_rgba(56,189,248,0.4)]">
-                    {user?.fullName?.charAt(0) || 'U'}
-                  </div>
-                  <span className="max-w-[110px] truncate text-xs font-bold">{user?.fullName}</span>
-                  <ChevronDown className={`h-3.5 w-3.5 text-sky-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* User Dropdown Menu */}
-                {dropdownOpen && (
-                  <div 
-                    className="absolute right-0 mt-2 w-64 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.8)] border border-white/10 py-2 text-slate-200 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
-                    style={{ background: 'rgba(10,17,29,0.98)', backdropFilter: 'blur(20px)' }}
+              <div className="flex items-center gap-2.5">
+                
+                {/* NOTIFICATION BELL */}
+                <div className="relative" ref={notifDropdownRef}>
+                  <button
+                    onClick={() => {
+                      setNotifDropdownOpen(!notifDropdownOpen);
+                      setDropdownOpen(false);
+                    }}
+                    className="relative p-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white transition focus:outline-none cursor-pointer"
+                    title="Thông báo & Tin nhắn CSKH"
+                    aria-label="Thông báo"
                   >
-                    {/* Header info */}
-                    <div className="px-4 py-3 border-b border-white/8 bg-white/[0.03] rounded-t-2xl">
-                      <div className="text-xs font-bold text-white truncate">{user?.fullName}</div>
-                      <div className="text-[11px] text-slate-400 truncate mt-0.5">{user?.email}</div>
+                    <Bell className="h-4 w-4 text-cyan-400" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white shadow-[0_0_10px_rgba(244,63,94,0.9)] animate-pulse">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* NOTIFICATION DROPDOWN PANEL */}
+                  {notifDropdownOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/12 py-3 text-slate-200 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                      style={{ background: 'rgba(10,17,29,0.98)', backdropFilter: 'blur(25px)' }}
+                    >
+                      {/* Header */}
+                      <div className="px-4 pb-3 border-b border-white/8 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Bell className="h-4 w-4 text-cyan-400" />
+                          <span className="text-xs font-bold text-white uppercase tracking-wider">Thông báo</span>
+                          {unreadCount > 0 && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                              {unreadCount} mới
+                            </span>
+                          )}
+                        </div>
+                        {notifications.length > 0 && (
+                          <button
+                            onClick={() => notificationService.markAllAsRead(user?.email)}
+                            className="text-[11px] text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition cursor-pointer"
+                          >
+                            <CheckCheck className="h-3 w-3" /> Đọc tất cả
+                          </button>
+                        )}
+                      </div>
+
+                      {/* List */}
+                      <div className="max-h-80 overflow-y-auto divide-y divide-white/5 py-1">
+                        {notifications.length === 0 ? (
+                          <div className="py-8 text-center text-xs text-slate-500">
+                            Bạn chưa có thông báo nào
+                          </div>
+                        ) : (
+                          notifications.map((n) => (
+                            <div
+                              key={n.id}
+                              onClick={() => {
+                                notificationService.markAsRead(n.id, user?.email);
+                                setSelectedNotif(n);
+                              }}
+                              className={`px-4 py-3 hover:bg-white/[0.04] transition cursor-pointer flex items-start gap-3 group relative ${
+                                !n.isRead ? 'bg-sky-500/[0.06]' : ''
+                              }`}
+                            >
+                              <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${
+                                n.type === 'CSKH_REPLY' 
+                                  ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' 
+                                  : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                              }`}>
+                                {n.type === 'CSKH_REPLY' ? (
+                                  <Headphones className="h-4 w-4" />
+                                ) : (
+                                  <Sparkles className="h-4 w-4" />
+                                )}
+                              </div>
+
+                              <div className="flex-1 min-w-0 pr-4">
+                                <div className="flex items-center justify-between mb-0.5">
+                                  <div className="text-xs font-bold text-white truncate">{n.title}</div>
+                                  <span className="text-[10px] text-slate-500 shrink-0 ml-2">{n.createdAt}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
+                                  {n.message}
+                                </p>
+                                {n.replyContent && (
+                                  <div className="mt-1.5 text-[10px] font-semibold text-sky-400 flex items-center gap-1">
+                                    <span>👉 Bấm để xem phản hồi chi tiết</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Unread indicator dot */}
+                              {!n.isRead && (
+                                <span className="absolute top-4 right-3 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Footer notice */}
+                      <div className="pt-2 px-4 border-t border-white/8 text-center">
+                        <span className="text-[10px] text-slate-500">
+                          Phản hồi cũng được gửi đồng thời vào hòm thư email của bạn
+                        </span>
+                      </div>
                     </div>
+                  )}
+                </div>
 
-                    {/* Menu items */}
-                    <div className="py-1.5 space-y-0.5 px-1.5">
-                      <Link
-                        to="/profile"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-sky-500/10 hover:text-sky-300 transition"
-                      >
-                        <UserIcon className="h-4 w-4 text-sky-400" />
-                        <span>Thông tin cá nhân</span>
-                      </Link>
+                {/* USER PROFILE DROPDOWN */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(!dropdownOpen);
+                      setNotifDropdownOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 hover:text-white transition focus:outline-none cursor-pointer"
+                    aria-expanded={dropdownOpen}
+                  >
+                    <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center text-xs font-bold uppercase shadow-[0_0_10px_rgba(56,189,248,0.4)]">
+                      {user?.fullName?.charAt(0) || 'U'}
+                    </div>
+                    <span className="max-w-[110px] truncate text-xs font-bold">{user?.fullName}</span>
+                    <ChevronDown className={`h-3.5 w-3.5 text-sky-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
 
-                      <Link
-                        to="/my-bookings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition"
-                      >
-                        <CalendarDays className="h-4 w-4 text-emerald-400" />
-                        <span>Lịch sử đặt tour</span>
-                      </Link>
+                  {/* User Dropdown Menu */}
+                  {dropdownOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-64 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.8)] border border-white/10 py-2 text-slate-200 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                      style={{ background: 'rgba(10,17,29,0.98)', backdropFilter: 'blur(20px)' }}
+                    >
+                      {/* Header info */}
+                      <div className="px-4 py-3 border-b border-white/8 bg-white/[0.03] rounded-t-2xl">
+                        <div className="text-xs font-bold text-white truncate">{user?.fullName}</div>
+                        <div className="text-[11px] text-slate-400 truncate mt-0.5">{user?.email}</div>
+                      </div>
 
-                      {isVendor && (
+                      {/* Menu items */}
+                      <div className="py-1.5 space-y-0.5 px-1.5">
                         <Link
-                          to="/vendor"
+                          to="/profile"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition border-t border-white/8 mt-1 pt-2"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-sky-500/10 hover:text-sky-300 transition"
                         >
-                          <Building2 className="h-4 w-4 text-amber-400" />
-                          <span>Kênh Nhà Cung Cấp</span>
+                          <UserIcon className="h-4 w-4 text-sky-400" />
+                          <span>Thông tin cá nhân</span>
                         </Link>
-                      )}
 
-                      {isAdmin && (
                         <Link
-                          to="/admin"
+                          to="/my-bookings"
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-violet-300 hover:bg-violet-500/10 transition border-t border-white/8 mt-1 pt-2"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-300 transition"
                         >
-                          <ShieldCheck className="h-4 w-4 text-violet-400" />
-                          <span>Trang Quản Trị Admin</span>
+                          <CalendarDays className="h-4 w-4 text-emerald-400" />
+                          <span>Lịch sử đặt tour</span>
                         </Link>
-                      )}
-                    </div>
 
-                    {/* Logout */}
-                    <div className="pt-1.5 border-t border-white/8 px-1.5">
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          logout();
-                          navigate('/login');
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition text-left cursor-pointer"
-                      >
-                        <LogOut className="h-4 w-4 text-rose-400" />
-                        <span>Đăng xuất</span>
-                      </button>
+                        {/* Notification item in User Menu */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setNotifDropdownOpen(true);
+                          }}
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition text-left cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Bell className="h-4 w-4 text-cyan-400" />
+                            <span>Thông báo của tôi</span>
+                          </div>
+                          {unreadCount > 0 && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.6)]">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
+
+                        {isVendor && (
+                          <Link
+                            to="/vendor"
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition border-t border-white/8 mt-1 pt-2"
+                          >
+                            <Building2 className="h-4 w-4 text-amber-400" />
+                            <span>Kênh Nhà Cung Cấp</span>
+                          </Link>
+                        )}
+
+                        {isAdmin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-violet-300 hover:bg-violet-500/10 transition border-t border-white/8 mt-1 pt-2"
+                          >
+                            <ShieldCheck className="h-4 w-4 text-violet-400" />
+                            <span>Trang Quản Trị Admin</span>
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Logout */}
+                      <div className="pt-1.5 border-t border-white/8 px-1.5">
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            logout();
+                            navigate('/login');
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition text-left cursor-pointer"
+                        >
+                          <LogOut className="h-4 w-4 text-rose-400" />
+                          <span>Đăng xuất</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
               </div>
             ) : (
               <div className="flex items-center gap-2 text-xs font-bold">
@@ -406,6 +574,75 @@ export const Navbar: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* NOTIFICATION DETAIL MODAL */}
+      {selectedNotif && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[#0a111d] border border-white/15 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-[0_24px_70px_rgba(0,0,0,0.9)] text-white relative">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2.5 text-cyan-300 font-bold text-sm sm:text-base">
+                <div className={`p-1.5 rounded-lg border ${
+                  selectedNotif.type === 'CSKH_REPLY' 
+                    ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300' 
+                    : 'bg-amber-500/15 border-amber-500/30 text-amber-300'
+                }`}>
+                  {selectedNotif.type === 'CSKH_REPLY' ? (
+                    <Headphones className="h-4 w-4" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                </div>
+                <span>{selectedNotif.type === 'CSKH_REPLY' ? 'Phản hồi từ Bộ phận CSKH' : 'Thông báo từ Smart Travel'}</span>
+              </div>
+              <button 
+                onClick={() => setSelectedNotif(null)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-bold text-white mb-1">{selectedNotif.title}</h3>
+                <div className="text-[11px] text-slate-400 flex items-center gap-2">
+                  <span>{selectedNotif.createdAt}</span>
+                  <span>•</span>
+                  <span className="text-cyan-400 font-semibold">{selectedNotif.sender || 'Smart Travel'}</span>
+                </div>
+              </div>
+
+              <div className="bg-white/[0.04] border border-white/10 p-4 rounded-2xl text-xs text-slate-300 leading-relaxed space-y-2 whitespace-pre-line">
+                {selectedNotif.replyContent || selectedNotif.message}
+              </div>
+
+              {selectedNotif.type === 'CSKH_REPLY' && (
+                <div className="rounded-xl bg-sky-500/10 border border-sky-500/20 p-3 text-[11px] text-sky-300 flex items-start gap-2">
+                  <Mail className="h-4 w-4 shrink-0 mt-0.5 text-sky-400" />
+                  <div>
+                    Hệ thống cũng đã gửi một bản sao phản hồi đầy đủ tới hòm thư email của bạn. Vui lòng kiểm tra hộp thư đến (Inbox) hoặc mục Spam!
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <a 
+                href="tel:0941899554"
+                className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <Phone className="h-3.5 w-3.5" /> Gọi Hotline
+              </a>
+              <button
+                onClick={() => setSelectedNotif(null)}
+                className="rounded-xl bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 text-xs font-bold transition cursor-pointer"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </header>
   );

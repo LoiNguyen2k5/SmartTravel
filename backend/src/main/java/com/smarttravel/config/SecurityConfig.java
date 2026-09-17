@@ -52,6 +52,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/contact/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/tours/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/destinations/**").permitAll()
                 .requestMatchers("/api/v1/payments/vnpay-callback", "/api/v1/payments/webhook", "/api/v1/payments/sepay-webhook", "/api/v1/payments/check-status/**", "/api/v1/payments/mark-paid/**").permitAll()

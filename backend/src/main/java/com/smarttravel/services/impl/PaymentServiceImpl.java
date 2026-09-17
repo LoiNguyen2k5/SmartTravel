@@ -6,6 +6,7 @@ import com.smarttravel.dto.response.PaymentResponse;
 import com.smarttravel.entities.Booking;
 import com.smarttravel.entities.Payment;
 import com.smarttravel.enums.BookingStatus;
+import com.smarttravel.enums.PaymentMethod;
 import com.smarttravel.enums.PaymentStatus;
 import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
@@ -196,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElse(Payment.builder()
                         .booking(booking)
                         .amount(booking.getTotalPrice())
-                        .paymentMethod("VIETQR")
+                        .paymentMethod(PaymentMethod.BANK_TRANSFER)
                         .build());
 
         payment.setPaymentStatus(PaymentStatus.PAID);
@@ -233,7 +234,10 @@ public class PaymentServiceImpl implements PaymentService {
         result.put("isPaid", isPaid);
         result.put("tourTitle", booking.getTour().getTitle());
         result.put("totalPrice", booking.getTotalPrice());
-        result.put("departureDate", booking.getDepartureDate() != null ? booking.getDepartureDate().toString() : "");
+        String departureDateStr = (booking.getTourSchedule() != null && booking.getTourSchedule().getStartDate() != null)
+                ? booking.getTourSchedule().getStartDate().toString()
+                : "";
+        result.put("departureDate", departureDateStr);
         result.put("qrCodeUrl", booking.getQrCodeUrl());
         return result;
     }
@@ -256,7 +260,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElse(Payment.builder()
                             .booking(booking)
                             .amount(booking.getTotalPrice())
-                            .paymentMethod("VIETQR")
+                            .paymentMethod(PaymentMethod.BANK_TRANSFER)
                             .build());
             payment.setPaymentStatus(PaymentStatus.PAID);
             payment.setTransactionId("TEST-" + System.currentTimeMillis());

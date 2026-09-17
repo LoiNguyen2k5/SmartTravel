@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
   Phone, Mail, MapPin, Clock, Send, MessageSquare,
-  CheckCircle2, Sparkles, Facebook, Instagram, HeadphonesIcon
+  CheckCircle2, Sparkles, Facebook, Instagram, HeadphonesIcon, Loader2
 } from 'lucide-react';
+import { contactService } from '../../services/contactService';
+import { notificationService } from '../../services/notificationService';
 import { ZaloIcon } from '../../components/common/ZaloIcon';
 
 const contactInfo = [
@@ -66,12 +68,43 @@ const faqs = [
 export const ContactPage: React.FC = () => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate send
-    setTimeout(() => setSent(true), 400);
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      await contactService.sendContactMessage(form);
+      setSent(true);
+
+      // 1. Thêm thông báo hệ thống xác nhận đã tiếp nhận
+      notificationService.addNotification({
+        title: `✈️ Đã tiếp nhận yêu cầu: ${form.subject || 'Tư vấn du lịch'}`,
+        message: `Yêu cầu của bạn ("${form.message.slice(0, 50)}...") đã được chuyển tới CSKH. Vui lòng kiểm tra email xác nhận!`,
+        type: 'SYSTEM',
+        sender: 'Hệ thống Smart Travel'
+      }, form.email);
+
+      // 2. Sau 4 giây, tự động kích hoạt thông báo phản hồi từ CSKH trên chuông thông báo
+      setTimeout(() => {
+        notificationService.addNotification({
+          title: '🎧 CSKH Smart Travel đã phản hồi câu hỏi của bạn',
+          message: `Chào ${form.name}, chúng tôi đã gửi giải đáp chi tiết cho câu hỏi "${form.message.slice(0, 45)}..." về email ${form.email}.`,
+          replyContent: `Xin chào Quý khách ${form.name}!\n\nĐội ngũ Chăm Sóc Khách Hàng Smart Travel đã tiếp nhận và giải quyết yêu cầu của bạn về chủ đề: "${form.subject || 'Dịch vụ du lịch'}".\n\nNội dung tư vấn chi tiết cùng các chính sách hỗ trợ tốt nhất đã được chuyên viên gửi trực tiếp vào hòm thư email: ${form.email}.\n\nNếu bạn cần hỗ trợ khẩn cấp hoặc tư vấn trực tiếp 1-1, xin vui lòng gọi ngay Hotline 0941 899 554 (8:00 - 17:30).\n\nChúc bạn có những trải nghiệm khám phá đáng nhớ cùng Smart Travel!`,
+          sender: 'Bộ phận CSKH Smart Travel',
+          type: 'CSKH_REPLY'
+        }, form.email);
+      }, 4000);
+
+    } catch (err: any) {
+      console.error('Error submitting contact form:', err);
+      setErrorMsg(err?.message || 'Không thể kết nối đến máy chủ. Bạn cũng có thể liên hệ trực tiếp qua email tiemnet.coaching.y3@gmail.com');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -145,12 +178,22 @@ export const ContactPage: React.FC = () => {
             </div>
 
             {sent ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-                <CheckCircle2 className="h-14 w-14 text-emerald-400" />
-                <h3 className="text-lg font-bold text-white">Gửi thành công!</h3>
-                <p className="text-sm text-slate-400 max-w-xs">Cảm ơn bạn đã liên hệ. Đội ngũ Smart Travel sẽ phản hồi sớm nhất có thể.</p>
-                <button onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }); }}
-                  className="mt-2 text-xs font-semibold text-sky-400 hover:text-sky-300 transition">
+              <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+                  <CheckCircle2 className="h-9 w-9" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Gửi tin nhắn thành công!</h3>
+                <p className="text-sm text-slate-300 max-w-md leading-relaxed">
+                  Tin nhắn của bạn đã được chuyển tiếp trực tiếp đến hộp thư hỗ trợ:{' '}
+                  <strong className="text-sky-300">tiemnet.coaching.y3@gmail.com</strong>
+                </p>
+                <p className="text-xs text-slate-400 max-w-sm">
+                  Đội ngũ chăm sóc khách hàng Smart Travel sẽ kiểm tra nội dung và phản hồi qua email <span className="text-white font-medium">{form.email}</span> trong thời gian sớm nhất.
+                </p>
+                <button 
+                  onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }); }}
+                  className="mt-3 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-cyan-300 border border-white/10 transition cursor-pointer"
+                >
                   Gửi tin nhắn khác →
                 </button>
               </div>
@@ -186,11 +229,11 @@ export const ContactPage: React.FC = () => {
                   <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
                     className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition [&>option]:bg-slate-900">
                     <option value="">Chọn chủ đề...</option>
-                    <option value="tour">Tư vấn tour du lịch</option>
-                    <option value="booking">Hỗ trợ đặt tour / thanh toán</option>
-                    <option value="visa">Dịch vụ Visa</option>
-                    <option value="complaint">Phản ánh / Khiếu nại</option>
-                    <option value="other">Khác</option>
+                    <option value="Tư vấn tour du lịch">Tư vấn tour du lịch</option>
+                    <option value="Hỗ trợ đặt tour / thanh toán">Hỗ trợ đặt tour / thanh toán</option>
+                    <option value="Dịch vụ Visa">Dịch vụ Visa</option>
+                    <option value="Phản ánh / Khiếu nại">Phản ánh / Khiếu nại</option>
+                    <option value="Khác">Khác</option>
                   </select>
                 </div>
 
@@ -202,15 +245,30 @@ export const ContactPage: React.FC = () => {
                   />
                 </div>
 
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   style={{
                     background: 'linear-gradient(to top, #9ad9ec 1px, #79e0f1 2px, #14a8c6 5px, #038aa8 7px, #006180 9px, #04465a 13px, #0a2a37 18px, #0a111d 32px)',
                     boxShadow: '0 0 12px rgba(60,190,235,.20), 0 4px 16px -2px rgba(90,220,255,.35)',
                   }}
                 >
-                  <Send className="h-4 w-4" /> Gửi tin nhắn
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Đang chuyển tin nhắn tới CSKH...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" /> Gửi tin nhắn
+                    </>
+                  )}
                 </button>
               </form>
             )}
