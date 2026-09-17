@@ -55,3 +55,8 @@ Thumbs.db
 *.pptx
 read_docx.ps1
 docx_content.txt
+
+# Local demo & documentation files
+docs/
+demo_hero/
+vertex_demo.html
