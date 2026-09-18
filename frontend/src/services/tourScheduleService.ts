@@ -49,6 +49,33 @@ export const formatScheduleDate = (dStr: string): string => {
 
 // Default template schedules for any tour
 const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
+	if ([14, 17, 18, 19, 20].includes(tourId)) {
+	  const start = new Date();
+	  start.setHours(12, 0, 0, 0);
+	  start.setDate(start.getDate() + 14);
+
+	  const end = new Date(start);
+	  end.setDate(end.getDate() + 4);
+
+	  const toDateString = (date: Date): string => {
+	    const year = date.getFullYear();
+	    const month = String(date.getMonth() + 1).padStart(2, '0');
+	    const day = String(date.getDate()).padStart(2, '0');
+	    return `${year}-${month}-${day}`;
+	  };
+
+	  return [
+	    {
+	      id: 1401,
+	      tourId,
+	      startDate: toDateString(start),
+	      endDate: toDateString(end),
+	      maxParticipants: 40,
+	      bookedCount: 0,
+	      note: 'Lịch mẫu để kiểm tra giao diện',
+	    },
+	  ];
+	}
   return [
     {
       id: Number(`${tourId}01`),

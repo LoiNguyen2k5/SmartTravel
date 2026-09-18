@@ -15,7 +15,6 @@ import {
   Bell,
   Headphones,
   CheckCheck,
-  Trash2,
   Mail,
   Sparkles
 } from 'lucide-react';
@@ -80,14 +79,6 @@ export const Navbar: React.FC = () => {
   const isVendor = user?.roles?.includes('ROLE_VENDOR');
   const isAdmin = user?.roles?.includes('ROLE_ADMIN');
 
-  const navLinks = [
-    { path: '/', label: 'Trang chu' },
-    { path: '/about', label: 'Gioi thieu' },
-    { path: '/tours', label: 'Tour du lich' },
-    { path: '/services', label: 'Dich vu' },
-    { path: '/blogs', label: 'Cam nang' },
-    { path: '/contact', label: 'Lien he' },
-  ];
 
   const navLabels: Record<string, string> = {
     '/': 'Trang chủ',

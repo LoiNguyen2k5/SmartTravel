@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
@@ -28,7 +28,18 @@ export const TourListPage: React.FC = () => {
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  // Mỗi trang hiển thị tối đa 9 tour
+  const PAGE_SIZE = 9;
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // tours là danh sách đã được lọc và sắp xếp
+  const totalPages = Math.max(1, Math.ceil(tours.length / PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const startIndex = (activePage - 1) * PAGE_SIZE;
+
+  const visibleTours = tours.slice(startIndex, startIndex + PAGE_SIZE);
+  const firstItem = tours.length === 0 ? 0 : startIndex + 1;
+  const lastItem = Math.min(startIndex + PAGE_SIZE, tours.length);
   // Filters state
   const [departure, setDeparture] = useState<string>(() => searchParams.get('departure') || 'Tất cả');
   const [destination, setDestination] = useState<string>(() => searchParams.get('destination') || 'Tất cả');
@@ -58,6 +69,7 @@ export const TourListPage: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchTours();
   }, [departure, destination, durationFilter, categoryFilter, budgetFilter, sortBy]);
 
@@ -142,6 +154,7 @@ export const TourListPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
+	setCurrentPage(1);
     setDeparture('Tất cả');
     setDestination('Tất cả');
     setDurationFilter('ALL');
@@ -336,9 +349,17 @@ export const TourListPage: React.FC = () => {
               className="flex items-center justify-between p-4 rounded-2xl border border-white/8"
               style={{ background: 'rgba(10,17,29,0.85)', backdropFilter: 'blur(16px)' }}
             >
-              <span className="text-sm font-semibold text-slate-400">
-                Hiển thị <span className="font-bold text-white">{tours.length > 0 ? `1–${tours.length}` : 0}</span> trên tổng số <span className="font-bold text-white">{tours.length}</span> tour
-              </span>
+			<span className="text-sm font-semibold text-slate-400">
+			  Hiển thị{' '}
+			  <span className="font-bold text-white">
+			    {tours.length > 0 ? `${firstItem}–${lastItem}` : '0'}
+			  </span>{' '}
+			  trên tổng số{' '}
+			  <span className="font-bold text-white">
+			    {tours.length}
+			  </span>{' '}
+			  tour
+			</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-slate-500">Sắp xếp:</span>
                 <select 
@@ -377,7 +398,7 @@ export const TourListPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {tours.map((tour) => (
+                {visibleTours.map((tour) => (
                   <div 
                     key={tour.id} 
                     className="group overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col hover:-translate-y-1"
@@ -463,9 +484,55 @@ export const TourListPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+				        ))}
+				      </div>
+				    )}
+
+				    {!loading && tours.length > PAGE_SIZE && (
+				      <nav
+				        aria-label="Phân trang danh sách tour"
+				        className="flex flex-wrap items-center justify-center gap-2 pt-4"
+				      >
+				        <button
+				          type="button"
+				          disabled={activePage === 1}
+				          onClick={() => setCurrentPage(activePage - 1)}
+				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+				        >
+				          Trước
+				        </button>
+
+				        {Array.from({ length: totalPages }, (_, index) => {
+				          const page = index + 1;
+
+				          return (
+				            <button
+				              key={page}
+				              type="button"
+				              aria-label={`Trang ${page}`}
+				              aria-current={activePage === page ? 'page' : undefined}
+				              onClick={() => setCurrentPage(page)}
+				              className={`h-10 min-w-10 rounded-lg border px-3 text-sm font-semibold transition ${
+				                activePage === page
+				                  ? 'border-sky-500 bg-sky-500 text-white'
+				                  : 'border-white/20 text-slate-300 hover:bg-white/10'
+				              }`}
+				            >
+				              {page}
+				            </button>
+				          );
+				        })}
+
+				        <button
+				          type="button"
+				          disabled={activePage === totalPages}
+				          onClick={() => setCurrentPage(activePage + 1)}
+				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+				        >
+				          Sau
+				        </button>
+				      </nav>
+				    )}
           </main>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ShieldCheck, Award, Target, Eye, Compass, CheckCircle2, ChevronRight,
-  Plane, QrCode, Bot, FileText, Map, Star, Users, Globe, Sparkles,
+  Plane, QrCode, Bot, FileText, Star, Users, Globe,
   Lock, Scale, ScrollText, UserCheck, ArrowRight
 } from 'lucide-react';
 

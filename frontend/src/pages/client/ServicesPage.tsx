@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  QrCode, ShieldCheck, Bot, Plane, Map, FileText,
+  QrCode, ShieldCheck, Bot, Plane, FileText,
   Star, ArrowRight, CheckCircle2, Sparkles, Globe, Users, Award
 } from 'lucide-react';
 

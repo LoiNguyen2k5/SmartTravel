@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Search, PhoneCall, Calendar, MapPin, 
+  PhoneCall, Calendar,
   Phone, CheckCircle2, Map, Instagram, Facebook, ArrowRight, Tag,
-  Star, Eye, Users, Sparkles
+  Star, Eye, Users
 } from 'lucide-react';
 import { ZaloIcon } from '../../components/common/ZaloIcon';
 import { tourScheduleService } from '../../services/tourScheduleService';
@@ -19,13 +19,13 @@ export const HomePage: React.FC = () => {
   const [allTours, setAllTours] = useState<Tour[]>(MOCK_TOURS);
 
   useEffect(() => {
-    tourService.getAllTours().then(tours => {
-      if (tours && tours.length > 0) {
-        setAllTours(tours);
-      }
-    }).catch(err => {
-      console.warn("Using mock tours fallback:", err);
-    });
+	tourService.getAllTours().then(response => {
+	  if (response.success && response.data?.length > 0) {
+	    setAllTours(response.data);
+	  }
+	}).catch(err => {
+	  console.warn("Using mock tours fallback:", err);
+	});
 
     const handleScheduleUpdate = () => {
       setScheduleVer(v => v + 1);
