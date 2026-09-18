@@ -49,69 +49,73 @@ export const formatScheduleDate = (dStr: string): string => {
 
 // Default template schedules for any tour
 const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
-	if ([14, 17, 18, 19, 20].includes(tourId)) {
-	  const start = new Date();
-	  start.setHours(12, 0, 0, 0);
-	  start.setDate(start.getDate() + 14);
+  const toDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-	  const end = new Date(start);
-	  end.setDate(end.getDate() + 4);
+  const d1Start = new Date();
+  d1Start.setHours(12, 0, 0, 0);
+  d1Start.setDate(d1Start.getDate() + 7);
+  const d1End = new Date(d1Start);
+  d1End.setDate(d1End.getDate() + 3);
 
-	  const toDateString = (date: Date): string => {
-	    const year = date.getFullYear();
-	    const month = String(date.getMonth() + 1).padStart(2, '0');
-	    const day = String(date.getDate()).padStart(2, '0');
-	    return `${year}-${month}-${day}`;
-	  };
+  const d2Start = new Date();
+  d2Start.setHours(12, 0, 0, 0);
+  d2Start.setDate(d2Start.getDate() + 15);
+  const d2End = new Date(d2Start);
+  d2End.setDate(d2End.getDate() + 4);
 
-	  return [
-	    {
-	      id: 1401,
-	      tourId,
-	      startDate: toDateString(start),
-	      endDate: toDateString(end),
-	      maxParticipants: 40,
-	      bookedCount: 0,
-	      note: 'Lịch mẫu để kiểm tra giao diện',
-	    },
-	  ];
-	}
+  const d3Start = new Date();
+  d3Start.setHours(12, 0, 0, 0);
+  d3Start.setDate(d3Start.getDate() + 25);
+  const d3End = new Date(d3Start);
+  d3End.setDate(d3End.getDate() + 4);
+
+  const d4Start = new Date();
+  d4Start.setHours(12, 0, 0, 0);
+  d4Start.setDate(d4Start.getDate() + 35);
+  const d4End = new Date(d4Start);
+  d4End.setDate(d4End.getDate() + 4);
+
   return [
     {
       id: Number(`${tourId}01`),
       tourId,
-      startDate: '2026-08-30',
-      endDate: '2026-09-02',
+      startDate: toDateString(d1Start),
+      endDate: toDateString(d1End),
       maxParticipants: 40,
       bookedCount: 12,
-      note: 'Lễ Quốc Khánh 2/9 (+15% giá)',
+      note: 'Khởi hành đợt 1 (Sắp khởi hành)',
     },
     {
       id: Number(`${tourId}02`),
       tourId,
-      startDate: '2026-09-15',
-      endDate: '2026-09-18',
+      startDate: toDateString(d2Start),
+      endDate: toDateString(d2End),
       maxParticipants: 35,
       bookedCount: 8,
-      note: 'Khởi hành giữa tháng',
+      note: 'Khởi hành đợt 2 (Giữa tháng)',
     },
     {
       id: Number(`${tourId}03`),
       tourId,
-      startDate: '2026-10-01',
-      endDate: '2026-10-04',
+      startDate: toDateString(d3Start),
+      endDate: toDateString(d3End),
       maxParticipants: 40,
       bookedCount: 0,
-      note: 'Mùa thu vàng',
+      note: 'Khởi hành đợt 3',
     },
     {
       id: Number(`${tourId}04`),
       tourId,
-      startDate: '2026-10-15',
-      endDate: '2026-10-18',
+      startDate: toDateString(d4Start),
+      endDate: toDateString(d4End),
       maxParticipants: 40,
       bookedCount: 0,
-      note: 'Lễ hội & ngắm hoa',
+      note: 'Khởi hành tháng tới',
     },
   ];
 };
@@ -140,7 +144,18 @@ export const tourScheduleService = {
   getUpcomingSchedulesForUser: (tourId: number): TourScheduleItem[] => {
     const all = tourScheduleService.getSchedulesForTour(tourId);
     // Tự động loại bỏ các lịch đã qua ngày theo thời gian thực
-    return all.filter((s) => isUpcomingSchedule(s.startDate));
+    const upcoming = all.filter((s) => isUpcomingSchedule(s.startDate));
+    if (upcoming.length === 0) {
+      // Tự động tái tạo lịch tương lai nếu lịch cũ đã hết hạn
+      const fresh = getDefaultSchedulesForTour(tourId);
+      try {
+        localStorage.setItem(STORAGE_PREFIX + tourId, JSON.stringify(fresh));
+      } catch (e) {
+        console.error(e);
+      }
+      return fresh.filter((s) => isUpcomingSchedule(s.startDate));
+    }
+    return upcoming;
   },
 
   // Lấy lịch khởi hành gần nhất trong tương lai (để hiển thị trên card tour trang chủ & danh sách tour)

@@ -90,7 +90,14 @@ export const TourListPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await tourService.getAllTours();
-      let liveTours: Tour[] = res.success && res.data && res.data.length > 0 ? res.data : MOCK_TOURS;
+      let liveTours: Tour[] = res.success && res.data && res.data.length > 0 ? [...res.data] : [...MOCK_TOURS];
+
+      // Đảm bảo luôn đầy đủ toàn bộ tour (kể cả 9 tour mới chuẩn HCM & quốc tế)
+      for (const m of MOCK_TOURS) {
+        if (!liveTours.some(t => t.id === m.id || t.title.trim().toLowerCase() === m.title.trim().toLowerCase())) {
+          liveTours.push(m);
+        }
+      }
 
       // Chuẩn hóa đường dẫn hình ảnh thực tế từ thư mục public/images/tours/
       liveTours = liveTours.map(t => {

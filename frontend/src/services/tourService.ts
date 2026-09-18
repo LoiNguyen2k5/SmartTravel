@@ -26,22 +26,39 @@ export const saveCustomToursToStorage = (tours: Tour[]): void => {
 export const tourService = {
   getAllTours: async (): Promise<ApiResponse<Tour[]>> => {
     const customTours = getCustomToursFromStorage();
+    let apiTours: Tour[] = [];
     try {
       const res = await axiosClient.get<any, ApiResponse<Tour[]>>('/tours');
       if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-        // Merge with custom tours
-        const merged = [...customTours, ...res.data.filter(t => !customTours.some(c => c.id === t.id))];
-        return { ...res, data: merged };
+        apiTours = res.data;
       }
     } catch {
       // Backend offline or fallback
     }
-    const merged = [...customTours, ...MOCK_TOURS.filter(t => !customTours.some(c => c.id === t.id))];
+
+    // Gộp theo thứ tự: Custom tours (tạo local) + API tours (database) + Mock tours (9 tour mới và tour chuẩn)
+    const combined: Tour[] = [...customTours];
+
+    for (const t of apiTours) {
+      if (!combined.some(c => c.id === t.id)) {
+        combined.push(t);
+      }
+    }
+
+    for (const m of MOCK_TOURS) {
+      const alreadyExists = combined.some(
+        c => c.id === m.id || c.title.trim().toLowerCase() === m.title.trim().toLowerCase()
+      );
+      if (!alreadyExists) {
+        combined.push(m);
+      }
+    }
+
     return {
       status: 200,
       success: true,
       message: 'Success',
-      data: merged,
+      data: combined,
       timestamp: new Date().toISOString(),
     };
   },

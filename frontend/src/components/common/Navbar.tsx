@@ -85,6 +85,7 @@ export const Navbar: React.FC = () => {
     '/about': 'Giới thiệu',
     '/tours': 'Tour du lịch',
     '/services': 'Dịch vụ',
+    '/blogs': 'Cẩm nang',
     '/contact': 'Liên hệ',
   };
 

@@ -442,7 +442,8 @@ export const HomePage: React.FC = () => {
           ].map((news, idx) => (
             <div 
               key={idx} 
-              className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 hover:shadow-[0_12px_36px_rgba(56,189,248,0.15)] transition-all duration-300 p-5 flex flex-col justify-between group"
+              onClick={() => navigate('/blogs')}
+              className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 hover:shadow-[0_12px_36px_rgba(56,189,248,0.15)] transition-all duration-300 p-5 flex flex-col justify-between group cursor-pointer"
             >
               <div className="space-y-3.5">
                 <div className="h-44 rounded-2xl overflow-hidden">
@@ -475,6 +476,16 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="text-center pt-2">
+          <button
+            onClick={() => navigate('/blogs')}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/30 text-sky-300 hover:text-white font-bold text-xs transition duration-200 shadow-sm"
+          >
+            <span>Xem tất cả bài viết cẩm nang du lịch</span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </section>
 
