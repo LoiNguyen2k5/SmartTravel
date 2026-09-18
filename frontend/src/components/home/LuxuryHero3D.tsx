@@ -163,9 +163,12 @@ export const LuxuryHero3D: React.FC<LuxuryHero3DProps> = ({
         {/* =====================================================================
             HERO HEADLINE & SUBTITLE
             ===================================================================== */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-tight drop-shadow-[0_0_34px_rgba(130,180,255,0.25)] max-w-4xl pt-4">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-normal drop-shadow-[0_0_34px_rgba(130,180,255,0.25)] max-w-4xl pt-4">
           KHÁM PHÁ THẾ GIỚI
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-cyan-200">
+          <span 
+            className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-cyan-200"
+            style={{ paddingTop: '0.2em', paddingBottom: '0.25em' }}
+          >
             TRỌN VẸN HÀNH TRÌNH
           </span>
         </h1>

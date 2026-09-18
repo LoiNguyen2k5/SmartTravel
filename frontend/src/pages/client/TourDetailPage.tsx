@@ -336,14 +336,39 @@ export const TourDetailPage: React.FC = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
       {/* Breadcrumb Bar */}
       <div className="bg-white/[0.02] border-b border-white/10 py-3.5 px-4 sm:px-6 lg:px-8 relative z-10 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-medium text-slate-400">
-          <span className="hover:text-sky-400 cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
-          <ChevronRight className="h-3 w-3 text-slate-600" />
-          <span className="hover:text-sky-400 cursor-pointer transition" onClick={() => navigate(`/tours?type=${tour.category}`)}>
-            {tour.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
-          </span>
-          <ChevronRight className="h-3 w-3 text-slate-600" />
-          <span className="text-white font-bold line-clamp-1">{tour.title}</span>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+            <button
+              type="button"
+              onClick={() => {
+                const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate(`/tours${savedPage && Number(savedPage) > 1 ? `?page=${savedPage}` : ''}`);
+                }
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition text-xs font-semibold mr-1"
+              title="Quay lại danh sách tour"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              <span>Quay lại</span>
+            </button>
+            <span className="hover:text-sky-400 cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
+            <ChevronRight className="h-3 w-3 text-slate-600" />
+            <span 
+              className="hover:text-sky-400 cursor-pointer transition" 
+              onClick={() => {
+                const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
+                const pageParam = savedPage && Number(savedPage) > 1 ? `&page=${savedPage}` : '';
+                navigate(`/tours?type=${tour.category}${pageParam}`);
+              }}
+            >
+              {tour.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
+            </span>
+            <ChevronRight className="h-3 w-3 text-slate-600" />
+            <span className="text-white font-bold line-clamp-1">{tour.title}</span>
+          </div>
         </div>
       </div>
 

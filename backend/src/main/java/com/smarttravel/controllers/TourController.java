@@ -72,4 +72,15 @@ public class TourController {
         List<TourResponse> tours = tourService.getToursByVendor(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(tours));
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
+    @Operation(summary = "Xóa Tour du lịch (Vendor hoặc Admin)")
+    public ResponseEntity<ApiResponse<Void>> deleteTour(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        tourService.deleteTour(id, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Xóa tour thành công", null));
+    }
 }

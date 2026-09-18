@@ -6,8 +6,10 @@ import com.smarttravel.entities.Destination;
 import com.smarttravel.entities.Review;
 import com.smarttravel.entities.Tour;
 import com.smarttravel.entities.User;
+import com.smarttravel.enums.RoleEnum;
 import com.smarttravel.enums.TourCategory;
 import com.smarttravel.enums.TourStatus;
+import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.DestinationRepository;
 import com.smarttravel.repositories.TourRepository;
@@ -118,6 +120,28 @@ public class TourServiceImpl implements TourService {
         );
 
         return tours.stream().map(this::mapToTourResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteTour(Long id, String vendorEmail) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", id));
+
+        User user = userRepository.findByEmail(vendorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
+
+        boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName() == RoleEnum.ROLE_ADMIN);
+        if (!isAdmin && (tour.getVendor() == null || !tour.getVendor().getId().equals(user.getId()))) {
+            throw new BadRequestException("Bạn không có quyền xóa tour này.");
+        }
+
+        try {
+            tourRepository.delete(tour);
+        } catch (Exception e) {
+            tour.setStatus(TourStatus.INACTIVE);
+            tourRepository.save(tour);
+        }
     }
 
     private TourResponse mapToTourResponse(Tour tour) {

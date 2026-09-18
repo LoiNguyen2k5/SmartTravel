@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { tourService } from '../../services/tourService';
+import { tourService, getDeletedTourIds } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
@@ -30,7 +30,23 @@ export const TourListPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   // Mỗi trang hiển thị tối đa 9 tour
   const PAGE_SIZE = 9;
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // Helper to read initial page from URL or sessionStorage
+  const getInitialPage = (): number => {
+    const pageInUrl = searchParams.get('page');
+    if (pageInUrl) {
+      const p = parseInt(pageInUrl, 10);
+      if (!isNaN(p) && p > 0) return p;
+    }
+    const saved = sessionStorage.getItem('smart_travel_tour_page');
+    if (saved) {
+      const p = parseInt(saved, 10);
+      if (!isNaN(p) && p > 0) return p;
+    }
+    return 1;
+  };
+
+  const [currentPage, setCurrentPage] = useState<number>(getInitialPage);
 
   // tours là danh sách đã được lọc và sắp xếp
   const totalPages = Math.max(1, Math.ceil(tours.length / PAGE_SIZE));
@@ -48,28 +64,91 @@ export const TourListPage: React.FC = () => {
   const [budgetFilter, setBudgetFilter] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<string>('FEATURED');
 
-  // Keep state synchronized with URL search params changes
+  const isMountedRef = React.useRef(false);
+  const prevFiltersRef = React.useRef({
+    departure,
+    destination,
+    durationFilter,
+    categoryFilter,
+    budgetFilter,
+    sortBy,
+  });
+
+  const changePage = (newPage: number) => {
+    setCurrentPage(newPage);
+    sessionStorage.setItem('smart_travel_tour_page', String(newPage));
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (newPage > 1) {
+        next.set('page', String(newPage));
+      } else {
+        next.delete('page');
+      }
+      return next;
+    });
+    window.scrollTo({ top: 350, behavior: 'smooth' });
+  };
+
+  // Keep state synchronized with URL search params changes (e.g. Browser Back/Forward)
   useEffect(() => {
     const newCategory = parseCategoryFromParams(searchParams);
-    setCategoryFilter(newCategory);
-
-    const newDest = searchParams.get('destination');
-    if (newDest) {
-      setDestination(newDest);
-    } else if (!searchParams.has('destination') && destination !== 'Tất cả') {
-      setDestination('Tất cả');
+    if (newCategory !== categoryFilter) {
+      setCategoryFilter(newCategory);
     }
 
-    const newDep = searchParams.get('departure');
-    if (newDep) {
+    const newDest = searchParams.get('destination') || 'Tất cả';
+    if (newDest !== destination) {
+      setDestination(newDest);
+    }
+
+    const newDep = searchParams.get('departure') || 'Tất cả';
+    if (newDep !== departure) {
       setDeparture(newDep);
-    } else if (!searchParams.has('departure') && departure !== 'Tất cả') {
-      setDeparture('Tất cả');
+    }
+
+    const pageInUrl = searchParams.get('page');
+    const p = pageInUrl ? parseInt(pageInUrl, 10) : 1;
+    if (!isNaN(p) && p > 0 && p !== currentPage) {
+      setCurrentPage(p);
+      sessionStorage.setItem('smart_travel_tour_page', String(p));
     }
   }, [searchParams]);
 
   useEffect(() => {
-    setCurrentPage(1);
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      fetchTours();
+      return;
+    }
+
+    const prev = prevFiltersRef.current;
+    const filterChanged =
+      prev.departure !== departure ||
+      prev.destination !== destination ||
+      prev.durationFilter !== durationFilter ||
+      prev.categoryFilter !== categoryFilter ||
+      prev.budgetFilter !== budgetFilter ||
+      prev.sortBy !== sortBy;
+
+    if (filterChanged) {
+      prevFiltersRef.current = {
+        departure,
+        destination,
+        durationFilter,
+        categoryFilter,
+        budgetFilter,
+        sortBy,
+      };
+      // Only reset to page 1 when user genuinely clicks a filter
+      setCurrentPage(1);
+      sessionStorage.setItem('smart_travel_tour_page', '1');
+      setSearchParams(prevParams => {
+        const next = new URLSearchParams(prevParams);
+        next.delete('page');
+        return next;
+      });
+    }
+
     fetchTours();
   }, [departure, destination, durationFilter, categoryFilter, budgetFilter, sortBy]);
 
@@ -93,11 +172,15 @@ export const TourListPage: React.FC = () => {
       let liveTours: Tour[] = res.success && res.data && res.data.length > 0 ? [...res.data] : [...MOCK_TOURS];
 
       // Đảm bảo luôn đầy đủ toàn bộ tour (kể cả 9 tour mới chuẩn HCM & quốc tế)
+      const deletedIds = getDeletedTourIds();
       for (const m of MOCK_TOURS) {
-        if (!liveTours.some(t => t.id === m.id || t.title.trim().toLowerCase() === m.title.trim().toLowerCase())) {
+        if (!deletedIds.includes(m.id) && !liveTours.some(t => t.id === m.id || t.title.trim().toLowerCase() === m.title.trim().toLowerCase())) {
           liveTours.push(m);
         }
       }
+
+      // Luôn loại bỏ tất cả tour đã bị xóa
+      liveTours = liveTours.filter(t => !deletedIds.includes(t.id));
 
       // Chuẩn hóa đường dẫn hình ảnh thực tế từ thư mục public/images/tours/
       liveTours = liveTours.map(t => {
@@ -154,7 +237,8 @@ export const TourListPage: React.FC = () => {
       setTours(liveTours);
     } catch (err) {
       console.error('Lỗi nạp danh sách tour:', err);
-      setTours(MOCK_TOURS);
+      const deletedIds = getDeletedTourIds();
+      setTours(MOCK_TOURS.filter(t => !deletedIds.includes(t.id)));
     } finally {
       setLoading(false);
     }
@@ -427,7 +511,7 @@ export const TourListPage: React.FC = () => {
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                       <div className="space-y-2">
                         <h3 
-                          onClick={() => navigate(`/tours/${tour.id}`)}
+                          onClick={() => navigate(`/tours/${tour.id}`, { state: { fromPage: activePage } })}
                           className="text-xs font-extrabold text-white hover:text-sky-300 cursor-pointer line-clamp-2 leading-snug uppercase transition-colors"
                         >
                           {tour.title}
@@ -479,7 +563,7 @@ export const TourListPage: React.FC = () => {
                         </div>
 
                         <button 
-                          onClick={() => navigate(`/tours/${tour.id}`)}
+                          onClick={() => navigate(`/tours/${tour.id}`, { state: { fromPage: activePage } })}
                           className="w-full rounded-xl py-2.5 text-xs font-bold transition hover:-translate-y-0.5 text-white"
                           style={{
                             background: 'linear-gradient(to top, #9ad9ec 1px, #14a8c6 5px, #04465a 13px, #0a111d 32px)',
@@ -503,7 +587,7 @@ export const TourListPage: React.FC = () => {
 				        <button
 				          type="button"
 				          disabled={activePage === 1}
-				          onClick={() => setCurrentPage(activePage - 1)}
+				          onClick={() => changePage(activePage - 1)}
 				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
 				        >
 				          Trước
@@ -518,7 +602,7 @@ export const TourListPage: React.FC = () => {
 				              type="button"
 				              aria-label={`Trang ${page}`}
 				              aria-current={activePage === page ? 'page' : undefined}
-				              onClick={() => setCurrentPage(page)}
+				              onClick={() => changePage(page)}
 				              className={`h-10 min-w-10 rounded-lg border px-3 text-sm font-semibold transition ${
 				                activePage === page
 				                  ? 'border-sky-500 bg-sky-500 text-white'
@@ -533,7 +617,7 @@ export const TourListPage: React.FC = () => {
 				        <button
 				          type="button"
 				          disabled={activePage === totalPages}
-				          onClick={() => setCurrentPage(activePage + 1)}
+				          onClick={() => changePage(activePage + 1)}
 				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
 				        >
 				          Sau

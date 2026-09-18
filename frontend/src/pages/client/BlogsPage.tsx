@@ -100,9 +100,12 @@ export const BlogsPage: React.FC = () => {
             <BookOpen className="h-3.5 w-3.5" />
             Cẩm nang du lịch
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white leading-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white leading-normal mb-5">
             Cẩm Nang
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-white to-sky-200">
+            <span 
+              className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-white to-sky-200"
+              style={{ paddingTop: '0.2em', paddingBottom: '0.25em' }}
+            >
               Khám Phá Thế Giới
             </span>
           </h1>

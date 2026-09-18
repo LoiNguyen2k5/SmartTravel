@@ -13,4 +13,5 @@ public interface TourService {
     TourResponse createTour(TourCreateRequest request, String vendorEmail);
     List<TourResponse> getToursByVendor(String vendorEmail);
     List<TourResponse> searchTours(String departure, String destination, TourCategory category, BigDecimal minPrice, BigDecimal maxPrice, String durationFilter);
+    void deleteTour(Long id, String vendorEmail);
 }

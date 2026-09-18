@@ -177,18 +177,6 @@ INSERT INTO tours (
   '[{"day":1,"title":"NGÀY 1: TP.HCM - BANGKOK - PATTAYA","content":"Đáp chuyến bay đi Bangkok, di chuyển về Pattaya, tham quan Chợ nổi 4 miền."},{"day":2,"title":"NGÀY 2: ĐẢO CORAL PATTAYA - TRÂN BẢO PHẬT SƠN","content":"Tắm biển Đảo San Hô Coral, chiêm bái tượng Phật dát vàng trên vách núi."}]'
 ),
 (
-  11, NOW(), NOW(), 'DEMO-VIETQR-5K',
-  '[DEMO TEST] TOUR TRẢI NGHIỆM THỬ NGHIỆM THANH TOÁN VIETQR THỰC TẾ (5.000Đ)',
-  'Tour thử nghiệm quét mã VietQR chuyển khoản tiền thật (5.000đ) trực tiếp về tài khoản Agribank / MoMo. Phục vụ kiểm thử quy trình thanh toán trực tuyến và nhận vé điện tử E-Ticket QR Code ngay lập tức.',
-  5000.00, 5000.00, 1, 0, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
-  'DOMESTIC', 100, 999, 'ACTIVE', 2, 4,
-  '• Trải nghiệm thanh toán quét mã VietQR tự động\n• Nhận vé điện tử E-Ticket QR Code tức thì\n• Thử nghiệm quy trình check-in vé',
-  '• Không áp dụng cho chuyến đi thực tế (Chỉ dành cho thử nghiệm thanh toán)',
-  '• Hỗ trợ hoàn tiền test trực tiếp',
-  '[{"day":1,"title":"HÀNH TRÌNH TEST: QUÉT MÃ VIETQR VÀ NHẬN VÉ ĐIỆN TỬ","content":"Chọn tour test 5.000đ, quét mã QR Agribank/MoMo và trải nghiệm quy trình xác nhận tự động."}]'
-),
-(
   12, NOW(), NOW(), 'HCM-HN-HL-NB-4N3D',
   'TOUR HÀ NỘI - HẠ LONG - NINH BÌNH 4N3Đ | KHỞI HÀNH TỪ TP.HCM',
   'Hành trình mẫu từ TP.HCM khám phá thủ đô Hà Nội, kỳ quan Vịnh Hạ Long, Tràng An Ninh Bình và Hang Múa.',

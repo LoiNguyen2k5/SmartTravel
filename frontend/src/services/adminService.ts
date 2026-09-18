@@ -4,6 +4,7 @@ import { User } from '../types/auth';
 import { Tour, TourStatus } from '../types/tour';
 import { AdminStats, VendorSettlement, PaymentRecord } from '../types/admin';
 import { MOCK_TOURS } from '../data/mockTours';
+import { getDeletedTourIds } from './tourService';
 
 export const adminService = {
   getDashboardStats: async (): Promise<ApiResponse<AdminStats>> => {
@@ -36,11 +37,17 @@ export const adminService = {
         combined.push(m);
       }
     }
+
+    const deletedIds = getDeletedTourIds();
+    const finalTours = combined.filter(
+      t => !deletedIds.includes(t.id) && t.id !== 11 && !t.title.toLowerCase().includes('vietqr')
+    );
+
     return {
       status: 200,
       success: true,
       message: 'Success',
-      data: combined,
+      data: finalTours,
       timestamp: new Date().toISOString(),
     };
   },

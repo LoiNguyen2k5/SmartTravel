@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['"Outfit"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Be Vietnam Pro"', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['"Be Vietnam Pro"', '"Outfit"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
         primary: {

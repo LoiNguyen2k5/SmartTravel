@@ -72,9 +72,12 @@ export const ServicesPage: React.FC = () => {
             <Sparkles className="h-3.5 w-3.5" />
             Dịch vụ du lịch Smart Travel
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-tight mb-5">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-normal mb-6">
             Dịch Vụ
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-cyan-200">
+            <span 
+              className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-cyan-200"
+              style={{ paddingTop: '0.2em', paddingBottom: '0.25em' }}
+            >
               Trọn Vẹn & Hiện Đại
             </span>
           </h1>

@@ -4,11 +4,39 @@ import { ApiResponse } from '../types/common';
 import { MOCK_TOURS } from '../data/mockTours';
 
 const CUSTOM_TOURS_KEY = 'smart_travel_custom_tours';
+const DELETED_TOURS_KEY = 'smart_travel_deleted_tours';
+
+export const getDeletedTourIds = (): number[] => {
+  try {
+    const raw = localStorage.getItem(DELETED_TOURS_KEY);
+    const list: number[] = raw ? JSON.parse(raw) : [];
+    if (!list.includes(11)) {
+      list.push(11);
+    }
+    return list;
+  } catch {
+    return [11];
+  }
+};
+
+export const markTourDeleted = (id: number): void => {
+  try {
+    const current = getDeletedTourIds();
+    if (!current.includes(id)) {
+      const next = [...current, id];
+      localStorage.setItem(DELETED_TOURS_KEY, JSON.stringify(next));
+      window.dispatchEvent(new CustomEvent('tour_deleted', { detail: { id } }));
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const getCustomToursFromStorage = (): Tour[] => {
   try {
     const raw = localStorage.getItem(CUSTOM_TOURS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed: Tour[] = raw ? JSON.parse(raw) : [];
+    return parsed.filter(t => t.id !== 11 && !t.title.toLowerCase().includes('vietqr'));
   } catch {
     return [];
   }
@@ -16,7 +44,8 @@ export const getCustomToursFromStorage = (): Tour[] => {
 
 export const saveCustomToursToStorage = (tours: Tour[]): void => {
   try {
-    localStorage.setItem(CUSTOM_TOURS_KEY, JSON.stringify(tours));
+    const cleaned = tours.filter(t => t.id !== 11 && !t.title.toLowerCase().includes('vietqr'));
+    localStorage.setItem(CUSTOM_TOURS_KEY, JSON.stringify(cleaned));
     window.dispatchEvent(new CustomEvent('custom_tours_updated'));
   } catch (e) {
     console.error('Error saving custom tours', e);
@@ -54,11 +83,17 @@ export const tourService = {
       }
     }
 
+    // Loại bỏ tất cả tour đã bị vendor / admin xóa
+    const deletedIds = getDeletedTourIds();
+    const finalTours = combined.filter(
+      t => !deletedIds.includes(t.id) && t.id !== 11 && !t.title.toLowerCase().includes('vietqr')
+    );
+
     return {
       status: 200,
       success: true,
       message: 'Success',
-      data: combined,
+      data: finalTours,
       timestamp: new Date().toISOString(),
     };
   },
@@ -72,6 +107,11 @@ export const tourService = {
   },
 
   getTourById: async (id: number): Promise<ApiResponse<Tour>> => {
+    const deletedIds = getDeletedTourIds();
+    if (deletedIds.includes(Number(id)) || Number(id) === 11) {
+      throw new Error('Tour này đã bị xóa hoặc không tồn tại.');
+    }
+
     const customTours = getCustomToursFromStorage();
     const foundCustom = customTours.find(t => t.id === id);
     if (foundCustom) {
@@ -91,7 +131,10 @@ export const tourService = {
     } catch {
       // Fallback
     }
-    const foundMock = MOCK_TOURS.find(t => t.id === id) || MOCK_TOURS[0];
+    const foundMock = MOCK_TOURS.find(t => t.id === id && !deletedIds.includes(t.id) && t.id !== 11);
+    if (!foundMock) {
+      throw new Error('Tour không tồn tại.');
+    }
     return {
       status: 200,
       success: true,
@@ -166,11 +209,17 @@ export const tourService = {
         combined.push(m);
       }
     }
+
+    const deletedIds = getDeletedTourIds();
+    const finalTours = combined.filter(
+      t => !deletedIds.includes(t.id) && t.id !== 11 && !t.title.toLowerCase().includes('vietqr')
+    );
+
     return {
       status: 200,
       success: true,
       message: 'Success',
-      data: combined,
+      data: finalTours,
       timestamp: new Date().toISOString(),
     };
   },
@@ -211,6 +260,7 @@ export const tourService = {
   },
 
   deleteTour: async (id: number): Promise<ApiResponse<void>> => {
+    markTourDeleted(id);
     const customTours = getCustomToursFromStorage();
     saveCustomToursToStorage(customTours.filter(t => t.id !== id));
     try {

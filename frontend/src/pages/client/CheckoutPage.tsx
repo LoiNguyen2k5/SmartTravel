@@ -37,10 +37,10 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const stateData = location.state || {};
 
-  const tourId = stateData.tourId || 11;
-  const tourTitle = stateData.tourTitle || '[DEMO TEST] TOUR TRẢI NGHIỆM THỬ NGHIỆM THANH TOÁN VIETQR THỰC TẾ (5.000Đ)';
-  const tourThumbnailUrl = stateData.tourThumbnailUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
-  const tourCode = stateData.tourCode || 'DEMO-VIETQR-5K';
+  const tourId = stateData.tourId || 1;
+  const tourTitle = stateData.tourTitle || 'TOUR ÂN THI ĐẠI HIỆP CỐC – PHƯỢNG HOÀNG CỔ TRẤN 5N4Đ';
+  const tourThumbnailUrl = stateData.tourThumbnailUrl || '/images/tours/tour_anthi.png';
+  const tourCode = stateData.tourCode || 'TOUR-001';
   const adults = stateData.numberOfAdults || 1;
   const children = stateData.numberOfChildren || 0;
   const voucherCode = stateData.voucherCode || '';
