@@ -9,13 +9,13 @@ INSERT IGNORE INTO roles (id, name) VALUES
 (3, 'ROLE_USER');
 
 -- 2. Insert Default Accounts (Password is BCrypt hash for "12345678")
--- Hash: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi -> "12345678"
+-- Hash: $2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB. -> "12345678"
 INSERT INTO users (id, created_at, updated_at, email, password, full_name, phone, avatar_url, enabled) VALUES 
-(1, NOW(), NOW(), 'admin@smarttravel.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi', 'Quản Trị Viên Hệ Thống', '0901234567', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', 1),
-(2, NOW(), NOW(), 'vendor@smarttravel.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi', 'NewTour Travel Company', '0988776655', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 1),
-(3, NOW(), NOW(), 'customer@smarttravel.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi', 'Khách Hàng SmartTravel', '0912345678', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1),
-(5, NOW(), NOW(), 'user@smarttravel.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi', 'Khách Hàng Thân Thiết', '0912345678', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1),
-(6, NOW(), NOW(), 'nguyenbaoloicv@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBDi', 'Nguyễn Bảo Lợi', '0941899554', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1)
+(1, NOW(), NOW(), 'admin@smarttravel.com', '$2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB.', 'Quản Trị Viên Hệ Thống', '0901234567', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', 1),
+(2, NOW(), NOW(), 'vendor@smarttravel.com', '$2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB.', 'NewTour Travel Company', '0988776655', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 1),
+(3, NOW(), NOW(), 'customer@smarttravel.com', '$2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB.', 'Khách Hàng SmartTravel', '0912345678', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1),
+(5, NOW(), NOW(), 'user@smarttravel.com', '$2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB.', 'Khách Hàng Thân Thiết', '0912345678', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1),
+(6, NOW(), NOW(), 'nguyenbaoloicv@gmail.com', '$2a$10$WGPw7.UlNUFOvTwnrMmheeXESd4N157b2Ue.S3LXe7LFHa1nSkrB.', 'Nguyễn Bảo Lợi', '0941899554', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', 1)
 ON DUPLICATE KEY UPDATE 
   password = VALUES(password),
   enabled = 1,
