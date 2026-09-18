@@ -225,21 +225,21 @@ export const LoginPage: React.FC = () => {
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            onClick={() => handleQuickFill('admin@smarttravel.com', '123456')}
+            onClick={() => handleQuickFill('admin@smarttravel.com', '12345678')}
             className="flex items-center justify-center gap-1 p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 text-[11px] font-bold transition cursor-pointer"
           >
             <ShieldCheck className="h-3.5 w-3.5" /> Admin
           </button>
           <button
             type="button"
-            onClick={() => handleQuickFill('vendor@smarttravel.com', '123456')}
+            onClick={() => handleQuickFill('vendor@smarttravel.com', '12345678')}
             className="flex items-center justify-center gap-1 p-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-[11px] font-bold transition cursor-pointer"
           >
             <Store className="h-3.5 w-3.5" /> Vendor
           </button>
           <button
             type="button"
-            onClick={() => handleQuickFill('user@smarttravel.com', '123456')}
+            onClick={() => handleQuickFill('user@smarttravel.com', '12345678')}
             className="flex items-center justify-center gap-1 p-2 rounded-xl border border-sky-500/30 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-[11px] font-bold transition cursor-pointer"
           >
             <UserCheck className="h-3.5 w-3.5" /> User
