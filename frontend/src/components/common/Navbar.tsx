@@ -107,45 +107,40 @@ export const Navbar: React.FC = () => {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+          <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
             <div
-              className="text-cyan-300 p-2.5 rounded-2xl group-hover:scale-105 transition-transform duration-200"
+              className="text-cyan-300 p-2 rounded-xl group-hover:scale-105 transition-transform duration-200"
               style={{
                 background: 'linear-gradient(135deg, #0a2a37 0%, #04465a 100%)',
                 boxShadow: '0 0 16px rgba(34,211,238,0.18), inset 0 1px 0 rgba(255,255,255,0.08)',
               }}
             >
-              <Compass className="h-6 w-6" />
+              <Compass className="h-5 w-5" />
             </div>
-            <div className="flex flex-col">
-              <span
-                className="font-display text-xl font-extrabold text-white tracking-tight leading-none group-hover:text-cyan-200 transition-colors"
-                style={{ textShadow: '0 0 20px rgba(34,211,238,0.15)' }}
-              >
-                SMART TRAVEL
-              </span>
-              <span className="text-[10px] tracking-wider text-sky-400/70 font-semibold mt-0.5 uppercase">
-                Khám phá thông minh
-              </span>
-            </div>
+            <span
+              className="font-display text-base font-extrabold text-white tracking-tight leading-none group-hover:text-cyan-200 transition-colors whitespace-nowrap"
+              style={{ textShadow: '0 0 20px rgba(34,211,238,0.15)' }}
+            >
+              SMART TRAVEL
+            </span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-0.5 text-[13px] font-semibold text-slate-400">
+          <div className="hidden lg:flex items-center gap-0 text-[12px] font-semibold text-slate-400 flex-1 justify-center">
             {Object.entries(navLabels).map(([path, label]) => {
               const isActive = location.pathname === path;
               return (
                 <Link
                   key={path}
                   to={path}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all duration-150 relative ${
+                  className={`px-2.5 py-1.5 rounded-xl transition-all duration-150 relative whitespace-nowrap ${
                     isActive ? 'text-white font-bold' : 'hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {label}
                   {isActive && (
                     <span
-                      className="absolute bottom-0 left-3.5 right-3.5 h-[2px] rounded-full"
+                      className="absolute bottom-0 left-2.5 right-2.5 h-[2px] rounded-full"
                       style={{ background: 'linear-gradient(90deg, rgba(34,211,238,0) 0%, rgba(34,211,238,0.9) 50%, rgba(34,211,238,0) 100%)' }}
                     />
                   )}
