@@ -9,7 +9,7 @@ export interface TourScheduleItem {
   seasonalPriceMultiplier?: number;
 }
 
-const STORAGE_PREFIX = 'smart_travel_tour_schedules_';
+const STORAGE_PREFIX = 'smart_travel_tour_schedules_v3_';
 
 // Check if a date string is today or in the future
 export const isUpcomingSchedule = (dateStr: string): boolean => {
@@ -242,10 +242,21 @@ export const tourScheduleService = {
   // Lấy tất cả lịch khởi hành của tour (dành cho Vendor quản lý & hiển thị)
   getSchedulesForTour: (tourId: number): TourScheduleItem[] => {
     try {
+      // Dọn dẹp cache cũ chứa "Lịch mẫu" nếu tồn tại
+      localStorage.removeItem('smart_travel_tour_schedules_' + tourId);
+      localStorage.removeItem('smart_travel_tour_schedules_v2_' + tourId);
+
       const stored = localStorage.getItem(STORAGE_PREFIX + tourId);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        const parsed: TourScheduleItem[] = JSON.parse(stored);
+        const isLegacy = parsed.some(
+          (s) =>
+            !s.note ||
+            s.note.includes('Lịch mẫu') ||
+            s.note.includes('kiểm tra giao diện') ||
+            s.id < 10000
+        );
+        if (!isLegacy && Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
       }
