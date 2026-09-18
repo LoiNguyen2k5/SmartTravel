@@ -15,15 +15,17 @@ const STORAGE_PREFIX = 'smart_travel_tour_schedules_v3_';
 export const isUpcomingSchedule = (dateStr: string): boolean => {
   if (!dateStr) return false;
   try {
-    const parts = dateStr.trim().split('-');
+    const clean = dateStr.trim();
+    const delimiter = clean.includes('/') ? '/' : '-';
+    const parts = clean.split(delimiter);
     let day: number, month: number, year: number;
     if (parts[0].length === 4) {
-      // YYYY-MM-DD
+      // YYYY-MM-DD or YYYY/MM/DD
       year = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10) - 1;
       day = parseInt(parts[2], 10);
     } else {
-      // DD-MM-YYYY
+      // DD-MM-YYYY or DD/MM/YYYY
       day = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10) - 1;
       year = parseInt(parts[2], 10);
