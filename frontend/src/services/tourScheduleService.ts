@@ -204,7 +204,7 @@ const TOUR_SCHEDULES: Record<number, TourScheduleItem[]> = {
   ],
   // ─── Tour 20: Indonesia – Bali 5N4Đ ───
   20: [
-    { id: 12001, tourId: 20, startDate: '2026-09-21', endDate: '2026-09-25', maxParticipants: 40, bookedCount: 24, note: 'Khởi hành 21/9 — Bali mùa khô đẹp nhất' },
+    { id: 12001, tourId: 20, startDate: '2026-09-21', endDate: '2026-09-25', maxParticipants: 40, bookedCount: 26, note: 'Khởi hành 21/9 — Bali mùa khô đẹp nhất' },
     { id: 12002, tourId: 20, startDate: '2026-10-01', endDate: '2026-10-05', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 01/10 — Lễ Quốc Khánh (+10%)', seasonalPriceMultiplier: 1.1 },
     { id: 12003, tourId: 20, startDate: '2026-10-11', endDate: '2026-10-15', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 11/10 — Ubud & Tegallalang mùa đẹp' },
     { id: 12004, tourId: 20, startDate: '2026-10-21', endDate: '2026-10-25', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 21/10 — Tanah Lot mùa lặng sóng' },
@@ -239,17 +239,15 @@ const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
 };
 
 export const tourScheduleService = {
-  // Lấy tất cả lịch khởi hành của tour (dành cho Vendor quản lý)
+  // Lấy tất cả lịch khởi hành của tour (dành cho Vendor quản lý & hiển thị)
   getSchedulesForTour: (tourId: number): TourScheduleItem[] => {
-    // Nếu tour đã có lịch cố định, luôn dùng lịch đó (bỏ qua cache cũ)
-    if (TOUR_SCHEDULES[tourId]) {
-      return TOUR_SCHEDULES[tourId];
-    }
-    // Với tour do Vendor tạo thủ công, dùng localStorage
     try {
       const stored = localStorage.getItem(STORAGE_PREFIX + tourId);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
       }
     } catch (e) {
       console.error('Error reading tour schedules', e);
@@ -351,11 +349,22 @@ export const tourScheduleService = {
   },
 
   // Trừ slot / ghế khi du khách đặt tour thành công
-  bookSeatsForSchedule: (tourId: number, scheduleId: number, guestCount: number): boolean => {
+  bookSeatsForSchedule: (tourId: number, scheduleId?: number, guestCount = 1, departureDate?: string): boolean => {
     const schedules = tourScheduleService.getSchedulesForTour(tourId);
     let updated = false;
+
+    const normDate = (d?: string) => {
+      if (!d) return '';
+      const parts = d.trim().split('-');
+      if (parts[0].length === 4) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      return d;
+    };
+    const targetDate = normDate(departureDate);
+
     const next = schedules.map((s) => {
-      if (s.id === scheduleId) {
+      const isMatchById = scheduleId !== undefined && (s.id === scheduleId || Number(s.id) === Number(scheduleId));
+      const isMatchByDate = targetDate && (normDate(s.startDate) === targetDate);
+      if (isMatchById || (!updated && isMatchByDate)) {
         updated = true;
         return {
           ...s,
@@ -364,8 +373,12 @@ export const tourScheduleService = {
       }
       return s;
     });
+
     if (updated) {
       tourScheduleService.saveSchedulesForTour(tourId, next);
+      if (TOUR_SCHEDULES[tourId]) {
+        TOUR_SCHEDULES[tourId] = next;
+      }
     }
     return updated;
   },

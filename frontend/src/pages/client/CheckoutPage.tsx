@@ -103,6 +103,31 @@ export const CheckoutPage: React.FC = () => {
 
   const [paymentSuccessToast, setPaymentSuccessToast] = useState(false);
   const pollingRef = useRef<any>(null);
+  const seatsDeductedRef = useRef(false);
+
+  const deductSeatsIfPending = () => {
+    if (seatsDeductedRef.current) return;
+    seatsDeductedRef.current = true;
+    try {
+      const scheduleId = stateData.scheduleId;
+      const totalGuests = (adults || 1) + (children || 0);
+      const chosenDate = stateData.departureDate;
+      if (tourId) {
+        tourScheduleService.bookSeatsForSchedule(tourId, scheduleId, totalGuests, chosenDate);
+      }
+      if (scheduleId) {
+        const storedSeatsStr = localStorage.getItem('schedule_seat_counts');
+        const storedSeats: Record<number, number> = storedSeatsStr 
+          ? JSON.parse(storedSeatsStr) 
+          : { 1: 28, 2: 35, 3: 40, 4: 40, 5: 45, 6: 45 };
+        const current = storedSeats[scheduleId] !== undefined ? storedSeats[scheduleId] : 35;
+        storedSeats[scheduleId] = Math.max(0, current - totalGuests);
+        localStorage.setItem('schedule_seat_counts', JSON.stringify(storedSeats));
+      }
+    } catch (e) {
+      console.error('Error updating seat count:', e);
+    }
+  };
 
   const handleInitiatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,6 +141,9 @@ export const CheckoutPage: React.FC = () => {
     setTimeLeft(900);
     setShowQrPaymentModal(true);
     setPaymentSuccessToast(false);
+
+    // Deduct seats immediately so availability is updated in real time
+    deductSeatsIfPending();
 
     // Create booking in backend in background
     try {
@@ -201,23 +229,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     // Automatically deduct remaining seats for this schedule
-    try {
-      const scheduleId = stateData.scheduleId || 2;
-      const totalGuests = (adults || 1) + (children || 0);
-      if (tourId) {
-        tourScheduleService.bookSeatsForSchedule(tourId, scheduleId, totalGuests);
-      }
-      const storedSeatsStr = localStorage.getItem('schedule_seat_counts');
-      const storedSeats: Record<number, number> = storedSeatsStr 
-        ? JSON.parse(storedSeatsStr) 
-        : { 1: 28, 2: 35, 3: 40, 4: 40, 5: 45, 6: 45 };
-      
-      const current = storedSeats[scheduleId] !== undefined ? storedSeats[scheduleId] : 35;
-      storedSeats[scheduleId] = Math.max(0, current - totalGuests);
-      localStorage.setItem('schedule_seat_counts', JSON.stringify(storedSeats));
-    } catch (e) {
-      console.error('Error updating seat count:', e);
-    }
+    deductSeatsIfPending();
 
     // Auto-transition to E-Ticket after 2 seconds
     setTimeout(() => {
