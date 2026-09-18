@@ -241,7 +241,7 @@ export const BookingHistoryPage: React.FC = () => {
 
         {/* E-TICKET QR MODAL */}
         {selectedTicket && (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
             <div className="bg-[#0a111d] border border-white/15 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-[0_24px_60px_rgba(0,0,0,0.8)] text-white">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2 text-cyan-300 font-bold text-base">

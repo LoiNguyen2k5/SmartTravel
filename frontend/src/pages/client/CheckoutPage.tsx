@@ -555,7 +555,7 @@ export const CheckoutPage: React.FC = () => {
 
         {/* VIETQR & MOMO PAYMENT MODAL */}
         {showQrPaymentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in">
             <div className="w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 shadow-2xl space-y-5 my-6 border border-slate-100">
               
               {/* Modal Header */}

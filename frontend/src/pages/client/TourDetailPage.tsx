@@ -1095,7 +1095,7 @@ export const TourDetailPage: React.FC = () => {
       {/* Lightbox / Fullscreen Image Viewer Modal */}
       {lightboxOpen && (
         <div 
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-between p-4 sm:p-6 select-none animate-fade-in"
+          className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex flex-col justify-between p-4 sm:p-6 select-none animate-fade-in"
           onClick={closeLightbox}
         >
           {/* Top Header Bar */}
