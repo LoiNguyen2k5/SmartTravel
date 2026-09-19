@@ -14,7 +14,7 @@ import { Tour } from '../../types/tour';
 import { LuxuryHero3D } from '../../components/home/LuxuryHero3D';
 
 const homeBlogPosts = posts.filter(post =>
-  [7, 8, 9].includes(post.id)
+  [112, 115, 120].includes(post.id)
 );
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();

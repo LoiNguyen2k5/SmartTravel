@@ -19,7 +19,31 @@ export const TourDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const fromBlogValue: unknown = location.state?.fromBlog;
+  const blogListValue: unknown = location.state?.blogListUrl;
 
+  const fromBlog =
+    typeof fromBlogValue === 'string' &&
+    /^\/blogs\/\d+(?:\?[^#]*)?$/.test(fromBlogValue)
+      ? fromBlogValue
+      : null;
+
+  const blogListUrl =
+    typeof blogListValue === 'string' &&
+    /^\/blogs(?:\?[^#]*)?$/.test(blogListValue)
+      ? blogListValue
+      : '/blogs';
+
+  const handleBackToSelection = () => {
+    if (fromBlog) {
+      navigate(fromBlog, {
+        state: { from: blogListUrl },
+      });
+      return;
+    }
+
+    navigate('/tours');
+  };
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -332,6 +356,17 @@ export const TourDetailPage: React.FC = () => {
 
   return (
     <div className="bg-[#020204] text-white min-h-screen pb-20 relative overflow-hidden">
+	<div className="mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
+	  <button
+	    type="button"
+	    onClick={handleBackToSelection}
+	    className="rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-sky-400 transition hover:bg-white/5"
+	  >
+	    {fromBlog
+	      ? '← Quay lại bài viết'
+	      : '← Chọn tour khác'}
+	  </button>
+	</div>
       {/* Background Ambient Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
       {/* Breadcrumb Bar */}
