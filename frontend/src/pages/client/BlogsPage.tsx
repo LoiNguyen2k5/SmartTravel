@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { posts } from '../../data/blogPosts';
+import type { Category } from '../../data/blogPosts';
 import {
   BookOpen, Map, Camera, Utensils, Backpack, Globe,
   Clock, Tag, ArrowRight, Search, Sparkles, TrendingUp, Eye
 } from 'lucide-react';
-
-type Category = 'all' | 'kinhNghiem' | 'diaDiem' | 'amThuc' | 'backpacker' | 'nuocNgoai';
 
 const categories: { id: Category; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: 'Tất cả', icon: <BookOpen className="h-4 w-4" /> },
@@ -14,63 +14,6 @@ const categories: { id: Category; label: string; icon: React.ReactNode }[] = [
   { id: 'amThuc', label: 'Ẩm thực', icon: <Utensils className="h-4 w-4" /> },
   { id: 'backpacker', label: 'Phượt', icon: <Backpack className="h-4 w-4" /> },
   { id: 'nuocNgoai', label: 'Quốc tế', icon: <Globe className="h-4 w-4" /> },
-];
-
-const posts = [
-  {
-    id: 1, cat: 'kinhNghiem' as Category,
-    tag: 'Kinh nghiệm', tagColor: 'bg-sky-500/90',
-    image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80',
-    title: 'Bí kíp đặt tour giá rẻ mùa cao điểm',
-    desc: 'Những mẹo giúp bạn tiết kiệm tới 40% chi phí khi đặt tour vào mùa hè và dịp lễ tết mà vẫn có trải nghiệm tuyệt vời.',
-    date: '12/09/2026', readTime: '5 phút', views: '2.4K',
-    featured: true,
-  },
-  {
-    id: 2, cat: 'diaDiem' as Category,
-    tag: 'Địa điểm', tagColor: 'bg-emerald-500/90',
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80',
-    title: 'Phượng Hoàng Cổ Trấn — Kiến trúc ngàn năm còn đó',
-    desc: 'Khám phá thị trấn cổ được xây dựng bên dòng sông Đà Giang với những ngôi nhà sàn độc đáo và nền văn hóa Miêu tộc huyền bí.',
-    date: '08/09/2026', readTime: '7 phút', views: '3.1K',
-    featured: false,
-  },
-  {
-    id: 3, cat: 'amThuc' as Category,
-    tag: 'Ẩm thực', tagColor: 'bg-amber-500/90',
-    image: 'https://images.unsplash.com/photo-1569451092049-c68e9a8f7869?w=600&q=80',
-    title: 'Đặc sản Đà Lạt không thể bỏ qua',
-    desc: 'Bánh tráng nướng, sữa đậu nành nóng, nem nướng Đà Lạt — hành trình ẩm thực xứ ngàn hoa dành cho mọi tín đồ đam mê khám phá.',
-    date: '05/09/2026', readTime: '4 phút', views: '1.8K',
-    featured: false,
-  },
-  {
-    id: 4, cat: 'nuocNgoai' as Category,
-    tag: 'Quốc tế', tagColor: 'bg-rose-500/90',
-    image: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=600&q=80',
-    title: 'Thượng Hải — Ô Trấn, hành trình cổ kim giao thoa',
-    desc: 'Từ những tòa nhà chọc trời ở Bund đến con sông cổ kính ở Ô Trấn — Thượng Hải là sự pha trộn hoàn hảo giữa hiện đại và truyền thống.',
-    date: '01/09/2026', readTime: '8 phút', views: '4.2K',
-    featured: true,
-  },
-  {
-    id: 5, cat: 'backpacker' as Category,
-    tag: 'Phượt', tagColor: 'bg-violet-500/90',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
-    title: 'Núi Chứa Chan — Phượt 1 ngày từ TP.HCM',
-    desc: 'Cách TP.HCM chỉ 100km, Núi Chứa Chan là điểm leo núi lý tưởng cuối tuần với cảnh quan hùng vĩ và chùa Bửu Quang linh thiêng.',
-    date: '28/08/2026', readTime: '6 phút', views: '2.0K',
-    featured: false,
-  },
-  {
-    id: 6, cat: 'kinhNghiem' as Category,
-    tag: 'Kinh nghiệm', tagColor: 'bg-sky-500/90',
-    image: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=600&q=80',
-    title: 'Chuẩn bị hành lý du lịch biển đúng cách',
-    desc: 'Checklist đầy đủ cho chuyến đi biển: từ kem chống nắng, phao bơi đến thuốc say sóng và những vật dụng không thể thiếu.',
-    date: '25/08/2026', readTime: '5 phút', views: '1.5K',
-    featured: false,
-  },
 ];
 
 export const BlogsPage: React.FC = () => {
@@ -154,11 +97,12 @@ export const BlogsPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {featured.map(post => (
-                <div
-                  key={post.id}
-                  className="group relative rounded-3xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-1"
-                  style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}
-                >
+				<Link
+				  key={post.id}
+				  to={`/blogs/${post.id}`}
+				  className="group relative rounded-3xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+				  style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}
+				>
                   <div className="relative h-56 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#020204] via-black/20 to-transparent" />
@@ -175,7 +119,7 @@ export const BlogsPage: React.FC = () => {
                       <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> {post.date}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -190,10 +134,11 @@ export const BlogsPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {regular.map(post => (
-                <div
-                  key={post.id}
-                  className="group rounded-2xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
-                >
+				<Link
+				  key={post.id}
+				  to={`/blogs/${post.id}`}
+				  className="group rounded-2xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
+				>
                   <div className="relative h-44 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -207,7 +152,7 @@ export const BlogsPage: React.FC = () => {
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
