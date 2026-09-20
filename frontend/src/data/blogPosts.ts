@@ -2,10 +2,8 @@ import { tourBlogArticles } from './tourBlogArticles';
 
 export type Category =
   | 'all'
-  | 'kinhNghiem'
   | 'diaDiem'
-  | 'amThuc'
-  | 'backpacker'
-  | 'nuocNgoai';
+  | 'kinhNghiem'
+  | 'amThuc';
 
 export const posts = tourBlogArticles;

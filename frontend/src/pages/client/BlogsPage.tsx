@@ -9,17 +9,15 @@ import {
 import { posts } from '../../data/blogPosts';
 import type { Category } from '../../data/blogPosts';
 import {
-  BookOpen, Map, Camera, Utensils, Backpack, Globe,
+  BookOpen, MapPin, Camera, Utensils,
   Clock, Tag, ArrowRight, Search, Sparkles, TrendingUp, Eye
 } from 'lucide-react';
 
 const categories: { id: Category; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: 'Tất cả', icon: <BookOpen className="h-4 w-4" /> },
+  { id: 'diaDiem', label: 'Địa điểm', icon: <MapPin className="h-4 w-4" /> },
   { id: 'kinhNghiem', label: 'Kinh nghiệm', icon: <TrendingUp className="h-4 w-4" /> },
-  { id: 'diaDiem', label: 'Địa điểm', icon: <Map className="h-4 w-4" /> },
   { id: 'amThuc', label: 'Ẩm thực', icon: <Utensils className="h-4 w-4" /> },
-  { id: 'backpacker', label: 'Phượt', icon: <Backpack className="h-4 w-4" /> },
-  { id: 'nuocNgoai', label: 'Quốc tế', icon: <Globe className="h-4 w-4" /> },
 ];
 
 export const BlogsPage: React.FC = () => {
