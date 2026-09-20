@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { posts } from '../../data/blogPosts';
 import { 
   PhoneCall, Calendar,
   Phone, CheckCircle2, Map, Instagram, Facebook, ArrowRight, Tag,
@@ -12,6 +13,9 @@ import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { LuxuryHero3D } from '../../components/home/LuxuryHero3D';
 
+const homeBlogPosts = posts.filter(post =>
+  [112, 115, 120].includes(post.id)
+);
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -404,90 +408,72 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 8. SECTION: TIN TỨC & CẨM NANG DU LỊCH */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <span className="text-xs font-bold text-sky-400 uppercase tracking-widest">Kinh nghiệm & Bí quyết</span>
-          <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Cẩm Nang & Tin Tức Du Lịch Mới Nhất
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Cập nhật xu hướng xê dịch, mẹo tiết kiệm chi phí và hướng dẫn chuẩn bị hành trang tốt nhất.
-          </p>
-        </div>
+	  {/* 8. SECTION: TIN TỨC & CẨM NANG DU LỊCH */}
+	  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+	    <div className="text-center space-y-2 max-w-2xl mx-auto">
+	      <span className="text-xs font-bold text-sky-400 uppercase tracking-widest">
+	        Kinh nghiệm & Bí quyết
+	      </span>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              title: 'Tour Tây Ninh lễ 2/9 – Chinh phục nóc nhà Nam Bộ núi Bà Đen 1 ngày',
-              date: '14/08/2026',
-              author: 'Ban Biên Tập Smart Travel',
-              summary: 'Khám phá quần thể tâm linh đỉnh Bà Đen hùng vĩ, trải nghiệm cáp treo hiện đại và thưởng thức đặc sản bò tơ nức tiếng.',
-              img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80'
-            },
-            {
-              title: 'Kinh nghiệm du lịch đảo Phú Quý tự túc trọn gói từ A đến Z',
-              date: '13/08/2026',
-              author: 'Ban Biên Tập Smart Travel',
-              summary: 'Khám phá hòn ngọc biển xanh nguyên sơ, những cung đường ven biển tuyệt đẹp và lịch trình ngắm hoàng hôn lý tưởng.',
-              img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'
-            },
-            {
-              title: 'Côn Đảo huyền bí – Hành trình về miền lịch sử và biển cả thiêng liêng',
-              date: '12/08/2026',
-              author: 'Ban Biên Tập Smart Travel',
-              summary: 'Lịch trình 2 ngày kết hợp nghỉ dưỡng bên bờ biển thanh bình và viếng mộ chị Võ Thị Sáu cùng các di tích lịch sử anh hùng.',
-              img: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=600&q=80'
-            }
-          ].map((news, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => navigate('/blogs')}
-              className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 hover:shadow-[0_12px_36px_rgba(56,189,248,0.15)] transition-all duration-300 p-5 flex flex-col justify-between group cursor-pointer"
-            >
-              <div className="space-y-3.5">
-                <div className="h-44 rounded-2xl overflow-hidden">
-                  <img 
-                    src={news.img} 
-                    alt={news.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out" 
-                  />
-                </div>
-                
-                <div className="flex items-center gap-3 text-[11px] text-slate-400 font-medium">
-                  <span>📅 {news.date}</span>
-                  <span>•</span>
-                  <span>✍️ {news.author}</span>
-                </div>
+	      <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+	        Cẩm Nang Du Lịch
+	      </h2>
 
-                <h4 className="font-display font-bold text-sm text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors">
-                  {news.title}
-                </h4>
+	      <p className="text-xs sm:text-sm text-slate-400">
+	        Khám phá điểm đến và chuẩn bị cho hành trình của bạn.
+	      </p>
+	    </div>
 
-                <p className="text-xs text-slate-300/80 line-clamp-3 leading-relaxed">
-                  {news.summary}
-                </p>
-              </div>
+	    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+	      {homeBlogPosts.map(post => (
+	        <Link
+	          key={post.id}
+	          to={`/blogs/${post.id}`}
+	          className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 transition-all duration-300 p-5 flex flex-col justify-between group focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400"
+	        >
+	          <div className="space-y-3.5">
+	            <div className="h-44 rounded-2xl overflow-hidden bg-slate-800">
+	              <img
+	                src={post.image}
+	                alt={post.title}
+	                loading="lazy"
+	                className="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out"
+	              />
+	            </div>
 
-              <div className="pt-4">
-                <span className="text-xs font-bold text-sky-400 group-hover:text-sky-300 inline-flex items-center gap-1 transition">
-                  Đọc bài viết <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+	            <p className="text-[11px] text-slate-400 font-medium">
+	              {post.date} · {post.tag}
+	            </p>
 
-        <div className="text-center pt-2">
-          <button
-            onClick={() => navigate('/blogs')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/30 text-sky-300 hover:text-white font-bold text-xs transition duration-200 shadow-sm"
-          >
-            <span>Xem tất cả bài viết cẩm nang du lịch</span>
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
-      </section>
+	            <h3 className="font-display font-bold text-sm text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors">
+	              {post.title}
+	            </h3>
+
+	            <p className="text-xs text-slate-300/80 line-clamp-3 leading-relaxed">
+	              {post.desc}
+	            </p>
+	          </div>
+
+	          <div className="pt-4">
+	            <span className="text-xs font-bold text-sky-400 inline-flex items-center gap-1">
+	              Đọc bài viết
+	              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+	            </span>
+	          </div>
+	        </Link>
+	      ))}
+	    </div>
+
+	    <div className="text-center">
+	      <Link
+	        to="/blogs"
+	        className="inline-flex items-center gap-2 rounded-xl border border-sky-400/30 px-5 py-3 text-sm font-semibold text-sky-400 hover:bg-sky-400/10"
+	      >
+	        Xem tất cả cẩm nang
+	        <ArrowRight className="h-4 w-4" />
+	      </Link>
+	    </div>
+	  </section>
 
       {/* 9. FLOATING CONTACT SPEED DIAL */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5">

@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from 'react-router-dom';
+import { posts } from '../../data/blogPosts';
+import type { Category } from '../../data/blogPosts';
 import {
   BookOpen, Map, Camera, Utensils, Backpack, Globe,
   Clock, Tag, ArrowRight, Search, Sparkles, TrendingUp, Eye
 } from 'lucide-react';
-
-type Category = 'all' | 'kinhNghiem' | 'diaDiem' | 'amThuc' | 'backpacker' | 'nuocNgoai';
 
 const categories: { id: Category; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: 'Tất cả', icon: <BookOpen className="h-4 w-4" /> },
@@ -16,77 +22,111 @@ const categories: { id: Category; label: string; icon: React.ReactNode }[] = [
   { id: 'nuocNgoai', label: 'Quốc tế', icon: <Globe className="h-4 w-4" /> },
 ];
 
-const posts = [
-  {
-    id: 1, cat: 'kinhNghiem' as Category,
-    tag: 'Kinh nghiệm', tagColor: 'bg-sky-500/90',
-    image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=80',
-    title: 'Bí kíp đặt tour giá rẻ mùa cao điểm',
-    desc: 'Những mẹo giúp bạn tiết kiệm tới 40% chi phí khi đặt tour vào mùa hè và dịp lễ tết mà vẫn có trải nghiệm tuyệt vời.',
-    date: '12/09/2026', readTime: '5 phút', views: '2.4K',
-    featured: true,
-  },
-  {
-    id: 2, cat: 'diaDiem' as Category,
-    tag: 'Địa điểm', tagColor: 'bg-emerald-500/90',
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80',
-    title: 'Phượng Hoàng Cổ Trấn — Kiến trúc ngàn năm còn đó',
-    desc: 'Khám phá thị trấn cổ được xây dựng bên dòng sông Đà Giang với những ngôi nhà sàn độc đáo và nền văn hóa Miêu tộc huyền bí.',
-    date: '08/09/2026', readTime: '7 phút', views: '3.1K',
-    featured: false,
-  },
-  {
-    id: 3, cat: 'amThuc' as Category,
-    tag: 'Ẩm thực', tagColor: 'bg-amber-500/90',
-    image: 'https://images.unsplash.com/photo-1569451092049-c68e9a8f7869?w=600&q=80',
-    title: 'Đặc sản Đà Lạt không thể bỏ qua',
-    desc: 'Bánh tráng nướng, sữa đậu nành nóng, nem nướng Đà Lạt — hành trình ẩm thực xứ ngàn hoa dành cho mọi tín đồ đam mê khám phá.',
-    date: '05/09/2026', readTime: '4 phút', views: '1.8K',
-    featured: false,
-  },
-  {
-    id: 4, cat: 'nuocNgoai' as Category,
-    tag: 'Quốc tế', tagColor: 'bg-rose-500/90',
-    image: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=600&q=80',
-    title: 'Thượng Hải — Ô Trấn, hành trình cổ kim giao thoa',
-    desc: 'Từ những tòa nhà chọc trời ở Bund đến con sông cổ kính ở Ô Trấn — Thượng Hải là sự pha trộn hoàn hảo giữa hiện đại và truyền thống.',
-    date: '01/09/2026', readTime: '8 phút', views: '4.2K',
-    featured: true,
-  },
-  {
-    id: 5, cat: 'backpacker' as Category,
-    tag: 'Phượt', tagColor: 'bg-violet-500/90',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
-    title: 'Núi Chứa Chan — Phượt 1 ngày từ TP.HCM',
-    desc: 'Cách TP.HCM chỉ 100km, Núi Chứa Chan là điểm leo núi lý tưởng cuối tuần với cảnh quan hùng vĩ và chùa Bửu Quang linh thiêng.',
-    date: '28/08/2026', readTime: '6 phút', views: '2.0K',
-    featured: false,
-  },
-  {
-    id: 6, cat: 'kinhNghiem' as Category,
-    tag: 'Kinh nghiệm', tagColor: 'bg-sky-500/90',
-    image: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=600&q=80',
-    title: 'Chuẩn bị hành lý du lịch biển đúng cách',
-    desc: 'Checklist đầy đủ cho chuyến đi biển: từ kem chống nắng, phao bơi đến thuốc say sóng và những vật dụng không thể thiếu.',
-    date: '25/08/2026', readTime: '5 phút', views: '1.5K',
-    featured: false,
-  },
-];
-
 export const BlogsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [activeCat, setActiveCat] = useState<Category>('all');
-  const [searchQ, setSearchQ] = useState('');
+	const navigate = useNavigate();
+	const location = useLocation();
+	const [searchParams, setSearchParams] = useSearchParams();
 
-  const filtered = posts.filter(p => {
-    const matchCat = activeCat === 'all' || p.cat === activeCat;
-    const matchQ = searchQ === '' || p.title.toLowerCase().includes(searchQ.toLowerCase());
-    return matchCat && matchQ;
-  });
+	const PAGE_SIZE = 9;
 
-  const featured = filtered.filter(p => p.featured);
-  const regular = filtered.filter(p => !p.featured);
+	const categoryParam = searchParams.get('category');
 
+	const activeCat: Category =
+	  categories.find(category => category.id === categoryParam)?.id ?? 'all';
+
+	const searchQ = searchParams.get('q') ?? '';
+
+	const pageParam = Number(searchParams.get('page') ?? '1');
+
+	const requestedPage =
+	  Number.isSafeInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+	const normalizedSearch = searchQ.trim().toLocaleLowerCase('vi');
+
+	const filtered = posts.filter(post => {
+	  const matchCategory =
+	    activeCat === 'all' || post.cat === activeCat;
+
+	  const matchSearch =
+	    normalizedSearch === '' ||
+	    post.title.toLocaleLowerCase('vi').includes(normalizedSearch);
+
+	  return matchCategory && matchSearch;
+	});
+
+	// Xếp bài nổi bật trước, rồi mới chia trang.
+	// Mỗi trang có tối đa 9 bài tính cả bài nổi bật.
+	const orderedPosts = [
+	  ...filtered.filter(post => post.featured),
+	  ...filtered.filter(post => !post.featured),
+	];
+
+	const totalPages = Math.max(
+	  1,
+	  Math.ceil(orderedPosts.length / PAGE_SIZE),
+	);
+
+	const currentPage = Math.min(requestedPage, totalPages);
+	const startIndex = (currentPage - 1) * PAGE_SIZE;
+
+	const pagePosts = orderedPosts.slice(
+	  startIndex,
+	  startIndex + PAGE_SIZE,
+	);
+
+	const featured = pagePosts.filter(post => post.featured);
+	const regular = pagePosts.filter(post => !post.featured);
+
+	const firstItem = orderedPosts.length === 0 ? 0 : startIndex + 1;
+	const lastItem = Math.min(
+	  startIndex + PAGE_SIZE,
+	  orderedPosts.length,
+	);
+
+	const listUrl = location.pathname + location.search;
+
+	const changeSearch = (value: string) => {
+	  const next = new URLSearchParams(searchParams);
+
+	  if (value) {
+	    next.set('q', value);
+	  } else {
+	    next.delete('q');
+	  }
+
+	  next.delete('page');
+	  setSearchParams(next, { replace: true });
+	};
+
+	const changeCategory = (value: Category) => {
+	  const next = new URLSearchParams(searchParams);
+
+	  if (value === 'all') {
+	    next.delete('category');
+	  } else {
+	    next.set('category', value);
+	  }
+
+	  next.delete('page');
+	  setSearchParams(next);
+	};
+
+	const changePage = (value: number) => {
+	  const next = new URLSearchParams(searchParams);
+
+	  if (value === 1) {
+	    next.delete('page');
+	  } else {
+	    next.set('page', String(value));
+	  }
+
+	  setSearchParams(next);
+
+	  document.getElementById('blog-results')?.scrollIntoView({
+	    behavior: 'smooth',
+	    block: 'start',
+	  });
+	};
   return (
     <div className="min-h-screen bg-[#020204] text-white">
 
@@ -120,7 +160,7 @@ export const BlogsPage: React.FC = () => {
               type="text"
               placeholder="Tìm bài viết..."
               value={searchQ}
-              onChange={e => setSearchQ(e.target.value)}
+              onChange={e => changeSearch(e.target.value)}
               className="bg-transparent focus:outline-none w-full text-sm text-slate-200 placeholder:text-slate-500"
             />
           </div>
@@ -133,7 +173,7 @@ export const BlogsPage: React.FC = () => {
           {categories.map(cat => (
             <button
               key={cat.id}
-              onClick={() => setActiveCat(cat.id)}
+              onClick={() => changeCategory(cat.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 activeCat === cat.id
                   ? 'bg-sky-500 text-white shadow-[0_0_12px_rgba(56,189,248,0.3)]'
@@ -146,7 +186,13 @@ export const BlogsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-14 space-y-14">
+	  <div
+	    id="blog-results"
+	    className="max-w-7xl mx-auto px-6 py-14 space-y-14 scroll-mt-28"
+	  >
+	    <p className="text-sm text-slate-400" aria-live="polite">
+	      Hiển thị {firstItem}–{lastItem} trong {orderedPosts.length} bài viết
+	    </p>
 
         {/* Featured posts */}
         {featured.length > 0 && (
@@ -157,11 +203,13 @@ export const BlogsPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {featured.map(post => (
-                <div
-                  key={post.id}
-                  className="group relative rounded-3xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-1"
-                  style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}
-                >
+				<Link
+				  key={post.id}
+				  to={`/blogs/${post.id}`}
+				  state={{ from: listUrl }}
+				  className="group relative rounded-3xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+				  style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}
+				>
                   <div className="relative h-56 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#020204] via-black/20 to-transparent" />
@@ -178,7 +226,7 @@ export const BlogsPage: React.FC = () => {
                       <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> {post.date}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -193,10 +241,12 @@ export const BlogsPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {regular.map(post => (
-                <div
-                  key={post.id}
-                  className="group rounded-2xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
-                >
+				<Link
+				  key={post.id}
+				  to={`/blogs/${post.id}`}
+				  state={{ from: listUrl }}
+				  className="group rounded-2xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
+				>
                   <div className="relative h-44 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -210,7 +260,7 @@ export const BlogsPage: React.FC = () => {
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -222,6 +272,49 @@ export const BlogsPage: React.FC = () => {
             <p className="text-sm">Không tìm thấy bài viết phù hợp.</p>
           </div>
         )}
+		{totalPages > 1 && (
+		  <nav
+		    aria-label="Phân trang cẩm nang"
+		    className="flex flex-wrap items-center justify-center gap-2"
+		  >
+		    <button
+		      type="button"
+		      onClick={() => changePage(currentPage - 1)}
+		      disabled={currentPage === 1}
+		      className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+		    >
+		      ← Trang trước
+		    </button>
+
+		    {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+		      page => (
+		        <button
+		          key={page}
+		          type="button"
+		          onClick={() => changePage(page)}
+		          aria-label={`Trang ${page}`}
+		          aria-current={page === currentPage ? 'page' : undefined}
+		          className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+		            page === currentPage
+		              ? 'border-sky-500 bg-sky-600 text-white'
+		              : 'border-white/15 text-slate-300 hover:bg-white/10'
+		          }`}
+		        >
+		          {page}
+		        </button>
+		      ),
+		    )}
+
+		    <button
+		      type="button"
+		      onClick={() => changePage(currentPage + 1)}
+		      disabled={currentPage === totalPages}
+		      className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+		    >
+		      Trang sau →
+		    </button>
+		  </nav>
+		)}
       </div>
 
       {/* CTA */}

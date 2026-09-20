@@ -19,7 +19,36 @@ export const TourDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const fromBlogValue: unknown = location.state?.fromBlog;
+  const blogListValue: unknown = location.state?.blogListUrl;
 
+  const fromBlog =
+    typeof fromBlogValue === 'string' &&
+    /^\/blogs\/\d+(?:\?[^#]*)?$/.test(fromBlogValue)
+      ? fromBlogValue
+      : null;
+
+  const blogListUrl =
+    typeof blogListValue === 'string' &&
+    /^\/blogs(?:\?[^#]*)?$/.test(blogListValue)
+      ? blogListValue
+      : '/blogs';
+
+  const handleBackToSelection = () => {
+    if (fromBlog) {
+      navigate(fromBlog, {
+        state: { from: blogListUrl },
+      });
+      return;
+    }
+
+    const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate(`/tours${savedPage && Number(savedPage) > 1 ? `?page=${savedPage}` : ''}`);
+    }
+  };
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -332,6 +361,17 @@ export const TourDetailPage: React.FC = () => {
 
   return (
     <div className="bg-[#020204] text-white min-h-screen pb-20 relative overflow-hidden">
+      {fromBlog && (
+        <div className="mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={handleBackToSelection}
+            className="rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-sky-400 transition hover:bg-white/5"
+          >
+            ← Quay lại bài viết
+          </button>
+        </div>
+      )}
       {/* Background Ambient Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
       {/* Breadcrumb Bar */}
@@ -340,16 +380,9 @@ export const TourDetailPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
             <button
               type="button"
-              onClick={() => {
-                const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
-                if (window.history.length > 1) {
-                  navigate(-1);
-                } else {
-                  navigate(`/tours${savedPage && Number(savedPage) > 1 ? `?page=${savedPage}` : ''}`);
-                }
-              }}
+              onClick={handleBackToSelection}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition text-xs font-semibold mr-1"
-              title="Quay lại danh sách tour"
+              title={fromBlog ? 'Quay lại bài viết' : 'Quay lại danh sách tour'}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               <span>Quay lại</span>

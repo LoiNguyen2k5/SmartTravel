@@ -42,6 +42,7 @@ import { EditTourPage } from '../pages/vendor/EditTourPage';
 import { AboutPage } from '../pages/client/AboutPage';
 import { ServicesPage } from '../pages/client/ServicesPage';
 import { BlogsPage } from '../pages/client/BlogsPage';
+import { BlogDetailPage } from '../pages/client/BlogDetailPage';
 import { ContactPage } from '../pages/client/ContactPage';
 import { ScrollToTop } from '../components/common/ScrollToTop';
 
@@ -67,6 +68,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/tours/:id" element={<TourDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/blogs" element={<BlogsPage />} />
+		  <Route path="/blogs/:id" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
 
