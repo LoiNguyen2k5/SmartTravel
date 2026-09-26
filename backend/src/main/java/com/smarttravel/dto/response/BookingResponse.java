@@ -36,6 +36,9 @@ public class BookingResponse {
     private String contactName;
     private String contactEmail;
     private String contactPhone;
+    private Boolean singleRoomSurcharge;
+    private BigDecimal singleRoomSurchargeAmount;
+    private String roomAllocation;
     private String qrCodeUrl;
     private LocalDateTime createdAt;
 }

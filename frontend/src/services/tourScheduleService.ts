@@ -1,41 +1,135 @@
+export type TourScheduleStatus = 
+  | 'ACTIVE' 
+  | 'CLOSED_BOOKING' 
+  | 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' 
+  | 'COMPLETED';
+
 export interface TourScheduleItem {
   id: number;
   tourId: number;
   startDate: string; // YYYY-MM-DD or DD-MM-YYYY
   endDate: string;   // YYYY-MM-DD or DD-MM-YYYY
+  minParticipants?: number; // Mặc định 10 khách
   maxParticipants: number;
   bookedCount: number;
   note?: string;
   seasonalPriceMultiplier?: number;
+  status?: TourScheduleStatus;
 }
 
 const STORAGE_PREFIX = 'smart_travel_tour_schedules_v3_';
 
-// Check if a date string is today or in the future
-export const isUpcomingSchedule = (dateStr: string): boolean => {
-  if (!dateStr) return false;
+// Tính số ngày còn lại từ hôm nay đến ngày khởi hành
+export const getDaysUntilDeparture = (dateStr: string): number => {
+  if (!dateStr) return -999;
   try {
     const clean = dateStr.trim();
     const delimiter = clean.includes('/') ? '/' : '-';
     const parts = clean.split(delimiter);
     let day: number, month: number, year: number;
     if (parts[0].length === 4) {
-      // YYYY-MM-DD or YYYY/MM/DD
+      // YYYY-MM-DD
       year = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10) - 1;
       day = parseInt(parts[2], 10);
     } else {
-      // DD-MM-YYYY or DD/MM/YYYY
+      // DD-MM-YYYY
       day = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10) - 1;
       year = parseInt(parts[2], 10);
     }
-    const scheduleDate = new Date(year, month, day, 23, 59, 59);
+    const scheduleDate = new Date(year, month, day, 0, 0, 0);
     const now = new Date();
-    return scheduleDate.getTime() >= now.getTime();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const diffMs = scheduleDate.getTime() - today.getTime();
+    return Math.round(diffMs / (1000 * 60 * 60 * 24));
   } catch {
-    return true;
+    return 0;
   }
+};
+
+// Quy định số ngày đặt trước tối thiểu (Tour nội địa: 3 ngày, Tour quốc tế: 15 ngày)
+export const getBookingCutoffDays = (category?: string): number => {
+  return category === 'NUOC_NGOAI' ? 15 : 3;
+};
+
+// Tính toán trạng thái vòng đời đợt khởi hành dựa trên Business Rules
+export const computeScheduleStatus = (
+  schedule: TourScheduleItem,
+  category?: string
+): {
+  status: TourScheduleStatus;
+  daysRemaining: number;
+  minLeadDays: number;
+  reason: string;
+  isBookable: boolean;
+} => {
+  const daysRemaining = getDaysUntilDeparture(schedule.startDate);
+  const minLeadDays = getBookingCutoffDays(category);
+  const minParticipants = schedule.minParticipants || 10;
+
+  // 1. Nếu đã qua ngày khởi hành -> Tour đã hoàn tất
+  if (daysRemaining < 0) {
+    return {
+      status: 'COMPLETED',
+      daysRemaining,
+      minLeadDays,
+      reason: 'Đợt khởi hành đã hoàn tất chuyến đi',
+      isBookable: false,
+    };
+  }
+
+  // 2. Nếu đã đầy chỗ
+  if (schedule.bookedCount >= schedule.maxParticipants) {
+    return {
+      status: 'CLOSED_BOOKING',
+      daysRemaining,
+      minLeadDays,
+      reason: 'Đã hết chỗ trống (Full slot)',
+      isBookable: false,
+    };
+  }
+
+  // 3. Nếu đã bước vào khung thời gian chốt sổ (dưới minLeadDays ngày)
+  if (daysRemaining < minLeadDays) {
+    // Kiểm tra quy định số lượng người tối thiểu (minParticipants)
+    if (schedule.bookedCount < minParticipants) {
+      return {
+        status: 'CANCELLED_NOT_ENOUGH_PARTICIPANTS',
+        daysRemaining,
+        minLeadDays,
+        reason: `Hủy do không đủ số lượng tối thiểu (${schedule.bookedCount}/${minParticipants} khách). Hệ thống tự động hoàn tiền 100%.`,
+        isBookable: false,
+      };
+    }
+
+    return {
+      status: 'CLOSED_BOOKING',
+      daysRemaining,
+      minLeadDays,
+      reason: category === 'NUOC_NGOAI'
+        ? `Đã hết hạn nhận hồ sơ Visa cho đợt này (Cần đặt trước tối thiểu ${minLeadDays} ngày)`
+        : `Đã đóng cổng nhận khách (Cần đặt trước tối thiểu ${minLeadDays} ngày để chốt dịch vụ)`,
+      isBookable: false,
+    };
+  }
+
+  // 4. Còn hạn đặt chỗ và chưa đầy chỗ -> Đang mở bán bình thường
+  const daysLeftToBook = Math.max(0, daysRemaining - minLeadDays);
+  return {
+    status: 'ACTIVE',
+    daysRemaining,
+    minLeadDays,
+    reason: daysLeftToBook > 0 
+      ? `Đang mở bán (Còn ${daysLeftToBook} ngày để đặt vé)` 
+      : 'Đang mở bán (Hạn chót đặt vé hôm nay)',
+    isBookable: true,
+  };
+};
+
+// Check if a date string is today or in the future
+export const isUpcomingSchedule = (dateStr: string): boolean => {
+  return getDaysUntilDeparture(dateStr) >= 0;
 };
 
 // Normalize date to DD-MM-YYYY for display
@@ -274,11 +368,11 @@ export const tourScheduleService = {
     return defaults;
   },
 
-  // Lấy các lịch khởi hành tương lai có thể đặt (dành cho User / Khách hàng)
-  getUpcomingSchedulesForUser: (tourId: number): TourScheduleItem[] => {
+  // Lấy các lịch khởi hành tương lai (chưa qua ngày đi) dành cho User / Khách hàng
+  getUpcomingSchedulesForUser: (tourId: number, category?: string): TourScheduleItem[] => {
     const all = tourScheduleService.getSchedulesForTour(tourId);
-    // Tự động loại bỏ các lịch đã qua ngày theo thời gian thực
-    const upcoming = all.filter((s) => isUpcomingSchedule(s.startDate));
+    // Tự động loại bỏ các lịch đã qua ngày theo thời gian thực (daysRemaining < 0)
+    let upcoming = all.filter((s) => isUpcomingSchedule(s.startDate));
     if (upcoming.length === 0) {
       // Tự động tái tạo lịch tương lai nếu lịch cũ đã hết hạn
       const fresh = getDefaultSchedulesForTour(tourId);
@@ -287,37 +381,85 @@ export const tourScheduleService = {
       } catch (e) {
         console.error(e);
       }
-      return fresh.filter((s) => isUpcomingSchedule(s.startDate));
+      upcoming = fresh.filter((s) => isUpcomingSchedule(s.startDate));
     }
-    return upcoming;
+    // Gán trạng thái vòng đời động cho từng lịch
+    return upcoming.map((s) => {
+      const computed = computeScheduleStatus(s, category);
+      return {
+        ...s,
+        minParticipants: s.minParticipants || 10,
+        status: computed.status,
+      };
+    });
   },
 
-  // Lấy lịch khởi hành gần nhất trong tương lai (để hiển thị trên card tour trang chủ & danh sách tour)
-  getNearestUpcomingSchedule: (tourId: number): TourScheduleItem | null => {
-    const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId);
+  // Phân loại toàn bộ lịch theo vòng đời (Đang mở bán, Đã đóng, Đã hủy, Đã hoàn tất) - Cho Vendor & Admin
+  getSchedulesByLifecycle: (tourId: number, category?: string) => {
+    const all = tourScheduleService.getSchedulesForTour(tourId).map((s) => {
+      const computed = computeScheduleStatus(s, category);
+      return {
+        ...s,
+        minParticipants: s.minParticipants || 10,
+        status: computed.status,
+        lifecycleInfo: computed,
+      };
+    });
+
+    return {
+      active: all.filter((s) => s.status === 'ACTIVE'),
+      closed: all.filter((s) => s.status === 'CLOSED_BOOKING'),
+      cancelled: all.filter((s) => s.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'),
+      completed: all.filter((s) => s.status === 'COMPLETED'),
+      all,
+    };
+  },
+
+  // Lấy lịch khởi hành gần nhất trong tương lai (ưu tiên lịch còn mở bán)
+  getNearestUpcomingSchedule: (tourId: number, category?: string): TourScheduleItem | null => {
+    const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
     if (upcoming.length === 0) return null;
-    // Sắp xếp theo ngày tăng dần
+    // Ưu tiên lịch ACTIVE trước, sau đó sắp xếp theo ngày tăng dần
     const sorted = [...upcoming].sort((a, b) => {
+      if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1;
+      if (a.status !== 'ACTIVE' && b.status === 'ACTIVE') return 1;
       return a.startDate.localeCompare(b.startDate);
     });
     return sorted[0];
   },
 
-  // Kiểm tra tour còn lịch khởi hành hợp lệ trong tương lai không
+  // Kiểm tra tour còn bất kỳ lịch tương lai nào không
   hasUpcomingSchedule: (tourId: number): boolean => {
     return tourScheduleService.getUpcomingSchedulesForUser(tourId).length > 0;
   },
 
+  // Kiểm tra tour có còn lịch nào đang MỞ BÁN (ACTIVE) không
+  hasActiveBookableSchedule: (tourId: number, category?: string): boolean => {
+    const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
+    return upcoming.some((s) => s.status === 'ACTIVE');
+  },
+
   // Lấy số chỗ còn trống của đợt khởi hành sắp tới
-  getTourAvailableSeats: (tourId: number, defaultSeats?: number): number => {
-    const nearest = tourScheduleService.getNearestUpcomingSchedule(tourId);
+  getTourAvailableSeats: (tourId: number, defaultSeats?: number, category?: string): number => {
+    const nearest = tourScheduleService.getNearestUpcomingSchedule(tourId, category);
     if (!nearest) return defaultSeats !== undefined ? 0 : 0;
     return Math.max(0, nearest.maxParticipants - nearest.bookedCount);
   },
 
+  // Lấy tỷ lệ số chỗ hiện tại đã đặt / tổng số chỗ có (Ví dụ: 25/40 chỗ)
+  getTourSeatRatioDisplay: (tourId: number, category?: string): { booked: number; max: number; text: string } => {
+    const nearest = tourScheduleService.getNearestUpcomingSchedule(tourId, category);
+    if (!nearest) return { booked: 0, max: 40, text: '0/40 chỗ' };
+    return {
+      booked: nearest.bookedCount,
+      max: nearest.maxParticipants,
+      text: `${nearest.bookedCount}/${nearest.maxParticipants} chỗ`,
+    };
+  },
+
   // Lấy ngày khởi hành hiển thị định dạng DD-MM-YYYY
-  getTourDepartureDateDisplay: (tourId: number): string => {
-    const nearest = tourScheduleService.getNearestUpcomingSchedule(tourId);
+  getTourDepartureDateDisplay: (tourId: number, category?: string): string => {
+    const nearest = tourScheduleService.getNearestUpcomingSchedule(tourId, category);
     if (!nearest) return 'Đã hết lịch';
     return formatScheduleDate(nearest.startDate);
   },

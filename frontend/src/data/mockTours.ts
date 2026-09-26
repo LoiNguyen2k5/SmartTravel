@@ -1,7 +1,25 @@
 import { Tour, TourCategory, TourStatus } from '../types/tour';
 
-// 10 Tours chuẩn 100% lấy chính xác từ trang đầu tiên https://dulichnewtour.vn/danh-sach-tour
+// ─────────────────────────────────────────────────────────────────────────────
+// RICH ITINERARY FORMAT (JSON stored in itineraryDetails)
+// Each day object:
+// {
+//   day: number,
+//   title: string,           // e.g. "NGÀY 1: TP.HCM – THƯỢNG HẢI"
+//   hotel: string,           // hotel name + star rating
+//   hotelRooms: string,      // room types: "Phòng đôi / phòng đơn (phụ thu)"
+//   meals: { sang: string, trua: string, chieu: string, toi: string },
+//   morning: string,         // morning activities
+//   afternoon: string,       // afternoon activities
+//   evening: string,         // evening activities
+//   highlights: string[],    // key highlights of the day
+// }
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const MOCK_TOURS: Tour[] = [
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 1: ÂN THI – PHƯỢNG HOÀNG CỔ TRẤN – TRƯƠNG GIA GIỚI 6N5Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 1,
     tourCode: 'AT-PHCT-TGG-6N5D',
@@ -18,7 +36,7 @@ export const MOCK_TOURS: Tour[] = [
       'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1527684651001-731c474bbb5a?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
     ],
     category: 'NUOC_NGOAI' as any,
     remainingSeats: 20,
@@ -30,15 +48,78 @@ export const MOCK_TOURS: Tour[] = [
     excludedServices: '• Hộ chiếu còn hạn trên 6 tháng\n• Chi phí cá nhân, hành lý quá cước\n• Tiền Tip cho HDV và tài xế (5 USD/ngày/khách)\n• Phụ thu phòng đơn (nếu có)',
     cancellationPolicy: '• Hủy trước 30 ngày: Miễn phí hủy tour.\n• Hủy từ 15-29 ngày: Phí 50% tổng giá trị tour.\n• Hủy từ 07-14 ngày: Phí 80% tổng giá trị tour.\n• Hủy trong vòng 07 ngày: Phí 100% tổng giá trị tour.',
     itineraryDetails: JSON.stringify([
-      { day: 0, title: 'MÔ TẢ TỔNG QUAN', content: 'Chuyến bay thẳng đưa đoàn đến sân bay Ân Thi. Bắt đầu hành trình chinh phục Phượng Hoàng Cổ Trấn 1.300 năm tuổi.' },
-      { day: 1, title: 'NGÀY 1: TP. HỒ CHÍ MINH - ÂN THI (Ăn tối)', content: 'Trưởng đoàn đón Quý khách tại sân bay Tân Sơn Nhất làm thủ tục đáp chuyến bay đi Ân Thi.' },
-      { day: 2, title: 'NGÀY 2: ÂN THI - TUYỀN ÂN (Ăn sáng, Trưa, Tối)', content: 'Ăn sáng tại khách sạn. Khởi hành tham quan Nữ Nhi Thành - vùng đất của tộc người Thổ Gia.' },
-      { day: 3, title: 'NGÀY 3: TUYỀN ÂN - PHƯỢNG HOÀNG CỔ TRẤN', content: 'Di chuyển đến Phượng Hoàng Cổ Trấn. Tham quan Hồng Kiều, Cầu Tuyết, Tháp Vạn Danh.' },
-      { day: 4, title: 'NGÀY 4: PHƯỢNG HOÀNG CỔ TRẤN - TRƯƠNG GIA GIỚI', content: 'Tham quan công viên quốc gia Trương Gia Giới - bối cảnh bộ phim Avatar.' },
-      { day: 5, title: 'NGÀY 5: TRƯƠNG GIA GIỚI - THIÊN MÔN SƠN', content: 'Chinh phục Cổng Trời Thiên Môn Sơn bằng cáp treo dài 7.455m.' },
-      { day: 6, title: 'NGÀY 6: ÂN THI - TP. HỒ CHÍ MINH', content: 'Tự do mua sắm đặc sản. Ra sân bay về TP. Hồ Chí Minh.' },
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HỒ CHÍ MINH → ÂN THI (TRUNG QUỐC)',
+        hotel: 'Khách sạn Fuyuan Business Hotel ★★★★',
+        hotelRooms: 'Phòng đôi tiêu chuẩn / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Tự túc tại sân bay', trua: 'Không có', chieu: 'Không có', toi: 'Tiệc chào mừng tại nhà hàng khách sạn' },
+        morning: 'Tập trung tại sân bay Tân Sơn Nhất (cửa số 3, ga quốc tế), HDV làm thủ tục. Đáp chuyến bay thẳng TP.HCM – Ân Thi.',
+        afternoon: 'Đến sân bay Ân Thi (Trung Quốc), hoàn tất thủ tục nhập cảnh. Xe đón đoàn về khách sạn, nhận phòng và nghỉ ngơi.',
+        evening: 'Dùng bữa tối tại nhà hàng trong khách sạn. Tự do dạo phố Ân Thi về đêm, khám phá ẩm thực đường phố địa phương.',
+        highlights: ['Sân bay Ân Thi – cửa ngõ vào Hồ Nam', 'Phố đêm ẩm thực địa phương'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: ÂN THI → TUYỀN ÂN → PHƯỢNG HOÀNG CỔ TRẤN',
+        hotel: 'Khách sạn Phoenix Legend Hotel ★★★★ (ngay bờ sông Đà Giang)',
+        hotelRooms: 'Phòng đôi view sông / Phòng đơn (phụ thu 1.400.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Địa Long – chuyên lẩu Thổ Gia', chieu: 'Không có', toi: 'Nhà hàng Feng Huang Garden – thực đơn đặc sản dân tộc Miêu' },
+        morning: 'Ăn sáng buffet tại khách sạn. Khởi hành đi Tuyền Ân, tham quan Nữ Nhi Thành – vùng đất nữ quyền của tộc người Thổ Gia. Khám phá kiến trúc sàn gỗ độc đáo "Điêu Lâu".',
+        afternoon: 'Ăn trưa tại Địa Long. Di chuyển đến Phượng Hoàng Cổ Trấn (Fenghuang Ancient Town) 1.300 năm tuổi. Tham quan Cầu Hồng Kiều (cầu mái đỏ biểu tượng), Cung Thành Hoàng, phố cổ lát đá xanh.',
+        evening: 'Ăn tối tại nhà hàng đặc sản Miêu – thưởng thức thịt muối chua, bánh gạo đen và rượu Mễ Tửu. Ngắm cổ trấn lung linh ánh đèn đỏ phản chiếu xuống sông Đà Giang.',
+        highlights: ['Nữ Nhi Thành – vùng đất Thổ Gia', 'Phượng Hoàng Cổ Trấn (Fenghuang)', 'Cầu Hồng Kiều lung linh về đêm', 'Sông Đà Giang huyền ảo'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: PHƯỢNG HOÀNG CỔ TRẤN (Tự do)',
+        hotel: 'Khách sạn Phoenix Legend Hotel ★★★★',
+        hotelRooms: 'Phòng đôi view sông / Phòng đơn (phụ thu 1.400.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự do – gợi ý: bún thịt nướng lá chuối tại phố cổ', chieu: 'Không có', toi: 'Nhà hàng Miêu Lý – nướng than hoa truyền thống' },
+        morning: 'Ăn sáng buffet. Tự do khám phá cổ trấn. Ghé thăm Tháp Vạn Danh, miếu Đại Long, tìm hiểu nghề thêu thổ cẩm và đúc bạc truyền thống.',
+        afternoon: 'Tự do mua sắm đặc sản: vòng bạc Miêu, vải thổ cẩm, rượu gạo đen. Hoặc tham gia thuyền tre dạo sông Đà Giang (tự túc, khoảng 60 CNY/người).',
+        evening: 'Tập trung dùng bữa tối. Xem biểu diễn văn hóa Miêu – múa trống, thổi khèn môi (tuỳ lịch biểu diễn địa phương).',
+        highlights: ['Thêu thổ cẩm & đúc bạc truyền thống', 'Thuyền tre sông Đà Giang', 'Biểu diễn văn hóa dân tộc Miêu'],
+      },
+      {
+        day: 4,
+        title: 'NGÀY 4: PHƯỢNG HOÀNG → TRƯƠNG GIA GIỚI (Vườn quốc gia)',
+        hotel: 'Khách sạn Grand Skylight International Hotel ★★★★★ Trương Gia Giới',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 1.800.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Zhangjiajie Village Food – cơm gà nướng núi đá', chieu: 'Không có', toi: 'Buffet tối tại khách sạn Grand Skylight' },
+        morning: 'Ăn sáng, trả phòng. Di chuyển xe 3 giờ đến Trương Gia Giới (Zhang Jia Jie). Nhận phòng khách sạn 5 sao, ăn trưa.',
+        afternoon: 'Tham quan Khu vực Suối Vàng (Jinbian Stream) – con suối dài 7.5km chạy giữa các núi đá sa thạch, bối cảnh bộ phim Avatar. Ngắm cá hồng và rùa nước quý hiếm.',
+        evening: 'Ăn tối buffet. Tự do nghỉ ngơi hoặc tham quan spa núi đá (tự túc).',
+        highlights: ['Vườn quốc gia Trương Gia Giới', 'Suối Vàng Jinbian Stream', 'Cảnh núi đá sa thạch – bối cảnh Avatar'],
+      },
+      {
+        day: 5,
+        title: 'NGÀY 5: TRƯƠNG GIA GIỚI → THIÊN MÔN SƠN',
+        hotel: 'Khách sạn Grand Skylight International Hotel ★★★★★',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 1.800.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Tianmen Pavilion – view núi mây', chieu: 'Không có', toi: 'Nhà hàng Old Charm Zhangjia – lẩu nấm rừng núi đá' },
+        morning: 'Ăn sáng sớm. Đi cáp treo Thiên Môn Sơn (Tianmen Shan) – cáp treo một chiều dài nhất thế giới 7.455m. Tham quan Cổng Trời Thiên Môn (99 bậc thang), đường Kính Nhân (Coiling Dragon Cliff Skywalk) – cầu kính bên vách núi.',
+        afternoon: 'Ăn trưa nhà hàng view núi. Tham quan bên trong Thiên Môn Động (cổng trời tự nhiên hình oval).',
+        evening: 'Ăn tối đặc sản nấm rừng. Tự do nghỉ ngơi. Chuẩn bị hành lý.',
+        highlights: ['Cáp treo Thiên Môn Sơn – 7.455m dài nhất thế giới', 'Cổng Trời 99 bậc – Thiên Môn Động', 'Cầu kính Coiling Dragon Cliff'],
+      },
+      {
+        day: 6,
+        title: 'NGÀY 6: ÂN THI → TP.HỒ CHÍ MINH',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự do tại sân bay', chieu: 'Không có', toi: 'Ăn tối tự do trên máy bay và xuất phát bay về TP.HCM' },
+        morning: 'Ăn sáng, trả phòng. Di chuyển ra sân bay Ân Thi. Tự do mua đặc sản tại cửa hàng miễn thuế: rượu Đỗ Khang, hàng thổ cẩm Miêu, đá quý Trương Gia Giới.',
+        afternoon: 'Làm thủ tục xuất cảnh. Đáp chuyến bay về TP.HCM, kết thúc hành trình ý nghĩa.',
+        evening: 'Chuyến bay đáp an toàn tại sân bay Tân Sơn Nhất (TP.HCM). Quý khách làm thủ tục nhập cảnh, nhận lại hành lý ký gửi. HDV chia tay đoàn và kết thúc hành trình tốt đẹp.',
+        highlights: ['Cửa hàng miễn thuế sân bay Ân Thi', 'Bay về TP.HCM'],
+      },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 2: THƯỢNG HẢI – Ô TRẤN 4N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 2,
     tourCode: 'SH-OTRAN-4N4D',
@@ -54,7 +135,7 @@ export const MOCK_TOURS: Tour[] = [
       '/images/tours/tour-2-thuong-hai-o-tran/image 1 thuong-hai-o-tran.jpg',
       '/images/tours/tour-2-thuong-hai-o-tran/images.jpg',
       '/images/tours/tour-2-thuong-hai-o-tran/a1-17019461240531747351528.jpg',
-      '/images/tours/tour-2-thuong-hai-o-tran/thumbnail.png'
+      '/images/tours/tour-2-thuong-hai-o-tran/thumbnail.png',
     ],
     category: 'NUOC_NGOAI' as any,
     remainingSeats: 40,
@@ -62,7 +143,60 @@ export const MOCK_TOURS: Tour[] = [
     averageRating: 4.9,
     totalReviews: 15,
     status: 'ACTIVE' as any,
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Thượng Hải (hành lý 20kg ký gửi)\n• Khách sạn 4 sao (2 người/phòng)\n• Các bữa ăn theo chương trình\n• Xe đưa đón máy lạnh suốt tuyến\n• HDV tiếng Việt 24/7\n• Vé tham quan các điểm trong lịch trình\n• Bảo hiểm du lịch quốc tế',
+    excludedServices: '• Hộ chiếu còn hạn trên 6 tháng (cần tự chuẩn bị)\n• Tip HDV và tài xế (5 USD/ngày/khách)\n• Phụ thu phòng đơn\n• Chi phí cá nhân',
+    cancellationPolicy: '• Hủy trước 30 ngày: Miễn phí\n• Hủy từ 15-29 ngày: 50% tổng giá\n• Hủy từ 7-14 ngày: 80% tổng giá\n• Hủy dưới 7 ngày: 100% tổng giá',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → THƯỢNG HẢI – PHỐ BÃI NGOẠI',
+        hotel: 'Khách sạn Ramada by Wyndham Shanghai ★★★★ (khu Tĩnh An)',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Tự túc tại sân bay', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Din Tai Fung Shanghai – há cảo và xiao long bao trứ danh' },
+        morning: 'Tập trung sân bay Tân Sơn Nhất, làm thủ tục. Đáp chuyến bay đi Thượng Hải (khoảng 3.5 giờ bay).',
+        afternoon: 'Đến sân bay Phố Đông (PVG), nhập cảnh, xe đón về khách sạn. Nhận phòng và nghỉ ngơi. Khám phá khu vực phố Tĩnh An lân cận khách sạn.',
+        evening: 'Ăn tối tại Din Tai Fung. Đi bộ dạo Phố Bãi Ngoại (The Bund) – ngắm toàn cảnh Phố Đông Lujiazui lung linh về đêm với tòa tháp Đông Phương Minh Châu.',
+        highlights: ['Phố Bãi Ngoại (The Bund) về đêm', 'Tòa tháp Đông Phương Minh Châu', 'Xiao long bao Din Tai Fung'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: THƯỢNG HẢI – THÀNH HOÀNG MIẾU – VY NGOẠI TÂN THIÊN ĐỊA',
+        hotel: 'Khách sạn Ramada by Wyndham Shanghai ★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Nanxiang Mantou Dian – bánh bao Nam Tường truyền thống', chieu: 'Không có', toi: 'Nhà hàng Lost Heaven Shanghai – ẩm thực Vân Nam' },
+        morning: 'Ăn sáng buffet. Tham quan Thành Hoàng Miếu (City God Temple) và Khu phố cổ Dự Viên. Thưởng thức bánh bao xiao long bao tại nhà hàng 100 năm tuổi Nanxiang.',
+        afternoon: 'Tham quan khu mua sắm và nghỉ dưỡng Tân Thiên Địa (Xintiandi) – khu phố Pháp tuyệt đẹp với kiến trúc Shikumen độc đáo. Tự do cà phê và mua sắm.',
+        evening: 'Ăn tối ẩm thực sáng tạo tại Lost Heaven. Tự do khám phá phố đêm và mua sắm đặc sản.',
+        highlights: ['Thành Hoàng Miếu & Dự Viên', 'Bánh bao Nanxiang 100 năm tuổi', 'Khu phố Shikumen – Xintiandi'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: THƯỢNG HẢI → Ô TRẤN (CỔ TRẤN 1.300 TUỔI)',
+        hotel: 'Khách sạn Wuzhen Xizha Hotel ★★★★ (trong lòng Ô Trấn Tây Sách)',
+        hotelRooms: 'Phòng đôi Cổ trấn view kênh / Phòng đơn (phụ thu 1.600.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn Thượng Hải', trua: 'Nhà hàng Wuzhen Old Tavern – lươn hồ nướng đặc sản', chieu: 'Không có', toi: 'Nhà hàng tại trong cổ trấn – cá gáy đồng hấp gừng' },
+        morning: 'Ăn sáng, trả phòng khách sạn Thượng Hải. Di chuyển xe 2 giờ đến Ô Trấn (Wuzhen), tỉnh Chiết Giang.',
+        afternoon: 'Tham quan Ô Trấn Tây Sách (West Scenic Zone) – khu vực bảo tồn nguyên vẹn nhất với nhà cổ 1.300 năm tuổi, kênh rạch xanh trong, cầu đá và thuyền gỗ truyền thống. Trải nghiệm nghề nhuộm vải chàm (bản độc quyền Ô Trấn).',
+        evening: 'Ăn tối cá gáy hồ đặc sản. Ngắm cổ trấn lên đèn – lung linh như tranh cổ điển.',
+        highlights: ['Ô Trấn Tây Sách – cổ trấn 1.300 năm', 'Nghề nhuộm vải chàm truyền thống', 'Thuyền gỗ trên kênh rạch', 'Cổ trấn về đêm'],
+      },
+      {
+        day: 4,
+        title: 'NGÀY 4: Ô TRẤN → THƯỢNG HẢI → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn Ô Trấn', trua: 'Tự do tại sân bay Thượng Hải', chieu: 'Không có', toi: 'Ăn tối tự do trên máy bay và xuất phát bay về TP.HCM' },
+        morning: 'Ăn sáng, trả phòng. Tự do tham quan thêm Ô Trấn Đông Sách (East Zone) hoặc mua đặc sản: rượu gạo Ô Trấn, trà Hoa Cúc, vải lụa thêu tay.',
+        afternoon: 'Di chuyển về sân bay Thượng Hải Hồng Kiều (SHA) hoặc Phố Đông (PVG). Làm thủ tục xuất cảnh. Đáp chuyến bay về TP.HCM.',
+        evening: 'Chuyến bay đáp an toàn tại sân bay Tân Sơn Nhất (TP.HCM). Quý khách làm thủ tục nhập cảnh, nhận lại hành lý. HDV chia tay đoàn và kết thúc hành trình tốt đẹp.',
+        highlights: ['Mua đặc sản Ô Trấn', 'Bay về TP.HCM kết thúc hành trình'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 3: NÚI CHỨA CHAN – DINH THẦY THÍM 1N1Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 3,
     tourCode: 'NUI-CHUA-CHAN-1D',
@@ -78,7 +212,7 @@ export const MOCK_TOURS: Tour[] = [
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80',
     ],
     category: 'DOMESTIC' as any,
     remainingSeats: 40,
@@ -86,7 +220,27 @@ export const MOCK_TOURS: Tour[] = [
     averageRating: 4.8,
     totalReviews: 9,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe máy lạnh đưa đón từ TP.HCM\n• Bữa trưa buffet chay / mặn tại nhà hàng Gia Lào\n• Hướng dẫn viên địa phương nhiệt tình\n• Nước uống trên xe',
+    excludedServices: '• Chi phí cá nhân\n• Phí leo núi (mua tại chỗ nếu muốn lên đỉnh)\n• Đồ cúng lễ tại dinh',
+    cancellationPolicy: '• Hủy trước 3 ngày: Miễn phí\n• Hủy trong vòng 3 ngày: 50% tổng giá',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → NÚI CHỨA CHAN → DINH THẦY THÍM → TP.HCM',
+        hotel: 'Tour 1 ngày – không lưu trú',
+        hotelRooms: '',
+        meals: { sang: 'Tự túc trước khi lên xe', trua: 'Buffet chay/mặn tại nhà hàng Gia Lào chân núi', chieu: 'Không có', toi: 'Tự túc bữa tối sau khi về đến TP.HCM' },
+        morning: '06:00 – Xuất phát từ TP.HCM theo xe máy lạnh. Di chuyển khoảng 2.5 tiếng đến chân Núi Chứa Chan (Đồng Nai). Chiêm bái Chùa Bửu Quang (Gia Lào) – ngôi chùa cổ trên lưng núi nổi tiếng linh thiêng của Nam Bộ. Leo bộ hoặc đi cáp treo (tự túc) lên đỉnh cao 839m, ngắm cảnh bao la.',
+        afternoon: 'Ăn trưa buffet tại nhà hàng chân núi. Di chuyển tiếp đến thị trấn La Gi (Bình Thuận) – viếng Dinh Thầy Thím, một trong những di tích tâm linh nổi tiếng nhất miền Nam, cầu bình an, tài lộc và sức khỏe.',
+        evening: '17:00 – Lên xe xuất phát trở về điểm đón ban đầu tại TP.HCM. Dự kiến về đến nơi lúc 19:30 – 20:00, chia tay đoàn và kết thúc hành trình chiêm bái ý nghĩa.',
+        highlights: ['Chùa Bửu Quang (Gia Lào) – ngôi chùa cổ linh thiêng', 'Đỉnh Núi Chứa Chan 839m', 'Dinh Thầy Thím – cầu an tài lộc'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 4: CHÂU ĐỐC AN GIANG 1N1Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 4,
     tourCode: 'CHAU-DOC-AN-GIANG-1N1D',
@@ -103,7 +257,7 @@ export const MOCK_TOURS: Tour[] = [
       '/images/tours/tour-4-chau-doc-an-giang/khu-du-lich-lam-vien-nui-cam-ve-dep-linh-thieng-cua-nui-rung-06-1659717324.jpg',
       '/images/tours/tour-4-chau-doc-an-giang/nui-cam-an-giang-1.png',
       '/images/tours/tour-4-chau-doc-an-giang/images.jpg',
-      '/images/tours/tour-4-chau-doc-an-giang/images (1).jpg'
+      '/images/tours/tour-4-chau-doc-an-giang/images (1).jpg',
     ],
     category: 'DOMESTIC' as any,
     remainingSeats: 40,
@@ -111,7 +265,38 @@ export const MOCK_TOURS: Tour[] = [
     averageRating: 5.0,
     totalReviews: 18,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe máy lạnh đưa đón từ TP.HCM\n• 1 đêm khách sạn 3 sao tại Châu Đốc\n• Bữa sáng, trưa và tối theo chương trình\n• HDV địa phương\n• Nước uống trên xe',
+    excludedServices: '• Chi phí cá nhân\n• Vé cáp treo Núi Cấm (tự túc)\n• Đồ cúng lễ',
+    cancellationPolicy: '• Hủy trước 5 ngày: Miễn phí\n• Hủy trong 5 ngày: 50% tổng giá',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → CHÂU ĐỐC – MIẾU BÀ CHÚA XỨ NÚI SAM',
+        hotel: 'Khách sạn Victoria Châu Đốc ★★★ (bên bờ sông Hậu)',
+        hotelRooms: 'Phòng đôi view sông / Phòng đơn (phụ thu 400.000đ/đêm)',
+        meals: { sang: 'Tự túc trước khi lên xe', trua: 'Nhà hàng Mekong Riverside – lẩu mắm miền Tây', chieu: 'Không có', toi: 'Nhà hàng Bassac Restaurant – đặc sản cá linh bông điên điển' },
+        morning: '05:30 – Xuất phát từ TP.HCM. Di chuyển qua Long An, Tiền Giang đến Châu Đốc (khoảng 4 giờ). Viếng Miếu Bà Chúa Xứ Núi Sam – ngôi miếu thiêng nổi tiếng bậc nhất Nam Bộ. Khám phá Lăng Thoại Ngọc Hầu và Chùa Tây An (kiến trúc kết hợp Ấn – Khmer độc đáo).',
+        afternoon: 'Ăn trưa tại nhà hàng đặc sản miền Tây. Chinh phục Núi Cấm (Thiên Cấm Sơn) bằng cáp treo hoặc leo bộ. Tham quan Chùa Tà Pạ nằm trên vách núi đá, hồ nhân tạo trên đỉnh núi Cấm.',
+        evening: 'Nhận phòng khách sạn. Ăn tối đặc sản cá linh (mùa nước nổi), bông điên điển và lẩu mắm. Dạo bờ sông Hậu về đêm.',
+        highlights: ['Miếu Bà Chúa Xứ Núi Sam – linh thiêng nhất Nam Bộ', 'Chùa Tây An kiến trúc Ấn – Khmer', 'Núi Cấm – Thiên Cấm Sơn', 'Chùa Tà Pạ trên vách núi đá'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: CHÂU ĐỐC → LÀNG NỔI CHÂU GIANG → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Sáng tại khách sạn', trua: 'Nhà hàng Phúc Đức – cơm tấm bì Châu Đốc', chieu: 'Không có', toi: 'Tự túc bữa tối sau khi về đến TP.HCM' },
+        morning: 'Ăn sáng tại khách sạn. Tham quan Làng chài nổi người Chăm trên sông Hậu – mua đặc sản: mắm tép, mắm cá linh, khô bò Châu Đốc, bánh pía.',
+        afternoon: 'Ăn trưa. Lên xe xuất phát trở về TP.HCM. Quý khách nghỉ ngơi trên xe.',
+        evening: '17:30 – 18:30: Xe đưa đoàn về đến điểm đón ban đầu tại TP.HCM an toàn. HDV chia tay Quý khách và kết thúc tour miền Tây.',
+        highlights: ['Làng nổi Chăm trên sông Hậu', 'Mắm Châu Đốc – đặc sản nổi tiếng cả nước'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 5: MIỀN TÂY 6 TỈNH 3N2Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 5,
     tourCode: 'MIEN-TAY-6TINH-3N2D',
@@ -122,12 +307,12 @@ export const MOCK_TOURS: Tour[] = [
     durationDays: 3,
     durationNights: 2,
     departureLocation: 'TP.Hồ Chí Minh',
-    thumbnailUrl: '/images/tours/tour-5-mien-tay-6-tinh/Tour-Du-Lịch-Mỹ-Tho-Bến-Tre-Cần-Thơ-Cà-Mau-Đất-Mũi.jpg',
+    thumbnailUrl: '/images/tours/tour-5-mien-tay-6-tinh/Tour-Du-Lịch-Mỹ-Tho-Bến-Tre-Cần-Thơ-Cà-Mau-Đất-Mũi.jpg',
     gallery: [
-      '/images/tours/tour-5-mien-tay-6-tinh/Tour-Du-Lịch-Mỹ-Tho-Bến-Tre-Cần-Thơ-Cà-Mau-Đất-Mũi.jpg',
-      '/images/tours/tour-5-mien-tay-6-tinh/Tham-quan-chợ-nổi-cái-răng.jpg',
+      '/images/tours/tour-5-mien-tay-6-tinh/Tour-Du-Lịch-Mỹ-Tho-Bến-Tre-Cần-Thơ-Cà-Mau-Đất-Mũi.jpg',
+      '/images/tours/tour-5-mien-tay-6-tinh/Tham-quan-chợ-nổi-cái-răng.jpg',
       '/images/tours/tour-5-mien-tay-6-tinh/mien-tay-song-nuoc-01.jpg',
-      '/images/tours/tour-5-mien-tay-6-tinh/images.jpg'
+      '/images/tours/tour-5-mien-tay-6-tinh/images.jpg',
     ],
     category: 'DOMESTIC' as any,
     remainingSeats: 35,
@@ -135,7 +320,49 @@ export const MOCK_TOURS: Tour[] = [
     averageRating: 4.9,
     totalReviews: 22,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe máy lạnh suốt tuyến\n• 2 đêm khách sạn 3 sao\n• Bữa ăn theo chương trình\n• Vé thuyền, vé tham quan các điểm\n• HDV địa phương\n• Nước uống trên xe',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Đồ uống trong bữa ăn',
+    cancellationPolicy: '• Hủy trước 5 ngày: Miễn phí\n• Hủy trong 5 ngày: 100% tổng giá',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → MỸ THO (TIỀN GIANG) → BẾN TRE → CẦN THƠ',
+        hotel: 'Khách sạn Mường Thanh Cần Thơ ★★★★ (bờ sông Cần Thơ)',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 500.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Nhà hàng Mỹ Tho – lẩu mắm cá linh, hũ tiếu Mỹ Tho', chieu: 'Không có', toi: 'Nhà hàng Sông Hương – cháo cá rô đồng, bánh xèo miền Tây' },
+        morning: '06:00 – Xuất phát từ TP.HCM. Đến Mỹ Tho, đi thuyền tham quan vườn cây ăn trái cù lao Thới Sơn. Thưởng thức mật ong, kẹo dừa và uống trà sen. Đến Bến Tre, tham quan làng nghề đan đát dừa trứ danh.',
+        afternoon: 'Ăn trưa. Di chuyển về Cần Thơ. Chiều tắt nắng: dạo bờ sông Cần Thơ, thăm Chùa Ông (Quảng Triệu Hội Quán) – kiến trúc Hoa độc đáo.',
+        evening: 'Nhận phòng Mường Thanh. Ăn tối đặc sản miền Tây. Tự do khám phá phố đêm Cần Thơ.',
+        highlights: ['Cù lao Thới Sơn – mật ong và kẹo dừa', 'Làng nghề đan đát dừa Bến Tre', 'Chùa Ông Cần Thơ', 'Bờ sông Cần Thơ về đêm'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: CHỢ NỔI CÁI RĂNG → CÀ MAU ĐẤT MŨI',
+        hotel: 'Khách sạn Mường Thanh Cà Mau ★★★★',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 450.000đ/đêm)',
+        meals: { sang: 'Bún riêu trên thuyền tại chợ nổi Cái Răng', trua: 'Nhà hàng tại Cà Mau – tôm đất, cua biển', chieu: 'Không có', toi: 'Nhà hàng Sông Đầm Cà Mau – cá thòi lòi nướng, ba khía muối' },
+        morning: '05:00 – Xuất phát trên thuyền tham quan Chợ nổi Cái Răng – phiên chợ đặc trưng nhất đồng bằng sông Cửu Long. Ăn sáng bún riêu trên thuyền. Trở về bờ, di chuyển về Cà Mau.',
+        afternoon: 'Ăn trưa hải sản Cà Mau. Tham quan Mũi Cà Mau – điểm cực Nam Tổ quốc, cột mốc GPS toạ độ 0. Khám phá Rừng đước Cà Mau – di sản thiên nhiên thế giới.',
+        evening: 'Nhận phòng Mường Thanh Cà Mau. Ăn tối cá thòi lòi, ba khía muối đặc sản vùng cực Nam.',
+        highlights: ['Chợ nổi Cái Răng – 5:00 sáng trên sông', 'Mũi Cà Mau – cực Nam Tổ quốc', 'Rừng đước Cà Mau – di sản thế giới', 'Ba khía muối và cá thòi lòi'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: BẠC LIÊU → SÓC TRĂNG → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Sóc Trăng – bún nước lèo Khmer', chieu: 'Không có', toi: 'Tự túc bữa tối sau khi về đến TP.HCM' },
+        morning: 'Ăn sáng. Di chuyển đến Bạc Liêu. Tham quan Nhà công tử Bạc Liêu (ngôi nhà đắt nhất Nam Kỳ thuộc địa), Vườn chim Bạc Liêu. Nghe nhạc đờn ca tài tử (di sản phi vật thể UNESCO).',
+        afternoon: 'Di chuyển Sóc Trăng. Tham quan Chùa Dơi (Mahatup) – ngôi chùa Khmer với hàng ngàn con dơi trú ngụ. Ăn trưa bún nước lèo Khmer đặc sản. Lên xe xuất phát trở về TP.HCM.',
+        evening: '18:30 – 19:30: Xe đưa đoàn về đến điểm hẹn ban đầu tại TP.HCM. HDV chia tay Quý khách, kết thúc chuyến khám phá 6 tỉnh miền Tây sông nước.',
+        highlights: ['Nhà công tử Bạc Liêu', 'Đờn ca tài tử – di sản UNESCO', 'Chùa Dơi Sóc Trăng', 'Bún nước lèo Khmer'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 6: ĐÀ LẠT 4N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 6,
     tourCode: 'DALAT-4N3D-HOA',
@@ -151,7 +378,7 @@ export const MOCK_TOURS: Tour[] = [
       '/images/tours/tour-6-da-lat-4n3d/dnt-da-lat.jpg',
       '/images/tours/tour-6-da-lat-4n3d/images (1).jpg',
       '/images/tours/tour-6-da-lat-4n3d/images.jpg',
-      '/images/tours/tour-6-da-lat-4n3d/lac-hu-co-tran-9.jpg'
+      '/images/tours/tour-6-da-lat-4n3d/lac-hu-co-tran-9.jpg',
     ],
     category: 'DOMESTIC' as any,
     remainingSeats: 28,
@@ -159,7 +386,60 @@ export const MOCK_TOURS: Tour[] = [
     averageRating: 4.8,
     totalReviews: 31,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe máy lạnh suốt tuyến\n• 3 đêm khách sạn 3 sao tại Đà Lạt\n• Bữa ăn theo chương trình\n• Vé tham quan các điểm trong lịch trình\n• HDV địa phương am hiểu Đà Lạt\n• Nước uống trên xe',
+    excludedServices: '• Vé máy bay (nếu muốn đi bay)\n• Chi phí cá nhân\n• Phụ thu phòng đơn (200.000đ/đêm)\n• Các hoạt động ngoài chương trình',
+    cancellationPolicy: '• Hủy trước 5 ngày: Miễn phí\n• Hủy trong 3-5 ngày: 50%\n• Hủy trong 3 ngày: 100%',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → ĐÀ LẠT – THÁC DATANLA',
+        hotel: 'Khách sạn Tulip 3 Đà Lạt ★★★ (khu trung tâm Hoàng Diệu 2)',
+        hotelRooms: 'Phòng đôi view thành phố / Phòng đơn (phụ thu 200.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Lê Lợi – lẩu gà lá é và cơm niêu đất' },
+        morning: '07:00 – Xe đón tại TP.HCM, di chuyển 6-7 giờ lên Đà Lạt. Dọc đường dừng ăn sáng tự túc (khoảng Bảo Lộc).',
+        afternoon: 'Đến Đà Lạt. Nhận phòng khách sạn. Nghỉ ngơi ngắn. Ghé thăm Thác Datanla – thác nước hùng vĩ trong rừng thông, trải nghiệm tàu lượn Coaster xuống thác (tự túc ~70.000đ).',
+        evening: 'Ăn tối tại nhà hàng Lê Lợi – thưởng thức lẩu gà lá é nổi tiếng, artichoke xào bơ, bánh mì Đà Lạt. Sau đó dạo Chợ Đêm Đà Lạt.',
+        highlights: ['Thác Datanla trong rừng thông', 'Tàu lượn Coaster', 'Lẩu gà lá é đặc sản Đà Lạt', 'Chợ đêm Đà Lạt'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: ĐÀ LẠT – HỒ TUYỀN LÂM – QUẢNG TRƯỜNG LÂM VIÊN',
+        hotel: 'Khách sạn Tulip 3 Đà Lạt ★★★',
+        hotelRooms: 'Phòng đôi view thành phố / Phòng đơn (phụ thu 200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Hồ Tuyền Lâm – cá tầm hấp gừng', chieu: 'Không có', toi: 'Nhà hàng Baguette & Chocolat Đà Lạt – pizza lò củi' },
+        morning: 'Ăn sáng buffet tại khách sạn. Đi cáp treo vượt Hồ Tuyền Lâm (hồ nhân tạo đẹp nhất Đà Lạt), tham quan Thiền Viện Trúc Lâm – thiền viện lớn nhất Việt Nam nằm giữa rừng thông trên đồi cao.',
+        afternoon: 'Ăn trưa cá tầm bên hồ. Tham quan Nhà thờ Domain de Marie (Nhà thờ Hoa), Dinh Bảo Đại (Dinh III) – nơi ở cuối cùng của Hoàng đế Bảo Đại. Chụp ảnh tại Đồi Hoa Cẩm Tú Cầu nở rộ (theo mùa).',
+        evening: 'Dạo Quảng trường Lâm Viên – thưởng thức kem bơ, sữa đậu nành nóng. Ăn tối nhà hàng kiểu Tây. Tự do nghỉ ngơi.',
+        highlights: ['Cáp treo Hồ Tuyền Lâm', 'Thiền Viện Trúc Lâm', 'Đồi hoa cẩm tú cầu', 'Dinh Bảo Đại (Dinh III)', 'Quảng trường Lâm Viên'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: ĐÀ LẠT – LÀNG HOA VẠN THÀNH – THÁC PRENN',
+        hotel: 'Khách sạn Tulip 3 Đà Lạt ★★★',
+        hotelRooms: 'Phòng đôi view thành phố / Phòng đơn (phụ thu 200.000đ/đêm)',
+        meals: { sang: 'Bánh mì thịt nướng tại chợ Đà Lạt', trua: 'Nhà hàng Làng Hoa – mì Quảng Đà Lạt', chieu: 'Không có', toi: 'Nhà hàng Chiều Tím – ếch nướng lá lốt, rau rừng xào tỏi' },
+        morning: 'Ăn sáng tại chợ Đà Lạt – bánh mì kẹp thịt nướng, sữa đậu nành. Tham quan Làng hoa Vạn Thành – vùng canh tác hoa lớn nhất Lâm Đồng, chụp ảnh check-in giữa đồng hoa hồng, cúc, ly.',
+        afternoon: 'Ăn trưa. Ghé Thác Prenn – thác nước hùng vĩ cách trung tâm 10km, tham quan vườn bướm và sở thú nhỏ lân cận. Mua đặc sản: mứt trái cây, atiso sấy, hồng treo gió, trà Atisô.',
+        evening: 'Ăn tối tại Chiều Tím. Dạo quanh hồ Xuân Hương về đêm – hồ trung tâm thành phố lãng mạn bậc nhất Đà Lạt.',
+        highlights: ['Làng hoa Vạn Thành', 'Thác Prenn và vườn bướm', 'Mứt trái cây và atisô Đà Lạt', 'Hồ Xuân Hương về đêm'],
+      },
+      {
+        day: 4,
+        title: 'NGÀY 4: ĐÀ LẠT → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Dừng ăn giữa đường – nhà hàng Bảo Lộc', chieu: 'Không có', toi: 'Tự túc bữa tối sau khi về đến TP.HCM' },
+        morning: 'Ăn sáng buffet. Tự do mua sắm cuối cùng tại chợ Đà Lạt: dâu tây, bơ, mật ong, artisô, hoa tươi. Trả phòng.',
+        afternoon: 'Lên xe xuất phát về TP.HCM. Dừng ăn trưa tại Bảo Lộc – nổi tiếng với trà B\'Lao. Quý khách nghỉ ngơi trên xe.',
+        evening: '18:00 – 19:00: Xe đưa đoàn về lại điểm đón ban đầu tại TP.HCM an toàn. Quý khách kiểm tra hành lý, HDV chia tay đoàn và kết thúc chuyến du lịch Đà Lạt.',
+        highlights: ['Chợ Đà Lạt – mua dâu tây, hoa tươi', 'Trà B\'Lao Bảo Lộc'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 7: ĐẢO NAM DU 3N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 7,
     tourCode: 'NAM-DU-3N3D',
@@ -171,13 +451,60 @@ export const MOCK_TOURS: Tour[] = [
     durationNights: 3,
     departureLocation: 'TP.Hồ Chí Minh',
     thumbnailUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1546514714-df0ccc50ad9f?auto=format&fit=crop&w=800&q=80',
+    ],
     category: 'DOMESTIC' as any,
     remainingSeats: 40,
     viewCount: 450,
     averageRating: 5.0,
     totalReviews: 14,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe từ TP.HCM đến bến tàu Rạch Giá và ngược lại\n• Vé tàu cao tốc Rạch Giá – Nam Du\n• 3 đêm nghỉ dưỡng tại Nam Du\n• Bữa ăn theo chương trình (hải sản tươi)\n• Xuồng tham quan đảo\n• HDV địa phương',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Trò chơi biển tự túc (kayak, lặn có bình...)\n• Đồ uống trong bữa ăn',
+    cancellationPolicy: '• Hủy trước 5 ngày: Miễn phí\n• Hủy trong 5 ngày: 100%',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → RẠCH GIÁ → ĐẢO NAM DU',
+        hotel: 'Nhà nghỉ Hoàng Gia Nam Du ★★★ (Hòn Lớn, ngay bãi biển)',
+        hotelRooms: 'Phòng đôi view biển / Phòng đơn (phụ thu 300.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Hải Sản Tươi Nam Du – ghẹ hấp bia, mực nướng muối ớt' },
+        morning: '05:00 – Xe đón tại TP.HCM di chuyển đến bến tàu Rạch Giá (khoảng 3.5 giờ). Làm thủ tục lên tàu cao tốc Superdong đi Nam Du.',
+        afternoon: 'Tàu cập đảo Hòn Lớn (~2.5 giờ). Nhận phòng, nghỉ ngơi. Chiều tắm biển Bãi Mến – bãi cát trắng phẳng lì, nước xanh trong vắt.',
+        evening: 'Ăn tối hải sản tươi – ghẹ, tôm, cá hú nướng. Ngắm sao đêm trên biển đảo hoang sơ.',
+        highlights: ['Tàu cao tốc Superdong', 'Bãi Mến – bãi cát trắng hoang sơ', 'Ghẹ hấp bia Nam Du'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: THAM QUAN 4 ĐẢO – HANG DỞI – HÒN MẤU',
+        hotel: 'Nhà nghỉ Hoàng Gia Nam Du ★★★',
+        hotelRooms: 'Phòng đôi view biển / Phòng đơn (phụ thu 300.000đ/đêm)',
+        meals: { sang: 'Cơm sáng tại nhà nghỉ', trua: 'Cơm trưa trên tàu – cá hú kho tiêu', chieu: 'Không có', toi: 'Nhà hàng Biển Xanh – lẩu hải sản hỗn hợp' },
+        morning: 'Ăn sáng. 08:00 – Xuồng tham quan Hang Dơi (Hòn Bà) – hang động kỳ thú trú ngụ hàng ngàn con dơi. Đảo Hòn Ngang, Hòn Đồi Mồi – ngắm rùa biển (theo mùa) và san hô màu sắc.',
+        afternoon: 'Ăn trưa trên tàu. Tiếp tục đến Hòn Mấu – đảo đẹp nhất quần đảo Nam Du, tắm biển và lặn ngắm san hô (snorkeling, tự túc thuê đồ). Bãi cát trắng phẳng như gương.',
+        evening: 'Trở về Hòn Lớn. Ăn tối lẩu hải sản. Tự do đi bộ khám phá làng chài địa phương.',
+        highlights: ['Hang Dơi – Hòn Bà kỳ bí', 'Hòn Đồi Mồi – ngắm rùa biển', 'Hòn Mấu – tắm biển và lặn san hô'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: ĐỒI MÒI – NGỌN HẢI ĐĂNG → RẠCH GIÁ → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Cơm sáng tại nhà nghỉ', trua: 'Nhà hàng Rạch Giá – bún cá Rạch Giá', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng. Leo Đồi Mòi – ngọn hải đăng đẹp nhất Nam Du, toàn cảnh quần đảo từ đỉnh đồi. Mua đặc sản: khô cá hú, khô mực một nắng, nước mắm nhĩ.',
+        afternoon: 'Tàu cao tốc trở về Rạch Giá. Ăn trưa bún cá Rạch Giá đặc sản. Xe đưa đoàn về TP.HCM. Dự kiến về lúc 19:00.',
+        evening: '',
+        highlights: ['Ngọn Hải Đăng Nam Du – toàn cảnh quần đảo', 'Khô mực một nắng đặc sản', 'Bún cá Rạch Giá'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 8: VŨNG TÀU – SUNWORLD 1N
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 8,
     tourCode: 'VUNG-TAU-SUNWORLD-1D',
@@ -189,13 +516,36 @@ export const MOCK_TOURS: Tour[] = [
     durationNights: 0,
     departureLocation: 'TP.Hồ Chí Minh',
     thumbnailUrl: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80',
+    ],
     category: 'DOMESTIC' as any,
     remainingSeats: 40,
     viewCount: 309,
     averageRating: 4.7,
     totalReviews: 11,
     status: 'ACTIVE' as any,
+    includedServices: '• Xe máy lạnh đưa đón từ TP.HCM\n• Vé vào cổng Sun World Water Park Vũng Tàu\n• Buffet trưa tại nhà hàng trong công viên\n• HDV đồng hành\n• Nước uống trên xe',
+    excludedServices: '• Chi phí cá nhân\n• Đồ uống và bữa tự chọn thêm\n• Phí đậu xe cá nhân nếu tự lái',
+    cancellationPolicy: '• Hủy trước 2 ngày: Miễn phí\n• Hủy trong 2 ngày: 100%',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → VŨNG TÀU – SUN WORLD – BÃI SAU → TP.HCM',
+        hotel: 'Tour 1 ngày – không lưu trú',
+        hotelRooms: '',
+        meals: { sang: 'Tự túc trước khi lên xe', trua: 'Buffet trưa tại Sun World Water Park Vũng Tàu', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: '06:30 – Xe đón tại TP.HCM (các điểm tập kết trên tuyến đường đi Vũng Tàu). Di chuyển khoảng 1.5 giờ. Đến Vũng Tàu, vào công viên Sun World Water Park. Vui chơi các trò chơi cảm giác mạnh: ống trượt siêu tốc, sóng nhân tạo, hồ bơi, khu thiếu nhi.',
+        afternoon: 'Ăn buffet trưa với hơn 50 món phong phú. Tiếp tục vui chơi hoặc di chuyển ra Bãi Sau Vũng Tàu tắm biển (khoảng 10 phút). Dạo phố Bãi Sau, thưởng thức bánh khọt, bún bà Rèn Vũng Tàu (tự túc).',
+        evening: '16:30 – Tập trung lên xe về TP.HCM. Dự kiến về đến nơi lúc 18:30 – 19:00.',
+        highlights: ['Sun World Water Park – ống trượt siêu tốc', 'Buffet trưa 50+ món', 'Bãi Sau Vũng Tàu', 'Bánh khọt Vũng Tàu'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 9: PHÚ YÊN – QUY NHƠN 3N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 9,
     tourCode: 'PHU-YEN-QUY-NHON-3N3D',
@@ -207,13 +557,58 @@ export const MOCK_TOURS: Tour[] = [
     durationNights: 3,
     departureLocation: 'TP.Hồ Chí Minh',
     thumbnailUrl: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80',
+    ],
     category: 'DOMESTIC' as any,
     remainingSeats: 40,
     viewCount: 580,
     averageRating: 4.9,
     totalReviews: 26,
     status: 'ACTIVE' as any,
+    includedServices: '• Vé máy bay TP.HCM – Tuy Hòa và Quy Nhơn – TP.HCM\n• Xe tham quan suốt tuyến\n• 3 đêm khách sạn 3-4 sao\n• Bữa ăn theo chương trình\n• HDV địa phương\n• Bảo hiểm du lịch',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Vé thuyền Kỳ Co (tự túc)\n• Đồ uống trong bữa ăn',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
+    itineraryDetails: JSON.stringify([
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → TUY HÒA (PHÚ YÊN) – GÀNH ĐÁ ĐĨA',
+        hotel: 'Khách sạn Cendeluxe Tuy Hòa ★★★★ (sát biển)',
+        hotelRooms: 'Phòng đôi view biển / Phòng đơn (phụ thu 500.000đ/đêm)',
+        meals: { sang: 'Tự túc tại sân bay', trua: 'Nhà hàng Đầm Ô Loan – cháo bạch tuộc, mực ngào đường', chieu: 'Không có', toi: 'Nhà hàng Ven Biển Tuy Hòa – cá ngừ đại dương sashimi kiểu Nhật' },
+        morning: 'Bay từ Tân Sơn Nhất đến sân bay Tuy Hòa (Liên Khương). Xe đón, di chuyển ra đầm Ô Loan – đầm phá nước mặn đẹp nhất miền Trung, nơi xuất xứ câu thơ Hàn Mặc Tử "Ô Loan nước lặng le te".',
+        afternoon: 'Ăn trưa hải sản đặc sản. Tham quan Gành Đá Đĩa (Đại Lãnh) – kỳ quan địa chất thiên nhiên, hàng triệu cột đá bazan hình lục giác xếp khít nhau ven biển (duy nhất tại Đông Nam Á).',
+        evening: 'Nhận phòng khách sạn Cendeluxe. Ăn tối cá ngừ đại dương – đặc sản số 1 Phú Yên. Dạo biển Tuy Hòa về đêm.',
+        highlights: ['Đầm Ô Loan – thơ Hàn Mặc Tử', 'Gành Đá Đĩa – kỳ quan địa chất Đông Nam Á', 'Cá ngừ đại dương Phú Yên'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: PHÚ YÊN → MŨI ĐIÊ U → QUY NHƠN – ĐẢO KỲ CO',
+        hotel: 'Khách sạn Seagull Quy Nhơn ★★★★ (trực tiếp bãi biển)',
+        hotelRooms: 'Phòng đôi view biển / Phòng đơn (phụ thu 500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Hải Sản Kỳ Co – cơm hải sản tươi', chieu: 'Không có', toi: 'Nhà hàng Lá Sen Quy Nhơn – bánh xèo tôm thịt, chả cá thu' },
+        morning: 'Ăn sáng buffet. Di chuyển lên Mũi Điêu – cực Đông của dải đất Phú Yên, nơi đón ánh mặt trời đầu tiên. Tháp Nhạn – tháp Chăm 1.000 năm tuổi bên sông Đà Rằng. Tiếp tục vào Quy Nhơn.',
+        afternoon: 'Đến đảo Kỳ Co bằng thuyền (tự túc phí thuyền ~200.000đ). Tắm biển nước xanh ngọc bích trong vắt, snorkeling ngắm san hô. Đây là "Maldives của Việt Nam".',
+        evening: 'Nhận phòng khách sạn. Ăn tối nhà hàng địa phương. Dạo bờ biển Quy Nhơn – thành phố biển trẻ trung năng động.',
+        highlights: ['Mũi Điêu – đón bình minh sớm nhất', 'Tháp Nhạn – tháp Chăm 1.000 năm', 'Đảo Kỳ Co – Maldives Việt Nam', 'Snorkeling san hô'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: QUY NHƠN – EO GIÓ – THÁP BÁNH ÍT → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Ghềnh Ráng – bún chả cá Quy Nhơn', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet. Tham quan Eo Gió (Nhơn Lý) – bãi đá kỳ thú nhô ra biển, sóng vỗ tung bọt trắng xóa. Ghềnh Ráng – mộ thi sĩ Hàn Mặc Tử, bãi tắm nước xanh trong.',
+        afternoon: 'Ăn trưa. Tham quan Tháp Bánh Ít – cụm tháp Chăm Pa 8 tháp trên đồi xanh (thế kỷ XI – XII). Ra sân bay Phù Cát, bay về TP.HCM.',
+        evening: '',
+        highlights: ['Eo Gió – bãi đá kỳ thú', 'Ghềnh Ráng – mộ Hàn Mặc Tử', 'Tháp Bánh Ít – Chăm Pa thế kỷ XI'],
+      },
+    ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 10: THÁI LAN – BANGKOK – PATTAYA 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 10,
     tourCode: 'TL-BKK-PAT-5N4D',
@@ -228,7 +623,7 @@ export const MOCK_TOURS: Tour[] = [
     gallery: [
       'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80',
     ],
     category: 'NUOC_NGOAI' as any,
     remainingSeats: 35,
@@ -240,19 +635,72 @@ export const MOCK_TOURS: Tour[] = [
     excludedServices: '• Tiền Tip cho HDV và tài xế (5 USD/khách/ngày)\n• Chi phí cá nhân: giặt ủi, điện thoại, thức uống ngoài chương trình',
     cancellationPolicy: '• Hủy trước 20 ngày miễn phí\n• Hủy từ 10-19 ngày tính 50%\n• Hủy trong vòng 10 ngày tính 100%',
     itineraryDetails: JSON.stringify([
-      { day: 1, title: 'NGÀY 1: TP.HCM - BANGKOK - PATTAYA', content: 'Đáp chuyến bay đi Bangkok, di chuyển về Pattaya, tham quan Chợ nổi 4 miền.' },
-      { day: 2, title: 'NGÀY 2: ĐẢO CORAL PATTAYA - TRÂN BẢO PHẬT SƠN', content: 'Tắm biển Đảo San Hô Coral, chiêm bái tượng Phật dát vàng trên vách núi.' },
-      { day: 3, title: 'NGÀY 3: PATTAYA - BANGKOK - BUFFET BAIYOKE SKY', content: 'Về Bangkok, thưởng thức đại tiệc buffet Baiyoke Sky ngắm toàn cảnh thành phố.' },
-      { day: 4, title: 'NGÀY 4: CHÙA PHẬT VÀNG - DẠO THUYỀN CHAOPHRAYA', content: 'Chiêm bái Chùa Wat Traimit, viếng Phật Bốn Mặt linh thiêng, tự do mua sắm IconSiam.' },
-      { day: 5, title: 'NGÀY 5: BANGKOK - TP. HỒ CHÍ MINH', content: 'Tham quan trung tâm nghiên cứu rắn hoàng gia, đáp chuyến bay về Việt Nam.' },
+      {
+        day: 1,
+        title: 'NGÀY 1: TP.HCM → BANGKOK → PATTAYA',
+        hotel: 'Khách sạn Mercure Pattaya Ocean Resort ★★★★ (view biển)',
+        hotelRooms: 'Phòng đôi Deluxe Ocean View / Phòng đơn (phụ thu 800.000đ/đêm)',
+        meals: { sang: 'Tự túc tại sân bay', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Floating Market Pattaya – Tom Yum Goong, Pad Thai trứ danh' },
+        morning: 'Bay từ Tân Sơn Nhất đến Suvarnabhumi Bangkok (~1.5h). Làm thủ tục nhập cảnh Thái Lan (visa on arrival hoặc visa trước nếu có). Xe đón đoàn di chuyển về Pattaya (~1.5h).',
+        afternoon: 'Đến Pattaya, nhận phòng khách sạn. Tham quan Chợ nổi 4 miền Pattaya (Floating Market) – mua sắm đặc sản và thưởng thức ẩm thực đường phố nổi trên mặt nước.',
+        evening: 'Ăn tối đặc sản Thái. Tự do khám phá phố đêm Walking Street Pattaya.',
+        highlights: ['Nhập cảnh Thái Lan', 'Chợ nổi 4 miền Pattaya', 'Tom Yum Goong và Pad Thai', 'Walking Street Pattaya'],
+      },
+      {
+        day: 2,
+        title: 'NGÀY 2: ĐẢO SAN HÔ CORAL – PHẬT BỐN MẶT NONG NUCH',
+        hotel: 'Khách sạn Mercure Pattaya Ocean Resort ★★★★',
+        hotelRooms: 'Phòng đôi Deluxe Ocean View / Phòng đơn (phụ thu 800.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Buffet hải sản tại đảo Coral', chieu: 'Không có', toi: 'Nhà hàng Nong Nooch Village – bữa tối kết hợp xem biểu diễn văn hóa Thái' },
+        morning: 'Ăn sáng buffet. Ra cảng, tàu đi Đảo San Hô Coral (Coral Island). Tắm biển nước xanh trong vắt, dù lượn, mô tô nước (tự túc). Ăn buffet hải sản trưa ngay trên đảo.',
+        afternoon: 'Trở về đất liền. Tham quan Vườn Hoa Nong Nooch – công viên hoa nhiệt đới đẹp nhất Thái Lan. Chiêm bái Phật Bốn Mặt Pattaya – linh thiêng nổi tiếng.',
+        evening: 'Ăn tối tại Nong Nooch Village, kết hợp xem biểu diễn văn hóa Thái: múa Khon, đấu Muay Thai, biểu diễn voi.',
+        highlights: ['Đảo Coral – tắm biển & dù lượn', 'Buffet hải sản trên đảo', 'Vườn hoa Nong Nooch', 'Biểu diễn voi và Muay Thai'],
+      },
+      {
+        day: 3,
+        title: 'NGÀY 3: PATTAYA → BANGKOK – BUFFET BAIYOKE SKY',
+        hotel: 'Khách sạn Grande Centre Point Ratchadamri Bangkok ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn Pattaya', trua: 'Nhà hàng Mango Tree Bangkok – Khao Pad, Green Curry', chieu: 'Không có', toi: 'Đại tiệc Buffet tại tầng 86 tòa nhà Baiyoke Sky Tower (tự xoay 360°)' },
+        morning: 'Ăn sáng buffet, trả phòng. Di chuyển về Bangkok (~1.5h). Tham quan trung tâm mua sắm IconSiam – mall hiện đại nhất Bangkok bên sông Chaophraya.',
+        afternoon: 'Ăn trưa. Tham quan chợ truyền thống Or Tor Kor Market – mua trái cây và thực phẩm tươi sống ngon nhất Bangkok. Nhận phòng khách sạn 5 sao.',
+        evening: 'Đại tiệc buffet tầng 86 Baiyoke Sky Tower – 300+ món ẩm thực thế giới, view 360° toàn thành phố Bangkok lung linh về đêm.',
+        highlights: ['IconSiam – mall bên sông', 'Or Tor Kor Market', 'Buffet 300+ món tầng 86 Baiyoke Sky'],
+      },
+      {
+        day: 4,
+        title: 'NGÀY 4: BANGKOK – CHÙA PHẬT VÀNG – DẠO THUYỀN CHAOPHRAYA',
+        hotel: 'Khách sạn Grande Centre Point Ratchadamri ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Blue Elephant Bangkok – ẩm thực Hoàng gia Thái', chieu: 'Không có', toi: 'Tự do tại Asiatique The Riverfront – chợ đêm bờ sông' },
+        morning: 'Ăn sáng buffet. Chiêm bái Chùa Wat Traimit (Chùa Phật Vàng) – tượng Phật vàng nguyên khối 5 tấn, lớn nhất thế giới. Viếng Tứ Diện Phật Erawan – nơi linh thiêng bậc nhất Bangkok.',
+        afternoon: 'Ăn trưa ẩm thực Hoàng gia. Đi thuyền trên sông Chaophraya – ngắm cảnh hai bờ sông với chùa Wat Arun, Cung điện Hoàng gia soi mình xuống nước. Tự do mua sắm tại MBK Center.',
+        evening: 'Khám phá Asiatique The Riverfront – chợ đêm ngoài trời cạnh sông, vòng quay khổng lồ, nhà hàng và bar. Ăn tối tự chọn tại các khu ẩm thực.',
+        highlights: ['Chùa Phật Vàng Wat Traimit – 5 tấn vàng', 'Tứ Diện Phật Erawan', 'Thuyền sông Chaophraya – Wat Arun', 'Asiatique The Riverfront'],
+      },
+      {
+        day: 5,
+        title: 'NGÀY 5: BANGKOK → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự túc tại sân bay Suvarnabhumi', chieu: 'Không có', toi: 'Tự túc (trên máy bay)' },
+        morning: 'Ăn sáng buffet, trả phòng. Tham quan trung tâm nghiên cứu rắn hoàng gia (Siam Serpentarium), một trong những trung tâm nghiên cứu rắn lớn nhất Đông Nam Á.',
+        afternoon: 'Ra sân bay Suvarnabhumi, làm thủ tục xuất cảnh. Đáp chuyến bay về TP.HCM. Kết thúc hành trình.',
+        evening: '',
+        highlights: ['Trung tâm nghiên cứu rắn hoàng gia', 'Duty Free sân bay Suvarnabhumi'],
+      },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 12: HÀ NỘI – HẠ LONG – NINH BÌNH 4N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 12,
     tourCode: 'HCM-HN-HL-NB-4N3D',
     title: 'TOUR HÀ NỘI - HẠ LONG - NINH BÌNH 4N3Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu 4 ngày 3 đêm từ TP.HCM: khám phá Hà Nội, vịnh Hạ Long, Tràng An, chùa Bái Đính và Hang Múa.',
+    description: 'Hành trình 4 ngày 3 đêm từ TP.HCM: khám phá Hà Nội, vịnh Hạ Long, Tràng An, chùa Bái Đính và Hang Múa.',
     price: 7990000,
     childPrice: 5990000,
     durationDays: 4,
@@ -272,45 +720,65 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Hà Nội; xe tham quan; khách sạn 3 đêm; vé tham quan và các bữa ăn theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí cá nhân, phụ thu phòng đơn và các dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Hà Nội\n• Xe tham quan suốt tuyến\n• 3 đêm khách sạn (1 đêm Hà Nội, 1 đêm tàu Hạ Long, 1 đêm Ninh Bình)\n• Bữa ăn theo chương trình\n• Vé tham quan và vé tàu Hạ Long\n• HDV suốt tuyến',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Đồ uống trong bữa ăn\n• Các hoạt động ngoài chương trình',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - HÀ NỘI',
-        content:
-          'Khởi hành từ sân bay Tân Sơn Nhất đến Hà Nội. Tham quan Hồ Gươm, dạo phố cổ và nghỉ đêm tại Hà Nội.',
+        title: 'NGÀY 1: TP.HCM → HÀ NỘI – HỒ GƯƠM – PHỐ CỔ',
+        hotel: 'Khách sạn Melia Hanoi ★★★★★ (trung tâm Hoàn Kiếm)',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 800.000đ/đêm)',
+        meals: { sang: 'Tự túc tại sân bay', trua: 'Nhà hàng Chả Cá Lã Vọng – 100 năm tuổi', chieu: 'Không có', toi: 'Nhà hàng Bún Chả Hương Liên (nơi Obama ghé thăm)' },
+        morning: 'Bay từ Tân Sơn Nhất đến Nội Bài (~2h). Xe đón về trung tâm Hà Nội. Tham quan Hồ Gươm (Hoàn Kiếm Lake) – hồ Kiếm huyền thoại với Tháp Rùa và Đền Ngọc Sơn.',
+        afternoon: 'Ăn trưa chả cá Lã Vọng. Dạo phố cổ 36 phường – phố Hàng Đào, Hàng Gai, Hàng Bạc. Tham quan Ô Quan Chưởng, Đền Bạch Mã cổ kính.',
+        evening: 'Ăn tối bún chả Obama tại Bún Chả Hương Liên. Tự do khám phá phố đi bộ Hà Nội.',
+        highlights: ['Hồ Gươm & Tháp Rùa', 'Đền Ngọc Sơn trên hồ', 'Phố cổ 36 phường Hà Nội', 'Bún chả – phở Hà Nội'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: HÀ NỘI - HẠ LONG',
-        content:
-          'Di chuyển đến Hạ Long, đi thuyền tham quan vịnh và ngắm các đảo đá vôi. Nghỉ đêm tại Hạ Long.',
+        title: 'NGÀY 2: HÀ NỘI → HẠ LONG (NGỦ TÀU)',
+        hotel: 'Tàu du lịch Paradise Elegance Cruise ★★★★★ (ngủ trên vịnh)',
+        hotelRooms: 'Cabin đôi có cửa sổ view biển / Cabin đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn Hà Nội', trua: 'Buffet hải sản tươi trên tàu Paradise', chieu: 'Bánh ngọt & trái cây trên tàu', toi: 'Bữa tối 5 sao trên tàu – lẩu hải sản, tôm hùm' },
+        morning: 'Ăn sáng, trả phòng. Xe di chuyển Hà Nội – Hạ Long (khoảng 3.5h). Làm thủ tục lên tàu, uống cocktail chào mừng. Tàu rời cảng khám phá vịnh Hạ Long – Di sản thiên nhiên thế giới UNESCO.',
+        afternoon: 'Kayak/thuyền khám phá hang Sáng Tối, hang Luồn. Thăm làng chài Cửa Vạn – làng chài nổi tiếng nhất Hạ Long. Bơi lội tại vùng biển xanh trong vắt.',
+        evening: 'Tiệc tối 5 sao trên tàu. Tham gia câu mực đêm trên biển. Ngắm sao đêm giữa vịnh Hạ Long huyền ảo.',
+        highlights: ['Vịnh Hạ Long – Di sản UNESCO', 'Kayak hang Sáng Tối', 'Làng chài Cửa Vạn', 'Câu mực đêm', 'Tàu Paradise Elegance 5 sao'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: HẠ LONG - NINH BÌNH',
-        content:
-          'Di chuyển đến Ninh Bình, tham quan chùa Bái Đính và trải nghiệm đi thuyền tại Tràng An. Nghỉ đêm tại Ninh Bình.',
+        title: 'NGÀY 3: HẠ LONG → NINH BÌNH – TRÀNG AN – BÁI ĐÍNH',
+        hotel: 'Khách sạn Emeralda Resort Ninh Bình ★★★★★',
+        hotelRooms: 'Phòng đôi Garden Villa / Phòng đơn (phụ thu 900.000đ/đêm)',
+        meals: { sang: 'Sáng trên tàu – dim sum và phở Bắc', trua: 'Nhà hàng Tràng An Garden – cơm niêu đất, dê núi Ninh Bình', chieu: 'Không có', toi: 'Nhà hàng Emeralda – buffet đặc sản Ninh Bình' },
+        morning: 'Ăn sáng trên tàu. Tàu cập bến, trả phòng cabin. Di chuyển về Ninh Bình (~2.5h). Tham quan chùa Bái Đính – chùa lớn nhất Đông Nam Á với tháp Bái Đính cao 100m, chuông đồng 36 tấn.',
+        afternoon: 'Ăn trưa dê núi Ninh Bình – đặc sản nổi tiếng. Đi thuyền tham quan Tràng An – quần thể hang động và thung lũng được UNESCO công nhận di sản kép (cả thiên nhiên lẫn văn hóa).',
+        evening: 'Nhận phòng Emeralda Resort. Ăn tối buffet. Nghỉ ngơi trong không gian resort giữa đồng bằng châu thổ yên bình.',
+        highlights: ['Chùa Bái Đính – lớn nhất Đông Nam Á', 'Tràng An – Di sản kép UNESCO', 'Dê núi Ninh Bình – đặc sản số 1', 'Resort Emeralda giữa đồng quê'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: HANG MÚA - HÀ NỘI - TP.HCM',
-        content:
-          'Tham quan Hang Múa, ngắm cảnh đồng quê Ninh Bình. Di chuyển về sân bay Nội Bài, đáp chuyến bay về TP.HCM.',
+        title: 'NGÀY 4: HANG MÚA – NINH BÌNH → HÀ NỘI → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại resort', trua: 'Nhà hàng Hà Nội – phở bò truyền thống Bắc', chieu: 'Không có', toi: 'Tự túc tại sân bay hoặc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet. Leo 500 bậc thang Hang Múa – nhìn từ đỉnh tháp toàn cảnh đồng lúa bao quanh như tranh vẽ. Trả phòng, di chuyển về Hà Nội.',
+        afternoon: 'Dừng ăn trưa phở Hà Nội. Ra sân bay Nội Bài, đáp chuyến bay về TP.HCM. Kết thúc hành trình.',
+        evening: '',
+        highlights: ['500 bậc thang Hang Múa – view đồng lúa', 'Phở Hà Nội chính gốc Bắc', 'Bay về TP.HCM'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 13: HÀ NỘI – SA PA – FANSIPAN 4N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 13,
     tourCode: 'HCM-HN-SP-FSP-4N3D',
     title: 'TOUR HÀ NỘI - SA PA - FANSIPAN 4N3Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM đến Hà Nội và Sa Pa, khám phá bản Cát Cát, thung lũng Mường Hoa và đỉnh Fansipan.',
+    description: 'Hành trình từ TP.HCM đến Hà Nội và Sa Pa, khám phá bản Cát Cát, thung lũng Mường Hoa và đỉnh Fansipan.',
     price: 8490000,
     childPrice: 6390000,
     durationDays: 4,
@@ -330,45 +798,65 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Hà Nội; xe di chuyển theo chương trình; khách sạn 3 đêm; các bữa ăn, vé tham quan và vé cáp treo Fansipan theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí cá nhân; phụ thu phòng đơn; đồ uống và các dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Hà Nội\n• Xe di chuyển theo chương trình\n• 3 đêm khách sạn (1 đêm Hà Nội, 2 đêm Sa Pa)\n• Vé cáp treo Fansipan khứ hồi\n• Bữa ăn theo chương trình\n• HDV suốt tuyến',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Đồ uống trong bữa ăn\n• Vé vào các điểm tâm linh tại Sa Pa (nếu phát sinh)',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - HÀ NỘI - SA PA',
-        content:
-          'Đáp chuyến bay sáng từ Tân Sơn Nhất đến Nội Bài. Di chuyển bằng xe đến Sa Pa, nhận phòng và nghỉ ngơi. Buổi tối tự do khám phá trung tâm thị trấn.',
+        title: 'NGÀY 1: TP.HCM → HÀ NỘI → SA PA',
+        hotel: 'Khách sạn Sapa Relax Hotel & Spa ★★★★ (view thung lũng Mường Hoa)',
+        hotelRooms: 'Phòng đôi View Valley / Phòng đơn (phụ thu 600.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Nhà hàng trên đường Hà Nội – Lào Cai', chieu: 'Không có', toi: 'Nhà hàng Baguette & Chocolat Sapa – súp bí đỏ, thịt lợn bản nướng' },
+        morning: 'Bay sáng từ Tân Sơn Nhất đến Nội Bài. Xe đón, di chuyển thẳng lên Lào Cai (~3.5h đường bộ). Ăn trưa dọc đường.',
+        afternoon: 'Đến Lào Cai, xe lên Sa Pa (30 phút). Nhận phòng khách sạn. Nghỉ ngơi, hít thở không khí trong lành 1.500m so mực nước biển.',
+        evening: 'Ăn tối tại nhà hàng Sapa Town. Dạo phố Sa Pa, thăm chợ đêm – người H\'Mông, Dao đỏ, Tày mang hàng thổ cẩm ra bán. Thưởng thức táo mèo nướng và thắng cố.',
+        highlights: ['Sa Pa – thị trấn sương mù 1.500m', 'Chợ đêm Sa Pa – giao lưu dân tộc', 'Thắng cố và táo mèo nướng'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: FANSIPAN - THUNG LŨNG MƯỜNG HOA',
-        content:
-          'Trải nghiệm cáp treo Fansipan, tham quan khu vực đỉnh núi khi điều kiện thời tiết cho phép. Buổi chiều ngắm cảnh thung lũng Mường Hoa tại điểm dừng phù hợp. Nghỉ đêm tại Sa Pa.',
+        title: 'NGÀY 2: FANSIPAN – NÓC NHÀ ĐÔNG DƯƠNG',
+        hotel: 'Khách sạn Sapa Relax Hotel & Spa ★★★★',
+        hotelRooms: 'Phòng đôi View Valley / Phòng đơn (phụ thu 600.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng tại khu Sun World Fansipan – cơm lam, thịt lợn sấy', chieu: 'Không có', toi: 'Nhà hàng Sapa O\'Chau – cơm lam cá hồi nướng Sa Pa' },
+        morning: 'Ăn sáng sớm buffet. Di chuyển đến ga cáp treo Fansipan. Trải nghiệm cáp treo 3 dây hiện đại nhất Đông Nam Á lên đỉnh Fansipan 3.143m – "Nóc nhà Đông Dương". Chiêm bái tượng Phật Di Lặc trên đỉnh.',
+        afternoon: 'Ăn trưa cơm lam trên đỉnh núi. Khám phá hệ thực vật cao nguyên: hoa đỗ quyên, đỗ quyên cổ thụ, địa y và mây mù. Xuống cáp treo, nghỉ ngơi.',
+        evening: 'Ăn tối cơm lam cá hồi – cá hồi Sa Pa nổi tiếng nhất Việt Nam. Nghỉ ngơi hoặc tắm ngâm thuốc dân tộc (tự túc).',
+        highlights: ['Cáp treo Fansipan 3 dây – hiện đại nhất ĐNA', 'Đỉnh Fansipan 3.143m – Nóc nhà Đông Dương', 'Tượng Phật Di Lặc trên đỉnh', 'Cá hồi Sa Pa'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: BẢN CÁT CÁT - HÀ NỘI',
-        content:
-          'Tham quan bản Cát Cát, tìm hiểu đời sống và nghề thủ công địa phương. Sau bữa trưa, di chuyển về Hà Nội, nhận phòng và nghỉ đêm.',
+        title: 'NGÀY 3: BẢN CÁT CÁT – THUNG LŨNG MƯỜNG HOA → HÀ NỘI',
+        hotel: 'Khách sạn Novotel Hanoi ★★★★★ (trung tâm Hoàn Kiếm)',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 900.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng bản Cát Cát – cơm nắm lá chuối', chieu: 'Không có', toi: 'Nhà hàng Cha Ca Thang Long Hanoi – chả cá Lã Vọng kiểu Hà Nội xưa' },
+        morning: 'Ăn sáng buffet. Đi bộ xuống Bản Cát Cát – bản làng người H\'Mông Đen cổ nhất Sa Pa, tìm hiểu nghề dệt thổ cẩm và chụp ảnh thác nước bản Cát Cát.',
+        afternoon: 'Tham quan ruộng bậc thang Mường Hoa – vẻ đẹp hùng vĩ nhất Tây Bắc, được công nhận là Di tích Quốc gia. Trả phòng, di chuyển về Hà Nội.',
+        evening: 'Nhận phòng Novotel Hanoi. Ăn tối chả cá Hà Nội. Tự do khám phá phố đêm Tạ Hiện.',
+        highlights: ['Bản Cát Cát – H\'Mông Đen cổ nhất', 'Dệt thổ cẩm & thác nước bản Cát Cát', 'Ruộng bậc thang Mường Hoa – Di tích Quốc gia'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: HỒ GƯƠM - TP.HCM',
-        content:
-          'Dạo quanh Hồ Gươm và phố cổ Hà Nội. Di chuyển đến sân bay Nội Bài, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 4: HỒ GƯƠM → SÂN BAY NỘI BÀI → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Hà Nội – bún bò Nam Bộ hoặc phở cuốn', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet, trả phòng. Dạo bộ cuối cùng quanh Hồ Gươm và phố cổ Hà Nội. Mua đặc sản: cốm làng Vòng, giò chả Hà Nội, chè lam, ô mai.',
+        afternoon: 'Ăn trưa. Ra sân bay Nội Bài, đáp chuyến bay về TP.HCM. Kết thúc hành trình.',
+        evening: '',
+        highlights: ['Cốm làng Vòng – đặc sản mùa thu Hà Nội', 'Phở cuốn & bún bò Nam Bộ Hà Nội'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 14: HÀ GIANG – ĐỒNG VĂN – MÃ PÍ LÈNG 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 14,
     tourCode: 'HCM-HG-DV-MPL-5N4D',
     title: 'TOUR HÀ GIANG - ĐỒNG VĂN - MÃ PÍ LÈNG 5N4Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM qua Hà Nội đến Hà Giang, khám phá dốc Thẩm Mã, cột cờ Lũng Cú, phố cổ Đồng Văn, đèo Mã Pí Lèng và sông Nho Quế.',
+    description: 'Hành trình từ TP.HCM qua Hà Nội đến Hà Giang, khám phá dốc Thẩm Mã, cột cờ Lũng Cú, phố cổ Đồng Văn, đèo Mã Pí Lèng và sông Nho Quế.',
     price: 9990000,
     childPrice: 7490000,
     durationDays: 5,
@@ -388,51 +876,76 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Hà Nội; xe di chuyển theo chương trình; lưu trú 4 đêm; các bữa ăn, vé tham quan và thuyền trên sông Nho Quế theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí cá nhân; phụ thu phòng đơn; đồ uống và các dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Hà Nội\n• Xe di chuyển theo chương trình (xe 16 chỗ máy lạnh)\n• 4 đêm khách sạn và nhà nghỉ homestay\n• Bữa ăn theo chương trình\n• Vé thuyền sông Nho Quế\n• HDV địa phương am hiểu vùng núi đá Đồng Văn',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Vé cột cờ Lũng Cú\n• Đồ uống trong bữa ăn',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - HÀ NỘI - HÀ GIANG',
-        content:
-          'Đáp chuyến bay sáng từ Tân Sơn Nhất đến Nội Bài. Di chuyển bằng xe đến Hà Giang, nhận phòng và nghỉ ngơi sau hành trình.',
+        title: 'NGÀY 1: TP.HCM → HÀ NỘI → HÀ GIANG',
+        hotel: 'Khách sạn Hà Giang Palace ★★★ (trung tâm thành phố Hà Giang)',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 350.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Nhà hàng Hà Nội – phở bò truyền thống', chieu: 'Không có', toi: 'Nhà hàng Hà Giang – thắng cố, rượu ngô Hà Giang' },
+        morning: 'Bay sáng Tân Sơn Nhất – Nội Bài. Xe đón di chuyển thẳng lên Hà Giang (~300km, 5-6h). Dừng ăn trưa Hà Nội.',
+        afternoon: 'Đến Hà Giang thành phố. Nhận phòng, nghỉ ngơi.',
+        evening: 'Ăn tối thắng cố và uống rượu ngô vùng cao. Khám phá chợ đêm Hà Giang.',
+        highlights: ['Rượu ngô Hà Giang', 'Thắng cố – ẩm thực vùng cao nguyên đá'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: HÀ GIANG - DỐC THẨM MÃ - ĐỒNG VĂN',
-        content:
-          'Di chuyển qua Quản Bạ và Yên Minh, dừng ngắm cảnh tại dốc Thẩm Mã. Tiếp tục đến Đồng Văn, nhận phòng và khám phá phố cổ vào buổi tối.',
+        title: 'NGÀY 2: HÀ GIANG → QUẢN BẠ → YÊN MINH → ĐỒNG VĂN',
+        hotel: 'Nhà nghỉ Đồng Văn Homestay ★★ (trong lòng phố cổ Đồng Văn)',
+        hotelRooms: 'Phòng đôi / Phòng đơn (phụ thu 200.000đ/đêm)',
+        meals: { sang: 'Sáng tại khách sạn Hà Giang', trua: 'Nhà hàng Yên Minh – xôi ngũ sắc, thịt heo muối hun khói', chieu: 'Không có', toi: 'Nhà hàng phố cổ Đồng Văn – mèn mén, cháo ấu tẩu' },
+        morning: 'Ăn sáng, khởi hành. Qua Cổng Trời Quản Bạ – nơi nhìn thấy "Núi đôi" (Cô Tiên) huyền thoại. Dừng tại dốc Thẩm Mã ngắm thung lũng Sủng Là.',
+        afternoon: 'Qua Yên Minh, ăn trưa xôi ngũ sắc. Tiếp tục đến Đồng Văn, nhận phòng homestay trong lòng phố cổ đá xanh.',
+        evening: 'Dạo phố cổ Đồng Văn về đêm – ngôi chợ cổ 100 tuổi, nhà trình tường người Mông. Ăn tối mèn mén (bột ngô xào muối vừng).',
+        highlights: ['Cổng Trời Quản Bạ – Núi đôi huyền thoại', 'Dốc Thẩm Mã – thung lũng Sủng Là', 'Phố cổ Đồng Văn 100 tuổi', 'Mèn mén – ẩm thực dân tộc H\'Mông'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: LŨNG CÚ - ĐỒNG VĂN',
-        content:
-          'Tham quan cột cờ Lũng Cú và tìm hiểu đời sống địa phương. Trở về Đồng Văn, dành thời gian tham quan phố cổ và nghỉ đêm.',
+        title: 'NGÀY 3: LŨNG CÚ – CỘT CỜ TỔ QUỐC → ĐỒNG VĂN',
+        hotel: 'Nhà nghỉ Đồng Văn Homestay ★★',
+        hotelRooms: 'Phòng đôi / Phòng đơn (phụ thu 200.000đ/đêm)',
+        meals: { sang: 'Sáng tại homestay', trua: 'Cơm nắm lá chuối tại Lũng Cú', chieu: 'Không có', toi: 'Nhà hàng Phố Cổ Đồng Văn – lẩu thắng cố hoàng su phì' },
+        morning: 'Ăn sáng, leo Cột cờ Lũng Cú – điểm cực Bắc Tổ quốc, cờ đỏ sao vàng tung bay ở độ cao 1.700m. Ngắm toàn cảnh sông Nho Quế uốn lượn.',
+        afternoon: 'Quay về Đồng Văn. Tham quan Nhà Vương – dinh thự của vua Mông Vương Chí Sình xây năm 1914, kiến trúc kết hợp Hán – Mông độc đáo.',
+        evening: 'Ăn tối lẩu thắng cố. Tự do khám phá và chụp ảnh phố cổ về đêm.',
+        highlights: ['Cột cờ Lũng Cú – cực Bắc Tổ quốc', 'Nhà Vương – dinh thự vua Mông 1914', 'Lẩu thắng cố Hoàng Su Phì'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: MÃ PÍ LÈNG - SÔNG NHO QUẾ - HÀ GIANG',
-        content:
-          'Ngắm cảnh đèo Mã Pí Lèng, trải nghiệm đi thuyền trên sông Nho Quế khi thời tiết và điều kiện vận hành cho phép. Sau tham quan, di chuyển về Hà Giang và nghỉ đêm.',
+        title: 'NGÀY 4: MÃ PÍ LÈNG – SÔNG NHO QUẾ → HÀ GIANG',
+        hotel: 'Khách sạn Hà Giang Palace ★★★',
+        hotelRooms: 'Phòng đôi standard / Phòng đơn (phụ thu 350.000đ/đêm)',
+        meals: { sang: 'Sáng tại homestay', trua: 'Nhà hàng Mèo Vạc – cơm lam xôi ngô', chieu: 'Không có', toi: 'Nhà hàng Hà Giang – thịt trâu gác bếp nướng than' },
+        morning: 'Khởi hành sớm đến đèo Mã Pí Lèng – một trong "Tứ đại đỉnh đèo" Việt Nam, cao 2.000m, dài 20km uốn theo vách núi dựng đứng. Đây là đèo đẹp nhất Hà Giang. Dừng điểm nhìn Panorama ngắm sông Nho Quế turquoise 300m bên dưới.',
+        afternoon: 'Đi thuyền trên sông Nho Quế – con sông xanh ngọc bích chảy giữa hai vách núi đá cao 800m. Trả phòng homestay, về Hà Giang.',
+        evening: 'Nhận phòng khách sạn, ăn tối thịt trâu gác bếp – đặc sản vùng cao.',
+        highlights: ['Đèo Mã Pí Lèng – Tứ đại đỉnh đèo Việt Nam', 'Sông Nho Quế – xanh ngọc bích', 'Thuyền giữa vách núi 800m', 'Thịt trâu gác bếp'],
       },
       {
         day: 5,
-        title: 'NGÀY 5: HÀ GIANG - HÀ NỘI - TP.HCM',
-        content:
-          'Khởi hành về sân bay Nội Bài, bố trí thời gian nghỉ dọc đường và dự phòng di chuyển. Đáp chuyến bay tối về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 5: HÀ GIANG → HÀ NỘI → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Sáng tại khách sạn', trua: 'Nhà hàng Hà Nội – bún thang', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng, trả phòng. Xe về Hà Nội (~6h). Mua đặc sản: mật ong bạc hà Đồng Văn, thịt trâu gác bếp, rượu ngô Đồng Văn.',
+        afternoon: 'Ăn trưa Hà Nội. Ra sân bay Nội Bài, bay về TP.HCM. Kết thúc hành trình hùng vĩ.',
+        evening: '',
+        highlights: ['Mật ong bạc hà Đồng Văn', 'Rượu ngô Hà Giang – đặc sản về nhà'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 15: ĐÀ NẴNG – HỘI AN – HUẾ 4N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 15,
     tourCode: 'HCM-DN-HA-HUE-4N3D',
     title: 'TOUR ĐÀ NẴNG - HỘI AN - HUẾ 4N3Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM khám phá biển Mỹ Khê, Cầu Vàng, phố cổ Hội An, Đại Nội Huế và chùa Thiên Mụ.',
+    description: 'Hành trình từ TP.HCM khám phá biển Mỹ Khê, Cầu Vàng, phố cổ Hội An, Đại Nội Huế và chùa Thiên Mụ.',
     price: 6990000,
     childPrice: 5290000,
     durationDays: 4,
@@ -452,45 +965,65 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay TP.HCM - Đà Nẵng và Huế - TP.HCM; xe tham quan; lưu trú 3 đêm; các bữa ăn theo chương trình; vé tham quan và cáp treo Bà Nà theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí cá nhân; phụ thu phòng đơn; đồ uống và các dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay TP.HCM – Đà Nẵng và Huế – TP.HCM\n• Xe tham quan suốt tuyến\n• 3 đêm khách sạn 4 sao\n• Bữa ăn theo chương trình\n• Vé tham quan và vé cáp treo Bà Nà\n• HDV địa phương',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Đồ uống trong bữa ăn\n• Chi phí mua sắm tự túc',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - ĐÀ NẴNG - HỘI AN',
-        content:
-          'Đáp chuyến bay sáng từ Tân Sơn Nhất đến Đà Nẵng. Tham quan biển Mỹ Khê, nghỉ ngơi trước khi đến phố cổ Hội An vào buổi chiều. Dạo phố đèn lồng, sau đó trở về Đà Nẵng nghỉ đêm.',
+        title: 'NGÀY 1: TP.HCM → ĐÀ NẴNG – HỘI AN PHỐ CỔ',
+        hotel: 'Khách sạn Pullman Danang Beach Resort ★★★★★ (bãi biển Mỹ Khê)',
+        hotelRooms: 'Phòng đôi Ocean View / Phòng đơn (phụ thu 700.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Nhà hàng Cô Ba Hội An – cao lầu Hội An trứ danh', chieu: 'Không có', toi: 'Nhà hàng Morning Glory Hội An – Bạch Thái Bưởi crab curry nổi tiếng' },
+        morning: 'Bay sáng Tân Sơn Nhất – Đà Nẵng (~1h). Xe đón, nhận phòng khách sạn Pullman bãi biển Mỹ Khê.',
+        afternoon: 'Di chuyển 30km đến Hội An. Tham quan phố cổ Hội An – Di sản văn hóa UNESCO: Chùa Phúc Kiến, Nhà cổ Tấn Ký, Chùa Cầu Nhật Bản 400 năm tuổi. Ăn trưa cao lầu – đặc sản bánh mì thế giới Hội An.',
+        evening: 'Ăn tối tại Morning Glory. Thả đèn hoa đăng trên sông Hoài. Dạo phố đèn lồng lung linh.',
+        highlights: ['Chùa Cầu Nhật Bản – 400 tuổi', 'Phố cổ Hội An – UNESCO', 'Cao lầu & bánh mì Hội An', 'Đèn lồng & hoa đăng sông Hoài'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: BÀ NÀ HILLS - CẦU VÀNG',
-        content:
-          'Di chuyển đến Bà Nà Hills, đi cáp treo và tham quan Cầu Vàng khi điều kiện thời tiết, vận hành cho phép. Buổi chiều trở về Đà Nẵng. Tự do khám phá thành phố và nghỉ đêm.',
+        title: 'NGÀY 2: BÀ NÀ HILLS – CẦU VÀNG – NGŨ HÀNH SƠN',
+        hotel: 'Khách sạn Pullman Danang Beach Resort ★★★★★',
+        hotelRooms: 'Phòng đôi Ocean View / Phòng đơn (phụ thu 700.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Buffet trưa tại Bà Nà Hills – nhà hàng Le Jardin', chieu: 'Không có', toi: 'Nhà hàng Trống Đồng Đà Nẵng – mì Quảng, bánh tráng cuốn thịt heo' },
+        morning: 'Ăn sáng buffet. Di chuyển đến Bà Nà Hills. Đi cáp treo 5.801m – kỷ lục thế giới. Tham quan Làng Pháp, Lâu đài Debay, vườn hoa Fantasy Park. Chụp ảnh Cầu Vàng được hai bàn tay khổng lồ đỡ – biểu tượng Đà Nẵng.',
+        afternoon: 'Ăn buffet trưa. Về Đà Nẵng, tham quan Ngũ Hành Sơn – 5 ngọn núi cẩm thạch huyền bí, ghé thăm làng nghề điêu khắc đá Non Nước.',
+        evening: 'Ăn tối mì Quảng và bánh tráng cuốn thịt heo – đặc sản Đà Nẵng. Tự do tắm biển Mỹ Khê về đêm.',
+        highlights: ['Cáp treo Bà Nà Hills – kỷ lục thế giới 5.801m', 'Cầu Vàng – biểu tượng Đà Nẵng', 'Ngũ Hành Sơn – 5 núi đá cẩm thạch', 'Làng đá Non Nước'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: ĐÀ NẴNG - HUẾ - ĐẠI NỘI',
-        content:
-          'Trả phòng, di chuyển đến Huế. Tham quan Đại Nội, tìm hiểu kiến trúc và lịch sử cố đô. Nhận phòng và nghỉ đêm tại Huế.',
+        title: 'NGÀY 3: ĐÀ NẴNG → HUẾ – ĐẠI NỘI HOÀNG TRIỀU',
+        hotel: 'Khách sạn Eldora Hotel Hue ★★★★ (bờ sông Hương)',
+        hotelRooms: 'Phòng đôi River View / Phòng đơn (phụ thu 500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Ẩm Thực Huế Xưa – bún bò Huế, cơm hến', chieu: 'Không có', toi: 'Nhà hàng Tiệm Ăn Hoàng Cung – ẩm thực cung đình Nguyễn' },
+        morning: 'Ăn sáng, trả phòng. Di chuyển Đà Nẵng – Huế qua đèo Hải Vân (30km) – "Thiên hạ đệ nhất hùng quan". Dừng đỉnh đèo ngắm cảnh vịnh Đà Nẵng.',
+        afternoon: 'Đến Huế. Tham quan Đại Nội (Hoàng Thành) – nơi các vua triều Nguyễn trị vì (1802-1945): Ngọ Môn, Thế Tổ Miếu, Điện Thái Hòa. Nhận phòng khách sạn.',
+        evening: 'Ăn tối ẩm thực cung đình Huế – bánh khoái, chả cuốn, cơm hến, bún bò Huế. Dạo bờ sông Hương.',
+        highlights: ['Đèo Hải Vân – Thiên hạ đệ nhất hùng quan', 'Đại Nội Huế – Hoàng Thành triều Nguyễn', 'Bún bò Huế & ẩm thực cung đình'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: CHÙA THIÊN MỤ - TP.HCM',
-        content:
-          'Tham quan chùa Thiên Mụ và ngắm cảnh sông Hương. Di chuyển đến sân bay Phú Bài, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 4: HUẾ – CHÙA THIÊN MỤ – LĂNG TỰ ĐỨC → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng ven sông Hương – cơm hến, bánh lọc Huế', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet. Thăm Chùa Thiên Mụ – ngôi chùa cổ 400 năm trên đồi Kim Long nhìn xuống sông Hương, Tháp Phước Duyên 7 tầng biểu tượng Huế. Đi thuyền rồng trên sông Hương.',
+        afternoon: 'Tham quan Lăng Tự Đức – lăng mộ đẹp nhất triều Nguyễn, vườn cây cổ thụ và hồ sen. Ăn trưa. Ra sân bay Phú Bài, bay về TP.HCM.',
+        evening: '',
+        highlights: ['Chùa Thiên Mụ 400 năm – Tháp Phước Duyên 7 tầng', 'Thuyền rồng sông Hương', 'Lăng Tự Đức – lăng đẹp nhất triều Nguyễn'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 16: PHÚ QUỐC – NAM ĐẢO 4N3Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 16,
     tourCode: 'HCM-PQ-NAMDAO-4N3D',
     title: 'TOUR PHÚ QUỐC - NAM ĐẢO 4N3Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM đến Phú Quốc, khám phá Bãi Sao, Hòn Thơm, cáp treo vượt biển, Hòn Móng Tay và hoàng hôn tại An Thới.',
+    description: 'Hành trình từ TP.HCM đến Phú Quốc, khám phá Bãi Sao, Hòn Thơm, cáp treo vượt biển, Hòn Móng Tay và hoàng hôn tại An Thới.',
     price: 7490000,
     childPrice: 5590000,
     durationDays: 4,
@@ -510,45 +1043,65 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Phú Quốc; xe di chuyển theo chương trình; lưu trú 3 đêm; các bữa ăn theo chương trình; vé cáp treo Hòn Thơm và chuyến tham quan Hòn Móng Tay.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí cá nhân; phụ thu phòng đơn; trò chơi biển có thu phí; đồ uống và các dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Phú Quốc\n• Xe di chuyển theo chương trình\n• 3 đêm khách sạn 4 sao\n• Bữa ăn theo chương trình\n• Vé cáp treo Hòn Thơm\n• Chuyến tàu Hòn Móng Tay\n• HDV địa phương',
+    excludedServices: '• Chi phí cá nhân\n• Phụ thu phòng đơn\n• Trò chơi biển có phí\n• Đồ uống trong bữa ăn',
+    cancellationPolicy: '• Hủy trước 7 ngày: Miễn phí\n• Hủy từ 3-7 ngày: 50%\n• Hủy trong 3 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - PHÚ QUỐC - BÃI SAO',
-        content:
-          'Đáp chuyến bay sáng từ Tân Sơn Nhất đến Phú Quốc. Dùng bữa trưa, tham quan và nghỉ ngơi tại Bãi Sao. Nhận phòng khách sạn, tự do khám phá Phú Quốc vào buổi tối.',
+        title: 'NGÀY 1: TP.HCM → PHÚ QUỐC – BÃI SAO',
+        hotel: 'Khách sạn Salinda Premium Resort & Spa ★★★★★ (bãi Trường)',
+        hotelRooms: 'Phòng đôi Garden View / Phòng đơn (phụ thu 900.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Nhà hàng Bãi Sao Seafood – cua đá, tôm hùm', chieu: 'Không có', toi: 'Nhà hàng Rika Restaurant – buffet hải sản tươi Phú Quốc' },
+        morning: 'Bay sáng Tân Sơn Nhất – Phú Quốc (~45 phút). Xe đón, nhận phòng Salinda Resort. Tắm hồ bơi vô cực hoặc nghỉ ngơi trong phòng view biển.',
+        afternoon: 'Di chuyển đến Bãi Sao (15km) – một trong những bãi biển đẹp nhất Đông Nam Á, cát trắng mịn như bột, nước xanh trong vắt. Tắm biển, chụp ảnh, thưởng thức hải sản bãi biển.',
+        evening: 'Trở về resort. Ăn tối buffet hải sản tươi. Dạo bãi Trường ngắm hoàng hôn Phú Quốc nổi tiếng.',
+        highlights: ['Bãi Sao – đẹp nhất Đông Nam Á', 'Cua đá và tôm hùm tươi', 'Hoàng hôn Phú Quốc'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: CÁP TREO HÒN THƠM - AN THỚI',
-        content:
-          'Di chuyển đến ga cáp treo, trải nghiệm hành trình vượt biển đến Hòn Thơm khi thời tiết và điều kiện vận hành cho phép. Buổi chiều trở về An Thới, dạo bộ và ngắm hoàng hôn. Nghỉ đêm tại Phú Quốc.',
+        title: 'NGÀY 2: CÁP TREO HON THƠM – HÒN MÓNG TAY',
+        hotel: 'Khách sạn Salinda Premium Resort & Spa ★★★★★',
+        hotelRooms: 'Phòng đôi Garden View / Phòng đơn (phụ thu 900.000đ/đêm)',
+        meals: { sang: 'Buffet tại resort', trua: 'Buffet hải sản trên đảo Hòn Thơm', chieu: 'Không có', toi: 'Nhà hàng Noir Dining in the Dark Phú Quốc – trải nghiệm ẩm thực bóng tối' },
+        morning: 'Ăn sáng buffet. Di chuyển đến ga cáp treo An Thới. Đi cáp treo Hòn Thơm – cáp treo vượt biển 3 dây dài nhất thế giới (7.899m), nhìn xuống biển xanh bên dưới. Đến Hòn Thơm, tắm biển và ăn buffet.',
+        afternoon: 'Đi tàu khám phá Hòn Móng Tay – đảo hoang sơ thuộc quần đảo An Thới, snorkeling ngắm san hô và cá nhiệt đới. Hoàng hôn An Thới khi tàu về.',
+        evening: 'Trải nghiệm ẩm thực bóng tối tại Noir – nhà hàng độc đáo nhất Phú Quốc.',
+        highlights: ['Cáp treo 3 dây 7.899m – dài nhất thế giới', 'Buffet hải sản trên đảo', 'Hòn Móng Tay – snorkeling san hô', 'Hoàng hôn An Thới'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: KHÁM PHÁ HÒN MÓNG TAY',
-        content:
-          'Tham gia chuyến tham quan Hòn Móng Tay thuộc khu vực quần đảo An Thới, nghỉ ngơi và tắm biển tại khu vực được hướng dẫn. Lịch trình đường biển có thể điều chỉnh theo thời tiết. Trở về khách sạn nghỉ đêm.',
+        title: 'NGÀY 3: BẮC ĐẢO – LÀNG CHÀI HÀM NINH – NHÀ TÙ PHÚ QUỐC',
+        hotel: 'Khách sạn Salinda Premium Resort & Spa ★★★★★',
+        hotelRooms: 'Phòng đôi Garden View / Phòng đơn (phụ thu 900.000đ/đêm)',
+        meals: { sang: 'Buffet tại resort', trua: 'Nhà hàng Hàm Ninh – ghẹ tươi hấp gừng, nhum biển', chieu: 'Không có', toi: 'Nhà hàng Ganesh Restaurant Phú Quốc – cà ri hải sản kiểu Ấn' },
+        morning: 'Ăn sáng buffet. Di chuyển lên Bắc đảo: thăm Vườn tiêu Phú Quốc, nhà thùng nước mắm truyền thống 100 năm. Tham quan Nhà tù Phú Quốc (Trại giam Phú Quốc – lịch sử bi hùng).',
+        afternoon: 'Ăn trưa ghẹ tươi và nhum biển tại làng chài Hàm Ninh – làng chài cổ nhất Phú Quốc. Chiều tự do nghỉ ngơi tại resort hoặc spa (tự túc).',
+        evening: 'Ăn tối ẩm thực Ấn Độ. Tự do khám phá chợ đêm Phú Quốc – mua mắm nhĩ, tiêu đỏ, ngọc trai.',
+        highlights: ['Vườn tiêu & nhà thùng nước mắm 100 năm', 'Nhà tù Phú Quốc – lịch sử bi hùng', 'Ghẹ tươi Hàm Ninh', 'Ngọc trai & tiêu đỏ Phú Quốc'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: PHÚ QUỐC - TP.HCM',
-        content:
-          'Ăn sáng, tự do nghỉ ngơi hoặc mua đặc sản trước khi trả phòng. Di chuyển đến sân bay Phú Quốc, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 4: PHÚ QUỐC → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại resort', trua: 'Tự túc trước khi ra sân bay', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet. Tự do nghỉ dưỡng lần cuối tại resort hoặc tắm biển. Mua đặc sản: rượu sim Phú Quốc, tiêu đen, nước mắm Phú Quốc, ngọc trai.',
+        afternoon: 'Trả phòng, di chuyển sân bay Phú Quốc. Bay về TP.HCM. Kết thúc hành trình.',
+        evening: '',
+        highlights: ['Rượu sim Phú Quốc', 'Nước mắm Phú Quốc – ngon nhất Việt Nam'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 17: SINGAPORE – MALAYSIA 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 17,
     tourCode: 'HCM-SG-MY-5N4D',
     title: 'TOUR SINGAPORE - MALAYSIA 5N4Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM khám phá Merlion, Gardens by the Bay, Marina Bay tại Singapore và tháp đôi Petronas, động Batu tại Malaysia.',
+    description: 'Hành trình từ TP.HCM khám phá Merlion, Gardens by the Bay, Marina Bay tại Singapore và tháp đôi Petronas, động Batu tại Malaysia.',
     price: 13990000,
     childPrice: 10490000,
     durationDays: 5,
@@ -568,51 +1121,76 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay TP.HCM - Singapore, Singapore - Kuala Lumpur và Kuala Lumpur - TP.HCM; xe theo chương trình; lưu trú 4 đêm; các bữa ăn và tham quan theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí giấy tờ xuất nhập cảnh nếu phát sinh; phụ thu phòng đơn; chi phí cá nhân; vé khu nhà kính tại Gardens by the Bay và đài quan sát Petronas nếu không được xác nhận trong chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ, yêu cầu xuất nhập cảnh và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay TP.HCM – Singapore, Singapore – KL, KL – TP.HCM\n• Xe theo chương trình\n• 4 đêm khách sạn 4 sao\n• Bữa ăn và tham quan theo chương trình\n• Bảo hiểm du lịch quốc tế\n• HDV tiếng Việt suốt tuyến',
+    excludedServices: '• Visa Singapore (nếu cần)\n• Phụ thu phòng đơn\n• Chi phí cá nhân\n• Vé đài quan sát Petronas (tự túc nếu muốn)',
+    cancellationPolicy: '• Hủy trước 15 ngày: Miễn phí\n• Hủy từ 7-15 ngày: 50%\n• Hủy trong 7 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - SINGAPORE - MERLION',
-        content:
-          'Đáp chuyến bay từ Tân Sơn Nhất đến Singapore. Di chuyển đến công viên Merlion, tham quan và chụp ảnh khu vực vịnh Marina. Nhận phòng, nghỉ đêm tại Singapore.',
+        title: 'NGÀY 1: TP.HCM → SINGAPORE – MERLION – MARINA BAY',
+        hotel: 'Khách sạn JW Marriott Singapore South Beach ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Jumbo Seafood Singapore – chilli crab trứ danh' },
+        morning: 'Bay từ Tân Sơn Nhất đến Changi Airport Singapore (~2h). Nhập cảnh, xe đón về khách sạn. Nhận phòng JW Marriott ngay trung tâm Singapore.',
+        afternoon: 'Tham quan Công viên Merlion, Esplanade – Nhà hát Sầu Riêng, ngắm toàn cảnh Marina Bay Sands nổi tiếng thế giới.',
+        evening: 'Ăn tối chilli crab Jumbo Seafood – đặc sản số 1 Singapore. Dạo Clark Quay về đêm sôi động.',
+        highlights: ['Sân bay Changi – đẹp nhất thế giới', 'Tượng Merlion & Esplanade', 'Marina Bay Sands', 'Chilli Crab Jumbo Seafood'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: GARDENS BY THE BAY - MARINA BAY',
-        content:
-          'Tham quan khu vườn ngoài trời tại Gardens by the Bay. Buổi chiều khám phá khu vực Marina Bay, tự do dạo bộ và chụp ảnh. Nghỉ đêm tại Singapore.',
+        title: 'NGÀY 2: GARDENS BY THE BAY – SENTOSA – CHINATOWN',
+        hotel: 'Khách sạn JW Marriott Singapore South Beach ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Lau Pa Sat Singapore – Satay Hawker Centre', chieu: 'Không có', toi: 'Nhà hàng Maxwell Food Centre – Tian Tian Chicken Rice' },
+        morning: 'Ăn sáng buffet. Tham quan Gardens by the Bay – hai nhà kính khổng lồ Flower Dome & Cloud Forest, rừng Supertree Grove. Đi dạo Skyway nhìn xuống vườn Singapore.',
+        afternoon: 'Đến đảo Sentosa – cáp treo, bãi biển Siloso, Universal Studios Singapore (bên ngoài, vào tham quan tự túc). Chiều về Chinatown, tham quan Chùa Phật Nha rực rỡ và khu phố Hoa.',
+        evening: 'Ăn tối Hainanese Chicken Rice tại Tian Tian – CNN bình chọn "Món ăn ngon nhất Singapore".',
+        highlights: ['Gardens by the Bay – Flower Dome & Cloud Forest', 'Supertree Grove & Skyway', 'Đảo Sentosa', 'Hainanese Chicken Rice'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: SINGAPORE - KUALA LUMPUR',
-        content:
-          'Trả phòng, di chuyển đến sân bay để đáp chuyến bay sang Kuala Lumpur. Sau khi hoàn tất thủ tục nhập cảnh, xe đưa đoàn về khách sạn. Nghỉ ngơi và khám phá khu vực trung tâm.',
+        title: 'NGÀY 3: SINGAPORE → KUALA LUMPUR (MALAYSIA)',
+        hotel: 'Khách sạn Mandarin Oriental Kuala Lumpur ★★★★★ (view Petronas)',
+        hotelRooms: 'Phòng đôi Deluxe City View / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn Singapore', trua: 'Nhà hàng tại sân bay Changi – Singapore', chieu: 'Không có', toi: 'Nhà hàng Kuala Lumpur – Nasi Lemak và Laksa Lemak' },
+        morning: 'Ăn sáng buffet. Trả phòng, di chuyển sân bay Changi. Bay Singapore – Kuala Lumpur (~50 phút).',
+        afternoon: 'Đến KL International Airport, nhập cảnh. Xe đón về Kuala Lumpur trung tâm. Nhận phòng Mandarin Oriental view Petronas. Dạo Bukit Bintang – khu mua sắm sầm uất nhất KL.',
+        evening: 'Ăn tối Nasi Lemak và Laksa – ẩm thực quốc dân Malaysia. Ngắm tháp đôi Petronas sáng rực về đêm.',
+        highlights: ['Sân bay Changi Singapore', 'Bay nội địa Singapore – KL', 'Bukit Bintang mua sắm', 'Petronas Twin Towers về đêm'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: ĐỘNG BATU - THÁP ĐÔI PETRONAS',
-        content:
-          'Tham quan động Batu, mặc trang phục phù hợp với điểm tham quan tôn giáo. Buổi chiều trở về trung tâm Kuala Lumpur, chụp ảnh bên ngoài tháp đôi Petronas và dạo công viên KLCC. Nghỉ đêm tại Kuala Lumpur.',
+        title: 'NGÀY 4: ĐỘNG BATU – THÁP ĐÔI PETRONAS – KLCC',
+        hotel: 'Khách sạn Mandarin Oriental Kuala Lumpur ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe City View / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Restoran Nelayan KL – nasi goreng ikan bilis', chieu: 'Không có', toi: 'Nhà hàng Atmosphere 360 KL Tower – buffet view 360° trên tháp KL' },
+        morning: 'Ăn sáng buffet. Tham quan Động Batu (Batu Caves) – hệ thống hang động Hindu linh thiêng với 272 bậc thang cầu thang vàng, tượng thần Murugan cao 42.7m. Mặc trang phục kín (vai và đầu gối).',
+        afternoon: 'Về KL, chụp ảnh ngoài tháp đôi Petronas (KLCC) – tòa nhà đôi cao nhất thế giới 1996-2004, 452m. Dạo công viên KLCC và hồ nhân tạo. Mua sắm tại Suria KLCC mall.',
+        evening: 'Ăn tối buffet view 360° tại tháp KL Tower – nhìn xuống toàn bộ Kuala Lumpur lung linh về đêm.',
+        highlights: ['Động Batu – 272 bậc thang vàng', 'Tượng thần Murugan 42.7m', 'Tháp đôi Petronas – 452m', 'Buffet Atmosphere 360 KL Tower'],
       },
       {
         day: 5,
-        title: 'NGÀY 5: KUALA LUMPUR - TP.HCM',
-        content:
-          'Ăn sáng, tự do nghỉ ngơi hoặc mua sắm tùy giờ bay. Trả phòng, di chuyển đến sân bay và đáp chuyến bay về TP.HCM.',
+        title: 'NGÀY 5: KUALA LUMPUR → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự túc tại KLIA', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet, trả phòng. Tự do mua sắm cuối tại Pavilion KL mall. Đặc sản về nhà: cà phê Liberica trắng Ipoh, socola beryl\'s, bánh kuih lapis.',
+        afternoon: 'Di chuyển KLIA, làm thủ tục xuất cảnh. Bay về TP.HCM.',
+        evening: '',
+        highlights: ['Mua sắm Pavilion KL', 'Cà phê trắng Ipoh – đặc sản Malaysia', 'Bay về TP.HCM kết thúc hành trình'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 18: HÀN QUỐC – SEOUL – NAMI 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 18,
     tourCode: 'HCM-SEOUL-NAMI-5N4D',
     title: 'TOUR HÀN QUỐC - SEOUL - NAMI 5N4Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM đến Hàn Quốc, khám phá cung Gyeongbokgung, đảo Nami, tháp N Seoul, làng Bukchon và phố Myeongdong.',
+    description: 'Hành trình từ TP.HCM đến Hàn Quốc, khám phá cung Gyeongbokgung, đảo Nami, tháp N Seoul, làng Bukchon và phố Myeongdong.',
     price: 18990000,
     childPrice: 14290000,
     durationDays: 5,
@@ -632,51 +1210,76 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Incheon; xe di chuyển theo chương trình; lưu trú 4 đêm; các bữa ăn theo chương trình; vé tham quan cung Gyeongbokgung và đảo Nami.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí hộ chiếu, visa và giấy tờ xuất nhập cảnh; phụ thu phòng đơn; chi phí cá nhân; thuê hanbok; vé đài quan sát tháp N Seoul và dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ, yêu cầu xuất nhập cảnh và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Incheon\n• Xe di chuyển theo chương trình\n• 4 đêm khách sạn 4 sao Seoul\n• Bữa ăn theo chương trình\n• Vé cung Gyeongbokgung và đảo Nami\n• Bảo hiểm du lịch quốc tế',
+    excludedServices: '• Visa Hàn Quốc (tự nộp trước hoặc qua đại lý)\n• Phụ thu phòng đơn\n• Chi phí cá nhân\n• Thuê hanbok\n• Vé đài quan sát N Seoul Tower',
+    cancellationPolicy: '• Hủy trước 15 ngày: Miễn phí\n• Hủy từ 7-15 ngày: 50%\n• Hủy trong 7 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - INCHEON - SEOUL',
-        content:
-          'Đáp chuyến bay ban ngày từ Tân Sơn Nhất đến Incheon. Hoàn tất thủ tục nhập cảnh, di chuyển về Seoul, nhận phòng và nghỉ ngơi. Nghỉ đêm tại Seoul.',
+        title: 'NGÀY 1: TP.HCM → INCHEON → SEOUL',
+        hotel: 'Khách sạn Lotte Hotel Seoul ★★★★★ (trung tâm Myeongdong)',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Gwangjang Market – Bibimbap và Bindaetteok (bánh xèo đậu xanh)' },
+        morning: 'Bay từ Tân Sơn Nhất đến Incheon International Airport (~5h). Nhập cảnh Hàn Quốc. Xe đón về Seoul trung tâm (~1h).',
+        afternoon: 'Nhận phòng Lotte Hotel Seoul, nghỉ ngơi. Dạo quanh khu vực Myeongdong – thiên đường mỹ phẩm K-beauty.',
+        evening: 'Tham quan chợ Gwangjang – chợ truyền thống lớn nhất Seoul 100 năm tuổi. Ăn tối Bibimbap và Bindaetteok. Dạo phố Cheonggyecheon (suối Thanh Khê) rực rỡ về đêm.',
+        highlights: ['Sân bay Incheon – sân bay tốt nhất thế giới', 'Myeongdong – K-beauty shopping', 'Chợ Gwangjang 100 tuổi', 'Suối Cheonggyecheon'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: GYEONGBOKGUNG - BUKCHON',
-        content:
-          'Tham quan cung Gyeongbokgung theo lịch mở cửa thực tế. Tiếp tục khám phá khu vực làng Bukchon trong khung giờ cho phép, giữ yên lặng và tôn trọng sinh hoạt của cư dân. Nghỉ đêm tại Seoul.',
+        title: 'NGÀY 2: CUNG GYEONGBOKGUNG – LÀNG BUKCHON',
+        hotel: 'Khách sạn Lotte Hotel Seoul ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng Tosokchon Samgyetang – gà hầm sâm trứ danh', chieu: 'Không có', toi: 'Nhà hàng Insadong – Topokki và Hoeddok nướng' },
+        morning: 'Ăn sáng buffet. Tham quan cung Gyeongbokgung – cung điện chính triều Joseon (1395), 600 năm lịch sử. Xem lễ đổi gác vệ binh hoàng gia (10:00 và 14:00 hằng ngày). Thuê Hanbok chụp ảnh trong cung (tự túc).',
+        afternoon: 'Ăn trưa Samgyetang (gà hầm sâm) tại Tosokchon. Tham quan làng Bukchon Hanok – 900 ngôi nhà truyền thống hanok được bảo tồn, phố nhỏ dốc mê hồn. Dạo phố Insadong – cửa hàng nghệ thuật truyền thống.',
+        evening: 'Ăn tối Topokki và Haemul Pajeon (bánh xèo hải sản). Mua sắm tại COEX Mall – mall ngầm lớn nhất thế giới.',
+        highlights: ['Cung Gyeongbokgung 600 năm', 'Đổi gác vệ binh hoàng gia', 'Hanbok & ảnh cung điện', 'Làng Bukchon Hanok 900 ngôi nhà'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: SEOUL - ĐẢO NAMI - SEOUL',
-        content:
-          'Khởi hành tham quan đảo Nami, đi bộ khám phá các hàng cây và cảnh quan ven sông. Cảnh sắc thay đổi theo mùa. Buổi chiều trở về Seoul, nghỉ đêm tại khách sạn.',
+        title: 'NGÀY 3: SEOUL → ĐẢO NAMI → SEOUL',
+        hotel: 'Khách sạn Lotte Hotel Seoul ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng tại đảo Nami – galbi (sườn bò nướng)', chieu: 'Không có', toi: 'Nhà hàng Jungsik Seoul – ẩm thực Korean fine dining' },
+        morning: 'Ăn sáng buffet. Di chuyển 60km đến Gapyeong, đi thuyền 5 phút ra đảo Nami (Namisum). Đây là đảo hình chiếc lá nằm giữa sông Bukhan, nổi tiếng qua phim "Bản tình ca mùa đông". Dạo 4 đường cây: bạch dương, metasequoia, hạnh đào và ginkgo (cảnh sắc thay đổi theo mùa).',
+        afternoon: 'Ăn trưa galbi tại đảo. Về Seoul. Tự do nghỉ ngơi hoặc mua sắm tại Dongdaemun Design Plaza.',
+        evening: 'Ăn tối Korean Fine Dining tại Jungsik – nhà hàng 2 sao Michelin Hàn Quốc.',
+        highlights: ['Đảo Nami – "Bản tình ca mùa đông"', '4 đường cây bốn mùa thay đổi', 'Thuyền ra đảo trên sông Bukhan', 'Jungsik – 2 sao Michelin'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: NAMSAN - THÁP N SEOUL - MYEONGDONG',
-        content:
-          'Tham quan khu vực Namsan, chụp ảnh bên ngoài tháp N Seoul. Buổi chiều và tối tự do khám phá phố Myeongdong, mua sắm và trải nghiệm ẩm thực với các chi phí ngoài chương trình tự túc. Nghỉ đêm tại Seoul.',
+        title: 'NGÀY 4: NAMSAN – THÁP N SEOUL – MYEONGDONG',
+        hotel: 'Khách sạn Lotte Hotel Seoul ★★★★★',
+        hotelRooms: 'Phòng đôi Deluxe / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Nhà hàng N Grill Seoul Tower – fine dining panoramic', chieu: 'Không có', toi: 'Tự do tại Myeongdong – Chimaek (gà chiên + bia Hàn)' },
+        morning: 'Ăn sáng buffet. Di chuyển lên đồi Namsan bằng cáp treo. Tham quan Tháp N Seoul (236m), chụp ảnh ổ khóa tình yêu, ngắm toàn cảnh Seoul bao la 360°.',
+        afternoon: 'Ăn trưa tại N Grill – nhà hàng xoay 360° trên đỉnh tháp. Về Myeongdong – phố mỹ phẩm, thời trang và ẩm thực đường phố sôi động nhất Hàn Quốc. Mua: sheet mask, BB cream, sunscreen K-beauty.',
+        evening: 'Ăn tối Chimaek – gà chiên giòn kết hợp bia Hàn, thưởng thức tại quán vỉa hè Myeongdong. Tự do mua sắm lần cuối.',
+        highlights: ['Tháp N Seoul 236m', 'Ổ khóa tình yêu nổi tiếng', 'N Grill – nhà hàng xoay 360°', 'Myeongdong K-beauty & Chimaek'],
       },
       {
         day: 5,
-        title: 'NGÀY 5: SEOUL - INCHEON - TP.HCM',
-        content:
-          'Ăn sáng, trả phòng và di chuyển đến sân bay Incheon theo giờ bay. Làm thủ tục xuất cảnh, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 5: SEOUL → INCHEON → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự túc tại Incheon Airport', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet, trả phòng. Mua đặc sản về nhà: hồng sâm KGC, lề mì indomie Shin Ramyun, kim chi, socola Lotte, mỹ phẩm Innisfree, COSRX.',
+        afternoon: 'Di chuyển sân bay Incheon, làm thủ tục xuất cảnh. Đáp chuyến bay về TP.HCM.',
+        evening: '',
+        highlights: ['Hồng sâm KGC', 'Kim chi & Shin Ramyun về nhà', 'Mỹ phẩm Innisfree & COSRX'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 19: NHẬT BẢN – TOKYO – PHÚ SĨ 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 19,
     tourCode: 'HCM-TOKYO-FUJI-5N4D',
     title: 'TOUR NHẬT BẢN - TOKYO - PHÚ SĨ 5N4Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM khám phá Tokyo, chùa Sensoji, Tokyo Skytree, hồ Kawaguchi và làng Oshino Hakkai; ngắm núi Phú Sĩ khi thời tiết thuận lợi.',
+    description: 'Hành trình từ TP.HCM khám phá Tokyo, chùa Sensoji, Tokyo Skytree, hồ Kawaguchi và làng Oshino Hakkai; ngắm núi Phú Sĩ.',
     price: 28990000,
     childPrice: 21790000,
     durationDays: 5,
@@ -696,51 +1299,76 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Tokyo; xe di chuyển theo chương trình; lưu trú 4 đêm; các bữa ăn và hoạt động tham quan theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí hộ chiếu, visa và giấy tờ xuất nhập cảnh; phụ thu phòng đơn; chi phí cá nhân; vé đài quan sát Tokyo Skytree và dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ, yêu cầu xuất nhập cảnh và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Narita Tokyo\n• Xe di chuyển theo chương trình\n• 4 đêm khách sạn 4 sao (Tokyo 2 đêm, Kawaguchiko 1 đêm)\n• Bữa ăn theo chương trình\n• Bảo hiểm du lịch quốc tế\n• HDV tiếng Việt',
+    excludedServices: '• Visa Nhật Bản (tự nộp hoặc qua đại lý)\n• Phụ thu phòng đơn\n• Chi phí cá nhân\n• Vé đài quan sát Tokyo Skytree\n• Gói ăn thêm ngoài chương trình',
+    cancellationPolicy: '• Hủy trước 20 ngày: Miễn phí\n• Hủy từ 10-20 ngày: 50%\n• Hủy trong 10 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - TOKYO',
-        content:
-          'Đáp chuyến bay ban ngày từ Tân Sơn Nhất đến Tokyo. Hoàn tất thủ tục nhập cảnh, di chuyển về khách sạn, nhận phòng và nghỉ ngơi. Nghỉ đêm tại Tokyo.',
+        title: 'NGÀY 1: TP.HCM → NARITA → TOKYO',
+        hotel: 'Khách sạn Shinjuku Washington Hotel ★★★★ (Shinjuku – trung tâm Tokyo)',
+        hotelRooms: 'Phòng đôi / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Ramen Ichiran Shinjuku – ramen Tonkotsu huyền thoại' },
+        morning: 'Bay từ Tân Sơn Nhất đến Narita (~7h). Nhập cảnh Nhật Bản. Tàu Narita Express về Shinjuku Tokyo (~1h). Nhận phòng khách sạn Shinjuku.',
+        afternoon: 'Dạo quanh Shinjuku – quận sầm uất nhất Tokyo: Kabukicho, Golden Gai, Omoide Yokocho (ngõ ký ức). Tự do mua sắm tại Takashimaya Times Square.',
+        evening: 'Ăn tối ramen Tonkotsu tại Ichiran – chuỗi ramen 1 người/ô cực độc đáo. Ngắm Shinjuku về đêm rực rỡ.',
+        highlights: ['Narita Express – tàu điện Japan Rail', 'Shinjuku – quận sầm uất nhất Tokyo', 'Ramen Ichiran 1 người/ô', 'Omoide Yokocho – ngõ ký ức'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: SENSOJI - TOKYO SKYTREE',
-        content:
-          'Tham quan chùa Sensoji và dạo khu phố Asakusa. Buổi chiều tham quan khu vực bên ngoài Tokyo Skytree, tự do mua sắm theo thời gian của đoàn. Vé lên đài quan sát không nằm trong chương trình mẫu. Nghỉ đêm tại Tokyo.',
+        title: 'NGÀY 2: CHÙA SENSOJI – TOKYO SKYTREE – AKIHABARA',
+        hotel: 'Khách sạn Shinjuku Washington Hotel ★★★★',
+        hotelRooms: 'Phòng đôi / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet Nhật tại khách sạn', trua: 'Nhà hàng Tempura Kondo Ginza – tempura ebi chính hiệu', chieu: 'Không có', toi: 'Nhà hàng Sushi Saito – omakase sushi Edo-mae 7 món' },
+        morning: 'Ăn sáng buffet. Đến phố Asakusa, tham quan Chùa Sensoji – ngôi chùa cổ nhất Tokyo (645 CE), cổng Kaminarimon (Cổng Sấm) đỏ rực, phố Nakamise mua đồ thủ công mỹ nghệ.',
+        afternoon: 'Tham quan Tokyo Skytree (634m) bên ngoài – toà tháp truyền hình cao nhất thế giới. Dạo phố Akihabara – thiên đường anime, game, điện tử và văn hóa otaku Nhật Bản.',
+        evening: 'Ăn tối omakase sushi Edo-mae 7 món tại Sushi Saito. Dạo Odaiba về đêm – đảo nhân tạo hiện đại với tượng Gundam khổng lồ.',
+        highlights: ['Chùa Sensoji 645 CE – Kaminarimon', 'Tokyo Skytree 634m', 'Akihabara – anime & otaku culture', 'Odaiba & tượng Gundam'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: TOKYO - HỒ KAWAGUCHI',
-        content:
-          'Di chuyển đến khu vực hồ Kawaguchi, dạo ven hồ và ngắm núi Phú Sĩ khi thời tiết thuận lợi. Đây là chương trình ngắm cảnh, không bao gồm leo núi. Nhận phòng và nghỉ đêm tại khu vực Kawaguchiko.',
+        title: 'NGÀY 3: TOKYO → HỒ KAWAGUCHI – NGẮ MÚA PHÚ SĨ',
+        hotel: 'Ryokan Sansen Kawaguchiko ★★★★ (nhà nghỉ truyền thống Nhật, view Phú Sĩ)',
+        hotelRooms: 'Phòng Tatami đôi với onsen riêng / Phòng đơn (phụ thu 1.800.000đ/đêm)',
+        meals: { sang: 'Buffet tại khách sạn Tokyo', trua: 'Nhà hàng ven hồ Kawaguchi – udon nóng', chieu: 'Không có', toi: 'Kaiseki dinner tại ryokan – 12 món ẩm thực truyền thống Nhật' },
+        morning: 'Ăn sáng buffet, trả phòng. Xe di chuyển đến vùng Fuji Five Lakes (~2h). Đến hồ Kawaguchi – hồ đẹp nhất trong 5 hồ quanh núi Phú Sĩ. Tham quan Pagoda Chureito và ngắm Phú Sĩ phản chiếu trên hồ (khi thời tiết đẹp).',
+        afternoon: 'Ăn trưa udon nóng ven hồ. Nhận phòng ryokan (nhà trọ truyền thống Nhật). Tắm onsen ngoài trời (rotenburo) view núi Phú Sĩ – trải nghiệm không thể quên.',
+        evening: 'Ăn tối kaiseki dinner 12 món – ẩm thực thiền truyền thống Nhật: sashimi, tempura, tsukemono, tofu yuba. Ngủ trên nệm futon tatami.',
+        highlights: ['Hồ Kawaguchi – ngắm núi Phú Sĩ', 'Chureito Pagoda – biểu tượng Nhật Bản', 'Onsen ngoài trời view Phú Sĩ', 'Kaiseki dinner 12 món', 'Ryokan – tatami & futon'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: OSHINO HAKKAI - TOKYO',
-        content:
-          'Tham quan làng Oshino Hakkai, khám phá cảnh quan các hồ nước và kiến trúc địa phương. Buổi chiều trở về Tokyo, nhận phòng và nghỉ đêm.',
+        title: 'NGÀY 4: OSHINO HAKKAI → TOKYO – HARAJUKU – SHIBUYA',
+        hotel: 'Khách sạn Shinjuku Washington Hotel ★★★★',
+        hotelRooms: 'Phòng đôi / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Sáng tại ryokan', trua: 'Nhà hàng Oshino – yakiniku bò Wagyu A5', chieu: 'Không có', toi: 'Tự do tại Shibuya – thử Gyukatsu Motomura (bò thăn chiên giòn)' },
+        morning: 'Ăn sáng tại ryokan. Thăm làng Oshino Hakkai – 8 hồ nước núi Phú Sĩ trong vắt nhìn thấy đáy, nước từ tuyết tan Phú Sĩ qua 80 năm lọc. Kiến trúc nhà mái rơm (gassho-zukuri) truyền thống.',
+        afternoon: 'Quay về Tokyo. Tham quan Harajuku (Takeshita Street – thời trang cá tính), đền Meiji Jingu giữa rừng cây 100.000 cây. Dạo Omotesando – "Champs-Élysées Tokyo".',
+        evening: 'Tự do tại Shibuya – ngã tư đông nhất thế giới Shibuya Scramble. Ngắm từ ban công Starbucks Shibuya 1-chome hoặc Mag\'s Park.',
+        highlights: ['Oshino Hakkai – 8 hồ nước Phú Sĩ', 'Harajuku Takeshita Street', 'Đền Meiji Jingu', 'Shibuya Scramble – ngã tư bận nhất thế giới'],
       },
       {
         day: 5,
-        title: 'NGÀY 5: TOKYO - TP.HCM',
-        content:
-          'Ăn sáng, trả phòng và di chuyển đến sân bay theo giờ bay. Làm thủ tục xuất cảnh, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 5: TOKYO → NARITA → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại khách sạn', trua: 'Tự túc tại Narita Airport', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet, trả phòng. Mua đặc sản về nhà: Kit Kat Nhật (matcha, sakura...), wagyu beef jerky, rượu sake Dassai, trà matcha Uji, socola Royce.',
+        afternoon: 'Ra sân bay Narita, duty free shopping. Đáp chuyến bay về TP.HCM.',
+        evening: '',
+        highlights: ['Kit Kat Nhật – 100+ hương vị', 'Rượu Sake Dassai', 'Royce chocolate', 'Bay về TP.HCM kết thúc hành trình'],
       },
     ]),
   },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOUR 20: INDONESIA – BALI 5N4Đ
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 20,
     tourCode: 'HCM-BALI-5N4D',
     title: 'TOUR INDONESIA - BALI 5N4Đ | KHỞI HÀNH TỪ TP.HCM',
-    description:
-      'Hành trình mẫu từ TP.HCM đến Bali, khám phá Tanah Lot, Uluwatu, ruộng bậc thang Tegallalang, đền Ulun Danu Beratan và biển Nusa Dua.',
+    description: 'Hành trình từ TP.HCM đến Bali, khám phá Tanah Lot, Uluwatu, ruộng bậc thang Tegallalang, đền Ulun Danu Beratan và biển Nusa Dua.',
     price: 15990000,
     childPrice: 11990000,
     durationDays: 5,
@@ -760,42 +1388,64 @@ export const MOCK_TOURS: Tour[] = [
     viewCount: 0,
     averageRating: 0,
     totalReviews: 0,
-    includedServices:
-      'Dữ liệu mẫu: vé máy bay khứ hồi TP.HCM - Bali; xe di chuyển theo chương trình; lưu trú 4 đêm; các bữa ăn và vé tham quan theo chương trình.',
-    excludedServices:
-      'Dữ liệu mẫu: chi phí hộ chiếu, visa, phí nhập cảnh hoặc phí du lịch nếu áp dụng; phụ thu phòng đơn; chi phí cá nhân; trò chơi biển, xích đu và dịch vụ ngoài chương trình.',
-    cancellationPolicy:
-      'Tour minh họa phục vụ phát triển giao diện. Giá, dịch vụ, yêu cầu xuất nhập cảnh và điều kiện hủy cần được xác nhận trước khi sử dụng thực tế.',
+    includedServices: '• Vé máy bay khứ hồi TP.HCM – Bali (Ngurah Rai)\n• Xe di chuyển theo chương trình\n• 4 đêm khách sạn resort 4 sao\n• Bữa ăn theo chương trình\n• Bảo hiểm du lịch quốc tế',
+    excludedServices: '• Visa on arrival Indonesia (25 USD, tự nộp tại sân bay)\n• Phụ thu phòng đơn\n• Chi phí cá nhân\n• Trò chơi biển, xích đu Bali, dịch vụ ngoài chương trình',
+    cancellationPolicy: '• Hủy trước 15 ngày: Miễn phí\n• Hủy từ 7-15 ngày: 50%\n• Hủy trong 7 ngày: 100%',
     itineraryDetails: JSON.stringify([
       {
         day: 1,
-        title: 'NGÀY 1: TP.HCM - BALI',
-        content:
-          'Đáp chuyến bay từ Tân Sơn Nhất đến Bali. Hoàn tất thủ tục nhập cảnh, di chuyển về khách sạn tại khu vực phía nam đảo, nhận phòng và nghỉ ngơi.',
+        title: 'NGÀY 1: TP.HCM → BALI – NUSA DUA',
+        hotel: 'Resort Sofitel Bali Nusa Dua Beach Resort ★★★★★',
+        hotelRooms: 'Phòng đôi Ocean Lagoon / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Tự túc', trua: 'Không có', chieu: 'Không có', toi: 'Nhà hàng Merah Putih Bali – nasi goreng và sate lilit đặc sản Bali' },
+        morning: 'Bay từ Tân Sơn Nhất đến Ngurah Rai Airport Bali (~3h). Làm visa on arrival (25 USD, xếp hàng tại quầy). Xe đón về khu resort Nusa Dua – khu resort sang trọng bậc nhất Bali.',
+        afternoon: 'Nhận phòng Sofitel. Nghỉ ngơi tại hồ bơi vô cực hoặc bãi biển Nusa Dua – bãi biển trong xanh nhất Bali, sóng êm ả.',
+        evening: 'Ăn tối nasi goreng (cơm chiên Bali) và sate lilit (thịt nướng xiên sả). Ngắm hoàng hôn Bali nổi tiếng toàn thế giới.',
+        highlights: ['Nusa Dua – khu resort sang trọng bậc nhất', 'Hồ bơi vô cực view biển', 'Hoàng hôn Bali', 'Nasi Goreng & Sate Lilit'],
       },
       {
         day: 2,
-        title: 'NGÀY 2: NUSA DUA - ULUWATU',
-        content:
-          'Tham quan và nghỉ ngơi tại biển Nusa Dua. Buổi chiều khám phá khu vực đền Uluwatu, ngắm cảnh ven biển khi thời tiết thuận lợi. Tuân thủ hướng dẫn về trang phục và khu vực được phép tham quan. Trở về khách sạn nghỉ đêm.',
+        title: 'NGÀY 2: ULUWATU – ĐỀN CLIFFSIDE – MÚA KECAK',
+        hotel: 'Resort Sofitel Bali Nusa Dua Beach Resort ★★★★★',
+        hotelRooms: 'Phòng đôi Ocean Lagoon / Phòng đơn (phụ thu 1.200.000đ/đêm)',
+        meals: { sang: 'Buffet tại resort', trua: 'Nhà hàng Jimbaran Cafe – hải sản nướng trên bãi biển Jimbaran', chieu: 'Không có', toi: 'Nhà hàng Rock Bar Bali – cocktail và sushi bar trên vách đá' },
+        morning: 'Ăn sáng buffet. Tham quan Đền Uluwatu (Pura Luhur Uluwatu) – đền Bali cổ kính trên vách đá 70m nhìn xuống Ấn Độ Dương. Mặc trang phục kín, cẩn thận khỉ hay giật đồ.',
+        afternoon: 'Ăn trưa hải sản nướng trên bãi biển Jimbaran – cua, tôm, cá mặt quỷ nướng đặc sản bên tiếng sóng biển. Thời gian tự do tại bãi Jimbaran.',
+        evening: 'Xem biểu diễn múa Kecak lúc hoàng hôn tại Uluwatu – vũ điệu cổ đại 200 người kể truyện Ramayana. Ăn tối Rock Bar trên vách đá.',
+        highlights: ['Đền Uluwatu – vách đá 70m', 'Hải sản nướng Jimbaran Beach', 'Múa Kecak khi hoàng hôn', 'Rock Bar trên vách đá'],
       },
       {
         day: 3,
-        title: 'NGÀY 3: TEGALLALANG - UBUD',
-        content:
-          'Trả phòng và di chuyển đến khu vực Ubud. Tham quan ruộng bậc thang Tegallalang, tìm hiểu cảnh quan và đời sống địa phương. Các hoạt động xích đu hoặc trải nghiệm có thu phí không nằm trong chương trình mẫu. Nghỉ đêm tại Ubud.',
+        title: 'NGÀY 3: UBUD – RUỘNG BẬC THANG TEGALLALANG – MONKEY FOREST',
+        hotel: 'Resort Komaneka at Bisma Ubud ★★★★★ (giữa rừng Ubud)',
+        hotelRooms: 'Phòng đôi Valley View Villa / Phòng đơn (phụ thu 1.500.000đ/đêm)',
+        meals: { sang: 'Buffet tại resort Nusa Dua', trua: 'Nhà hàng Café Lotus Ubud – nasi campur Bali truyền thống', chieu: 'Không có', toi: 'Nhà hàng Locavore Ubud – ẩm thực Indonesian fine dining (top 50 châu Á)' },
+        morning: 'Ăn sáng, trả phòng Sofitel. Di chuyển lên Ubud (~1.5h). Tham quan ruộng bậc thang Tegallalang (Subak – di sản UNESCO). Chụp ảnh xích đu Bali "trên mây" và tổ chim (tự túc, có phí).',
+        afternoon: 'Ăn trưa nasi campur Bali. Tham quan Monkey Forest Ubud – khu rừng linh thiêng với 700 con khỉ đuôi dài sinh sống. Tham quan Puri Saren Palace – cung điện hoàng gia Ubud.',
+        evening: 'Nhận phòng Komaneka at Bisma. Ăn tối fine dining tại Locavore – nhà hàng nổi tiếng nhất Indonesia.',
+        highlights: ['Ruộng bậc thang Tegallalang – UNESCO Subak', 'Xích đu Bali "trên mây"', 'Monkey Forest Ubud – 700 con khỉ', 'Locavore – top 50 nhà hàng châu Á'],
       },
       {
         day: 4,
-        title: 'NGÀY 4: ULUN DANU BERATAN - TANAH LOT',
-        content:
-          'Khởi hành sớm đến khu vực hồ Beratan, tham quan đền Ulun Danu Beratan. Sau đó di chuyển đến Tanah Lot để ngắm cảnh ven biển từ khu vực được phép tiếp cận, tùy điều kiện thủy triều và thời tiết. Về khách sạn phía nam đảo nghỉ đêm.',
+        title: 'NGÀY 4: ĐỀN ULUN DANU BERATAN – HỒ BRATAN – TANAH LOT',
+        hotel: 'Resort Sofitel Bali Seminyak ★★★★★ (bãi Seminyak)',
+        hotelRooms: 'Phòng đôi Pool Access / Phòng đơn (phụ thu 1.400.000đ/đêm)',
+        meals: { sang: 'Sáng tại resort Ubud', trua: 'Nhà hàng Bedugul Tegal Alang – ayam betutu (gà xông khói Bali)', chieu: 'Không có', toi: 'Nhà hàng Ku De Ta Seminyak – cocktail và Mediterranean dinner view biển' },
+        morning: 'Ăn sáng, trả phòng. Di chuyển lên vùng cao Bedugul. Tham quan Đền Ulun Danu Beratan – đền thờ nữ thần nước Dewi Danu nổi giữa hồ Bratan ở độ cao 1.000m, khí hậu mát mẻ 20°C.',
+        afternoon: 'Ăn trưa ayam betutu – gà Bali xông khói với 20+ loại gia vị. Di chuyển xuống Tanah Lot – đền thiêng đứng trên mỏm đá giữa biển, một trong những hình ảnh biểu tượng nhất Bali.',
+        evening: 'Nhận phòng Sofitel Seminyak. Ăn tối Ku De Ta – view hoàng hôn sống động tại bờ biển Seminyak sầm uất.',
+        highlights: ['Đền Ulun Danu Beratan – giữa hồ núi', 'Hồ Bratan 1.000m mát mẻ 20°C', 'Tanah Lot – biểu tượng Bali', 'Seminyak nightlife'],
       },
       {
         day: 5,
-        title: 'NGÀY 5: BALI - TP.HCM',
-        content:
-          'Ăn sáng, trả phòng và di chuyển đến sân bay theo giờ bay. Làm thủ tục xuất cảnh, đáp chuyến bay về TP.HCM, kết thúc hành trình.',
+        title: 'NGÀY 5: BALI → TP.HCM',
+        hotel: '',
+        hotelRooms: '',
+        meals: { sang: 'Buffet tại resort', trua: 'Tự túc tại sân bay Ngurah Rai', chieu: 'Không có', toi: 'Tự túc sau khi về TP.HCM' },
+        morning: 'Ăn sáng buffet, trả phòng. Tự do dạo biển Seminyak buổi sáng. Mua đặc sản Bali: Kopi Luwak (cà phê chồn), dầu dừa virgin, batik thủ công, tượng gỗ Bali.',
+        afternoon: 'Ra sân bay Ngurah Rai. Làm thủ tục xuất cảnh. Đáp chuyến bay về TP.HCM.',
+        evening: '',
+        highlights: ['Kopi Luwak – cà phê chồn Bali', 'Batik thủ công Bali', 'Bay về TP.HCM kết thúc hành trình thiên đường'],
       },
     ]),
   },

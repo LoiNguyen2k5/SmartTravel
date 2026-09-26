@@ -45,6 +45,10 @@ export const CheckoutPage: React.FC = () => {
   const children = stateData.numberOfChildren || 0;
   const voucherCode = stateData.voucherCode || '';
   const discountAmount = stateData.discountAmount || 0;
+  const singleRoomRequired = Boolean(stateData.singleRoomRequired);
+  const singleRoomSurchargeAmount = Number(stateData.singleRoomSurchargeAmount || 0);
+  const roomAllocation = stateData.roomAllocation || (adults === 1 ? 'Ghép phòng đôi tiêu chuẩn 2 người cùng giới tính' : `${Math.floor((adults + children) / 2)} Phòng đôi tiêu chuẩn (2 khách/phòng)`);
+  const minParticipants = stateData.minParticipants || 10;
 
   // Form states
   const [contactName, setContactName] = useState('Nguyễn Bảo Lợi');
@@ -83,7 +87,7 @@ export const CheckoutPage: React.FC = () => {
   // Price calculations
   const adultPrice = stateData.adultPrice || stateData.price || 5000;
   const childPrice = stateData.childPrice || adultPrice;
-  const subtotal = (adultPrice * adults) + (childPrice * children);
+  const subtotal = (adultPrice * adults) + (childPrice * children) + singleRoomSurchargeAmount;
   const totalAfterDiscount = Math.max(0, subtotal - discountAmount);
   const finalPayAmount = paymentOption === 'DEPOSIT' ? Math.round(totalAfterDiscount * 0.3) : totalAfterDiscount;
 
@@ -317,6 +321,10 @@ export const CheckoutPage: React.FC = () => {
                 <span className="text-slate-500">Số lượng khách:</span>
                 <span className="font-semibold text-slate-900">{createdBooking.numberOfAdults} Người lớn {createdBooking.numberOfChildren ? `, ${createdBooking.numberOfChildren} Trẻ em` : ''}</span>
               </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-slate-500">Tiêu chuẩn phòng:</span>
+                <span className="font-bold text-emerald-800">{roomAllocation}</span>
+              </div>
               <div className="flex justify-between pt-1 text-sm font-black text-slate-900">
                 <span>Tổng giá trị tour đã thanh toán:</span>
                 <span className="text-rose-600">{formatCurrency(createdBooking.totalPrice || finalPayAmount)}</span>
@@ -401,13 +409,51 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Room Allocation & Accommodation Box */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="font-black text-slate-900 text-base flex items-center gap-2">
+                    2. Tiêu chuẩn lưu trú & Phân bổ phòng
+                  </h3>
+                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
+                    Tiêu chuẩn 02 khách/phòng
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider">Phân bổ phòng dự kiến:</span>
+                      {singleRoomRequired && (
+                        <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                          Phòng đơn riêng biệt
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                      🏨 {roomAllocation}
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed pt-1 border-t border-slate-200/60">
+                      {singleRoomRequired
+                        ? `✓ Đã tính phụ thu phòng đơn riêng biệt: +${formatCurrency(singleRoomSurchargeAmount)}. Khách hàng được bố trí phòng 1 người riêng tư tiêu chuẩn 3-4 sao.`
+                        : `ℹ️ Tiêu chuẩn tour 02 người/phòng (Twin 2 giường đơn hoặc Double 1 giường đôi). Nếu đi 1 mình, quý khách được ghép cùng đoàn.`}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-[11px] text-slate-500 bg-emerald-50/60 border border-emerald-200/60 p-2.5 rounded-xl">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                    <span>Đoàn cam kết tối thiểu <strong>{minParticipants} khách</strong>. Nếu không đủ đoàn trước ngày đi, hoàn tiền 100%.</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Payment Option & Method Box */}
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 
                 {/* Deposit Option Choice */}
                 <div className="space-y-3">
                   <h3 className="font-black text-slate-900 text-base border-b border-slate-100 pb-3">
-                    2. Tùy chọn thanh toán
+                    3. Tùy chọn thanh toán
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -523,6 +569,12 @@ export const CheckoutPage: React.FC = () => {
                     <div className="flex justify-between">
                       <span>Trẻ em ({children} x {formatCurrency(childPrice)}):</span>
                       <span className="font-semibold text-slate-900">{formatCurrency(childPrice * children)}</span>
+                    </div>
+                  )}
+                  {singleRoomRequired && singleRoomSurchargeAmount > 0 && (
+                    <div className="flex justify-between text-amber-700 font-semibold">
+                      <span>Phụ thu phòng đơn ({adults} phòng):</span>
+                      <span>+{formatCurrency(singleRoomSurchargeAmount)}</span>
                     </div>
                   )}
                   {discountAmount > 0 && (

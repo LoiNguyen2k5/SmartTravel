@@ -69,6 +69,17 @@ public class Booking extends BaseEntity {
     @Column(name = "contact_phone", nullable = false, length = 20)
     private String contactPhone;
 
+    @Column(name = "single_room_surcharge")
+    @Builder.Default
+    private Boolean singleRoomSurcharge = false;
+
+    @Column(name = "single_room_surcharge_amount", precision = 12, scale = 2)
+    @Builder.Default
+    private BigDecimal singleRoomSurchargeAmount = BigDecimal.ZERO;
+
+    @Column(name = "room_allocation", length = 255)
+    private String roomAllocation;
+
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 

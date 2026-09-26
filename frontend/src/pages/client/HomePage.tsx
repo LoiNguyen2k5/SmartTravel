@@ -195,7 +195,7 @@ export const HomePage: React.FC = () => {
                   <div className="flex items-center justify-between text-xs text-slate-400 font-medium border-b border-white/10 pb-3">
                     <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5 text-slate-400" /> {tour.viewCount || 300}</span>
                     <span className="flex items-center gap-1 text-amber-400 font-bold"><Star className="h-3.5 w-3.5 fill-amber-400" /> {tour.averageRating?.toFixed(1) || '5.0'}</span>
-                    <span className="flex items-center gap-1 text-emerald-400 font-semibold"><Users className="h-3.5 w-3.5" /> Còn {tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats || 40)} chỗ</span>
+                    <span className="flex items-center gap-1 text-emerald-400 font-semibold"><Users className="h-3.5 w-3.5" /> {tourScheduleService.getTourSeatRatioDisplay(tour.id, tour.category).text}</span>
                   </div>
 
                   <div className="space-y-1.5 text-xs text-slate-300">
@@ -279,7 +279,7 @@ export const HomePage: React.FC = () => {
                   <div className="flex items-center justify-between text-xs text-slate-400 font-medium border-b border-white/10 pb-3">
                     <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5 text-slate-400" /> {tour.viewCount || 300}</span>
                     <span className="flex items-center gap-1 text-amber-400 font-bold"><Star className="h-3.5 w-3.5 fill-amber-400" /> 5.0</span>
-                    <span className="flex items-center gap-1 text-emerald-400 font-semibold"><Users className="h-3.5 w-3.5" /> Còn {tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats || 35)} chỗ</span>
+                    <span className="flex items-center gap-1 text-emerald-400 font-semibold"><Users className="h-3.5 w-3.5" /> {tourScheduleService.getTourSeatRatioDisplay(tour.id, tour.category).text}</span>
                   </div>
 
                   <div className="space-y-1.5 text-xs text-slate-300">

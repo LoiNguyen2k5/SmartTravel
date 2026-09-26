@@ -41,6 +41,23 @@ public class BookingServiceImpl implements BookingService {
         Tour tour = tourRepository.findById(request.getTourId())
                 .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", request.getTourId()));
 
+        // 1. Kiểm tra quy định thời gian đặt trước (Advance Booking Cut-off)
+        if (request.getDepartureDate() != null) {
+            java.time.LocalDate today = java.time.LocalDate.now();
+            long daysUntil = java.time.temporal.ChronoUnit.DAYS.between(today, request.getDepartureDate());
+            boolean isInternational = tour.getCategory() == com.smarttravel.enums.TourCategory.NUOC_NGOAI;
+            int minLeadDays = isInternational ? 15 : 3;
+            if (daysUntil < 0) {
+                throw new BadRequestException("Chuyến đi đã qua ngày khởi hành (" + request.getDepartureDate() + "). Vui lòng chọn đợt khởi hành khác.");
+            }
+            if (daysUntil < minLeadDays) {
+                String msg = isInternational 
+                    ? "Đã hết hạn nhận hồ sơ Visa cho đợt khởi hành này (Tour quốc tế yêu cầu đặt trước tối thiểu 15 ngày làm việc)."
+                    : "Đã đóng cổng nhận khách cho đợt khởi hành này (Tour trong nước yêu cầu đặt trước tối thiểu 3 ngày).";
+                throw new BadRequestException(msg);
+            }
+        }
+
         BigDecimal adultPrice = tour.getPrice();
         BigDecimal childPrice = tour.getChildPrice() != null ? tour.getChildPrice() : adultPrice.multiply(new BigDecimal("0.7"));
 
@@ -57,8 +74,15 @@ public class BookingServiceImpl implements BookingService {
             tourRepository.save(tour);
         }
 
+        // 2. Tính tiền phụ thu phòng đơn (nếu khách chọn)
+        BigDecimal surchargeAmount = BigDecimal.ZERO;
+        if (Boolean.TRUE.equals(request.getSingleRoomSurcharge()) && request.getSingleRoomSurchargeAmount() != null) {
+            surchargeAmount = request.getSingleRoomSurchargeAmount();
+        }
+
         BigDecimal subtotal = adultPrice.multiply(BigDecimal.valueOf(numAdults))
-                .add(childPrice.multiply(BigDecimal.valueOf(numChildren)));
+                .add(childPrice.multiply(BigDecimal.valueOf(numChildren)))
+                .add(surchargeAmount);
 
         BigDecimal discountAmount = BigDecimal.ZERO;
 
@@ -85,6 +109,9 @@ public class BookingServiceImpl implements BookingService {
                 .voucherCode(request.getVoucherCode())
                 .discountAmount(discountAmount)
                 .totalPrice(totalPrice)
+                .singleRoomSurcharge(Boolean.TRUE.equals(request.getSingleRoomSurcharge()))
+                .singleRoomSurchargeAmount(surchargeAmount)
+                .roomAllocation(request.getRoomAllocation())
                 .status(BookingStatus.PAID) // Set to PAID upon successful checkout flow
                 .contactName(request.getContactName() != null ? request.getContactName() : user.getFullName())
                 .contactEmail(request.getContactEmail() != null ? request.getContactEmail() : user.getEmail())
@@ -200,6 +227,9 @@ public class BookingServiceImpl implements BookingService {
                 .contactName(b.getContactName())
                 .contactEmail(b.getContactEmail())
                 .contactPhone(b.getContactPhone())
+                .singleRoomSurcharge(b.getSingleRoomSurcharge())
+                .singleRoomSurchargeAmount(b.getSingleRoomSurchargeAmount())
+                .roomAllocation(b.getRoomAllocation())
                 .qrCodeUrl(b.getQrCodeUrl())
                 .createdAt(b.getCreatedAt())
                 .build();

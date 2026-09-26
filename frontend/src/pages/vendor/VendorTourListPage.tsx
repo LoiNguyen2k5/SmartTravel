@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, Plus, Search, Edit, CalendarDays, Trash2 } from 'lucide-react';
+import { Compass, Plus, Search, Edit, CalendarDays, Trash2, Archive, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
+import { tourScheduleService } from '../../services/tourScheduleService';
 import { Tour } from '../../types/tour';
 
 export const VendorTourListPage: React.FC = () => {
@@ -10,6 +11,7 @@ export const VendorTourListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
+  const [lifecycleFilter, setLifecycleFilter] = useState<'ACTIVE' | 'ARCHIVED' | 'ALL'>('ACTIVE');
 
   useEffect(() => {
     fetchMyTours();
@@ -42,6 +44,12 @@ export const VendorTourListPage: React.FC = () => {
   };
 
   const filteredTours = tours.filter((t) => {
+    const hasUpcoming = tourScheduleService.hasUpcomingSchedule(t.id);
+    const matchesLifecycle = 
+      lifecycleFilter === 'ALL' ||
+      (lifecycleFilter === 'ACTIVE' && hasUpcoming) ||
+      (lifecycleFilter === 'ARCHIVED' && !hasUpcoming);
+
     const matchesCat = categoryFilter === 'ALL' || (t.category as any) === categoryFilter;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
@@ -50,7 +58,7 @@ export const VendorTourListPage: React.FC = () => {
       (t.tourCode && t.tourCode.toLowerCase().includes(q)) ||
       (t.departureLocation && t.departureLocation.toLowerCase().includes(q));
 
-    return matchesCat && matchesSearch;
+    return matchesLifecycle && matchesCat && matchesSearch;
   });
 
   return (
@@ -73,11 +81,36 @@ export const VendorTourListPage: React.FC = () => {
         </Link>
       </div>
 
+      {/* LIFECYCLE TABS (Đang mở bán vs Lịch sử đã kết thúc) */}
+      <div className="flex flex-wrap items-center gap-2">
+        {[
+          { id: 'ACTIVE', label: 'Đang Mở Bán (Active Tours)', icon: CheckCircle2, desc: 'Tour có lịch tương lai' },
+          { id: 'ARCHIVED', label: 'Lịch Sử Đã Kết Thúc (Archived)', icon: Archive, desc: 'Tour đã qua ngày đi / lưu trữ đối soát' },
+          { id: 'ALL', label: 'Tất Cả Tour', icon: Compass, desc: 'Toàn bộ danh mục' },
+        ].map((tab) => {
+          const IconC = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setLifecycleFilter(tab.id as any)}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 ${
+                lifecycleFilter === tab.id
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
+              }`}
+            >
+              <IconC className="h-4 w-4 text-emerald-500" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* FILTER & SEARCH BAR */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
           {[
-            { id: 'ALL', label: 'Tất cả Tour' },
+            { id: 'ALL', label: 'Tất cả phân loại' },
             { id: 'DOMESTIC', label: 'Trong Nước' },
             { id: 'NUOC_NGOAI', label: 'Nước Ngoài' },
           ].map((cat) => (
@@ -110,7 +143,16 @@ export const VendorTourListPage: React.FC = () => {
       {/* TOUR GRID LIST */}
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <h3 className="font-extrabold text-slate-900 text-base">Danh Sách Tour ({filteredTours.length})</h3>
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-base">
+              {lifecycleFilter === 'ACTIVE' ? 'Tour Đang Mở Bán' : lifecycleFilter === 'ARCHIVED' ? 'Kho Lưu Trữ Tour Đã Kết Thúc' : 'Danh Sách Tất Cả Tour'} ({filteredTours.length})
+            </h3>
+            <p className="text-xs text-slate-500">
+              {lifecycleFilter === 'ACTIVE' 
+                ? 'Các tour đang hiển thị cho khách hàng đặt mua trên hệ thống' 
+                : 'Lưu trữ tự động các tour đã qua ngày khởi hành để đối soát doanh thu'}
+            </p>
+          </div>
           <span className="text-xs font-bold text-slate-500">Đã lưu trực tiếp MySQL Database</span>
         </div>
 
@@ -121,60 +163,81 @@ export const VendorTourListPage: React.FC = () => {
         ) : filteredTours.length === 0 ? (
           <div className="text-center py-12 text-slate-400 space-y-2">
             <Compass className="h-10 w-10 text-slate-300 mx-auto" />
-            <p className="text-xs font-medium">Chưa có tour nào phù hợp với bộ lọc.</p>
+            <p className="text-xs font-medium">Chưa có tour nào phù hợp với bộ lọc hiện tại.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-            {filteredTours.map((t) => (
-              <div
-                key={t.id}
-                className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition space-y-3 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="relative h-44 overflow-hidden bg-slate-100">
-                    <img src={t.thumbnailUrl} alt={t.title} className="w-full h-full object-cover" />
-                    <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg">
-                      {t.tourCode}
-                    </span>
-                    <span className="absolute top-3 right-3 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                      {(t.category as any) === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
-                    </span>
-                  </div>
+            {filteredTours.map((t) => {
+              const hasUpcoming = tourScheduleService.hasUpcomingSchedule(t.id);
+              const nearestDate = tourScheduleService.getTourDepartureDateDisplay(t.id, t.category);
+              const seats = tourScheduleService.getTourAvailableSeats(t.id);
 
-                  <div className="p-4 space-y-2">
-                    <h4 className="font-black text-slate-900 text-sm line-clamp-2 leading-snug">{t.title}</h4>
-                    <p className="text-xs text-slate-500">
-                      Khởi hành: <strong>{t.departureLocation}</strong> | Thời lượng: {t.durationDays}N{t.durationNights}Đ
-                    </p>
-                    <div className="pt-2 flex items-baseline justify-between border-t border-slate-100">
-                      <span className="text-[11px] text-slate-400 font-medium">Giá người lớn:</span>
-                      <span className="text-base font-black text-rose-600">{t.price.toLocaleString('vi-VN')} đ</span>
+              return (
+                <div
+                  key={t.id}
+                  className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition space-y-3 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="relative h-44 overflow-hidden bg-slate-100">
+                      <img src={t.thumbnailUrl} alt={t.title} className="w-full h-full object-cover" />
+                      <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg">
+                        {t.tourCode}
+                      </span>
+                      <span className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg ${
+                        hasUpcoming ? 'bg-emerald-600' : 'bg-slate-700'
+                      }`}>
+                        {hasUpcoming ? 'Đang Mở Bán' : 'Đã Kết Thúc'}
+                      </span>
+                    </div>
+
+                    <div className="p-4 space-y-2.5">
+                      <h4 className="font-black text-slate-900 text-sm line-clamp-2 leading-snug">{t.title}</h4>
+                      <p className="text-xs text-slate-500">
+                        Khởi hành: <strong>{t.departureLocation}</strong> | Thời lượng: {t.durationDays}N{t.durationNights}Đ
+                      </p>
+
+                      {/* Live Departure & Seats Status Pill */}
+                      <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] space-y-1">
+                        <div className="flex items-center justify-between text-slate-700 font-medium">
+                          <span>📅 Đợt gần nhất:</span>
+                          <strong className={hasUpcoming ? 'text-slate-900' : 'text-slate-400'}>{nearestDate}</strong>
+                        </div>
+                        <div className="flex items-center justify-between text-slate-700 font-medium">
+                          <span>Số chỗ còn trống:</span>
+                          <strong className={seats > 0 ? 'text-emerald-600' : 'text-rose-600'}>{seats} chỗ</strong>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 flex items-baseline justify-between border-t border-slate-100">
+                        <span className="text-[11px] text-slate-400 font-medium">Giá người lớn:</span>
+                        <span className="text-base font-black text-rose-600">{t.price.toLocaleString('vi-VN')} đ</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-4 pt-0 grid grid-cols-3 gap-2 border-t border-slate-100 mt-2">
-                  <button
-                    onClick={() => navigate(`/vendor/tours/${t.id}/edit`)}
-                    className="flex items-center justify-center gap-1 rounded-xl bg-slate-100 text-slate-700 py-2 text-[11px] font-bold hover:bg-slate-200 transition"
-                  >
-                    <Edit className="h-3.5 w-3.5" /> Sửa
-                  </button>
-                  <button
-                    onClick={() => navigate('/vendor/schedules')}
-                    className="flex items-center justify-center gap-1 rounded-xl bg-sky-50 text-sky-700 py-2 text-[11px] font-bold hover:bg-sky-100 transition"
-                  >
-                    <CalendarDays className="h-3.5 w-3.5" /> Lịch Slot
-                  </button>
-                  <button
-                    onClick={() => handleDeleteTour(t.id, t.title)}
-                    className="flex items-center justify-center gap-1 rounded-xl bg-rose-50 text-rose-600 py-2 text-[11px] font-bold hover:bg-rose-100 transition"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Xóa
-                  </button>
+                  <div className="p-4 pt-0 grid grid-cols-3 gap-2 border-t border-slate-100 mt-2">
+                    <button
+                      onClick={() => navigate(`/vendor/tours/${t.id}/edit`)}
+                      className="flex items-center justify-center gap-1 rounded-xl bg-slate-100 text-slate-700 py-2 text-[11px] font-bold hover:bg-slate-200 transition"
+                    >
+                      <Edit className="h-3.5 w-3.5" /> Sửa
+                    </button>
+                    <button
+                      onClick={() => navigate('/vendor/schedules')}
+                      className="flex items-center justify-center gap-1 rounded-xl bg-sky-50 text-sky-700 py-2 text-[11px] font-bold hover:bg-sky-100 transition"
+                    >
+                      <CalendarDays className="h-3.5 w-3.5" /> Lịch Slot
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTour(t.id, t.title)}
+                      className="flex items-center justify-center gap-1 rounded-xl bg-rose-50 text-rose-600 py-2 text-[11px] font-bold hover:bg-rose-100 transition"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Xóa
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

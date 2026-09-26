@@ -50,6 +50,8 @@ export interface Tour {
   totalReviews?: number;
   ratingBreakdown?: Record<number, number>;
   gallery?: string[];
+  singleRoomSurcharge?: number;
+  minParticipants?: number;
 }
 
 export interface TourSearchParams {

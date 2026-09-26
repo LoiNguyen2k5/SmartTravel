@@ -27,4 +27,7 @@ public class BookingCreateRequest {
     private String contactEmail;
     private String contactPhone;
     private String note;
+    private Boolean singleRoomSurcharge = false;
+    private java.math.BigDecimal singleRoomSurchargeAmount = java.math.BigDecimal.ZERO;
+    private String roomAllocation;
 }

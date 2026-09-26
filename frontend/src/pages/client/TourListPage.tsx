@@ -551,12 +551,13 @@ export const TourListPage: React.FC = () => {
                             <span className="text-[10px] text-slate-500"> / Khách</span>
                           </div>
                           {(() => {
+                            const ratio = tourScheduleService.getTourSeatRatioDisplay(tour.id, tour.category);
                             const avail = tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats ?? 40);
                             return (
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                                 avail > 0 ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'
                               }`}>
-                                {avail > 0 ? `Còn ${avail} chỗ` : 'Hết chỗ'}
+                                {avail > 0 ? `${ratio.booked}/${ratio.max} chỗ` : 'Hết chỗ'}
                               </span>
                             );
                           })()}

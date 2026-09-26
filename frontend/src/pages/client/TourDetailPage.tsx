@@ -8,12 +8,45 @@ import { Review } from '../../types/review';
 import { MOCK_TOURS, findMockTourById } from '../../data/mockTours';
 import { 
   Star, Clock, Calendar, MapPin, 
-  HelpCircle, ShieldCheck, Tag, ChevronRight, ChevronLeft, PhoneCall, 
-  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2
+  HelpCircle, ShieldCheck, ChevronRight, ChevronLeft, PhoneCall, 
+  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2, Users
 } from 'lucide-react';
-import { tourScheduleService, formatScheduleDate } from '../../services/tourScheduleService';
+import { 
+  tourScheduleService, 
+  formatScheduleDate, 
+  computeScheduleStatus, 
+  TourScheduleStatus 
+} from '../../services/tourScheduleService';
 
 const MOCK_DETAIL_TOUR: Tour = MOCK_TOURS[0]; // Default fallback = first tour
+
+interface TimelineActivity {
+  time: string;
+  icon: string;
+  badge: string;
+  badgeType: 'meal' | 'hotel' | 'tour' | 'transit';
+  content: string;
+}
+
+interface SessionBlock {
+  key: string;
+  sessionName: string;
+  sessionIcon: string;
+  timeRange: string;
+  activities: TimelineActivity[];
+}
+
+// Helper to check if an itinerary JSON has rich details (hotel, meals, morning/afternoon/evening, highlights)
+const isRichItineraryData = (itineraryStr?: string): boolean => {
+  if (!itineraryStr) return false;
+  try {
+    const list = JSON.parse(itineraryStr);
+    if (!Array.isArray(list) || list.length === 0) return false;
+    return list.some((day: any) => !!(day.hotel || day.meals || day.morning || day.afternoon || day.evening || (day.highlights && day.highlights.length > 0)));
+  } catch {
+    return false;
+  }
+};
 
 export const TourDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,28 +94,55 @@ export const TourDetailPage: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [isPolicyExpanded, setIsPolicyExpanded] = useState<boolean>(false);
 
+  // Single room surcharge selection & Room Allocation
+  const [singleRoomRequired, setSingleRoomRequired] = useState<boolean>(false);
+
   // Synchronized schedules state from tourScheduleService
   const [schedulesWithDynamicSeats, setSchedulesWithDynamicSeats] = useState<Array<{
     id: number;
+    rawStartDate: string;
+    rawEndDate: string;
     startDate: string;
     endDate: string;
     seats: number;
+    bookedCount: number;
+    maxParticipants: number;
+    minParticipants: number;
     note: string;
+    status: TourScheduleStatus;
+    reason: string;
+    daysRemaining: number;
+    minLeadDays: number;
+    isBookable: boolean;
   }>>([]);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number>(1);
 
-  const loadSchedules = (tourId: number) => {
-    const active = tourScheduleService.getUpcomingSchedulesForUser(tourId);
-    const mapped = active.map((s) => ({
-      id: s.id,
-      startDate: formatScheduleDate(s.startDate),
-      endDate: formatScheduleDate(s.endDate),
-      seats: Math.max(0, s.maxParticipants - s.bookedCount),
-      note: s.note || 'Lịch mở bán',
-    }));
+  const loadSchedules = (tourId: number, category?: string) => {
+    const active = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
+    const mapped = active.map((s) => {
+      const computed = computeScheduleStatus(s, category);
+      return {
+        id: s.id,
+        rawStartDate: s.startDate,
+        rawEndDate: s.endDate,
+        startDate: formatScheduleDate(s.startDate),
+        endDate: formatScheduleDate(s.endDate),
+        seats: Math.max(0, s.maxParticipants - s.bookedCount),
+        bookedCount: s.bookedCount,
+        maxParticipants: s.maxParticipants,
+        minParticipants: s.minParticipants || 10,
+        note: s.note || 'Lịch mở bán',
+        status: computed.status,
+        reason: computed.reason,
+        daysRemaining: computed.daysRemaining,
+        minLeadDays: computed.minLeadDays,
+        isBookable: computed.isBookable,
+      };
+    });
     setSchedulesWithDynamicSeats(mapped);
     if (mapped.length > 0) {
-      setSelectedScheduleId(mapped[0].id);
+      const firstBookable = mapped.find((s) => s.isBookable);
+      setSelectedScheduleId(firstBookable ? firstBookable.id : mapped[0].id);
     }
   };
 
@@ -90,28 +150,38 @@ export const TourDetailPage: React.FC = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
     const targetId = tour?.id || (id ? Number(id) : null);
     if (targetId) {
-      loadSchedules(targetId);
+      loadSchedules(targetId, tour?.category);
     }
-  }, [tour?.id, id]);
+  }, [tour?.id, tour?.category, id]);
 
   // Listen to schedule updates from Vendor or booking
   useEffect(() => {
     const handleUpdate = (e: any) => {
       const targetId = tour?.id || (id ? Number(id) : null);
       if (targetId && (!e.detail?.tourId || e.detail?.tourId === targetId)) {
-        loadSchedules(targetId);
+        loadSchedules(targetId, tour?.category);
       }
     };
     window.addEventListener('tour_schedules_updated', handleUpdate);
     return () => window.removeEventListener('tour_schedules_updated', handleUpdate);
-  }, [tour?.id, id]);
+  }, [tour?.id, tour?.category, id]);
 
   const selectedSchedule = schedulesWithDynamicSeats.find(s => s.id === selectedScheduleId) || schedulesWithDynamicSeats[0] || {
     id: 0,
+    rawStartDate: '',
+    rawEndDate: '',
     startDate: 'Hết đợt khởi hành',
     endDate: 'N/A',
     seats: 0,
+    bookedCount: 0,
+    maxParticipants: 40,
+    minParticipants: 10,
     note: 'Đã hết hạn',
+    status: 'COMPLETED' as const,
+    reason: 'Đã hết đợt khởi hành',
+    daysRemaining: -1,
+    minLeadDays: 3,
+    isBookable: false,
   };
 
   // Read URL query parameter for active tab
@@ -212,11 +282,17 @@ export const TourDetailPage: React.FC = () => {
         const res = await tourService.getTourById(tourId);
         if (res.success && res.data) {
           const fallback = getMockFallback();
+          const dbItin = res.data.itineraryDetails;
+          const fallbackItin = fallback.itineraryDetails;
+          const chosenItinerary = isRichItineraryData(dbItin)
+            ? dbItin
+            : (isRichItineraryData(fallbackItin) ? fallbackItin : (dbItin || fallbackItin));
+
           setTour({
             ...res.data,
             thumbnailUrl: (res.data.thumbnailUrl && !res.data.thumbnailUrl.includes('unsplash')) ? res.data.thumbnailUrl : fallback.thumbnailUrl,
             gallery: (res.data.gallery && res.data.gallery.length > 0) ? res.data.gallery : fallback.gallery,
-            itineraryDetails: res.data.itineraryDetails || fallback.itineraryDetails,
+            itineraryDetails: chosenItinerary,
             includedServices: res.data.includedServices || fallback.includedServices,
             excludedServices: res.data.excludedServices || fallback.excludedServices,
             cancellationPolicy: res.data.cancellationPolicy || fallback.cancellationPolicy,
@@ -248,10 +324,29 @@ export const TourDetailPage: React.FC = () => {
     }
   };
 
+  const singleRoomSurchargeUnit = tour?.singleRoomSurcharge || (tour?.category === 'NUOC_NGOAI' ? 3500000 : 950000);
+  const singleRoomSurchargeTotal = singleRoomRequired ? singleRoomSurchargeUnit * Math.max(1, adults) : 0;
+
+  const getRoomAllocationText = () => {
+    if (singleRoomRequired) {
+      return `${adults} Phòng Đơn riêng biệt (01 người/phòng - Có phụ thu phòng đơn)`;
+    }
+    if (adults === 1 && children === 0) {
+      return '01 Khách ghép phòng đôi tiêu chuẩn 2 người (Twin/Double) cùng giới tính';
+    }
+    const total = adults + children;
+    const doubleRooms = Math.floor(total / 2);
+    const extra = total % 2;
+    if (extra === 0) {
+      return `${doubleRooms} Phòng đôi tiêu chuẩn (02 khách/phòng Twin hoặc Double)`;
+    }
+    return `${doubleRooms} Phòng đôi tiêu chuẩn (2 khách/phòng) + 01 Giường phụ kê thêm (Extra Bed)`;
+  };
+
   const handleApplyVoucher = async () => {
     if (!voucherCode.trim() || !tour) return;
     try {
-      const originalTotal = (tour.price * adults) + ((tour.childPrice || tour.price * 0.7) * children);
+      const originalTotal = (tour.price * adults) + ((tour.childPrice || tour.price * 0.7) * children) + singleRoomSurchargeTotal;
       const res = await bookingService.validateVoucher(voucherCode.trim(), originalTotal);
       if (res.success && res.data) {
         setVoucherDiscount(res.data.discountAmount);
@@ -265,6 +360,14 @@ export const TourDetailPage: React.FC = () => {
 
   const handleBookNow = () => {
     if (!tour) return;
+
+    // 1. Kiểm tra quy định thời gian đặt trước (Lead time validation)
+    if (!selectedSchedule.isBookable) {
+      alert(`⚠️ ${selectedSchedule.reason || 'Lịch khởi hành này hiện không thể đặt do đã quá hạn đặt trước!'}`);
+      return;
+    }
+
+    // 2. Kiểm tra slot ghế
     if (selectedSchedule.seats <= 0) {
       alert('Lịch khởi hành này hiện đã hết chỗ. Vui lòng chọn ngày khởi hành khác!');
       return;
@@ -295,6 +398,12 @@ export const TourDetailPage: React.FC = () => {
         endDate: selectedSchedule.endDate,
         scheduleNote: selectedSchedule.note,
         availableSeats: selectedSchedule.seats,
+        // Dữ liệu phụ thu phòng đơn & Phân bổ phòng
+        singleRoomRequired,
+        singleRoomSurchargeAmount: singleRoomSurchargeTotal,
+        singleRoomUnitSurcharge: singleRoomSurchargeUnit,
+        roomAllocation: getRoomAllocationText(),
+        minParticipants: selectedSchedule.minParticipants || 10,
       }
     });
   };
@@ -352,11 +461,334 @@ export const TourDetailPage: React.FC = () => {
     );
   }
 
-  const rawItinerary = tour.itineraryDetails ? JSON.parse(tour.itineraryDetails) : [];
+  // Parse rawItinerary with guaranteed rich details fallback
+  let rawItinerary: any[] = [];
+  try {
+    if (tour.itineraryDetails) {
+      rawItinerary = JSON.parse(tour.itineraryDetails);
+    }
+  } catch {
+    rawItinerary = [];
+  }
+  const hasRichFields = rawItinerary.some((item: any) => !!(item.hotel || item.meals || item.morning || item.afternoon || item.evening || (item.highlights && item.highlights.length > 0)));
+  if (!hasRichFields) {
+    const mockMatch = findMockTourById(tour.id) || MOCK_DETAIL_TOUR;
+    if (mockMatch?.itineraryDetails) {
+      try {
+        const mockParsed = JSON.parse(mockMatch.itineraryDetails);
+        if (mockParsed.some((item: any) => !!(item.hotel || item.meals || item.morning || item.afternoon || item.evening || (item.highlights && item.highlights.length > 0)))) {
+          rawItinerary = mockParsed;
+        }
+      } catch {}
+    }
+  }
+  const buildDaySessions = (item: any, prevItem?: any): SessionBlock[] => {
+    const sessions: SessionBlock[] = [];
+    const dayNum = Number(item.day) || 1;
+    const isFirstDay = dayNum === 1;
+    const isLastDay = dayNum >= (tour?.durationDays || 5);
+    const textMorning = (item.morning || '').toLowerCase();
+    const textAfternoon = (item.afternoon || '').toLowerCase();
+
+    // Kiểm tra xem hôm nay có chuyển khách sạn / chuyển điểm đến so với hôm trước không
+    const hasHotelChanged = !!(prevItem && prevItem.hotel && item.hotel && prevItem.hotel !== item.hotel);
+    const prevHotelName = prevItem?.hotel || 'khách sạn trước';
+    const currentHotelName = item.hotel || 'khách sạn';
+
+    // Tách lộ trình di chuyển từ tiêu đề (ví dụ: "NGÀY 2: ÂN THI → TUYỀN ÂN → PHƯỢNG HOÀNG CỔ TRẤN")
+    const routeParts = (item.title || '')
+      .replace(/^NGÀY \d+:\s*/i, '')
+      .split(/→|->|-/)
+      .map((s: string) => s.trim())
+      .filter(Boolean);
+
+    // ─── 1. BUỔI SÁNG ───
+    const morningActs: TimelineActivity[] = [];
+    if (item.meals?.sang && item.meals.sang !== 'Không có') {
+      morningActs.push({
+        time: isFirstDay ? '06:00 – 07:00' : '06:30 – 08:00',
+        icon: '🍽',
+        badge: 'Điểm tâm sáng',
+        badgeType: 'meal',
+        content: isFirstDay 
+          ? item.meals.sang 
+          : `${item.meals.sang} (tại nhà hàng ${hasHotelChanged ? prevHotelName : currentHotelName}).`,
+      });
+    } else if (!isFirstDay) {
+      morningActs.push({
+        time: '06:30 – 08:00',
+        icon: '🍽',
+        badge: 'Điểm tâm sáng',
+        badgeType: 'meal',
+        content: `Dùng bữa sáng buffet tiêu chuẩn tại nhà hàng ${hasHotelChanged ? prevHotelName : currentHotelName}.`,
+      });
+    }
+
+    // Check-out khách sạn cũ (khi đổi khách sạn, có chữ trả phòng, hoặc ngày cuối)
+    if (hasHotelChanged || textMorning.includes('trả phòng') || textMorning.includes('check-out') || (isLastDay && !isFirstDay)) {
+      morningActs.push({
+        time: '08:00 – 08:30',
+        icon: '🏨',
+        badge: hasHotelChanged ? 'Check-out khách sạn cũ' : 'Check-out khách sạn',
+        badgeType: 'hotel',
+        content: `Làm thủ tục trả phòng (Check-out) tại ${hasHotelChanged ? prevHotelName : currentHotelName}, thanh toán chi phí cá nhân (nếu có), thu xếp hành lý lên xe chuẩn bị di chuyển chặng mới.`,
+      });
+    }
+
+    // Thời gian di chuyển liên tuyến (Transit) khi đổi nơi đến / đổi khách sạn
+    if (hasHotelChanged || (routeParts.length >= 2 && !isFirstDay)) {
+      const fromLoc = routeParts[0] || 'điểm lưu trú';
+      const toLoc = routeParts.length >= 3 ? `${routeParts[1]} & ${routeParts[2]}` : (routeParts[1] || 'điểm tham quan tiếp theo');
+      morningActs.push({
+        time: '08:30 – 10:00',
+        icon: '🚌',
+        badge: 'Di chuyển chặng mới',
+        badgeType: 'transit',
+        content: `Xe du lịch và HDV đón đoàn khởi hành di chuyển từ ${fromLoc} sang ${toLoc}. Quý khách nghỉ ngơi và ngắm cảnh đẹp trên cung đường di chuyển.`,
+      });
+    }
+
+    if (item.morning) {
+      morningActs.push({
+        time: (hasHotelChanged || isFirstDay) ? '10:00 – 11:30' : '08:30 – 11:30',
+        icon: '📍',
+        badge: 'Lịch trình tham quan',
+        badgeType: 'tour',
+        content: item.morning,
+      });
+    }
+
+    sessions.push({
+      key: 'morning',
+      sessionName: 'Buổi Sáng',
+      sessionIcon: '🌅',
+      timeRange: isFirstDay ? '06:00 – 11:30' : '06:30 – 11:30',
+      activities: morningActs,
+    });
+
+    // ─── 2. BUỔI CHIỀU ───
+    const afternoonActs: TimelineActivity[] = [];
+    if (item.meals?.trua && item.meals.trua !== 'Không có') {
+      afternoonActs.push({
+        time: '11:30 – 13:00',
+        icon: '🍽',
+        badge: 'Bữa trưa',
+        badgeType: 'meal',
+        content: item.meals.trua,
+      });
+    } else {
+      afternoonActs.push({
+        time: '11:30 – 13:00',
+        icon: '🍽',
+        badge: 'Bữa trưa',
+        badgeType: 'meal',
+        content: 'Đoàn dùng bữa trưa tại nhà hàng địa phương, thưởng thức ẩm thực đặc trưng.',
+      });
+    }
+
+    // Check-in khách sạn mới (ngày đầu tiên hoặc khi đổi khách sạn)
+    if (hasHotelChanged || isFirstDay || textAfternoon.includes('nhận phòng') || textAfternoon.includes('check-in')) {
+      if (item.hotel) {
+        afternoonActs.push({
+          time: '14:00 – 14:30',
+          icon: '🏨',
+          badge: hasHotelChanged ? 'Check-in khách sạn mới' : 'Check-in khách sạn',
+          badgeType: 'hotel',
+          content: `Xe đưa đoàn đến ${currentHotelName}, HDV hỗ trợ làm thủ tục nhận phòng (Check-in), nghỉ ngơi chuẩn bị cho chương trình buổi chiều.`,
+        });
+      }
+    }
+
+    if (item.afternoon) {
+      afternoonActs.push({
+        time: (hasHotelChanged || isFirstDay) ? '14:30 – 17:30' : '13:30 – 17:30',
+        icon: '📍',
+        badge: 'Lịch trình tham quan',
+        badgeType: 'tour',
+        content: item.afternoon,
+      });
+    }
+
+    if (item.meals?.chieu && item.meals.chieu !== 'Không có') {
+      afternoonActs.push({
+        time: '15:30 – 16:30',
+        icon: '☕',
+        badge: 'Ăn nhẹ buổi chiều',
+        badgeType: 'meal',
+        content: item.meals.chieu,
+      });
+    }
+
+    sessions.push({
+      key: 'afternoon',
+      sessionName: 'Buổi Chiều',
+      sessionIcon: '☀️',
+      timeRange: '11:30 – 17:30',
+      activities: afternoonActs,
+    });
+
+    // ─── 3. BUỔI TỐI ───
+    const eveningActs: TimelineActivity[] = [];
+    const departureLoc = tour?.departureLocation || 'TP.Hồ Chí Minh';
+    const textEvening = (item.evening || '').toLowerCase();
+    const textTitle = (item.title || '').toLowerCase();
+
+    // Nhận biết hành trình trở về nơi xuất phát hoặc ngày cuối
+    const isReturningTrip = isLastDay || 
+      textEvening.includes('trở về') || 
+      textEvening.includes('về lại') || 
+      textEvening.includes('về tp') || 
+      textEvening.includes('về đến') ||
+      textEvening.includes('lên xe trở về') || 
+      textEvening.includes('xuất phát về') ||
+      textAfternoon.includes('bay về') ||
+      textAfternoon.includes('lên xe trở về') ||
+      textAfternoon.includes('về tp') ||
+      (textTitle.includes('→') && textTitle.endsWith(departureLoc.toLowerCase()));
+
+    const isFlightTrip = 
+      textEvening.includes('máy bay') || 
+      textEvening.includes('chuyến bay') || 
+      textAfternoon.includes('máy bay') || 
+      textAfternoon.includes('sân bay') || 
+      textAfternoon.includes('chuyến bay') ||
+      (item.meals?.toi && item.meals.toi.toLowerCase().includes('máy bay'));
+
+    const mealToiRaw = item.meals?.toi && item.meals.toi !== 'Không có' ? item.meals.toi : '';
+    const mealToiLower = mealToiRaw.toLowerCase();
+    const isDinnerAfterReturn = isReturningTrip && (mealToiLower.includes('sau khi về') || mealToiLower.includes('tự túc'));
+
+    // ──────────────────────────────────────────
+    // TRƯỜNG HỢP 1: TOUR CÓ CHUYẾN BAY VỀ (FLIGHT RETURN)
+    // ──────────────────────────────────────────
+    if (isFlightTrip && isReturningTrip) {
+      // 1.1 Bữa tối & Chuyến bay xuất phát về (18:00 – 19:30)
+      eveningActs.push({
+        time: '18:00 – 19:30',
+        icon: '✈️',
+        badge: 'Bữa tối trên máy bay & Xuất phát về',
+        badgeType: 'transit',
+        content: mealToiLower.includes('tự do') || mealToiLower.includes('tự túc') || !mealToiRaw
+          ? `Quý khách ăn tối tự do / thưởng thức suất ăn nhẹ trên máy bay trong hành trình xuất phát bay về lại ${departureLoc}.`
+          : `${mealToiRaw} – Quý khách dùng bữa trên máy bay trong hành trình xuất phát bay về lại ${departureLoc}.`,
+      });
+
+      // 1.2 Hạ cánh & Thủ tục nhập cảnh (19:30 – 20:30)
+      eveningActs.push({
+        time: '19:30 – 20:30',
+        icon: '🛬',
+        badge: 'Hạ cánh & Thủ tục nhập cảnh (Kết thúc tour)',
+        badgeType: 'transit',
+        content: item.evening && (textEvening.includes('đáp') || textEvening.includes('nhập cảnh') || textEvening.includes('hạ cánh'))
+          ? item.evening
+          : `Chuyến bay đáp an toàn tại sân bay Tân Sơn Nhất / Nội Bài (${departureLoc}). Hướng dẫn viên hỗ trợ Quý khách làm thủ tục nhập cảnh, nhận lại hành lý ký gửi. Chia tay đoàn, cảm ơn Quý khách và kết thúc chương trình tour tốt đẹp. Hẹn gặp lại Quý khách!`,
+      });
+    }
+    // ──────────────────────────────────────────
+    // TRƯỜNG HỢP 2: TOUR ĐI XE VỀ LẠI ĐIỂM XUẤT PHÁT (ROAD / COACH RETURN)
+    // ──────────────────────────────────────────
+    else if (isReturningTrip) {
+      // 2.1 Di chuyển trên đường về (17:30 – 19:30)
+      eveningActs.push({
+        time: '17:30 – 19:30',
+        icon: '🚌',
+        badge: `Khởi hành về lại ${departureLoc}`,
+        badgeType: 'transit',
+        content: `Xe du lịch và HDV đón đoàn xuất phát trở về điểm hẹn ban đầu tại ${departureLoc}. Quý khách nghỉ ngơi và ngắm cảnh trên đường.`,
+      });
+
+      // 2.2 Về đến nơi & Kết thúc tour (19:30 – 20:30)
+      eveningActs.push({
+        time: '19:30 – 20:30',
+        icon: '🏁',
+        badge: `Về đến điểm đón & Kết thúc tour`,
+        badgeType: 'transit',
+        content: item.evening && (textEvening.includes('về đến') || textEvening.includes('kết thúc') || textEvening.includes('chia tay') || textEvening.includes('lên xe'))
+          ? item.evening
+          : `Xe đưa Quý khách về đến điểm xuất phát ban đầu tại ${departureLoc} an toàn. HDV hỗ trợ Quý khách nhận lại toàn bộ hành lý cá nhân, gửi lời cảm ơn và chia tay đoàn.`,
+      });
+
+      // 2.3 Bữa tối tự túc khi về đến nơi (20:30 – 21:30)
+      if (mealToiRaw && isDinnerAfterReturn) {
+        eveningActs.push({
+          time: '20:30 – 21:30',
+          icon: '🍽',
+          badge: `Bữa tối tự túc khi về đến ${departureLoc}`,
+          badgeType: 'meal',
+          content: `${mealToiRaw} (Quý khách tự do dùng bữa tối sau khi về đến nơi xuất phát, hoàn tất chuyến đi).`,
+        });
+      } else if (mealToiRaw && !isDinnerAfterReturn) {
+        eveningActs.push({
+          time: '18:00 – 19:30',
+          icon: '🍽',
+          badge: 'Bữa tối',
+          badgeType: 'meal',
+          content: mealToiRaw,
+        });
+      }
+    }
+    // ──────────────────────────────────────────
+    // TRƯỜNG HỢP 3: NGÀY TOUR BÌNH THƯỜNG (LƯU TRÚ LẠI)
+    // ──────────────────────────────────────────
+    else {
+      // 3.1 Bữa tối tại nhà hàng (18:00 – 19:30)
+      if (mealToiRaw) {
+        eveningActs.push({
+          time: '18:00 – 19:30',
+          icon: '🍽',
+          badge: 'Bữa tối',
+          badgeType: 'meal',
+          content: mealToiRaw,
+        });
+      } else {
+        eveningActs.push({
+          time: '18:00 – 19:30',
+          icon: '🍽',
+          badge: 'Bữa tối',
+          badgeType: 'meal',
+          content: 'Đoàn dùng bữa tối tại nhà hàng với các món ăn hấp dẫn theo chương trình.',
+        });
+      }
+
+      // 3.2 Khám phá về đêm (19:30 – 21:30)
+      if (item.evening) {
+        eveningActs.push({
+          time: '19:30 – 21:30',
+          icon: '🌙',
+          badge: 'Khám phá về đêm',
+          badgeType: 'tour',
+          content: item.evening,
+        });
+      }
+
+      // 3.3 Nghỉ đêm tại khách sạn (Từ 21:30)
+      const isNoStay = item.hotel && (item.hotel.toLowerCase().includes('không lưu trú') || item.hotel.toLowerCase().includes('tour 1 ngày'));
+      if (item.hotel && !isNoStay) {
+        eveningActs.push({
+          time: 'Từ 21:30',
+          icon: '🏨',
+          badge: 'Nghỉ đêm tại khách sạn',
+          badgeType: 'hotel',
+          content: `Quý khách về lại ${currentHotelName} nghỉ ngơi, chuẩn bị năng lượng cho ngày tiếp theo.`,
+        });
+      }
+    }
+
+    sessions.push({
+      key: 'evening',
+      sessionName: 'Buổi Tối',
+      sessionIcon: '🌙',
+      timeRange: '18:00 – 22:00',
+      activities: eveningActs,
+    });
+
+    return sessions;
+  };
+
   const adultTotal = tour.price * adults;
   const childPriceVal = tour.childPrice || Math.round(tour.price * 0.7);
   const childTotal = childPriceVal * children;
-  const subtotal = adultTotal + childTotal;
+  const subtotal = adultTotal + childTotal + singleRoomSurchargeTotal;
   const finalTotal = Math.max(0, subtotal - voucherDiscount);
 
   return (
@@ -523,39 +955,149 @@ export const TourDetailPage: React.FC = () => {
               {activeTab === 'itinerary' && (
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    {/* Left Day Selection Menu (Matching Screenshot 2) */}
+                    {/* Left Day Selection Menu */}
                     <div className="md:col-span-1 space-y-2 border-b md:border-b-0 md:border-r border-white/10 pr-0 md:pr-4 pb-4 md:pb-0">
                       {rawItinerary.map((item: any, idx: number) => (
                         <button
                           key={idx}
                           onClick={() => setSelectedDay(item.day)}
-                          className={`w-full text-left p-3 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer ${
+                          className={`w-full text-left p-3 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                             selectedDay === item.day
                               ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-lg shadow-sky-500/25 border border-sky-400/40'
                               : 'bg-white/[0.03] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/5'
                           }`}
                         >
-                          <span className="line-clamp-2">{item.title}</span>
+                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${selectedDay === item.day ? 'bg-white/20' : 'bg-white/10'}`}>
+                            {item.day}
+                          </span>
+                          <span className="line-clamp-2 leading-tight">{item.title?.replace(/^NGÀY \d+:\s*/i, '')}</span>
                         </button>
                       ))}
                     </div>
 
-                    {/* Right Day Details Panel */}
-                    <div className="md:col-span-3 space-y-4">
+                    {/* Right Day Details Panel – Rich Format */}
+                    <div className="md:col-span-3 space-y-5">
                       {rawItinerary
                         .filter((item: any) => item.day === selectedDay)
-                        .map((item: any, idx: number) => (
-                          <div key={idx} className="space-y-4 animate-fade-in">
-                            <div className="bg-sky-500/10 p-4 rounded-xl border border-sky-500/20">
-                              <h4 className="text-sm font-black text-sky-300 uppercase tracking-wide">
-                                {item.title}
-                              </h4>
+                        .map((item: any, idx: number) => {
+                          const isRich = !!(item.morning || item.afternoon || item.hotel || item.meals);
+                          return (
+                            <div key={idx} className="space-y-5">
+                              {/* Day Title */}
+                              <div className="bg-gradient-to-r from-sky-500/15 to-cyan-500/10 p-4 rounded-xl border border-sky-500/25">
+                                <h4 className="text-sm font-black text-sky-300 uppercase tracking-wide">{item.title}</h4>
+                              </div>
+
+                              {isRich ? (
+                                <>
+                                  {/* Hotel & Room Info */}
+                                  {item.hotel && (
+                                    <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+                                      <span className="text-amber-400 text-lg flex-shrink-0">🏨</span>
+                                      <div>
+                                        <p className="text-xs font-black text-amber-300 uppercase tracking-wider mb-0.5">Lưu trú</p>
+                                        <p className="text-sm font-semibold text-white">{item.hotel}</p>
+                                        {item.hotelRooms && <p className="text-xs text-slate-400 mt-0.5">{item.hotelRooms}</p>}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Sessions List with Specific Times for Activities, Meals & Hotel Check-in/out */}
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                                      <p className="text-xs font-black text-sky-400 uppercase tracking-widest flex items-center gap-2">
+                                        <span>📍</span> Lịch trình chi tiết theo buổi (Khung giờ, Ăn uống & Lưu trú)
+                                      </p>
+                                    </div>
+
+                                    {buildDaySessions(item, rawItinerary.find((x: any) => x.day === item.day - 1)).map((session) => (
+                                      <div key={session.key} className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-sm">
+                                        {/* Session Title Header */}
+                                        <div className="flex items-center justify-between border-b border-white/8 pb-3">
+                                          <div className="flex items-center gap-2.5">
+                                            <span className="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-base">
+                                              {session.sessionIcon}
+                                            </span>
+                                            <h5 className="text-sm font-extrabold text-white uppercase tracking-wide">
+                                              {session.sessionName}
+                                            </h5>
+                                          </div>
+                                          <span className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                                            <Clock className="h-3 w-3 text-amber-400" />
+                                            {session.timeRange}
+                                          </span>
+                                        </div>
+
+                                        {/* Activities Timeline within the Session */}
+                                        <div className="space-y-3.5 pl-2 sm:pl-3 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-white/10">
+                                          {session.activities.map((act, aIdx) => (
+                                            <div key={aIdx} className="relative flex items-start gap-3.5">
+                                              {/* Timeline node */}
+                                              <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-sm z-10 border shadow-sm ${
+                                                act.badgeType === 'meal' 
+                                                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' 
+                                                  : act.badgeType === 'hotel' 
+                                                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-300' 
+                                                    : act.badgeType === 'transit'
+                                                      ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300'
+                                                      : 'bg-sky-500/15 border-sky-500/30 text-sky-300'
+                                              }`}>
+                                                {act.icon}
+                                              </div>
+
+                                              {/* Event detail */}
+                                              <div className="flex-1 bg-white/[0.02] border border-white/5 p-3 rounded-xl hover:bg-white/[0.04] transition space-y-1">
+                                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                  <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                                                    act.badgeType === 'meal'
+                                                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                                      : act.badgeType === 'hotel'
+                                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                                        : act.badgeType === 'transit'
+                                                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+                                                          : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                                                  }`}>
+                                                    {act.badge}
+                                                  </span>
+                                                  <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                                                    <Clock className="h-3 w-3 text-slate-400" />
+                                                    {act.time}
+                                                  </span>
+                                                </div>
+                                                <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                                                  {act.content}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  {/* Highlights */}
+                                  {item.highlights && item.highlights.length > 0 && (
+                                    <div>
+                                      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">⭐ Điểm nổi bật trong ngày</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {item.highlights.map((hl: string, hIdx: number) => (
+                                          <span key={hIdx} className="px-3 py-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-semibold rounded-full">
+                                            {hl}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                /* Legacy plain-text format fallback */
+                                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line font-normal">
+                                  {item.content}
+                                </p>
+                              )}
                             </div>
-                            <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line font-normal">
-                              {item.content}
-                            </p>
-                          </div>
-                        ))}
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
@@ -903,12 +1445,76 @@ export const TourDetailPage: React.FC = () => {
                       onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
                       className="w-full rounded-xl border border-white/15 bg-slate-900/90 p-2.5 text-xs font-bold text-white focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 shadow-inner cursor-pointer"
                     >
-                      {schedulesWithDynamicSeats.map((sch) => (
-                        <option key={sch.id} value={sch.id} disabled={sch.seats <= 0} className="bg-slate-900 text-white">
-                          📅 {sch.startDate} - {sch.endDate} ({sch.seats > 0 ? `${sch.seats} chỗ` : 'HẾT CHỖ'}) - {sch.note}
-                        </option>
-                      ))}
+                      {schedulesWithDynamicSeats.map((sch) => {
+                        let labelSuffix = '';
+                        if (sch.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS') {
+                          labelSuffix = ' - ❌ [HỦY: ĐOÀN < 10 KHÁCH]';
+                        } else if (sch.status === 'CLOSED_BOOKING') {
+                          labelSuffix = ' - 🔒 [HẾT HẠN ĐẶT]';
+                        } else if (sch.seats <= 0) {
+                          labelSuffix = ' - ⛔ [HẾT CHỖ]';
+                        }
+
+                        return (
+                          <option key={sch.id} value={sch.id} className="bg-slate-900 text-white">
+                            📅 {sch.startDate} - {sch.endDate} ({sch.bookedCount}/{sch.maxParticipants} chỗ){labelSuffix} - {sch.note}
+                          </option>
+                        );
+                      })}
                     </select>
+                  )}
+
+                  {/* Cut-off Lead Time & Lifecycle Alert / Information */}
+                  {selectedSchedule && (
+                    <>
+                      {!selectedSchedule.isBookable ? (
+                        <div className={`rounded-xl border p-3.5 text-xs space-y-1.5 mt-2 ${
+                          selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
+                            ? 'bg-rose-500/15 border-rose-500/40 text-rose-200'
+                            : 'bg-amber-500/15 border-amber-500/40 text-amber-200'
+                        }`}>
+                          <div className={`font-bold flex items-center gap-1.5 ${
+                            selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' ? 'text-rose-400' : 'text-amber-300'
+                          }`}>
+                            <AlertCircle className="h-4 w-4" /> 
+                            {selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
+                              ? 'Đợt Đi Không Đủ Khách Khởi Hành (Đã Hủy Đoàn)'
+                              : 'Đã Đóng Cổng Nhận Đặt Chỗ'}
+                          </div>
+                          <p className="text-[11px] leading-relaxed">
+                            {selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
+                              ? `Đợt khởi hành này chỉ có ${selectedSchedule.bookedCount}/${selectedSchedule.maxParticipants} chỗ được đặt (chưa đạt tối thiểu 10 khách để khởi hành đoàn) nên đã bị hủy. Hệ thống hoàn tiền 100% cho khách đã đặt. Quý khách vui lòng chọn đợt khởi hành tiếp theo.`
+                              : selectedSchedule.reason}
+                          </p>
+                          <p className="text-[10px] italic opacity-80">
+                            Quy định lữ hành: Tour {tour.category === 'NUOC_NGOAI' ? 'quốc tế cần đặt trước tối thiểu 15 ngày (thủ tục visa & xuất vé quốc tế)' : 'trong nước cần đặt trước tối thiểu 3 ngày (chốt xe & danh sách lưu trú)'}.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-sky-300 mt-2 gap-2 whitespace-nowrap">
+                          {(() => {
+                            const daysLeftToBook = Math.max(0, selectedSchedule.daysRemaining - selectedSchedule.minLeadDays);
+                            return (
+                              <>
+                                <span className="flex items-center gap-1.5 flex-shrink-0">
+                                  <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+                                  <span>
+                                    {daysLeftToBook > 0 ? (
+                                      <>Còn <strong className="text-white font-bold">{daysLeftToBook} ngày</strong> đặt vé</>
+                                    ) : (
+                                      <strong className="text-amber-300 font-bold">Hôm nay hạn chót đặt vé</strong>
+                                    )}
+                                  </span>
+                                </span>
+                                <span className="font-semibold text-white flex-shrink-0">
+                                  Đã đặt: <strong className="text-sky-300">{selectedSchedule.bookedCount}/{selectedSchedule.maxParticipants} chỗ</strong>
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -921,14 +1527,25 @@ export const TourDetailPage: React.FC = () => {
                   <span className="font-bold text-white">{tour.departureLocation}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><Tag className="h-4 w-4 text-sky-400" /> Số chỗ còn nhận:</span>
-                  <span className={`font-bold px-2 py-0.5 rounded text-xs ${
-                    selectedSchedule.seats > 0 
-                      ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' 
-                      : 'text-rose-400 bg-rose-500/10 border border-rose-500/30'
-                  }`}>
-                    {selectedSchedule.seats > 0 ? `${selectedSchedule.seats} chỗ` : 'Hết chỗ (0 chỗ)'}
-                  </span>
+                  <span className="text-slate-400 flex items-center gap-1.5"><Users className="h-4 w-4 text-sky-400" /> Số chỗ:</span>
+                  <div className="text-right">
+                    <span className="font-extrabold text-white text-xs">
+                      {selectedSchedule.bookedCount} / {selectedSchedule.maxParticipants} chỗ
+                    </span>
+                    <span className={`ml-2 font-bold px-2 py-0.5 rounded text-[11px] ${
+                      selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
+                        ? 'text-rose-400 bg-rose-500/15 border border-rose-500/30'
+                        : selectedSchedule.seats > 0 
+                          ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' 
+                          : 'text-rose-400 bg-rose-500/10 border border-rose-500/30'
+                    }`}>
+                      {selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
+                        ? '(Đã hủy đoàn)'
+                        : selectedSchedule.seats > 0 
+                          ? `(Còn ${selectedSchedule.seats} chỗ)` 
+                          : '(Hết chỗ)'}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-sky-400" /> Mã tour:</span>
@@ -975,6 +1592,45 @@ export const TourDetailPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* SINGLE ROOM SURCHARGE & ROOM ALLOCATION DETAILS */}
+              <div className="space-y-3 pt-3 border-t border-white/10">
+                <div className="flex items-start justify-between gap-2 text-xs">
+                  <label className="font-bold text-slate-200 flex items-start gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={singleRoomRequired}
+                      onChange={(e) => setSingleRoomRequired(e.target.checked)}
+                      className="h-4 w-4 mt-0.5 rounded border-white/20 bg-slate-900 text-sky-500 focus:ring-sky-400 cursor-pointer"
+                    />
+                    <div>
+                      <span className="block text-slate-100">Yêu cầu phòng đơn riêng biệt</span>
+                      <span className="block text-[10px] text-slate-400 font-normal">Không ghép phòng với khách lẻ khác</span>
+                    </div>
+                  </label>
+                  <span className="text-[11px] font-extrabold text-amber-400 whitespace-nowrap">
+                    +{singleRoomSurchargeUnit.toLocaleString('vi-VN')} đ/khách
+                  </span>
+                </div>
+
+                {/* Clear Room Allocation Display */}
+                <div className="rounded-xl bg-white/[0.04] border border-white/10 p-3 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-300 font-semibold">
+                    <span className="flex items-center gap-1.5 text-sky-300">
+                      🏨 Tiêu chuẩn xếp phòng:
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium">02 khách/phòng</span>
+                  </div>
+                  <div className="text-[11px] text-emerald-300 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 rounded-lg leading-relaxed">
+                    Phân bổ: {getRoomAllocationText()}
+                  </div>
+                  <p className="text-[10px] text-slate-400 italic leading-snug">
+                    {singleRoomRequired 
+                      ? '✓ Đã kích hoạt phụ thu phòng riêng. Quý khách được bố trí phòng đơn 1 giường tiêu chuẩn 3-4 sao.' 
+                      : 'ℹ️ Khách đi 1 mình mặc định ghép phòng Twin (2 giường đơn) với khách cùng giới tính. Quý khách có thể tick ô trên nếu muốn ở phòng riêng.'}
+                  </p>
+                </div>
+              </div>
+
               {/* Voucher Application Form */}
               <div className="space-y-2 pt-3 border-t border-white/10">
                 <label className="text-[11px] font-bold text-slate-300">Mã giảm giá (Voucher):</label>
@@ -1003,9 +1659,15 @@ export const TourDetailPage: React.FC = () => {
               {/* Total Calculation Breakdown */}
               <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 text-xs">
                 <div className="flex justify-between text-slate-400">
-                  <span>Tạm tính ({adults} NL, {children} TE):</span>
-                  <span className="text-slate-200 font-semibold">{subtotal.toLocaleString('vi-VN')} đ</span>
+                  <span>Tiền vé ({adults} NL{children > 0 ? `, ${children} TE` : ''}):</span>
+                  <span className="text-slate-200 font-semibold">{(adultTotal + childTotal).toLocaleString('vi-VN')} đ</span>
                 </div>
+                {singleRoomRequired && (
+                  <div className="flex justify-between text-amber-300 font-medium">
+                    <span>Phụ thu phòng đơn ({adults} phòng):</span>
+                    <span>+{singleRoomSurchargeTotal.toLocaleString('vi-VN')} đ</span>
+                  </div>
+                )}
                 {voucherDiscount > 0 && (
                   <div className="flex justify-between text-emerald-400 font-medium">
                     <span>Giảm giá Voucher:</span>
@@ -1018,26 +1680,43 @@ export const TourDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* CTA Action Buttons (Matching Screenshot 2) */}
+              {/* CTA Action Buttons */}
               <div className="space-y-3 pt-2">
                 <button
                   onClick={handleBookNow}
-                  disabled={selectedSchedule.seats <= 0}
+                  disabled={!selectedSchedule.isBookable}
                   className={`w-full rounded-xl py-3.5 text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
-                    selectedSchedule.seats <= 0 
+                    !selectedSchedule.isBookable 
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5' 
                       : 'bg-gradient-to-r from-sky-500 via-cyan-500 to-sky-600 hover:from-sky-400 hover:to-cyan-400 text-white shadow-[0_0_20px_rgba(56,189,248,0.35)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] active:scale-[0.99]'
                   }`}
                 >
-                  {selectedSchedule.seats <= 0 ? 'Lịch Này Đã Hết Chỗ' : 'Đặt ngay'}
+                  {!selectedSchedule.isBookable
+                    ? (selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' 
+                        ? 'Đợt Đã Hủy (Chưa Đủ Đoàn)' 
+                        : 'Đã Đóng Cổng Nhận Khách')
+                    : 'Đặt ngay'}
                 </button>
                 
                 <button
                   onClick={() => alert('Đội ngũ tư vấn viên Smart Travel đang sẵn sàng! Hotline hỗ trợ 24/7: 1900 6868')}
                   className="w-full rounded-xl border border-sky-400/40 text-sky-300 hover:bg-sky-500/10 hover:border-sky-400 py-3 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <PhoneCall className="h-4 w-4" /> Liên hệ tư vấn
+                  <PhoneCall className="h-4 w-4" /> Liên hệ tư vấn 1900 6868
                 </button>
+              </div>
+
+              {/* Policy & Minimum Participants Guarantee Box */}
+              <div className="rounded-xl bg-white/[0.02] border border-white/10 p-3 space-y-1.5 text-[11px] text-slate-400">
+                <div className="flex items-center gap-1.5 font-bold text-slate-300">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" /> Cam kết quyền lợi khách hàng:
+                </div>
+                <p className="leading-relaxed">
+                  • <strong>Đoàn tối thiểu:</strong> Mỗi đợt khởi hành yêu cầu tối thiểu {selectedSchedule.minParticipants || 10} khách. Nếu không đủ đoàn trước ngày đi {selectedSchedule.minLeadDays} ngày, SmartTravel hoàn tiền 100% hoặc đổi lịch mới tặng voucher giảm 10%.
+                </p>
+                <p className="leading-relaxed">
+                  • <strong>Hạn đặt chỗ:</strong> {tour.category === 'NUOC_NGOAI' ? 'Đặt trước tối thiểu 15 ngày để xử lý Visa' : 'Đặt trước tối thiểu 3 ngày để chốt dịch vụ'}.
+                </p>
               </div>
 
             </div>
