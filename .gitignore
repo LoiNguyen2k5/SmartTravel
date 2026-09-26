@@ -60,3 +60,8 @@ docx_content.txt
 docs/
 demo_hero/
 vertex_demo.html
+
+# StarUML Diagrams
+SmartTravel_UseCase_Diagram.mdj
+SmartTravel_UseCase_Diagram_backup.mdj
+*.mdj

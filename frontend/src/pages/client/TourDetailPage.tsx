@@ -5,6 +5,7 @@ import { reviewService } from '../../services/reviewService';
 import { bookingService } from '../../services/bookingService';
 import { Tour } from '../../types/tour';
 import { Review } from '../../types/review';
+import useAuth from '../../hooks/useAuth';
 import { MOCK_TOURS, findMockTourById } from '../../data/mockTours';
 import { 
   Star, Clock, Calendar, MapPin, 
@@ -82,6 +83,17 @@ export const TourDetailPage: React.FC = () => {
       navigate(`/tours${savedPage && Number(savedPage) > 1 ? `?page=${savedPage}` : ''}`);
     }
   };
+
+  const { user } = useAuth();
+  const currentUserName = user?.fullName || (() => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved).fullName : 'Nguyễn Bảo Lợi';
+    } catch {
+      return 'Nguyễn Bảo Lợi';
+    }
+  })();
+
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -308,10 +320,32 @@ export const TourDetailPage: React.FC = () => {
       if (id) {
         try {
           const revRes = await reviewService.getReviewsByTourId(tourId);
-          if (revRes.success && revRes.data) {
-            setReviews(revRes.data);
+          let loadedReviews: Review[] = (revRes.success && revRes.data) ? revRes.data : [];
+
+          // Merge with locally stored reviews for this tour
+          const storageKey = `smarttravel_reviews_${tourId}`;
+          const localStored = localStorage.getItem(storageKey);
+          if (localStored) {
+            try {
+              const localList: Review[] = JSON.parse(localStored);
+              loadedReviews = [...localList, ...loadedReviews];
+            } catch (e) {
+              console.error(e);
+            }
           }
-        } catch { /* reviews not available */ }
+
+          // Deduplicate by ID
+          const uniqueReviews = Array.from(new Map(loadedReviews.map(r => [r.id, r])).values());
+          setReviews(uniqueReviews);
+        } catch {
+          const storageKey = `smarttravel_reviews_${tourId}`;
+          const localStored = localStorage.getItem(storageKey);
+          if (localStored) {
+            try {
+              setReviews(JSON.parse(localStored));
+            } catch {}
+          }
+        }
 
         // Always enable review form for authenticated user
         setEligibleToReview(true);
@@ -412,16 +446,27 @@ export const TourDetailPage: React.FC = () => {
     e.preventDefault();
     if (!tour || !newComment.trim()) return;
     setSubmittingReview(true);
+    const reviewerName = currentUserName || 'Nguyễn Bảo Lợi';
     const newRevObj: Review = {
       id: Date.now(),
       tourId: tour.id,
-      userId: 1,
-      userName: 'Khách Hàng SmartTravel',
+      userId: user?.id || 1,
+      userName: reviewerName,
       rating: newRating,
       comment: newComment.trim(),
       imageUrl: newImageUrl.trim() || undefined,
       createdAt: new Date().toISOString(),
     };
+
+    // Save to local storage for persistence across reloads
+    try {
+      const storageKey = `smarttravel_reviews_${tour.id}`;
+      const existing = localStorage.getItem(storageKey);
+      const list: Review[] = existing ? JSON.parse(existing) : [];
+      localStorage.setItem(storageKey, JSON.stringify([newRevObj, ...list.filter(item => item.id !== newRevObj.id)]));
+    } catch (err) {
+      console.error(err);
+    }
 
     try {
       const res = await reviewService.createReview({
@@ -431,12 +476,16 @@ export const TourDetailPage: React.FC = () => {
         imageUrl: newImageUrl.trim() || undefined,
       });
       if (res.success && res.data) {
-        setReviews([res.data, ...reviews]);
+        const apiRev = {
+          ...res.data,
+          userName: (res.data.userName && res.data.userName !== 'Khách Hàng SmartTravel') ? res.data.userName : reviewerName
+        };
+        setReviews(prev => [apiRev, ...prev.filter(r => r.id !== apiRev.id)]);
       } else {
-        setReviews([newRevObj, ...reviews]);
+        setReviews(prev => [newRevObj, ...prev.filter(r => r.id !== newRevObj.id)]);
       }
     } catch {
-      setReviews([newRevObj, ...reviews]);
+      setReviews(prev => [newRevObj, ...prev.filter(r => r.id !== newRevObj.id)]);
     } finally {
       setNewComment('');
       setNewImageUrl('');
@@ -1378,18 +1427,24 @@ export const TourDetailPage: React.FC = () => {
                     {reviews.length === 0 ? (
                       <p className="text-xs text-slate-500 text-center py-4">Chưa có bình luận nào cho tour này.</p>
                     ) : (
-                      reviews.map((rev) => (
-                        <div key={rev.id} className="bg-white/[0.02] p-4 rounded-xl border border-white/8 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="h-8 w-8 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 font-bold flex items-center justify-center text-xs">
-                                {rev.userName ? rev.userName.charAt(0) : 'U'}
+                      reviews.map((rev) => {
+                        const displayName = (rev.userName && rev.userName !== 'Khách Hàng SmartTravel') 
+                          ? rev.userName 
+                          : (currentUserName || 'Nguyễn Bảo Lợi');
+                        const initialLetter = displayName.charAt(0).toUpperCase();
+
+                        return (
+                          <div key={rev.id} className="bg-white/[0.02] p-4 rounded-xl border border-white/8 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 font-bold flex items-center justify-center text-xs">
+                                  {initialLetter}
+                                </div>
+                                <div>
+                                  <div className="text-xs font-bold text-white">{displayName}</div>
+                                  <div className="text-[10px] text-slate-400">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</div>
+                                </div>
                               </div>
-                              <div>
-                                <div className="text-xs font-bold text-white">{rev.userName}</div>
-                                <div className="text-[10px] text-slate-400">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</div>
-                              </div>
-                            </div>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star key={i} className={`h-3.5 w-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-700'}`} />
@@ -1403,7 +1458,8 @@ export const TourDetailPage: React.FC = () => {
                             </div>
                           )}
                         </div>
-                      ))
+                      );
+                    })
                     )}
                   </div>
                 </div>
