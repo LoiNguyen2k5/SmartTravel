@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  ShoppingBag, 
-  Plus, 
-  User, 
-  Phone, 
-  TrendingUp, 
-  Users, 
-  Award, 
-  ArrowUpRight,
-  ChevronRight,
-  Eye,
-  Edit
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ShoppingBag, Plus, User, Phone, TrendingUp, Users, Award, ArrowUpRight,
+  ChevronRight, Eye, Edit, DollarSign, Clock, XCircle, CheckCircle2,
+  BarChart3, Download, Filter, RefreshCw, AlertTriangle, Wallet, Info,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
@@ -18,292 +10,468 @@ import { bookingService } from '../../services/bookingService';
 import { Tour } from '../../types/tour';
 import { Booking } from '../../types/booking';
 
+const COMMISSION_RATE = 0.10;
+const PAYMENT_FEE_RATE = 0.015;
+
+const fmt = (n: number) => n.toLocaleString('vi-VN');
+const fmtM = (n: number) => `${(n / 1_000_000).toFixed(1)}M`;
+
+function getMonthLabel(offset: number): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() - offset);
+  return `Thg ${d.getMonth() + 1}`;
+}
+
+const STATUS_GROUPS = {
+  confirmed: ['CONFIRMED', 'PAID', 'DA THANH TOAN', 'CONFIRMED_PAID'],
+  pending: ['PENDING', 'AWAITING_PAYMENT', 'CHO THANH TOAN'],
+  completed: ['COMPLETED', 'DA HOAN THANH', 'DONE'],
+  cancelled: ['CANCELLED', 'REFUNDED', 'DA HUY', 'HOAN TIEN'],
+};
+
+function classifyStatus(status: string | undefined): keyof typeof STATUS_GROUPS {
+  for (const [key, vals] of Object.entries(STATUS_GROUPS)) {
+    if (vals.some((v) => (status || '').toUpperCase().includes(v.split(' ')[0]))) {
+      return key as keyof typeof STATUS_GROUPS;
+    }
+  }
+  return 'confirmed';
+}
+
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
+  <span className="relative group inline-flex items-center">
+    {children}
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-52 rounded-xl bg-slate-900 text-white text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
+      {text}
+    </span>
+  </span>
+);
+
 export const VendorDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [tours, setTours] = useState<Tour[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [filterMonths, setFilterMonths] = useState<number>(6);
+  const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchVendorData();
-  }, []);
-
-  const applyStatusOverrides = (bookingList: Booking[]): Booking[] => {
+  const applyStatusOverrides = (list: Booking[]): Booking[] => {
     try {
-      const savedStatusesStr = localStorage.getItem('vendor_booking_statuses');
-      if (savedStatusesStr) {
-        const savedStatuses: Record<number, string> = JSON.parse(savedStatusesStr);
-        return bookingList.map((b) => {
-          if (savedStatuses[b.id]) {
-            return { ...b, status: savedStatuses[b.id] as any };
-          }
-          return b;
-        });
+      const saved = localStorage.getItem('vendor_booking_statuses');
+      if (saved) {
+        const map: Record<number, string> = JSON.parse(saved);
+        return list.map((b) => (map[b.id] ? { ...b, status: map[b.id] as any } : b));
       }
-    } catch (e) {
-      console.error(e);
-    }
-    return bookingList;
+    } catch (_) {}
+    return list;
   };
 
   const fetchVendorData = async () => {
     setLoading(true);
     let userBookings: Booking[] = [];
     try {
-      const userCreatedStr = localStorage.getItem('user_created_bookings');
-      if (userCreatedStr) userBookings = JSON.parse(userCreatedStr);
-    } catch (e) {
-      console.error(e);
-    }
-
+      const raw = localStorage.getItem('user_created_bookings');
+      if (raw) userBookings = JSON.parse(raw);
+    } catch (_) {}
     try {
       const [toursRes, bookingsRes] = await Promise.all([
         tourService.getMyTours(),
         bookingService.getVendorBookings(),
       ]);
-
-      if (toursRes.success && toursRes.data) {
-        setTours(toursRes.data);
+      if (toursRes.success && toursRes.data) setTours(toursRes.data);
+      let rawList: Booking[] = bookingsRes.success && bookingsRes.data?.length ? bookingsRes.data : [];
+      if (!rawList.length) {
+        const fb = await bookingService.getMyBookings();
+        if (fb.success && fb.data) rawList = fb.data;
       }
-      let rawList: Booking[] = (bookingsRes.success && bookingsRes.data && bookingsRes.data.length > 0) ? bookingsRes.data : [];
-      if (rawList.length === 0) {
-        const fallbackRes = await bookingService.getMyBookings();
-        if (fallbackRes.success && fallbackRes.data) {
-          rawList = fallbackRes.data;
-        }
-      }
-      const combined = [...userBookings, ...rawList];
-      setBookings(applyStatusOverrides(combined));
+      setBookings(applyStatusOverrides([...userBookings, ...rawList]));
     } catch (err) {
-      console.error('Lỗi khi tải dữ liệu vendor, thử fallback getMyBookings:', err);
-      let fallbackList: Booking[] = [];
       try {
-        const fallbackRes = await bookingService.getMyBookings();
-        if (fallbackRes.success && fallbackRes.data) {
-          fallbackList = fallbackRes.data;
-        }
-      } catch (e) {
-        console.error('Fallback failed:', e);
-      }
-      const combined = [...userBookings, ...fallbackList];
-      setBookings(applyStatusOverrides(combined));
+        const fb = await bookingService.getMyBookings();
+        if (fb.success && fb.data) setBookings(applyStatusOverrides(fb.data));
+      } catch (_) {}
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculations for analytics
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
-  const totalGuests = bookings.reduce(
-    (sum, b) => sum + (b.numberOfAdults || 0) + (b.numberOfChildren || 0),
-    0
-  );
+  // Vendor ID cố định cho demo (thực tế lấy từ auth context)
+  const VENDOR_ID = 1;
+  const SETTLED_VENDORS_KEY = 'smart_travel_settled_vendor_ids';
 
-  // Occupancy rate calculation (total guests / (tours * 40 max capacity))
-  const totalCapacity = (tours.length || 1) * 40;
-  const occupancyRate = Math.min(100, Math.round((totalGuests / totalCapacity) * 100));
+  const isAdminSettled = (): boolean => {
+    try {
+      const raw = localStorage.getItem(SETTLED_VENDORS_KEY);
+      if (!raw) return false;
+      const ids: number[] = JSON.parse(raw);
+      return ids.includes(VENDOR_ID);
+    } catch (_) { return false; }
+  };
 
-  // Monthly revenue chart data (Mock last 6 months)
-  const monthlyData = [
-    { month: 'Thg 3', revenue: 12500000 },
-    { month: 'Thg 4', revenue: 18400000 },
-    { month: 'Thg 5', revenue: 25900000 },
-    { month: 'Thg 6', revenue: 31200000 },
-    { month: 'Thg 7', revenue: 42000000 },
-    { month: 'Thg 8', revenue: totalRevenue > 0 ? totalRevenue : 38500000 },
-  ];
-  const maxMonthlyRevenue = Math.max(...monthlyData.map((m) => m.revenue));
+  useEffect(() => { fetchVendorData(); }, []);
+
+  // Re-check settlement status khi tab được focus lại (admin vừa chi trả ở tab khác)
+  useEffect(() => {
+    const onFocus = () => fetchVendorData();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
+  const analytics = useMemo(() => {
+    const confirmed = bookings.filter((b) => classifyStatus(b.status) === 'confirmed');
+    const pending = bookings.filter((b) => classifyStatus(b.status) === 'pending');
+    const completed = bookings.filter((b) => classifyStatus(b.status) === 'completed');
+    const cancelled = bookings.filter((b) => classifyStatus(b.status) === 'cancelled');
+    const grossRevenue = bookings.reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const cancelledTotal = cancelled.reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const netRevenue = grossRevenue - cancelledTotal;
+    const commission = netRevenue * COMMISSION_RATE;
+    const gatewayFee = netRevenue * PAYMENT_FEE_RATE;
+    const netPayout = netRevenue - commission - gatewayFee;
+    // Nếu admin đã quyết toán → pendingSettlement = 0
+    const rawPendingSettlement = completed.reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const pendingSettlement = isAdminSettled() ? 0 : rawPendingSettlement;
+    const adminSettled = isAdminSettled();
+    const paidCount = confirmed.length + completed.length;
+    const aov = paidCount > 0 ? netRevenue / paidCount : 0;
+    const cancellationRate = bookings.length > 0 ? (cancelled.length / bookings.length) * 100 : 0;
+    const totalGuests = bookings.reduce((s, b) => s + (b.numberOfAdults || 0) + (b.numberOfChildren || 0), 0);
+    return { grossRevenue, netRevenue, commission, gatewayFee, netPayout, pendingSettlement, adminSettled, aov, cancellationRate, totalGuests, counts: { confirmed: confirmed.length, pending: pending.length, completed: completed.length, cancelled: cancelled.length, total: bookings.length } };
+  }, [bookings]);
+
+  const chartData = useMemo(() => {
+    return Array.from({ length: filterMonths }, (_, i) => {
+      const offset = filterMonths - 1 - i;
+      const d = new Date();
+      d.setMonth(d.getMonth() - offset);
+      const targetMonth = d.getMonth();
+      const targetYear = d.getFullYear();
+      const monthBookings = bookings.filter((b) => {
+        if (!b.createdAt) return false;
+        const bd = new Date(b.createdAt);
+        return bd.getMonth() === targetMonth && bd.getFullYear() === targetYear;
+      });
+      const settled = monthBookings.filter((b) => classifyStatus(b.status) === 'completed').reduce((s, b) => s + (b.totalPrice || 0), 0);
+      const pendingRev = monthBookings.filter((b) => ['confirmed', 'pending'].includes(classifyStatus(b.status))).reduce((s, b) => s + (b.totalPrice || 0), 0);
+      return { month: getMonthLabel(offset), settled, pending: pendingRev, total: settled + pendingRev, bookingCount: monthBookings.length, guestCount: monthBookings.reduce((s, b) => s + (b.numberOfAdults || 0) + (b.numberOfChildren || 0), 0), netRev: (settled + pendingRev) * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE) };
+    });
+  }, [bookings, filterMonths]);
+
+  const mockBase = [8200000, 14500000, 22800000, 31000000, 38500000, 42000000, 35000000, 27000000, 44000000, 51000000, 39000000, 47000000];
+  const chartDataFinal = useMemo(() => {
+    const hasReal = chartData.some((d) => d.total > 0);
+    if (hasReal) return chartData;
+    return chartData.map((d, i) => ({ ...d, settled: Math.round(mockBase[i % 12] * 0.55), pending: Math.round(mockBase[i % 12] * 0.45), total: mockBase[i % 12], bookingCount: Math.round(2 + i * 1.5), guestCount: Math.round(8 + i * 5), netRev: Math.round(mockBase[i % 12] * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE)) }));
+  }, [chartData]);
+
+  const maxChartVal = Math.max(...chartDataFinal.map((d) => d.total), 1);
+  const filteredBookings = useMemo(() => filterStatus === 'ALL' ? bookings : bookings.filter((b) => classifyStatus(b.status) === filterStatus), [bookings, filterStatus]);
+
+  const exportCSV = () => {
+    const headers = ['Ma dat tour', 'Tour', 'Khach', 'SDT', 'Tong tien', 'Trang thai', 'Ngay dat'];
+    const rows = bookings.map((b) => [b.bookingCode || b.id, b.tourTitle || '', b.contactName || b.userName || '', b.contactPhone || '', b.totalPrice || 0, b.status || '', b.createdAt || '']);
+    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bao-cao-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const statusBadge = (status: string | undefined) => {
+    const key = classifyStatus(status);
+    const configs = { confirmed: { cls: 'bg-sky-100 text-sky-700', label: 'Xác nhận' }, pending: { cls: 'bg-amber-100 text-amber-700', label: 'Chờ thanh toán' }, completed: { cls: 'bg-emerald-100 text-emerald-700', label: 'Hoàn thành' }, cancelled: { cls: 'bg-rose-100 text-rose-700', label: 'Đã hủy' } };
+    const c = configs[key];
+    return <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${c.cls}`}>{status || c.label}</span>;
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
-      {/* Header Bar */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900">Vendor Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-600">Báo cáo doanh thu, quản lý tour du lịch & đơn đặt hàng</p>
+          <p className="mt-1 text-sm text-slate-500">Báo cáo tài chính · Quản lý tour · Đối soát doanh thu</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            to="/vendor/tours/create"
-            className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-md shadow-emerald-900/20"
-          >
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+            <Download className="h-4 w-4" /> Xuất CSV
+          </button>
+          <button onClick={fetchVendorData} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+            <RefreshCw className="h-4 w-4" />
+          </button>
+          <Link to="/vendor/tours/create" className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-md shadow-emerald-900/20">
             <Plus className="h-4 w-4" /> Thêm Tour Mới
           </Link>
         </div>
       </div>
 
-      {/* KPI STAT CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Total Revenue */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Tổng Doanh Thu</p>
-            <h3 className="text-2xl font-black text-slate-900">
-              {totalRevenue > 0 ? `${(totalRevenue / 1000000).toFixed(1)}M đ` : '38.5M đ'}
-            </h3>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-              <ArrowUpRight className="h-3 w-3" /> +18.4% so với tháng trước
+      {/* Revenue 4 cards */}
+      <div>
+        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Phân Tích Doanh Thu</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Gross */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="rounded-2xl bg-sky-100 p-2.5 text-sky-700"><DollarSign className="h-5 w-5" /></div>
+              <Tooltip text="Tổng tiền khách thanh toán cho mọi đơn, kể cả đơn đã hủy. Chưa trừ hoàn tiền hay phí.">
+                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              </Tooltip>
+            </div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp</p>
+            <p className="text-[10px] text-slate-400 mb-1">(Gross Revenue)</p>
+            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? fmtM(analytics.grossRevenue) : '258.8M'} đ</h3>
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1"><ArrowUpRight className="h-3 w-3" /> +18.4% tháng trước</span>
+          </div>
+
+          {/* Net Revenue */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="rounded-2xl bg-emerald-100 p-2.5 text-emerald-700"><TrendingUp className="h-5 w-5" /></div>
+              <Tooltip text="Doanh thu sau khi trừ các đơn hủy và đơn hoàn tiền. = Gross - Cancelled.">
+                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              </Tooltip>
+            </div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Ròng</p>
+            <p className="text-[10px] text-slate-400 mb-1">(Net Revenue)</p>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? fmtM(analytics.netRevenue) : '241.2M'} đ</h3>
+            <span className="text-[11px] text-slate-400">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
+          </div>
+
+          {/* Net Payout */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="rounded-2xl bg-emerald-100 p-2.5 text-emerald-700"><Wallet className="h-5 w-5" /></div>
+              <Tooltip text={`Số tiền vendor thực nhận = Net Revenue − hoa hồng platform (${COMMISSION_RATE * 100}%) − phí cổng thanh toán (${PAYMENT_FEE_RATE * 100}%).`}>
+                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              </Tooltip>
+            </div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Thực Nhận</p>
+            <p className="text-[10px] text-slate-400 mb-1">(Net Payout)</p>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? fmtM(analytics.netPayout) : '216.3M'} đ</h3>
+            <div className="text-[11px] text-slate-500 space-y-0.5 mt-1">
+              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? fmtM(analytics.commission) : '19.3M'} đ</span></div>
+              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? fmtM(analytics.gatewayFee) : '3.6M'} đ</span></div>
+            </div>
+          </div>
+
+          {/* Pending Settlement — amber khi còn tiền chờ, trắng khi đã đối soát xong */}
+          <div className={`rounded-3xl border p-5 shadow-sm transition-colors duration-500 ${
+            analytics.pendingSettlement > 0
+              ? 'border-amber-200 bg-amber-50'
+              : 'border-slate-200 bg-white'
+          }`}>
+            <div className="flex items-start justify-between mb-3">
+              <div className={`rounded-2xl p-2.5 transition-colors duration-500 ${
+                analytics.pendingSettlement > 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
+              }`}><Clock className="h-5 w-5" /></div>
+              <Tooltip text="Đơn đã hoàn thành tour nhưng platform chưa chuyển tiền về tài khoản vendor. Sẽ đối soát định kỳ.">
+                <Info className={`h-3.5 w-3.5 cursor-help ${analytics.pendingSettlement > 0 ? 'text-amber-400' : 'text-slate-300'}`} />
+              </Tooltip>
+            </div>
+            <p className={`text-[11px] font-bold uppercase tracking-wider ${
+              analytics.pendingSettlement > 0 ? 'text-amber-700' : 'text-slate-500'
+            }`}>Chờ Đối Soát</p>
+            <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-slate-400'}`}>(Pending Settlement)</p>
+            <h3 className={`text-xl font-black ${
+              analytics.pendingSettlement > 0 ? 'text-amber-800' : 'text-slate-900'
+            }`}>{analytics.pendingSettlement > 0 ? fmtM(analytics.pendingSettlement) : '0'} đ</h3>
+            <span className={`text-[11px] font-medium ${
+              analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-emerald-600'
+            }`}>
+              {analytics.pendingSettlement > 0
+                ? `${analytics.counts.completed} tour chờ đối soát`
+                : '✓ Đã đối soát toàn bộ'}
             </span>
-          </div>
-          <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-700">
-            <TrendingUp className="h-6 w-6" />
-          </div>
-        </div>
-
-        {/* Card 2: Bookings Count */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Đơn Đặt Tour</p>
-            <h3 className="text-2xl font-black text-slate-900">{bookings.length}</h3>
-            <span className="text-[11px] text-slate-400 font-medium">Đã cập nhật thực tế</span>
-          </div>
-          <div className="rounded-2xl bg-sky-100 p-3 text-sky-700">
-            <ShoppingBag className="h-6 w-6" />
-          </div>
-        </div>
-
-        {/* Card 3: Guests Count */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Số Lượt Khách</p>
-            <h3 className="text-2xl font-black text-slate-900">{totalGuests > 0 ? totalGuests : 76} khách</h3>
-            <span className="text-[11px] text-emerald-600 font-bold">Du khách đã trải nghiệm</span>
-          </div>
-          <div className="rounded-2xl bg-purple-100 p-3 text-purple-700">
-            <Users className="h-6 w-6" />
-          </div>
-        </div>
-
-        {/* Card 4: Occupancy Rate */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Tỷ Lệ Lấp Đầy</p>
-            <h3 className="text-2xl font-black text-slate-900">{occupancyRate > 0 ? occupancyRate : 68}%</h3>
-            <span className="text-[11px] text-slate-400 font-medium">Công suất chỗ tối đa</span>
-          </div>
-          <div className="rounded-2xl bg-amber-100 p-3 text-amber-700">
-            <Award className="h-6 w-6" />
           </div>
         </div>
       </div>
 
-      {/* REVENUE CHART & TOP SELLING TOURS GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* REVENUE BAR CHART */}
-        <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+      {/* KPI Secondary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Booking split */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm col-span-2 sm:col-span-1">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="rounded-xl bg-slate-100 p-2 text-slate-600"><ShoppingBag className="h-4 w-4" /></div>
+            <p className="text-xs font-bold text-slate-500 uppercase">Đơn Đặt Tour</p>
+          </div>
+          <p className="text-2xl font-black text-slate-900 mb-2">{analytics.counts.total}</p>
+          <div className="space-y-1 text-[11px]">
+            <div className="flex justify-between"><span className="flex items-center gap-1 text-sky-600"><CheckCircle2 className="h-3 w-3" /> Xác nhận</span><span className="font-bold">{analytics.counts.confirmed}</span></div>
+            <div className="flex justify-between"><span className="flex items-center gap-1 text-amber-600"><Clock className="h-3 w-3" /> Chờ TT</span><span className="font-bold">{analytics.counts.pending}</span></div>
+            <div className="flex justify-between"><span className="flex items-center gap-1 text-emerald-600"><Award className="h-3 w-3" /> Hoàn thành</span><span className="font-bold">{analytics.counts.completed}</span></div>
+            <div className="flex justify-between"><span className="flex items-center gap-1 text-rose-600"><XCircle className="h-3 w-3" /> Đã hủy</span><span className="font-bold">{analytics.counts.cancelled}</span></div>
+          </div>
+        </div>
+
+        {/* AOV */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="rounded-xl bg-purple-100 p-2 text-purple-700"><BarChart3 className="h-4 w-4" /></div>
+            <Tooltip text="Average Order Value = Doanh thu ròng / Số đơn thanh toán thành công. Giá trị trung bình mỗi booking.">
+              <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+            </Tooltip>
+          </div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">AOV</p>
+          <p className="text-[10px] text-slate-400 mb-2">Avg Order Value</p>
+          <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? fmtM(analytics.aov) : '14.2M'} đ</p>
+          <p className="text-[11px] text-slate-400 mt-1">/ đơn đặt</p>
+        </div>
+
+        {/* Cancellation */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="rounded-xl bg-rose-100 p-2 text-rose-600"><AlertTriangle className="h-4 w-4" /></div>
+            <Tooltip text="Tỷ lệ hủy = Số đơn hủy / Tổng đơn. Ngành tour tỷ lệ lý tưởng < 5%.">
+              <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+            </Tooltip>
+          </div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Tỷ Lệ Hủy</p>
+          <p className="text-[10px] text-slate-400 mb-2">Cancellation Rate</p>
+          <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) : '3.2'}%</p>
+          <p className={`text-[11px] mt-1 font-bold ${analytics.cancellationRate > 10 ? 'text-rose-500' : 'text-emerald-500'}`}>{analytics.cancellationRate > 10 ? '⚠ Cần theo dõi' : '✓ Trong ngưỡng tốt'}</p>
+        </div>
+
+        {/* Guests */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="rounded-xl bg-teal-100 p-2 text-teal-700"><Users className="h-4 w-4" /></div>
+          </div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Tổng Khách</p>
+          <p className="text-2xl font-black text-slate-900">{analytics.totalGuests > 0 ? analytics.totalGuests : 76}</p>
+          <p className="text-[11px] text-slate-400 mt-1">du khách đã trải nghiệm</p>
+          <div className="mt-2 h-1.5 rounded-full bg-teal-100 overflow-hidden">
+            <div className="h-full rounded-full bg-teal-500" style={{ width: `${Math.min(100, (analytics.totalGuests / 200) * 100)}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Chart + Top Tours */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 className="font-extrabold text-slate-900 text-base">Biểu Đồ Doanh Thu Theo Tháng</h3>
-              <p className="text-xs text-slate-500">Thống kê tổng thu từ đơn đặt tour 6 tháng gần nhất</p>
+              <p className="text-xs text-slate-500">Tính theo ngày đặt đơn (booking date). Màu đậm = đã đối soát · Màu nhạt = chờ đối soát</p>
             </div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">Năm 2026</span>
+            <select value={filterMonths} onChange={(e) => setFilterMonths(Number(e.target.value))} className="text-xs font-bold border border-slate-200 rounded-xl px-3 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+              <option value={3}>3 tháng</option>
+              <option value={6}>6 tháng</option>
+              <option value={12}>12 tháng</option>
+            </select>
           </div>
 
-          <div className="h-56 flex items-end justify-between gap-3 pt-6 px-2">
-            {monthlyData.map((item) => {
-              const heightPercent = Math.round((item.revenue / maxMonthlyRevenue) * 100);
+          <div className="flex items-center gap-5 text-[11px] font-bold text-slate-500">
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-4 rounded bg-emerald-600" /> Đã đối soát</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-4 rounded border-2 border-dashed border-teal-400 bg-teal-100" /> Chờ đối soát</span>
+          </div>
+
+          <div className="h-52 flex items-end justify-between gap-2 px-1">
+            {chartDataFinal.map((item, i) => {
+              const totalH = Math.round((item.total / maxChartVal) * 100);
+              const settledH = item.total > 0 ? Math.round((item.settled / item.total) * totalH) : 0;
+              const pendH = totalH - settledH;
+              const isHov = hoveredBar === i;
               return (
-                <div key={item.month} className="flex-1 flex flex-col items-center gap-2 group">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-black text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                    {(item.revenue / 1000000).toFixed(1)}M
+                <div key={item.month} className="flex-1 flex flex-col items-center gap-2 cursor-pointer" onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)}>
+                  <div className={`transition-all duration-150 ${isHov ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} text-[10px] font-bold text-slate-700 bg-white border border-slate-200 shadow-xl rounded-xl px-2 py-1.5 whitespace-nowrap text-center`}>
+                    <div className="font-black text-slate-900">{fmtM(item.total)} đ</div>
+                    <div className="text-emerald-600">Ròng: {fmtM(item.netRev)} đ</div>
+                    <div className="text-slate-500">{item.bookingCount} đơn · {item.guestCount} khách</div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-2xl h-44 flex items-end p-1 overflow-hidden">
-                    <div
-                      className="w-full rounded-xl bg-gradient-to-t from-emerald-600 to-teal-400 group-hover:from-emerald-500 group-hover:to-teal-300 transition-all duration-500"
-                      style={{ height: `${heightPercent}%` }}
-                    ></div>
+                  <div className="w-full bg-slate-100 rounded-2xl h-40 flex flex-col justify-end overflow-hidden p-0.5 gap-0.5">
+                    <div className="w-full rounded-t-xl border-2 border-dashed border-teal-400 bg-teal-100 transition-all duration-500" style={{ height: `${pendH}%`, minHeight: pendH > 0 ? 4 : 0 }} />
+                    <div className="w-full rounded-b-xl bg-gradient-to-t from-emerald-700 to-emerald-500 transition-all duration-500" style={{ height: `${settledH}%`, minHeight: settledH > 0 ? 4 : 0 }} />
                   </div>
-                  <span className="text-xs font-bold text-slate-600">{item.month}</span>
+                  <span className="text-[11px] font-bold text-slate-500">{item.month}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* TOP SELLING TOURS LIST */}
+        {/* Top Tours */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <h3 className="font-extrabold text-slate-900 text-base">Tour Bán Chạy Nhất</h3>
+            <h3 className="font-extrabold text-slate-900 text-base">Tour Bán Chạy</h3>
             <Link to="/vendor/tours" className="text-xs font-bold text-emerald-600 hover:underline">Xem tất cả</Link>
           </div>
-
-          <div className="space-y-4">
-            {tours.slice(0, 4).map((t, idx) => (
-              <div key={t.id} className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className={`h-6 w-6 rounded-lg flex items-center justify-center font-black text-xs ${
-                    idx === 0 ? 'bg-amber-400 text-amber-950' : idx === 1 ? 'bg-slate-300 text-slate-800' : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {idx + 1}
-                  </span>
-                  <img src={t.thumbnailUrl} alt={t.title} className="h-10 w-12 object-cover rounded-lg border" />
-                  <div>
-                    <p className="text-xs font-black text-slate-900 line-clamp-1">{t.title}</p>
-                    <p className="text-[11px] text-slate-500">Giá: {t.price.toLocaleString('vi-VN')} đ</p>
+          {tours.length === 0 ? (
+            <p className="text-xs text-slate-400 text-center py-8">Chưa có tour nào</p>
+          ) : (
+            <div className="space-y-4">
+              {tours.slice(0, 4).map((t, idx) => (
+                <div key={t.id} className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className={`h-6 w-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 ${idx === 0 ? 'bg-amber-400 text-amber-950' : idx === 1 ? 'bg-slate-300 text-slate-800' : 'bg-orange-100 text-orange-700'}`}>{idx + 1}</span>
+                    <img src={t.thumbnailUrl} alt={t.title} className="h-9 w-12 object-cover rounded-lg border flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-black text-slate-900 line-clamp-1">{t.title}</p>
+                      <p className="text-[10px] text-slate-400">{fmt(t.price)} đ</p>
+                    </div>
                   </div>
+                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md flex-shrink-0">HOT</span>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md">
-                  HOT
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
+          <div className="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-[11px] text-slate-500 space-y-1">
+            <p className="font-bold text-slate-700">Thông số nền tảng</p>
+            <div className="flex justify-between"><span>Hoa hồng platform</span><span className="font-bold text-rose-600">{COMMISSION_RATE * 100}%</span></div>
+            <div className="flex justify-between"><span>Phí cổng thanh toán</span><span className="font-bold text-rose-600">{PAYMENT_FEE_RATE * 100}%</span></div>
+            <div className="flex justify-between border-t border-slate-200 pt-1 mt-1"><span>Vendor giữ lại</span><span className="font-black text-emerald-600">{((1 - COMMISSION_RATE - PAYMENT_FEE_RATE) * 100).toFixed(1)}%</span></div>
           </div>
         </div>
       </div>
 
-      {/* SECTION 1: ĐƠN ĐẶT TOUR KHÁCH HÀNG GẦN ĐÂY */}
+      {/* Recent Bookings */}
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <h2 className="font-bold text-slate-900 text-base">Đơn Đặt Tour Mới Nhất</h2>
-            <p className="text-xs text-slate-500">Danh sách khách hàng vừa thực hiện đặt tour</p>
+            <h2 className="font-bold text-slate-900 text-base">Đơn Đặt Tour Gần Đây</h2>
+            <p className="text-xs text-slate-500">Lọc theo trạng thái để phân tích từng nhóm</p>
           </div>
-          <Link
-            to="/vendor/bookings"
-            className="flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900"
-          >
-            Quản lý đơn hàng <ChevronRight className="h-4 w-4" />
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Filter className="h-3.5 w-3.5 text-slate-400" />
+            {(['ALL', 'confirmed', 'pending', 'completed', 'cancelled'] as const).map((s) => {
+              const labels: Record<string, string> = { ALL: 'Tất cả', confirmed: 'Xác nhận', pending: 'Chờ TT', completed: 'Hoàn thành', cancelled: 'Đã hủy' };
+              return (
+                <button key={s} onClick={() => setFilterStatus(s)} className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition ${filterStatus === s ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{labels[s]}</button>
+              );
+            })}
+            <Link to="/vendor/bookings" className="flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900 ml-1">Tất cả <ChevronRight className="h-4 w-4" /></Link>
+          </div>
         </div>
 
         {loading ? (
-          <div className="flex h-24 items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-4 border-sky-600 border-t-transparent"></div>
-          </div>
-        ) : bookings.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-xs">Chưa có đơn đặt tour nào từ khách hàng.</div>
+          <div className="flex h-24 items-center justify-center"><div className="h-6 w-6 animate-spin rounded-full border-4 border-sky-600 border-t-transparent" /></div>
+        ) : filteredBookings.length === 0 ? (
+          <div className="text-center py-8 text-slate-400 text-xs">Không có đơn nào trong nhóm này.</div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {bookings.slice(0, 5).map((b) => (
+            {filteredBookings.slice(0, 6).map((b) => (
               <div key={b.id} className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <img
-                    src={b.tourThumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=200&q=80'}
-                    alt={b.tourTitle}
-                    className="h-14 w-18 object-cover rounded-xl border border-slate-200 flex-shrink-0"
-                  />
+                  <img src={b.tourThumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=200&q=80'} alt={b.tourTitle} className="h-14 w-20 object-cover rounded-xl border border-slate-200 flex-shrink-0" />
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-slate-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">
-                        {b.bookingCode}
-                      </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700">
-                        {b.status || 'ĐÃ THANH TOÁN'}
-                      </span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="bg-slate-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">{b.bookingCode}</span>
+                      {statusBadge(b.status)}
                     </div>
-
                     <h4 className="text-xs font-black text-slate-900 line-clamp-1">{b.tourTitle}</h4>
-
-                    <div className="flex items-center gap-3 text-[11px] text-slate-600 font-medium">
-                      <span><User className="h-3 w-3 inline text-slate-400" /> {b.contactName || b.userName}</span>
-                      <span><Phone className="h-3 w-3 inline text-slate-400" /> {b.contactPhone}</span>
+                    <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                      <span className="flex items-center gap-1"><User className="h-3 w-3" />{b.contactName || b.userName}</span>
+                      <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{b.contactPhone}</span>
                     </div>
                   </div>
                 </div>
-
-                <div className="text-right">
-                  <div className="text-[11px] text-slate-400">{b.numberOfAdults} người lớn</div>
-                  <div className="text-sm font-black text-rose-600">{(b.totalPrice || 0).toLocaleString('vi-VN')} đ</div>
+                <div className="text-right space-y-0.5">
+                  <div className="text-[11px] text-slate-400">{b.numberOfAdults} người lớn{b.numberOfChildren ? ` · ${b.numberOfChildren} trẻ em` : ''}</div>
+                  <div className="text-sm font-black text-rose-600">{fmt(b.totalPrice || 0)} đ</div>
+                  <div className="text-[10px] text-emerald-600 font-bold">Ròng: {fmt(Math.round((b.totalPrice || 0) * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE)))} đ</div>
                 </div>
               </div>
             ))}
@@ -311,15 +479,14 @@ export const VendorDashboardPage: React.FC = () => {
         )}
       </div>
 
-      {/* SECTION 2: DANH SÁCH TOUR DU LỊCH CỦA VENDOR */}
+      {/* Tour list */}
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <h2 className="font-bold text-slate-900 text-base">Danh Sách Tour Của Bạn</h2>
-          <span className="text-xs font-semibold text-slate-500">Tổng cộng: {tours.length} tour</span>
+          <span className="text-xs font-semibold text-slate-500">Tổng: {tours.length} tour</span>
         </div>
-
         {tours.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">Chưa có tour nào do bạn đăng. Bấm "Thêm Tour Mới" để bắt đầu!</p>
+          <p className="text-sm text-slate-400 text-center py-8">Chưa có tour. Bấm "Thêm Tour Mới" để bắt đầu!</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {tours.map((t) => (
@@ -328,23 +495,12 @@ export const VendorDashboardPage: React.FC = () => {
                   <img src={t.thumbnailUrl} alt={t.title} className="h-12 w-16 object-cover rounded-xl border border-slate-200" />
                   <div>
                     <div className="text-xs font-extrabold text-slate-900 line-clamp-1">{t.title}</div>
-                    <div className="text-[11px] text-slate-500">Mã: {t.tourCode} | Giá: <strong className="text-rose-600">{t.price.toLocaleString('vi-VN')} đ</strong></div>
+                    <div className="text-[11px] text-slate-500">Mã: {t.tourCode} · Giá: <strong className="text-rose-600">{fmt(t.price)} đ</strong></div>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => navigate(`/vendor/tours/${t.id}/edit`)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition"
-                  >
-                    <Edit className="h-3.5 w-3.5" /> Chỉnh sửa
-                  </button>
-                  <button
-                    onClick={() => navigate(`/tours/${t.id}`)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition"
-                  >
-                    <Eye className="h-3.5 w-3.5" /> Xem chi tiết
-                  </button>
+                  <button onClick={() => navigate(`/vendor/tours/${t.id}/edit`)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition"><Edit className="h-3.5 w-3.5" /> Chỉnh sửa</button>
+                  <button onClick={() => navigate(`/tours/${t.id}`)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition"><Eye className="h-3.5 w-3.5" /> Xem</button>
                 </div>
               </div>
             ))}
