@@ -31,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final TourRepository tourRepository;
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
+    private final com.smarttravel.services.VoucherService voucherService;
 
     @Override
     @Transactional
@@ -121,6 +122,9 @@ public class BookingServiceImpl implements BookingService {
                 .build();
 
         Booking saved = bookingRepository.save(booking);
+        if (request.getVoucherCode() != null && !request.getVoucherCode().trim().isEmpty()) {
+            voucherService.incrementUsedCount(request.getVoucherCode().trim());
+        }
         return mapToResponse(saved);
     }
 
@@ -185,21 +189,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BigDecimal validateAndCalculateVoucher(String voucherCode, BigDecimal originalTotal) {
-        Voucher voucher = voucherRepository.findByCodeAndActiveTrue(voucherCode.toUpperCase())
-                .orElseThrow(() -> new BadRequestException("Mã giảm giá '" + voucherCode + "' không tồn tại hoặc đã hết hạn."));
-
-        if (voucher.getMinOrderValue() != null && originalTotal.compareTo(voucher.getMinOrderValue()) < 0) {
-            throw new BadRequestException("Mã giảm giá yêu cầu giá trị đơn hàng tối thiểu từ " + voucher.getMinOrderValue().longValue() + "đ");
+        java.util.Map<String, Object> result = voucherService.validateAndCalculateVoucher(voucherCode, originalTotal);
+        Object discount = result.get("discountAmount");
+        if (discount instanceof BigDecimal) {
+            return (BigDecimal) discount;
+        } else if (discount instanceof Number) {
+            return BigDecimal.valueOf(((Number) discount).doubleValue());
         }
-
-        if (voucher.getDiscountPercent() != null && voucher.getDiscountPercent() > 0) {
-            return originalTotal.multiply(BigDecimal.valueOf(voucher.getDiscountPercent())).divide(BigDecimal.valueOf(100));
-        }
-
-        if (voucher.getDiscountAmount() != null) {
-            return voucher.getDiscountAmount();
-        }
-
         return BigDecimal.ZERO;
     }
 

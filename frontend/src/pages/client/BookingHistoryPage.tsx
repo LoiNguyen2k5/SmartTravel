@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
 import { History, Package, QrCode, XCircle, Star } from 'lucide-react';
+import useAuth from '../../hooks/useAuth';
 
 const MOCK_BOOKINGS: Booking[] = [
   {
@@ -58,13 +59,26 @@ const MOCK_BOOKINGS: Booking[] = [
 
 export const BookingHistoryPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const getStoredUser = () => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  };
+  const activeUser = user || getStoredUser();
+  const currentEmail = activeUser?.email || 'nguyenbaoloicv@gmail.com';
+  const currentName = activeUser?.fullName || 'Nguyễn Bảo Lợi';
+  const currentPhone = activeUser?.phone || '0941899554';
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [user]);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -72,7 +86,21 @@ export const BookingHistoryPage: React.FC = () => {
       let localBookings: Booking[] = [];
       try {
         const localStr = localStorage.getItem('user_created_bookings');
-        if (localStr) localBookings = JSON.parse(localStr);
+        if (localStr) {
+          localBookings = JSON.parse(localStr);
+          // Migrate any old dummy email to the real registered user email
+          let hasMigration = false;
+          localBookings = localBookings.map(b => {
+            if (b.contactEmail === 'baoloi@smarttravel.com' || b.contactEmail === 'nguyenbaoloi@gmail.com' || !b.contactEmail) {
+              hasMigration = true;
+              return { ...b, contactEmail: currentEmail, contactName: currentName, userName: currentName, contactPhone: b.contactPhone || currentPhone };
+            }
+            return b;
+          });
+          if (hasMigration) {
+            localStorage.setItem('user_created_bookings', JSON.stringify(localBookings));
+          }
+        }
       } catch (e) {
         console.error(e);
       }
@@ -82,18 +110,22 @@ export const BookingHistoryPage: React.FC = () => {
         ? [...localBookings, ...res.data]
         : [...localBookings, ...MOCK_BOOKINGS];
 
-      // Sync status from saved vendor status updates
+      // Sync status from saved vendor status updates & ensure real user info is shown
       try {
         const savedStatusesStr = localStorage.getItem('vendor_booking_statuses');
-        if (savedStatusesStr) {
-          const savedStatuses: Record<number, string> = JSON.parse(savedStatusesStr);
-          rawList = rawList.map((b) => {
-            if (savedStatuses[b.id]) {
-              return { ...b, status: savedStatuses[b.id] as any };
-            }
-            return b;
-          });
-        }
+        const savedStatuses: Record<number, string> = savedStatusesStr ? JSON.parse(savedStatusesStr) : {};
+        rawList = rawList.map((b) => {
+          let updated = { ...b };
+          if (savedStatuses[b.id]) {
+            updated.status = savedStatuses[b.id] as any;
+          }
+          if (updated.contactEmail === 'baoloi@smarttravel.com' || updated.contactEmail === 'nguyenbaoloi@gmail.com' || updated.userName === 'Nguyễn Bảo Lợi') {
+            updated.contactEmail = currentEmail;
+            updated.contactName = currentName;
+            updated.userName = currentName;
+          }
+          return updated;
+        });
       } catch (e) {
         console.error(e);
       }

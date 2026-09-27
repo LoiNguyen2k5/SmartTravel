@@ -10,8 +10,10 @@ import { MOCK_TOURS, findMockTourById } from '../../data/mockTours';
 import { 
   Star, Clock, Calendar, MapPin, 
   HelpCircle, ShieldCheck, ChevronRight, ChevronLeft, PhoneCall, 
-  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2, Users
+  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2, Users,
+  Sparkles
 } from 'lucide-react';
+import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
 import { 
   tourScheduleService, 
   formatScheduleDate, 
@@ -210,6 +212,7 @@ export const TourDetailPage: React.FC = () => {
   const [voucherCode, setVoucherCode] = useState<string>('');
   const [voucherDiscount, setVoucherDiscount] = useState<number>(0);
   const [voucherMsg, setVoucherMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [showVoucherModal, setShowVoucherModal] = useState<boolean>(false);
 
   // Reviews state & validation
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -377,12 +380,14 @@ export const TourDetailPage: React.FC = () => {
     return `${doubleRooms} Phòng đôi tiêu chuẩn (2 khách/phòng) + 01 Giường phụ kê thêm (Extra Bed)`;
   };
 
-  const handleApplyVoucher = async () => {
-    if (!voucherCode.trim() || !tour) return;
+  const handleApplyVoucher = async (codeOverride?: string) => {
+    const code = (codeOverride !== undefined ? codeOverride : voucherCode).trim();
+    if (!code || !tour) return;
     try {
       const originalTotal = (tour.price * adults) + ((tour.childPrice || tour.price * 0.7) * children) + singleRoomSurchargeTotal;
-      const res = await bookingService.validateVoucher(voucherCode.trim(), originalTotal);
+      const res = await bookingService.validateVoucher(code, originalTotal);
       if (res.success && res.data) {
+        setVoucherCode(code);
         setVoucherDiscount(res.data.discountAmount);
         setVoucherMsg({ text: `Áp dụng mã thành công! Giảm ${res.data.discountAmount.toLocaleString('vi-VN')} đ`, type: 'success' });
       }
@@ -1689,7 +1694,17 @@ export const TourDetailPage: React.FC = () => {
 
               {/* Voucher Application Form */}
               <div className="space-y-2 pt-3 border-t border-white/10">
-                <label className="text-[11px] font-bold text-slate-300">Mã giảm giá (Voucher):</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-slate-300">Mã giảm giá (Voucher):</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowVoucherModal(true)}
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1 cursor-pointer"
+                  >
+                    <Sparkles className="h-3 w-3 text-cyan-400" />
+                    <span>Xem ưu đãi có sẵn</span>
+                  </button>
+                </div>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -1699,7 +1714,7 @@ export const TourDetailPage: React.FC = () => {
                     className="flex-1 rounded-xl border border-white/10 px-3 py-2 text-xs focus:border-sky-400 focus:outline-none uppercase font-semibold bg-white/[0.05] text-white placeholder-slate-500"
                   />
                   <button
-                    onClick={handleApplyVoucher}
+                    onClick={() => handleApplyVoucher()}
                     className="rounded-xl bg-white/[0.1] hover:bg-white/[0.18] text-white border border-white/15 px-3.5 py-2 text-xs font-bold transition cursor-pointer"
                   >
                     Áp dụng
@@ -1984,6 +1999,15 @@ export const TourDetailPage: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Voucher Selector Modal */}
+      <VoucherSelectorModal
+        isOpen={showVoucherModal}
+        onClose={() => setShowVoucherModal(false)}
+        orderTotal={(tour?.price || 0) * adults + ((tour?.childPrice || (tour?.price || 0) * 0.7) * children) + singleRoomSurchargeTotal}
+        selectedCode={voucherCode}
+        onSelectVoucher={(code) => handleApplyVoucher(code)}
+      />
     </div>
   );
 };

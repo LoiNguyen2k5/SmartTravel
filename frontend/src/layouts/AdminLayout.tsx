@@ -8,7 +8,8 @@ import {
   CreditCard, 
   LogOut, 
   ArrowLeft,
-  ShieldCheck
+  ShieldCheck,
+  Ticket
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 
@@ -22,6 +23,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Kiểm duyệt Tour', path: '/admin/tours', icon: Compass },
     { label: 'Quản lý Đơn hàng', path: '/admin/bookings', icon: ShoppingBag },
     { label: 'Giao dịch & Đối soát', path: '/admin/settlements', icon: CreditCard },
+    { label: 'Quản lý Khuyến mãi', path: '/admin/vouchers', icon: Ticket },
     { label: 'Tài khoản & Vendor', path: '/admin/users', icon: Users },
   ];
 

@@ -29,6 +29,7 @@ import { TourManagementPage } from '../pages/admin/TourManagementPage';
 import { BookingManagementPage } from '../pages/admin/BookingManagementPage';
 import { UserManagementPage } from '../pages/admin/UserManagementPage';
 import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
+import { VoucherManagementPage } from '../pages/admin/VoucherManagementPage';
 
 // Vendor Pages
 import { VendorDashboardPage } from '../pages/vendor/VendorDashboardPage';
@@ -89,6 +90,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin/tours" element={<TourManagementPage />} />
             <Route path="/admin/bookings" element={<BookingManagementPage />} />
             <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
+            <Route path="/admin/vouchers" element={<VoucherManagementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
           </Route>
         </Route>

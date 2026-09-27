@@ -4,6 +4,7 @@ import { bookingService } from '../../services/bookingService';
 import { paymentService } from '../../services/paymentService';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { Booking } from '../../types/booking';
+import useAuth from '../../hooks/useAuth';
 import { 
   CreditCard, 
   CheckCircle, 
@@ -16,9 +17,13 @@ import {
   Check, 
   Clock, 
   Loader2,
-  Zap
+  Zap,
+  Ticket,
+  Sparkles
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
+import { voucherService } from '../../services/voucherService';
+import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
 
 // Config Bank Account Thụ Hưởng (Real VietQR & MoMo)
 const BANK_CONFIG = {
@@ -42,17 +47,38 @@ export const CheckoutPage: React.FC = () => {
   const tourCode = stateData.tourCode || 'TOUR-001';
   const adults = stateData.numberOfAdults || 1;
   const children = stateData.numberOfChildren || 0;
-  const voucherCode = stateData.voucherCode || '';
-  const discountAmount = stateData.discountAmount || 0;
+  const [currentVoucherCode, setCurrentVoucherCode] = useState<string>(stateData.voucherCode || '');
+  const [currentDiscountAmount, setCurrentDiscountAmount] = useState<number>(stateData.discountAmount || 0);
+  const [showVoucherModal, setShowVoucherModal] = useState<boolean>(false);
   const singleRoomRequired = Boolean(stateData.singleRoomRequired);
   const singleRoomSurchargeAmount = Number(stateData.singleRoomSurchargeAmount || 0);
   const roomAllocation = stateData.roomAllocation || (adults === 1 ? 'Ghép phòng đôi tiêu chuẩn 2 người cùng giới tính' : `${Math.floor((adults + children) / 2)} Phòng đôi tiêu chuẩn (2 khách/phòng)`);
   const minParticipants = stateData.minParticipants || 10;
 
-  // Form states
-  const [contactName, setContactName] = useState('Nguyễn Bảo Lợi');
-  const [contactEmail, setContactEmail] = useState('baoloi@smarttravel.com');
-  const [contactPhone, setContactPhone] = useState('0988776655');
+  const { user } = useAuth();
+  const getStoredUser = () => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
+  const activeUser = user || getStoredUser();
+
+  // Form states synced with real registered user
+  const [contactName, setContactName] = useState<string>(() => activeUser?.fullName || 'Nguyễn Bảo Lợi');
+  const [contactEmail, setContactEmail] = useState<string>(() => activeUser?.email || 'nguyenbaoloicv@gmail.com');
+  const [contactPhone, setContactPhone] = useState<string>(() => activeUser?.phone || '0941899554');
+
+  useEffect(() => {
+    const current = user || getStoredUser();
+    if (current) {
+      if (current.fullName) setContactName(current.fullName);
+      if (current.email) setContactEmail(current.email);
+      if (current.phone) setContactPhone(current.phone);
+    }
+  }, [user]);
   const [note, setNote] = useState('');
   const [paymentOption, setPaymentOption] = useState<'FULL' | 'DEPOSIT'>('FULL');
   const [paymentMethod, setPaymentMethod] = useState<'BANK' | 'MOMO' | 'VNPAY'>('BANK');
@@ -87,8 +113,20 @@ export const CheckoutPage: React.FC = () => {
   const adultPrice = stateData.adultPrice || stateData.price || 5000;
   const childPrice = stateData.childPrice || adultPrice;
   const subtotal = (adultPrice * adults) + (childPrice * children) + singleRoomSurchargeAmount;
-  const totalAfterDiscount = Math.max(0, subtotal - discountAmount);
+  const totalAfterDiscount = Math.max(0, subtotal - currentDiscountAmount);
   const finalPayAmount = paymentOption === 'DEPOSIT' ? Math.round(totalAfterDiscount * 0.3) : totalAfterDiscount;
+
+  const handleApplyVoucherOnCheckout = async (code: string) => {
+    try {
+      const res = await voucherService.validateVoucher(code, subtotal);
+      if (res.data) {
+        setCurrentVoucherCode(code);
+        setCurrentDiscountAmount(res.data.discountAmount);
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc chưa đủ điều kiện áp dụng');
+    }
+  };
 
   const handleCopy = (text: string, type: 'stk' | 'amount' | 'content') => {
     navigator.clipboard.writeText(text);
@@ -155,7 +193,7 @@ export const CheckoutPage: React.FC = () => {
         tourId: tourId,
         numberOfAdults: adults,
         numberOfChildren: children,
-        voucherCode: voucherCode || undefined,
+        voucherCode: currentVoucherCode || undefined,
         contactName: contactName.trim(),
         contactEmail: contactEmail.trim(),
         contactPhone: contactPhone.trim(),
@@ -210,8 +248,8 @@ export const CheckoutPage: React.FC = () => {
       numberOfChildren: children,
       adultPrice: adultPrice,
       childPrice: childPrice,
-      voucherCode: voucherCode,
-      discountAmount: discountAmount,
+      voucherCode: currentVoucherCode,
+      discountAmount: currentDiscountAmount,
       totalPrice: finalPayAmount,
       status: 'PAID',
       contactName: contactName.trim(),
@@ -397,7 +435,7 @@ export const CheckoutPage: React.FC = () => {
                       required
                       value={contactEmail}
                       onChange={(e) => setContactEmail(e.target.value)}
-                      placeholder="baoloi@smarttravel.com"
+                      placeholder={activeUser?.email || "nguyenbaoloicv@gmail.com"}
                       className="w-full rounded-xl border border-white/10 px-3.5 py-2.5 bg-white/[0.04] text-white placeholder-slate-500 focus:border-cyan-400 focus:bg-white/[0.08] focus:outline-none font-medium transition"
                     />
                   </div>
@@ -592,12 +630,28 @@ export const CheckoutPage: React.FC = () => {
                       <span>+{formatCurrency(singleRoomSurchargeAmount)}</span>
                     </div>
                   )}
-                  {discountAmount > 0 && (
-                    <div className="flex justify-between text-emerald-400 font-semibold">
-                      <span>Mã giảm giá ({voucherCode}):</span>
-                      <span>-{formatCurrency(discountAmount)}</span>
+                  {/* Voucher display & selection */}
+                  <div className="pt-2 border-t border-white/10 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-300 font-medium flex items-center gap-1">
+                        <Ticket className="h-3.5 w-3.5 text-cyan-400" /> Mã khuyến mãi:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowVoucherModal(true)}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        <span>{currentVoucherCode ? 'Đổi mã' : 'Chọn mã ưu đãi'}</span>
+                      </button>
                     </div>
-                  )}
+                    {currentDiscountAmount > 0 && (
+                      <div className="flex justify-between text-emerald-400 font-bold">
+                        <span>Đã giảm ({currentVoucherCode}):</span>
+                        <span>-{formatCurrency(currentDiscountAmount)}</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm font-black text-white">
                     <span>Tổng đơn hàng:</span>
                     <span className="text-rose-400">{formatCurrency(totalAfterDiscount)}</span>
@@ -837,6 +891,15 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
         )}
+
+        {/* Voucher Selector Modal */}
+        <VoucherSelectorModal
+          isOpen={showVoucherModal}
+          onClose={() => setShowVoucherModal(false)}
+          orderTotal={subtotal}
+          selectedCode={currentVoucherCode}
+          onSelectVoucher={(code) => handleApplyVoucherOnCheckout(code)}
+        />
 
       </div>
     </div>
