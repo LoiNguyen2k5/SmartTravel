@@ -4,7 +4,7 @@ import com.smarttravel.dto.request.TourModerationRequest;
 import com.smarttravel.dto.response.*;
 import com.smarttravel.entities.*;
 import com.smarttravel.enums.BookingStatus;
-import com.smarttravel.enums.PaymentStatus;
+
 import com.smarttravel.enums.RoleEnum;
 import com.smarttravel.enums.TourStatus;
 import com.smarttravel.exceptions.ResourceNotFoundException;

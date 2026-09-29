@@ -14,6 +14,9 @@ import {
   Sparkles
 } from 'lucide-react';
 import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
+import { VisaRequirementInfo } from '../../components/visa/VisaRequirementInfo';
+import { visaService } from '../../services/visaService';
+import { VisaRequirementResponse } from '../../types/visa';
 import { 
   tourScheduleService, 
   formatScheduleDate, 
@@ -98,6 +101,16 @@ export const TourDetailPage: React.FC = () => {
 
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
+  const [visaReqs, setVisaReqs] = useState<VisaRequirementResponse[]>([]);
+
+  useEffect(() => {
+    const targetId = tour?.id || (id ? Number(id) : null);
+    if (targetId) {
+      visaService.getRequirements(targetId)
+        .then(reqs => setVisaReqs(reqs))
+        .catch(err => console.log('Không có visa', err));
+    }
+  }, [tour?.id, id]);
 
   // Lightbox Modal State
   const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
@@ -1161,6 +1174,11 @@ export const TourDetailPage: React.FC = () => {
               {activeTab === 'policy' && (
                 <div className="p-6 space-y-6 text-xs text-slate-300 leading-relaxed font-sans">
                   
+                  {/* VISA REQUIREMENTS */}
+                  {visaReqs.length > 0 && (
+                     <VisaRequirementInfo requirements={visaReqs} />
+                  )}
+
                   {/* BẢNG GIÁ TOUR GHÉP LẺ */}
                   <div className="space-y-3">
                     <h3 className="font-black text-white text-base uppercase tracking-tight">

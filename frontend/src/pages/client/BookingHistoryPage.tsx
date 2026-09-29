@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
-import { History, Package, QrCode, XCircle, Star } from 'lucide-react';
+import { History, Package, QrCode, XCircle, Star, Globe } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import { visaService } from '../../services/visaService';
+import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
+import { VisaApplicationResponse, VisaRequirementResponse } from '../../types/visa';
 
 const MOCK_BOOKINGS: Booking[] = [
   {
@@ -13,6 +17,7 @@ const MOCK_BOOKINGS: Booking[] = [
     tourTitle: 'TOUR ÂN THI - PHƯỢNG HOÀNG CỔ TRẤN - TRƯƠNG GIA GIỚI 6N5Đ | DẤU ẤN XỨ TRUNG HOA',
     tourThumbnailUrl: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=500&q=80',
     tourCode: 'DAHT14VQDZ',
+    tourCategory: 'NUOC_NGOAI',
     durationDays: 6,
     durationNights: 5,
     departureLocation: 'TP.Hồ Chí Minh',
@@ -39,6 +44,7 @@ const MOCK_BOOKINGS: Booking[] = [
     tourTitle: 'TOUR ĐÀ LẠT 4N3Đ | KHÁM PHÁ THÀNH PHỐ SƯƠNG MỜ & NHỮNG MÙA HOA',
     tourThumbnailUrl: '/images/tours/tour-6-da-lat-4n3d/dnt-da-lat.jpg',
     tourCode: 'DALAT-4N3D-HOA',
+    tourCategory: 'TRONG_NUOC',
     durationDays: 4,
     durationNights: 3,
     departureLocation: 'TP.Hồ Chí Minh',
@@ -75,10 +81,69 @@ export const BookingHistoryPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
+  const [tourCategories, setTourCategories] = useState<Record<number, string>>({});
+
+  // Visa states
+  const [selectedVisaBooking, setSelectedVisaBooking] = useState<Booking | null>(null);
+  const [visaApp, setVisaApp] = useState<VisaApplicationResponse | null>(null);
+  const [visaReqs, setVisaReqs] = useState<VisaRequirementResponse[]>([]);
+  const [loadingVisa, setLoadingVisa] = useState(false);
+
+  const handleOpenVisaTracker = async (b: Booking) => {
+    setSelectedVisaBooking(b);
+    setLoadingVisa(true);
+    try {
+      // Fetch requirements first
+      const reqs = await visaService.getRequirements(b.tourId);
+      setVisaReqs(reqs || []);
+      
+      // If there are requirements, check if application exists
+      if (reqs && reqs.length > 0) {
+        try {
+          const app = await visaService.getApplication(b.id);
+          setVisaApp(app);
+        } catch (err) {
+          // Application not found (not created yet)
+          setVisaApp(null);
+        }
+      } else {
+        setVisaApp(null);
+      }
+    } catch (e) {
+      console.log('Error opening visa tracker', e);
+      setVisaApp(null);
+      setVisaReqs([]);
+    } finally {
+      setLoadingVisa(false);
+    }
+  };
 
   useEffect(() => {
     fetchBookings();
   }, [user]);
+
+  useEffect(() => {
+    if (bookings.length === 0) return;
+    const fetchCategories = async () => {
+      try {
+        const { tourService } = await import('../../services/tourService');
+        const uniqueIds = Array.from(new Set(bookings.map(b => b.tourId)));
+        const newMap: Record<number, string> = {};
+        await Promise.all(uniqueIds.map(async id => {
+          try {
+            const res = await tourService.getTourById(id);
+            if (res?.data?.category) {
+              newMap[id] = res.data.category;
+            }
+          } catch(e) {}
+        }));
+        setTourCategories(prev => ({ ...prev, ...newMap }));
+      } catch (e) {
+        console.error('Lỗi lấy danh mục tour:', e);
+      }
+    };
+    fetchCategories();
+  }, [bookings]);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -130,6 +195,8 @@ export const BookingHistoryPage: React.FC = () => {
         console.error(e);
       }
 
+      // Hide all CANCELLED bookings from history
+      rawList = rawList.filter(b => b.status !== 'CANCELLED');
       setBookings(rawList);
     } catch (err) {
       console.error(err);
@@ -138,18 +205,68 @@ export const BookingHistoryPage: React.FC = () => {
         const localStr = localStorage.getItem('user_created_bookings');
         if (localStr) localBookings = JSON.parse(localStr);
       } catch (e) { console.error(e); }
-      setBookings([...localBookings, ...MOCK_BOOKINGS]);
+      
+      let allBookings = [...localBookings, ...MOCK_BOOKINGS];
+      try {
+        const savedStatusesStr = localStorage.getItem('vendor_booking_statuses');
+        const savedStatuses: Record<number, string> = savedStatusesStr ? JSON.parse(savedStatusesStr) : {};
+        allBookings = allBookings.map(b => savedStatuses[b.id] ? { ...b, status: savedStatuses[b.id] as any } : b);
+      } catch (e) {}
+
+      allBookings = allBookings.filter(b => b.status !== 'CANCELLED');
+      setBookings(allBookings);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancelBooking = async (id: number) => {
-    if (!window.confirm('Bạn có chắc chắn muốn hủy đơn đặt tour này?')) return;
+    const booking = bookings.find(b => b.id === id);
+    if (!booking) return;
+
+    if (booking.status === 'PENDING') {
+      if (!window.confirm('Bạn có chắc chắn muốn hủy đơn chờ thanh toán này? Đơn sẽ bị xóa khỏi lịch sử.')) return;
+    } else {
+      if (!window.confirm('Đơn này đã được thanh toán/đặt cọc. Hủy tour sẽ KHÔNG ĐƯỢC HOÀN TIỀN. Bạn có chắc chắn muốn hủy không?')) return;
+    }
+
     try {
+      // Check local bookings first
+      const localStr = localStorage.getItem('user_created_bookings');
+      if (localStr) {
+        let localBookings: Booking[] = JSON.parse(localStr);
+        const idx = localBookings.findIndex(b => b.id === id);
+        if (idx !== -1) {
+          if (booking.status === 'PENDING') {
+             localBookings.splice(idx, 1); // Delete completely
+          } else {
+             localBookings[idx].status = 'CANCELLED' as any;
+          }
+          localStorage.setItem('user_created_bookings', JSON.stringify(localBookings));
+          alert('Hủy đơn đặt tour thành công!');
+          fetchBookings();
+          return;
+        }
+      }
+
+      // Check MOCK_BOOKINGS
+      if (MOCK_BOOKINGS.some(b => b.id === id)) {
+        try {
+          const savedStr = localStorage.getItem('vendor_booking_statuses');
+          const saved = savedStr ? JSON.parse(savedStr) : {};
+          saved[id] = 'CANCELLED';
+          localStorage.setItem('vendor_booking_statuses', JSON.stringify(saved));
+        } catch (e) {}
+
+        alert('Hủy đơn đặt tour thành công!');
+        fetchBookings();
+        return;
+      }
+
+      // If not local, call backend
       const res = await bookingService.cancelBooking(id);
       if (res.success) {
-        alert('Hủy đơn đặt tour thành công');
+        alert('Hủy đơn đặt tour thành công!');
         fetchBookings();
       }
     } catch (err: any) {
@@ -189,7 +306,7 @@ export const BookingHistoryPage: React.FC = () => {
           <div className="flex h-64 items-center justify-center bg-[#0a111d]/80 rounded-3xl border border-white/10">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-400 border-t-transparent shadow-[0_0_15px_rgba(56,189,248,0.4)]"></div>
           </div>
-        ) : bookings.length === 0 ? (
+        ) : bookings.filter(b => b.status !== 'CANCELLED' && b.status !== 'REFUNDED').length === 0 ? (
           <div className="rounded-3xl border border-dashed border-white/15 p-16 text-center bg-[#0a111d]/60 backdrop-blur-xl text-slate-400 space-y-4">
             <Package className="mx-auto h-12 w-12 text-slate-500" />
             <div className="text-base font-bold text-white">Bạn chưa có đơn đặt tour nào</div>
@@ -197,8 +314,11 @@ export const BookingHistoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {bookings.map((b) => {
+            {bookings.filter(b => b.status !== 'CANCELLED' && b.status !== 'REFUNDED').map((b) => {
               const badge = statusBadges[b.status] || { label: b.status, style: 'bg-white/10 text-slate-300 border-white/15' };
+              const requiresVisa = tourCategories[b.tourId] 
+                ? tourCategories[b.tourId] === 'NUOC_NGOAI' 
+                : (b.tourCategory === 'NUOC_NGOAI' || b.tourTitle?.toLowerCase().match(/hàn quốc|châu âu|nhật bản|đài loan|visa|trung hoa|trung quốc|thái lan|singapore|malaysia|bali|indonesia|phượng hoàng cổ trấn|cửu trại câu|lệ giang|hồng kông|hong kong|mỹ|úc|pháp|anh|quốc tế/i) != null);
               return (
                 <div 
                   key={b.id} 
@@ -234,35 +354,86 @@ export const BookingHistoryPage: React.FC = () => {
                         <div>Tổng tiền: <strong className="text-rose-400 font-black text-sm block">{b.totalPrice?.toLocaleString('vi-VN')} đ</strong></div>
                         <div>Ngày đặt: <span className="text-slate-400 block">{new Date(b.createdAt).toLocaleDateString('vi-VN')}</span></div>
                       </div>
+                      
+                      {/* Pending Payment Warning */}
+                      {b.status === 'PENDING' && (
+                        <div className="mt-4 bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+                          <div className="h-7 w-7 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                            <QrCode className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <h4 className="font-bold text-amber-400 text-xs uppercase">Chờ thanh toán</h4>
+                            <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                              Đơn hàng đang được giữ chỗ tạm thời. Vui lòng hoàn tất thanh toán trước ngày <strong>{new Date(Date.now() + 86400000).toLocaleDateString('vi-VN')}</strong> để không bị hủy tự động.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Visa Deadline Warning */}
+                      {requiresVisa && b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && b.status !== 'REFUNDED' && (
+                        <div className="mt-3 bg-red-500/10 border border-red-500/40 rounded-xl p-3 flex items-start gap-3 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.15)]">
+                          <div className="h-7 w-7 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                            <Globe className="h-4 w-4 text-red-400" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <h4 className="font-bold text-red-400 text-xs uppercase">Cảnh báo: Hạn chót nộp hồ sơ Visa sắp tới</h4>
+                            <p className="text-[11px] text-red-200/80 leading-relaxed">
+                              Tour của bạn yêu cầu nộp hồ sơ Visa trước ngày <strong>15/10/2026</strong>. Vui lòng bấm vào "Hồ sơ Visa" bên dưới để bổ sung ngay, tránh việc bị hủy tour và mất cọc!
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/8">
                       <div className="flex items-center gap-2.5">
-                        <button
-                          onClick={() => setSelectedTicket(b)}
-                          className="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] cursor-pointer"
-                        >
-                          <QrCode className="h-4 w-4" /> Xem Vé QR Code
-                        </button>
+                          {b.status === 'PENDING' && (
+                            <button
+                              onClick={() => setSelectedTicket(b)}
+                              className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-pointer"
+                            >
+                              <QrCode className="h-4 w-4" /> Thanh Toán Ngay
+                            </button>
+                          )}
+                          
+                          {['DEPOSITED', 'CONFIRMED', 'PAID', 'COMPLETED'].includes(b.status) && (
+                            <button
+                              onClick={() => setSelectedTicket(b)}
+                              className="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] cursor-pointer"
+                            >
+                              <QrCode className="h-4 w-4" /> Xem Vé QR Code
+                            </button>
+                          )}
 
-                        {b.status === 'COMPLETED' && (
+                          {requiresVisa && (
+                            <button
+                              onClick={() => handleOpenVisaTracker(b)}
+                              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
+                            >
+                              <Globe className="h-4 w-4" /> Hồ sơ Visa
+                            </button>
+                          )}
+
+
+                          {b.status === 'COMPLETED' && (
+                            <button
+                              onClick={() => navigate(`/tours/${b.tourId || 6}?tab=reviews`)}
+                              className="rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.2)] cursor-pointer"
+                            >
+                              <Star className="h-4 w-4 fill-amber-300 text-amber-300" /> Viết Đánh Giá
+                            </button>
+                          )}
+                        </div>
+
+                        {b.status !== 'COMPLETED' && (
                           <button
-                            onClick={() => navigate(`/tours/${b.tourId || 6}?tab=reviews`)}
-                            className="rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.2)] cursor-pointer"
+                            onClick={() => handleCancelBooking(b.id)}
+                            className="rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                           >
-                            <Star className="h-4 w-4 fill-amber-300 text-amber-300" /> Viết Đánh Giá
+                            <XCircle className="h-4 w-4" /> Hủy Tour
                           </button>
                         )}
-                      </div>
-
-                      {b.status !== 'COMPLETED' && b.status !== 'CANCELLED' && (
-                        <button
-                          onClick={() => handleCancelBooking(b.id)}
-                          className="rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
-                        >
-                          <XCircle className="h-4 w-4" /> Hủy Tour
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -317,6 +488,70 @@ export const BookingHistoryPage: React.FC = () => {
               </button>
             </div>
           </div>
+        )}
+
+        {/* VISA TRACKER MODAL */}
+        {selectedVisaBooking && createPortal(
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+            <div className="bg-[#0a111d] border border-white/15 rounded-3xl max-w-3xl w-full p-6 shadow-[0_24px_60px_rgba(0,0,0,0.8)] text-white overflow-y-auto max-h-[90vh]">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                <div className="flex items-center gap-2 text-blue-400 font-bold text-base">
+                  <Globe className="h-5 w-5" /> Quản lý Hồ sơ Visa
+                </div>
+                <button 
+                  onClick={() => { setSelectedVisaBooking(null); setVisaApp(null); }} 
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {loadingVisa ? (
+                <div className="py-12 flex justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-400 border-t-transparent"></div></div>
+              ) : visaApp ? (
+                <div className="text-black">
+                  <MyVisaTracker 
+                    application={visaApp}
+                    requirements={visaReqs}
+                    onUploadFile={async (reqId, file) => {
+                       await visaService.uploadDocument(visaApp.id, reqId, file);
+                       const updatedApp = await visaService.getApplication(selectedVisaBooking.id);
+                       setVisaApp(updatedApp);
+                    }}
+                  />
+                </div>
+              ) : visaReqs.length > 0 ? (
+                <div className="text-center py-12 text-slate-400 space-y-4">
+                  <Globe className="h-12 w-12 mx-auto mb-3 text-blue-400 opacity-80" />
+                  <p className="text-white text-lg font-bold">Hồ sơ Visa của bạn chưa được khởi tạo.</p>
+                  <p className="text-sm">Tour này yêu cầu cung cấp {visaReqs.length} loại giấy tờ Visa.</p>
+                  <button 
+                    onClick={async () => {
+                       try {
+                          setLoadingVisa(true);
+                          await visaService.createApplication(selectedVisaBooking.id, selectedVisaBooking);
+                          const app = await visaService.getApplication(selectedVisaBooking.id);
+                          setVisaApp(app);
+                       } catch(e) {
+                          alert("Lỗi khi khởi tạo hồ sơ Visa!");
+                       } finally {
+                          setLoadingVisa(false);
+                       }
+                    }}
+                    className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                  >
+                    Tạo Hồ Sơ Xin Visa Ngay
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-slate-400">
+                  <Globe className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>Tour này không yêu cầu hồ sơ Visa.</p>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
         )}
 
       </div>

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Compass, Save, ArrowLeft, Image, Plus, Trash2 } from 'lucide-react';
 import { tourService } from '../../services/tourService';
+import { visaService } from '../../services/visaService';
+import { VisaRequirementConfig } from '../../components/visa/VisaRequirementConfig';
+import { VisaRequirementRequest } from '../../types/visa';
 
 export const EditTourPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +28,7 @@ export const EditTourPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [initialRequirements, setInitialRequirements] = useState<VisaRequirementRequest[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -49,6 +53,15 @@ export const EditTourPage: React.FC = () => {
         setCategory((t.category as any) || 'DOMESTIC');
         setDescription(t.description || '');
         setGalleryImages(t.gallery || (t.thumbnailUrl ? [t.thumbnailUrl] : []));
+      }
+      
+      try {
+        const reqs = await visaService.getRequirements(tourId);
+        if (reqs && reqs.length > 0) {
+          setInitialRequirements(reqs);
+        }
+      } catch (err) {
+        console.error('Không tải được cấu hình visa:', err);
       }
     } catch (err) {
       console.error('Lỗi tải tour:', err);
@@ -312,6 +325,21 @@ export const EditTourPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* CẤU HÌNH VISA */}
+        {category === 'NUOC_NGOAI' && (
+          <VisaRequirementConfig 
+            initialRequirements={initialRequirements} 
+            onSave={async (reqs) => {
+              try {
+                await visaService.saveRequirements(Number(id), reqs);
+                setSuccessMsg('Đã lưu cấu hình hồ sơ Visa thành công!');
+              } catch (err: any) {
+                setError(err?.response?.data?.message || 'Không thể lưu cấu hình Visa.');
+              }
+            }} 
+          />
+        )}
 
         {/* Submit */}
         <div className="flex justify-end">
