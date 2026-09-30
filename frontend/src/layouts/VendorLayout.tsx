@@ -7,7 +7,8 @@ import {
   Building2, 
   LogOut, 
   Globe, 
-  QrCode
+  QrCode,
+  Stamp
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -21,12 +22,14 @@ export const VendorLayout: React.FC = () => {
   };
 
   const navItems = [
-    { label: 'Tổng quan & Thống kê', path: '/vendor', icon: LayoutDashboard, end: true },
-    { label: 'Quản lý Tour', path: '/vendor/tours', icon: Compass },
-    { label: 'Lịch khởi hành & Slot', path: '/vendor/schedules', icon: CalendarDays },
-    { label: 'Đơn đặt & QR Check-in', path: '/vendor/bookings', icon: QrCode },
-    { label: 'Hồ sơ đại lý & Ngân hàng', path: '/vendor/profile', icon: Building2 },
+    { label: 'Tổng Quan & Thống Kê', path: '/vendor', icon: LayoutDashboard, end: true },
+    { label: 'Quản Lý Tour', path: '/vendor/tours', icon: Compass },
+    { label: 'Lịch Khởi Hành & Slot', path: '/vendor/schedules', icon: CalendarDays },
+    { label: 'Đơn Đặt & QR Check-in', path: '/vendor/bookings', icon: QrCode },
+    { label: 'Thủ Tục Visa', path: '/vendor/visas', icon: Stamp },
+    { label: 'Hồ Sơ Đại Lý & Ngân Hàng', path: '/vendor/profile', icon: Building2 },
   ];
+
 
   return (
     <div className="flex h-screen bg-[#020204] text-slate-100 overflow-hidden font-sans portal-dark relative">

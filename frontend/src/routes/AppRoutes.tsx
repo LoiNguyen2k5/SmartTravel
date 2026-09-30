@@ -37,6 +37,7 @@ import { VendorTourListPage } from '../pages/vendor/VendorTourListPage';
 import { VendorBookingManagementPage } from '../pages/vendor/VendorBookingManagementPage';
 import { VendorProfilePage } from '../pages/vendor/VendorProfilePage';
 import { VendorSchedulesPage } from '../pages/vendor/VendorSchedulesPage';
+import { VendorVisaPage } from '../pages/vendor/VendorVisaPage';
 import { CreateTourPage } from '../pages/vendor/CreateTourPage';
 import { EditTourPage } from '../pages/vendor/EditTourPage';
 
@@ -102,6 +103,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/vendor/tours" element={<VendorTourListPage />} />
             <Route path="/vendor/schedules" element={<VendorSchedulesPage />} />
             <Route path="/vendor/bookings" element={<VendorBookingManagementPage />} />
+            <Route path="/vendor/visas" element={<VendorVisaPage />} />
             <Route path="/vendor/profile" element={<VendorProfilePage />} />
             <Route path="/vendor/tours/create" element={<CreateTourPage />} />
             <Route path="/vendor/tours/:id/edit" element={<EditTourPage />} />

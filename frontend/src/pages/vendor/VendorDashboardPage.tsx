@@ -9,7 +9,6 @@ import { tourService } from '../../services/tourService';
 import { bookingService } from '../../services/bookingService';
 import { Tour } from '../../types/tour';
 import { Booking } from '../../types/booking';
-import { VisaManagementBoard } from '../../components/visa/VisaManagementBoard';
 
 const COMMISSION_RATE = 0.10;
 const PAYMENT_FEE_RATE = 0.015;
@@ -509,10 +508,22 @@ export const VendorDashboardPage: React.FC = () => {
         )}
       </div>
 
-      {/* Visa Management Board */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-        <VisaManagementBoard />
-      </div>
+      {/* Shortcut đến trang Quản lý Visa */}
+      <Link
+        to="/vendor/visas"
+        className="flex items-center justify-between rounded-3xl border border-sky-500/30 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 p-5 shadow-sm hover:from-sky-500/20 hover:to-indigo-500/20 transition-all group"
+      >
+        <div className="flex items-center gap-4">
+          <span className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg">
+            <span className="text-2xl">🌐</span>
+          </span>
+          <div>
+            <p className="font-black text-white text-base">Quản Lý Thủ Tục Visa</p>
+            <p className="text-sm text-slate-400 mt-0.5">Thẩm định hồ sơ, duyệt giấy tờ và quản lý mẫu visa theo quốc gia</p>
+          </div>
+        </div>
+        <ChevronRight className="h-5 w-5 text-sky-400 group-hover:translate-x-1 transition-transform" />
+      </Link>
     </div>
   );
 };

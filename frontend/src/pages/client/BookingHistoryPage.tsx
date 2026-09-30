@@ -509,12 +509,17 @@ export const BookingHistoryPage: React.FC = () => {
               {loadingVisa ? (
                 <div className="py-12 flex justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-400 border-t-transparent"></div></div>
               ) : visaApp ? (
-                <div className="text-black">
+                <div className="text-white">
                   <MyVisaTracker 
                     application={visaApp}
                     requirements={visaReqs}
                     onUploadFile={async (reqId, file) => {
                        await visaService.uploadDocument(visaApp.id, reqId, file);
+                       const updatedApp = await visaService.getApplication(selectedVisaBooking.id);
+                       setVisaApp(updatedApp);
+                    }}
+                    onSubmitApplication={async () => {
+                       await visaService.updateApplicationStatus(visaApp.id, 'PROCESSING', 'Khách hàng đã nộp đầy đủ hồ sơ trực tuyến.');
                        const updatedApp = await visaService.getApplication(selectedVisaBooking.id);
                        setVisaApp(updatedApp);
                     }}

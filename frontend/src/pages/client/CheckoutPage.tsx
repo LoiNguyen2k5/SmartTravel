@@ -94,7 +94,7 @@ export const CheckoutPage: React.FC = () => {
         const tourRes = await tourService.getTourById(tourId);
         let category = 'TRONG_NUOC';
         if (tourRes && tourRes.data) {
-           category = tourRes.data.category;
+           category = String(tourRes.data.category ?? 'TRONG_NUOC');
            setFetchedCategory(category);
         }
 

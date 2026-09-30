@@ -180,7 +180,7 @@ export const visaService = {
       const apps: VisaApplicationResponse[] = JSON.parse(localStorage.getItem('mock_visa_apps') || '[]');
       let updatedApp = null;
       for (const app of apps) {
-        const doc = app.documents.find(d => d.id === documentId);
+        const doc = app.documents.find(d => Number(d.id) === Number(documentId) || d.id === documentId);
         if (doc) {
           doc.status = status;
           doc.vendorFeedback = feedback;

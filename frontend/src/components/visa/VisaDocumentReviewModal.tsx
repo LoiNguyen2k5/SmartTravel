@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, CheckCircle, XCircle, FileText, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle, XCircle, FileText, AlertCircle, Clock } from 'lucide-react';
 import { VisaApplicationResponse, VisaDocumentStatus, VisaApplicationStatus } from '../../types/visa';
 
 interface Props {
@@ -18,16 +18,23 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
   const [activeDocId, setActiveDocId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [appNotes, setAppNotes] = useState(application.notes || '');
+  const [localDocs, setLocalDocs] = useState(application.documents);
+
+  useEffect(() => {
+    setLocalDocs(application.documents);
+  }, [application.documents]);
 
   const handleDocumentAction = (documentId: number, status: VisaDocumentStatus) => {
+    // Phản hồi UI ngay lập tức
+    setLocalDocs(prev => prev.map(d => (Number(d.id) === Number(documentId) || d.id === documentId) ? { ...d, status, vendorFeedback: status === 'REJECTED' ? feedback : undefined } : d));
     onUpdateDocumentStatus(documentId, status, status === 'REJECTED' ? feedback : undefined);
     setActiveDocId(null);
     setFeedback('');
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-[#131d30] rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-700/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+      <div className="bg-[#131d30] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-700/60">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-slate-700/50">
           <div>
@@ -42,20 +49,20 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-800/50 flex flex-col md:flex-row gap-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-[#0c1424] flex flex-col md:flex-row gap-6">
           
           {/* Left Column: Documents List */}
           <div className="flex-1 space-y-4">
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">Danh sách giấy tờ khách đã nộp</h3>
             
-            {application.documents.length === 0 ? (
-              <div className="text-center py-8 bg-[#131d30] rounded-lg border border-slate-700/50">
+            {localDocs.length === 0 ? (
+              <div className="text-center py-8 bg-[#131d30] rounded-xl border border-slate-700/50">
                 <AlertCircle className="mx-auto text-yellow-500 mb-2" size={32} />
                 <p className="text-slate-300">Khách hàng chưa nộp giấy tờ nào.</p>
               </div>
             ) : (
-              application.documents.map((doc) => (
-                <div key={doc.id} className="bg-[#131d30] rounded-lg border border-slate-700/50 overflow-hidden shadow-sm">
+              localDocs.map((doc) => (
+                <div key={doc.id} className="bg-[#131d30] rounded-xl border border-slate-700/50 overflow-hidden shadow-sm">
                   <div className="p-4 flex items-center justify-between border-b border-slate-700/50">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-sky-500/10 text-sky-400 rounded-lg">
@@ -63,32 +70,44 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                       </div>
                       <div>
                         <h4 className="font-semibold text-white">{doc.documentName}</h4>
-                        <p className="text-xs text-slate-400 flex items-center gap-1">
-                          Trạng thái: 
-                          <span className={`font-medium ${doc.status === 'APPROVED' ? 'text-green-600' : doc.status === 'REJECTED' ? 'text-red-600' : 'text-yellow-600'}`}>
-                            {doc.status}
-                          </span>
-                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-xs text-slate-400">Trạng thái:</span>
+                          {doc.status === 'APPROVED' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              <CheckCircle size={13} className="text-emerald-400" /> Hợp lệ (Đã duyệt)
+                            </span>
+                          ) : doc.status === 'REJECTED' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                              <XCircle size={13} className="text-rose-400" /> Bị từ chối
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              <Clock size={13} className="text-amber-400" /> Chờ duyệt
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
                       <a 
                         href={doc.fileUrl} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="px-3 py-1.5 text-sm font-medium text-sky-400 bg-sky-500/10 hover:bg-sky-500/20 rounded-md transition-colors"
+                        className="px-3 py-1.5 text-xs font-bold text-sky-400 bg-sky-500/10 hover:bg-sky-500/20 rounded-lg transition-colors border border-sky-500/20"
                       >
                         Xem file
                       </a>
-                      {doc.status === 'PENDING' && (
-                        <button 
-                          onClick={() => setActiveDocId(activeDocId === doc.id ? null : doc.id)}
-                          className="px-3 py-1.5 text-sm font-medium text-slate-300 bg-white/5 hover:bg-white/10 rounded-md transition-colors border border-white/10"
-                        >
-                          Đánh giá
-                        </button>
-                      )}
+                      <button 
+                        onClick={() => setActiveDocId(activeDocId === doc.id ? null : doc.id)}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                          activeDocId === doc.id
+                            ? 'bg-sky-500 text-white border-sky-400'
+                            : 'text-slate-300 bg-white/5 hover:bg-white/10 border-white/10'
+                        }`}
+                      >
+                        {doc.status === 'PENDING' ? 'Đánh giá' : 'Đổi đánh giá'}
+                      </button>
                     </div>
                   </div>
 
@@ -106,13 +125,13 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                       <div className="flex gap-3 justify-end">
                         <button
                           onClick={() => handleDocumentAction(doc.id, 'REJECTED')}
-                          className="flex items-center gap-1 px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md font-medium text-sm transition-colors"
+                          className="flex items-center gap-1 px-4 py-2 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 border border-rose-500/30 rounded-xl font-bold text-xs transition-colors"
                         >
                           <XCircle size={16} /> Từ chối
                         </button>
                         <button
                           onClick={() => handleDocumentAction(doc.id, 'APPROVED')}
-                          className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-md font-medium text-sm transition-colors"
+                          className="flex items-center gap-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition-colors shadow-lg shadow-emerald-600/20"
                         >
                           <CheckCircle size={16} /> Hợp lệ (Duyệt)
                         </button>
