@@ -19,11 +19,15 @@ import {
   Loader2,
   Zap,
   Ticket,
-  Sparkles
+  Sparkles,
+  Package,
+  Globe
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
+import { notificationService } from '../../services/notificationService';
 import { voucherService } from '../../services/voucherService';
 import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
+
 
 // Config Bank Account Thụ Hưởng (Real VietQR & MoMo)
 const BANK_CONFIG = {
@@ -71,14 +75,42 @@ export const CheckoutPage: React.FC = () => {
   const [contactEmail, setContactEmail] = useState<string>(() => activeUser?.email || 'nguyenbaoloicv@gmail.com');
   const [contactPhone, setContactPhone] = useState<string>(() => activeUser?.phone || '0941899554');
 
+  const [hasVisaConfig, setHasVisaConfig] = useState(false);
+  const [fetchedCategory, setFetchedCategory] = useState('TRONG_NUOC');
+
   useEffect(() => {
+    // Sync user data
     const current = user || getStoredUser();
     if (current) {
       if (current.fullName) setContactName(current.fullName);
       if (current.email) setContactEmail(current.email);
       if (current.phone) setContactPhone(current.phone);
     }
-  }, [user]);
+
+    // Check visa requirements for this tour
+    const checkVisaAndCategory = async () => {
+      try {
+        const { tourService } = await import('../../services/tourService');
+        const tourRes = await tourService.getTourById(tourId);
+        let category = 'TRONG_NUOC';
+        if (tourRes && tourRes.data) {
+           category = tourRes.data.category;
+           setFetchedCategory(category);
+        }
+
+        if (category === 'NUOC_NGOAI') {
+          const { visaService } = await import('../../services/visaService');
+          const reqs = await visaService.getRequirements(tourId);
+          if (reqs && reqs.length > 0) {
+            setHasVisaConfig(true);
+          }
+        }
+      } catch (err) {
+        console.log('Error fetching tour info', err);
+      }
+    };
+    checkVisaAndCategory();
+  }, [user, tourId]);
   const [note, setNote] = useState('');
   const [paymentOption, setPaymentOption] = useState<'FULL' | 'DEPOSIT'>('FULL');
   const [paymentMethod, setPaymentMethod] = useState<'BANK' | 'MOMO' | 'VNPAY'>('BANK');
@@ -170,25 +202,16 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handleInitiatePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSavePendingBooking = async () => {
     if (!contactName.trim() || !contactEmail.trim() || !contactPhone.trim()) {
       alert('Vui lòng điền đầy đủ thông tin người liên hệ');
       return;
     }
-
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    setPendingBookingCode(code);
-    setTimeLeft(900);
-    setShowQrPaymentModal(true);
-    setPaymentSuccessToast(false);
-
-    // Deduct seats immediately so availability is updated in real time
-    deductSeatsIfPending();
-
-    // Create booking in backend in background
+    const chosenDate = stateData.departureDate || '15-09-2026';
+    
+    // Attempt backend first
     try {
-      const chosenDate = stateData.departureDate || '15-09-2026';
       await bookingService.createBooking({
         tourId: tourId,
         numberOfAdults: adults,
@@ -201,9 +224,63 @@ export const CheckoutPage: React.FC = () => {
         paymentMethod: paymentMethod,
         departureDate: chosenDate,
       });
+      // Optionally update status to PENDING if needed via API, but usually it defaults to PENDING
     } catch (err) {
-      console.log('Background booking initialisation:', err);
+      // Fallback local
+      const pendingBooking: Booking = {
+        id: Date.now(),
+        bookingCode: code,
+        tourId, tourTitle, tourThumbnailUrl, tourCode,
+        tourCategory: fetchedCategory,
+        durationDays: stateData.durationDays || 1, durationNights: stateData.durationNights || 0,
+        departureLocation: 'TP.Hồ Chí Minh', userId: 1, userName: contactName.trim(),
+        numberOfAdults: adults, numberOfChildren: children,
+        adultPrice, childPrice, voucherCode: currentVoucherCode,
+        discountAmount: currentDiscountAmount, totalPrice: finalPayAmount,
+        status: 'PENDING', contactName: contactName.trim(),
+        contactEmail: contactEmail.trim(), contactPhone: contactPhone.trim(),
+        departureDate: chosenDate,
+        qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=SMARTTRAVEL-E-TICKET%7C${code}%7C${tourCode}%7CPENDING`,
+        createdAt: new Date().toISOString(),
+      };
+      const existingStr = localStorage.getItem('user_created_bookings');
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      localStorage.setItem('user_created_bookings', JSON.stringify([pendingBooking, ...existing]));
     }
+    
+    // Add notifications
+    notificationService.addNotification({
+      title: 'Đơn hàng chờ thanh toán',
+      message: `Đơn hàng đặt tour "${tourTitle}" của bạn đang chờ thanh toán. Vui lòng thanh toán trước 24h để giữ chỗ!`,
+      type: 'BOOKING'
+    }, contactEmail);
+
+    if (hasVisaConfig) {
+      notificationService.addNotification({
+        title: '⚠️ Bắt buộc: Nộp hồ sơ Visa',
+        message: `Hành trình "${tourTitle}" yêu cầu phải có Visa. Vui lòng vào Lịch sử đặt tour để nộp hồ sơ Visa càng sớm càng tốt để kịp nộp lên Lãnh sự quán!`,
+        type: 'SYSTEM'
+      }, contactEmail);
+    }
+
+    alert('Đã lưu thông tin! Đơn đặt tour của bạn đã được thêm vào Lịch sử (Chờ thanh toán).');
+    navigate('/my-bookings');
+  };
+
+  const handleInitiatePayment = async () => {
+    if (!contactName.trim() || !contactEmail.trim() || !contactPhone.trim()) {
+      alert('Vui lòng điền đầy đủ thông tin người liên hệ');
+      return;
+    }
+
+    const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    setPendingBookingCode(code);
+    setTimeLeft(900);
+    setShowQrPaymentModal(true);
+    setPaymentSuccessToast(false);
+
+    // Deduct seats temporarily for checkout process
+    deductSeatsIfPending();
   };
 
   // Live Bank Polling Effect: Checks backend every 2.5s for real-world incoming transfer
@@ -273,10 +350,43 @@ export const CheckoutPage: React.FC = () => {
     deductSeatsIfPending();
 
     // Auto-transition to E-Ticket after 2 seconds
-    setTimeout(() => {
+    setTimeout(async () => {
+      try {
+        await bookingService.createBooking({
+          tourId: tourId,
+          numberOfAdults: adults,
+          numberOfChildren: children,
+          voucherCode: currentVoucherCode || undefined,
+          contactName: contactName.trim(),
+          contactEmail: contactEmail.trim(),
+          contactPhone: contactPhone.trim(),
+          note: note.trim() || undefined,
+          paymentMethod: paymentMethod,
+          departureDate: chosenDate,
+        });
+      } catch (err) {
+        console.log('Backend booking creation on success:', err);
+      }
+
       setCreatedBooking(finalBooking);
       setShowQrPaymentModal(false);
       setPaymentSuccessToast(false);
+      
+      // Add notifications
+      notificationService.addNotification({
+        title: '🎉 Thanh toán thành công',
+        message: `Đơn hàng đặt tour "${tourTitle}" đã được thanh toán thành công. Cảm ơn quý khách!`,
+        type: 'BOOKING'
+      }, contactEmail);
+
+      if (hasVisaConfig) {
+         notificationService.addNotification({
+           title: '⚠️ Bắt buộc: Nộp hồ sơ Visa',
+           message: `Hành trình "${tourTitle}" yêu cầu phải có Visa. Vui lòng vào Lịch sử đặt tour để nộp hồ sơ Visa càng sớm càng tốt để kịp nộp lên Lãnh sự quán!`,
+           type: 'SYSTEM'
+         }, contactEmail);
+      }
+
     }, 2200);
   };
 
@@ -391,7 +501,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
         ) : (
           /* CHECKOUT FORM & SUMMARY */
-          <form onSubmit={handleInitiatePayment} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Left Form Fields */}
             <div className="lg:col-span-2 space-y-6">
@@ -491,6 +601,20 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {hasVisaConfig && (
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Globe className="h-4 w-4 text-blue-400" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-blue-400 text-sm">Hành trình yêu cầu Visa</h4>
+                    <p className="text-xs text-blue-200/70 leading-relaxed">
+                      Để thuận tiện cho bạn, thủ tục nộp giấy tờ Visa sẽ được thực hiện <strong>sau khi đặt tour</strong>. Bạn có thể upload hồ sơ bất cứ lúc nào trong mục <strong>Lịch sử đặt tour</strong>.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Option & Method Box */}
               <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-6">
@@ -669,13 +793,24 @@ export const CheckoutPage: React.FC = () => {
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 text-xs font-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <QrCode className="h-4 w-4" />
-                  Tiến Hành Quét Mã QR Thanh Toán
-                </button>
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSavePendingBooking}
+                    className="w-full rounded-2xl bg-[#0a111d] border border-white/20 hover:bg-white/10 text-slate-300 py-3.5 text-xs font-bold transition flex items-center justify-center gap-2"
+                  >
+                    <Package className="h-4 w-4" />
+                    Lưu thông tin & Chờ thanh toán
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleInitiatePayment}
+                    className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 text-xs font-black transition shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                  >
+                    <QrCode className="h-4 w-4" />
+                    Thanh Toán Ngay (Quét mã QR)
+                  </button>
+                </div>
 
                 <div className="flex items-center gap-2 text-[10px] text-slate-400 justify-center">
                   <ShieldCheck className="h-4 w-4 text-emerald-400" /> Cổng thanh toán VietQR chuẩn Napas 24/7

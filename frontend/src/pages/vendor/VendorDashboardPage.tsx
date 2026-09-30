@@ -9,6 +9,7 @@ import { tourService } from '../../services/tourService';
 import { bookingService } from '../../services/bookingService';
 import { Tour } from '../../types/tour';
 import { Booking } from '../../types/booking';
+import { VisaManagementBoard } from '../../components/visa/VisaManagementBoard';
 
 const COMMISSION_RATE = 0.10;
 const PAYMENT_FEE_RATE = 0.015;
@@ -506,6 +507,11 @@ export const VendorDashboardPage: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Visa Management Board */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <VisaManagementBoard />
       </div>
     </div>
   );

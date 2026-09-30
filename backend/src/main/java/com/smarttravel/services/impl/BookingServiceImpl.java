@@ -5,7 +5,7 @@ import com.smarttravel.dto.response.BookingResponse;
 import com.smarttravel.entities.Booking;
 import com.smarttravel.entities.Tour;
 import com.smarttravel.entities.User;
-import com.smarttravel.entities.Voucher;
+
 import com.smarttravel.enums.BookingStatus;
 import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
