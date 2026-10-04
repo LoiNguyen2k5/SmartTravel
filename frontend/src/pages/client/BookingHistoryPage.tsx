@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import { visaService } from '../../services/visaService';
 import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
 import { VisaApplicationResponse, VisaRequirementResponse } from '../../types/visa';
+import { PaymentQrModal } from '../../components/payment/PaymentQrModal';
 
 const MOCK_BOOKINGS: Booking[] = [
   {
@@ -81,6 +82,7 @@ export const BookingHistoryPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
+  const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [tourCategories, setTourCategories] = useState<Record<number, string>>({});
 
   // Visa states
@@ -274,6 +276,28 @@ export const BookingHistoryPage: React.FC = () => {
     }
   };
 
+  const handlePaymentSuccess = (booking: Booking) => {
+    try {
+      const localStr = localStorage.getItem('user_created_bookings');
+      if (localStr) {
+        let localBookings: Booking[] = JSON.parse(localStr);
+        localBookings = localBookings.map((b) =>
+          b.id === booking.id || b.bookingCode === booking.bookingCode ? { ...b, status: 'PAID' as const } : b
+        );
+        localStorage.setItem('user_created_bookings', JSON.stringify(localBookings));
+      }
+    } catch (e) {
+      console.error('Error updating local booking payment status:', e);
+    }
+    
+    // Automatically display E-Ticket after payment
+    setTimeout(() => {
+        setSelectedTicket({ ...booking, status: 'PAID' });
+    }, 500);
+
+    fetchBookings();
+  };
+
   const statusBadges: Record<string, { label: string; style: string }> = {
     DEPOSITED: { label: 'Đã Cọc 30%', style: 'bg-amber-500/15 text-amber-300 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]' },
     PAID: { label: 'Đã Thanh Toán Full', style: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]' },
@@ -390,7 +414,7 @@ export const BookingHistoryPage: React.FC = () => {
                       <div className="flex items-center gap-2.5">
                           {b.status === 'PENDING' && (
                             <button
-                              onClick={() => setSelectedTicket(b)}
+                              onClick={() => setPaymentBooking(b)}
                               className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-pointer"
                             >
                               <QrCode className="h-4 w-4" /> Thanh Toán Ngay
@@ -441,6 +465,14 @@ export const BookingHistoryPage: React.FC = () => {
             })}
           </div>
         )}
+
+        {/* PAYMENT QR MODAL */}
+        <PaymentQrModal 
+          isOpen={!!paymentBooking}
+          onClose={() => setPaymentBooking(null)}
+          booking={paymentBooking}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
 
         {/* E-TICKET QR MODAL */}
         {selectedTicket && (
