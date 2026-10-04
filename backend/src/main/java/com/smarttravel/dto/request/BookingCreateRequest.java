@@ -1,5 +1,6 @@
 package com.smarttravel.dto.request;
 
+import com.smarttravel.enums.BookingStatus;
 import com.smarttravel.enums.PaymentMethod;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -30,4 +31,7 @@ public class BookingCreateRequest {
     private Boolean singleRoomSurcharge = false;
     private java.math.BigDecimal singleRoomSurchargeAmount = java.math.BigDecimal.ZERO;
     private String roomAllocation;
+    private String bookingCode;
+    private BookingStatus status;
 }
+
