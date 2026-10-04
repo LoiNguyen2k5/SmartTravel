@@ -41,4 +41,10 @@ export interface BookingCreateRequest {
   contactEmail?: string;
   contactPhone?: string;
   note?: string;
+  bookingCode?: string;
+  status?: BookingStatusType;
+  singleRoomSurcharge?: boolean;
+  singleRoomSurchargeAmount?: number;
+  roomAllocation?: string;
 }
+

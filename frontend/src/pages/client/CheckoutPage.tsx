@@ -14,11 +14,6 @@ import {
   ArrowLeft, 
   Building2, 
   Wallet, 
-  Copy, 
-  Check, 
-  Clock, 
-  Loader2,
-  Zap,
   Ticket,
   Sparkles,
   Package,
@@ -226,6 +221,29 @@ export const CheckoutPage: React.FC = () => {
 
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     const chosenDate = stateData.departureDate || '15-09-2026';
+
+    // Call backend to persist PENDING booking so Webhook & Polling match it 100%
+    try {
+      await bookingService.createBooking({
+        tourId: tourId,
+        numberOfAdults: adults,
+        numberOfChildren: children,
+        voucherCode: currentVoucherCode || undefined,
+        contactName: contactName.trim(),
+        contactEmail: contactEmail.trim(),
+        contactPhone: contactPhone.trim(),
+        note: note.trim() || undefined,
+        paymentMethod: paymentMethod,
+        departureDate: chosenDate,
+        bookingCode: code,
+        status: 'PENDING',
+        singleRoomSurcharge: singleRoomRequired,
+        singleRoomSurchargeAmount: singleRoomSurchargeAmount,
+        roomAllocation: roomAllocation,
+      });
+    } catch (e) {
+      console.log('Pre-create booking notice (offline/fallback mode):', e);
+    }
     
     const tempBooking: Booking = {
       id: Date.now(),
@@ -275,20 +293,9 @@ export const CheckoutPage: React.FC = () => {
 
     setTimeout(async () => {
       try {
-        await bookingService.createBooking({
-          tourId: tourId,
-          numberOfAdults: adults,
-          numberOfChildren: children,
-          voucherCode: currentVoucherCode || undefined,
-          contactName: contactName.trim(),
-          contactEmail: contactEmail.trim(),
-          contactPhone: contactPhone.trim(),
-          note: note.trim() || undefined,
-          paymentMethod: paymentMethod,
-          departureDate: booking.departureDate,
-        });
+        await paymentService.markBookingPaid(booking.bookingCode);
       } catch (err) {
-        console.log('Backend booking creation on success:', err);
+        console.log('Backend mark paid notice:', err);
       }
 
       setCreatedBooking(finalBooking);
@@ -595,8 +602,6 @@ export const CheckoutPage: React.FC = () => {
                           key={m.id}
                           onClick={() => {
                             setPaymentMethod(m.id as any);
-                            if (m.id === 'MOMO') setQrGatewayTab('MOMO');
-                            else setQrGatewayTab('VIETQR');
                           }}
                           className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition ${
                             isSelected

@@ -96,8 +96,12 @@ public class BookingServiceImpl implements BookingService {
             totalPrice = BigDecimal.ZERO;
         }
 
-        String bookingCode = "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String bookingCode = (request.getBookingCode() != null && !request.getBookingCode().trim().isEmpty())
+                ? request.getBookingCode().trim().toUpperCase()
+                : "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String qrContent = "SMARTTRAVEL-E-TICKET|" + bookingCode + "|" + tour.getTitle() + "|GUESTS:" + (numAdults + numChildren);
+
+        BookingStatus initialStatus = request.getStatus() != null ? request.getStatus() : BookingStatus.PENDING;
 
         Booking booking = Booking.builder()
                 .bookingCode(bookingCode)
@@ -113,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
                 .singleRoomSurcharge(Boolean.TRUE.equals(request.getSingleRoomSurcharge()))
                 .singleRoomSurchargeAmount(surchargeAmount)
                 .roomAllocation(request.getRoomAllocation())
-                .status(BookingStatus.PAID) // Set to PAID upon successful checkout flow
+                .status(initialStatus)
                 .contactName(request.getContactName() != null ? request.getContactName() : user.getFullName())
                 .contactEmail(request.getContactEmail() != null ? request.getContactEmail() : user.getEmail())
                 .contactPhone(request.getContactPhone() != null ? request.getContactPhone() : user.getPhone())

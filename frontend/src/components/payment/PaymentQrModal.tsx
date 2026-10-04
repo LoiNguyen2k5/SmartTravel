@@ -109,7 +109,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
   if (!isOpen || !booking) return null;
 
   const transferContent = `SMARTTRAVEL ${booking.bookingCode}`;
-  const vietQrAgribankUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-compact2.png?amount=${BANK_CONFIG.realTestAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+  const vietQrBankUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-compact2.png?amount=${BANK_CONFIG.realTestAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
   const vietQrMomoUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-qr_only.png?amount=${BANK_CONFIG.realTestAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
 
   const formatCurrency = (amount: number) => {
@@ -156,7 +156,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
           }`}>
             <div className="relative inline-block bg-white p-2.5 rounded-2xl shadow-xl border border-slate-200">
               <img
-                src={qrGatewayTab === 'VIETQR' ? vietQrAgribankUrl : vietQrMomoUrl}
+                src={qrGatewayTab === 'VIETQR' ? vietQrBankUrl : vietQrMomoUrl}
                 alt="Payment QR"
                 className="h-44 w-44 sm:h-48 sm:w-48 mx-auto object-contain"
               />

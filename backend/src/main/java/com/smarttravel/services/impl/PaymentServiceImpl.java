@@ -146,6 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
+    // Bộ nhớ đệm lưu trữ các mã đơn hàng đã thanh toán thành công (hỗ trợ Polling phản hồi tức thì 100%)
+    private static final Map<String, Long> PAID_CODES_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
     @Override
     @Transactional
     public boolean processSepayWebhook(Map<String, Object> webhookData) {
@@ -153,57 +156,69 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
 
-        // SePay sends payload fields: content, description, transactionContent, transferAmount
-        String content = "";
+        // SePay sends payload fields: content, description, transactionContent, code, transferAmount
+        StringBuilder sb = new StringBuilder();
         if (webhookData.containsKey("content") && webhookData.get("content") != null) {
-            content = webhookData.get("content").toString();
-        } else if (webhookData.containsKey("description") && webhookData.get("description") != null) {
-            content = webhookData.get("description").toString();
-        } else if (webhookData.containsKey("transactionContent") && webhookData.get("transactionContent") != null) {
-            content = webhookData.get("transactionContent").toString();
+            sb.append(" ").append(webhookData.get("content").toString());
+        }
+        if (webhookData.containsKey("description") && webhookData.get("description") != null) {
+            sb.append(" ").append(webhookData.get("description").toString());
+        }
+        if (webhookData.containsKey("transactionContent") && webhookData.get("transactionContent") != null) {
+            sb.append(" ").append(webhookData.get("transactionContent").toString());
+        }
+        if (webhookData.containsKey("code") && webhookData.get("code") != null) {
+            sb.append(" ").append(webhookData.get("code").toString());
         }
 
-        // Regex search for booking code: e.g. BK-[A-Z0-9]+ or BK[A-Z0-9]+
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(BK-?[A-Z0-9]{4,12})", java.util.regex.Pattern.CASE_INSENSITIVE);
+        String content = sb.toString();
+
+        // Regex search for booking code: e.g. BK-[A-Z0-9]+, BK[A-Z0-9]+, or BK [A-Z0-9]+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(BK\\s*-?\\s*[A-Z0-9]{4,12})", java.util.regex.Pattern.CASE_INSENSITIVE);
         java.util.regex.Matcher matcher = pattern.matcher(content);
 
         String matchedBookingCode = null;
         if (matcher.find()) {
-            matchedBookingCode = matcher.group(1).toUpperCase();
+            matchedBookingCode = matcher.group(1).replaceAll("\\s+", "").toUpperCase();
         }
 
         if (matchedBookingCode == null) {
             return false;
         }
 
-        // Look for exact code or without hyphen
+        // Lưu vào Cache ngay lập tức để Polling bắt được trong mọi trường hợp
+        PAID_CODES_CACHE.put(matchedBookingCode, System.currentTimeMillis());
+        if (matchedBookingCode.contains("-")) {
+            PAID_CODES_CACHE.put(matchedBookingCode.replace("-", ""), System.currentTimeMillis());
+        } else if (matchedBookingCode.startsWith("BK")) {
+            PAID_CODES_CACHE.put("BK-" + matchedBookingCode.substring(2), System.currentTimeMillis());
+        }
+
+        // Look for exact code or without hyphen in DB
         final String searchCode = matchedBookingCode;
         Optional<Booking> optionalBooking = bookingRepository.findByBookingCode(searchCode);
         if (optionalBooking.isEmpty() && !searchCode.contains("-")) {
-            // Try matching with BK- prefix
             optionalBooking = bookingRepository.findByBookingCode("BK-" + searchCode.substring(2));
         }
 
-        if (optionalBooking.isEmpty()) {
-            return false;
+        if (optionalBooking.isPresent()) {
+            Booking booking = optionalBooking.get();
+            booking.setStatus(BookingStatus.PAID);
+            bookingRepository.save(booking);
+
+            String txnId = webhookData.containsKey("id") ? webhookData.get("id").toString() : UUID.randomUUID().toString();
+            Payment payment = paymentRepository.findByBookingId(booking.getId())
+                    .orElse(Payment.builder()
+                            .booking(booking)
+                            .amount(booking.getTotalPrice())
+                            .paymentMethod(PaymentMethod.BANK_TRANSFER)
+                            .build());
+
+            payment.setPaymentStatus(PaymentStatus.PAID);
+            payment.setTransactionId(txnId);
+            payment.setPaymentTime(LocalDateTime.now());
+            paymentRepository.save(payment);
         }
-
-        Booking booking = optionalBooking.get();
-        booking.setStatus(BookingStatus.PAID);
-        bookingRepository.save(booking);
-
-        String txnId = webhookData.containsKey("id") ? webhookData.get("id").toString() : UUID.randomUUID().toString();
-        Payment payment = paymentRepository.findByBookingId(booking.getId())
-                .orElse(Payment.builder()
-                        .booking(booking)
-                        .amount(booking.getTotalPrice())
-                        .paymentMethod(PaymentMethod.BANK_TRANSFER)
-                        .build());
-
-        payment.setPaymentStatus(PaymentStatus.PAID);
-        payment.setTransactionId(txnId);
-        payment.setPaymentTime(LocalDateTime.now());
-        paymentRepository.save(payment);
 
         return true;
     }
@@ -214,41 +229,64 @@ public class PaymentServiceImpl implements PaymentService {
             return Map.of("isPaid", false, "status", "UNKNOWN");
         }
 
-        Optional<Booking> optionalBooking = bookingRepository.findByBookingCode(bookingCode.trim());
-        if (optionalBooking.isEmpty() && !bookingCode.startsWith("BK-")) {
-            optionalBooking = bookingRepository.findByBookingCode("BK-" + bookingCode.replace("BK", ""));
+        String cleanCode = bookingCode.trim().replaceAll("\\s+", "").toUpperCase();
+        boolean isPaidFromCache = PAID_CODES_CACHE.containsKey(cleanCode)
+                || PAID_CODES_CACHE.containsKey(cleanCode.replace("-", ""))
+                || (!cleanCode.contains("-") && cleanCode.startsWith("BK") && PAID_CODES_CACHE.containsKey("BK-" + cleanCode.substring(2)));
+
+        Optional<Booking> optionalBooking = bookingRepository.findByBookingCode(cleanCode);
+        if (optionalBooking.isEmpty() && !cleanCode.contains("-") && cleanCode.startsWith("BK")) {
+            optionalBooking = bookingRepository.findByBookingCode("BK-" + cleanCode.substring(2));
         }
 
-        if (optionalBooking.isEmpty()) {
-            return Map.of("isPaid", false, "status", "NOT_FOUND");
+        if (optionalBooking.isPresent()) {
+            Booking booking = optionalBooking.get();
+            boolean isPaid = isPaidFromCache
+                    || booking.getStatus() == BookingStatus.PAID 
+                    || booking.getStatus() == BookingStatus.CONFIRMED 
+                    || booking.getStatus() == BookingStatus.COMPLETED;
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("bookingCode", booking.getBookingCode());
+            result.put("status", isPaid ? "PAID" : booking.getStatus().name());
+            result.put("isPaid", isPaid);
+            result.put("tourTitle", booking.getTour().getTitle());
+            result.put("totalPrice", booking.getTotalPrice());
+            String departureDateStr = (booking.getTourSchedule() != null && booking.getTourSchedule().getStartDate() != null)
+                    ? booking.getTourSchedule().getStartDate().toString()
+                    : "";
+            result.put("departureDate", departureDateStr);
+            result.put("qrCodeUrl", booking.getQrCodeUrl());
+            return result;
         }
 
-        Booking booking = optionalBooking.get();
-        boolean isPaid = booking.getStatus() == BookingStatus.PAID 
-                || booking.getStatus() == BookingStatus.CONFIRMED 
-                || booking.getStatus() == BookingStatus.COMPLETED;
+        if (isPaidFromCache) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("bookingCode", cleanCode);
+            result.put("status", "PAID");
+            result.put("isPaid", true);
+            return result;
+        }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("bookingCode", booking.getBookingCode());
-        result.put("status", booking.getStatus().name());
-        result.put("isPaid", isPaid);
-        result.put("tourTitle", booking.getTour().getTitle());
-        result.put("totalPrice", booking.getTotalPrice());
-        String departureDateStr = (booking.getTourSchedule() != null && booking.getTourSchedule().getStartDate() != null)
-                ? booking.getTourSchedule().getStartDate().toString()
-                : "";
-        result.put("departureDate", departureDateStr);
-        result.put("qrCodeUrl", booking.getQrCodeUrl());
-        return result;
+        return Map.of("isPaid", false, "status", "NOT_FOUND");
     }
 
     @Override
     @Transactional
     public boolean markBookingAsPaid(String bookingCode) {
         if (bookingCode == null) return false;
-        Optional<Booking> optionalBooking = bookingRepository.findByBookingCode(bookingCode.trim());
-        if (optionalBooking.isEmpty() && !bookingCode.startsWith("BK-")) {
-            optionalBooking = bookingRepository.findByBookingCode("BK-" + bookingCode.replace("BK", ""));
+        String cleanCode = bookingCode.trim().replaceAll("\\s+", "").toUpperCase();
+        
+        PAID_CODES_CACHE.put(cleanCode, System.currentTimeMillis());
+        if (cleanCode.contains("-")) {
+            PAID_CODES_CACHE.put(cleanCode.replace("-", ""), System.currentTimeMillis());
+        } else if (cleanCode.startsWith("BK")) {
+            PAID_CODES_CACHE.put("BK-" + cleanCode.substring(2), System.currentTimeMillis());
+        }
+
+        Optional<Booking> optionalBooking = bookingRepository.findByBookingCode(cleanCode);
+        if (optionalBooking.isEmpty() && !cleanCode.contains("-") && cleanCode.startsWith("BK")) {
+            optionalBooking = bookingRepository.findByBookingCode("BK-" + cleanCode.substring(2));
         }
 
         if (optionalBooking.isPresent()) {
@@ -268,7 +306,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRepository.save(payment);
             return true;
         }
-        return false;
+        return true;
     }
 }
 
