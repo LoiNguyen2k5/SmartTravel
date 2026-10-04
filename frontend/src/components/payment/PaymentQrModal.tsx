@@ -21,7 +21,7 @@ const BANK_CONFIG = {
 };
 
 export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose, booking, onPaymentSuccess }) => {
-  const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
   const [qrGatewayTab, setQrGatewayTab] = useState<'VIETQR' | 'MOMO'>('VIETQR');
   const [copiedStk, setCopiedStk] = useState(false);
   const [copiedAmount, setCopiedAmount] = useState(false);
@@ -31,7 +31,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
 
   useEffect(() => {
     if (!isOpen) {
-      setTimeLeft(900);
+      setTimeLeft(180);
       setQrGatewayTab('VIETQR');
       setPaymentSuccessToast(false);
       if (pollingRef.current) clearInterval(pollingRef.current);
@@ -45,7 +45,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen || !booking || paymentSuccessToast) return;
+    if (!isOpen || !booking || paymentSuccessToast || timeLeft === 0) return;
 
     pollingRef.current = setInterval(async () => {
       try {
@@ -122,12 +122,23 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
         <div className="w-full max-w-lg bg-[#0a111d] rounded-3xl p-5 sm:p-7 shadow-[0_25px_60px_rgba(0,0,0,0.8)] space-y-4 border border-white/15 text-white relative">
           
           <div className="text-center space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-              <Clock className="h-3.5 w-3.5 text-emerald-400" />
-              Thời gian thanh toán còn lại: <span className="font-mono text-white font-black">{formatTime(timeLeft)}</span>
-            </div>
+            {timeLeft > 0 ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                Thời gian thanh toán còn lại: <span className="font-mono text-white font-black">{formatTime(timeLeft)}</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold shadow-[0_0_10px_rgba(244,63,94,0.3)] animate-pulse">
+                <Clock className="h-3.5 w-3.5 text-rose-400" />
+                Mã QR đã hết hạn giữ chỗ (3 phút)
+              </div>
+            )}
             <h3 className="text-lg sm:text-xl font-black text-white pt-0.5">Quét Mã QR Thanh Toán Trực Tiếp</h3>
-            <p className="text-xs text-slate-400">Mở ứng dụng Ngân hàng (Agribank, MB, VCB...) hoặc Ví MoMo để quét mã</p>
+            <p className="text-xs text-slate-400">
+              {timeLeft > 0
+                ? 'Mở ứng dụng Ngân hàng (Agribank, MB, VCB...) hoặc Ví MoMo để quét mã'
+                : 'Đã hết thời hạn giữ chỗ. Chỗ đặt đã được tự động hoàn trả lại tour.'}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2 p-1 bg-white/[0.05] border border-white/10 rounded-2xl text-xs font-bold">
