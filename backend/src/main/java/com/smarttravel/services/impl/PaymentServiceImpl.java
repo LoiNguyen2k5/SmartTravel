@@ -30,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final VNPayConfig vnPayConfig;
+    private final com.smarttravel.services.EmailService emailService;
 
     @Override
     @Transactional
@@ -128,22 +129,33 @@ public class PaymentServiceImpl implements PaymentService {
 
             booking.setStatus(BookingStatus.PAID);
             bookingRepository.save(booking);
+
+            Payment savedPayment = paymentRepository.save(payment);
+            emailService.sendETicketEmail(booking, savedPayment);
+            return PaymentResponse.builder()
+                    .id(savedPayment.getId())
+                    .bookingId(booking.getId())
+                    .bookingCode(booking.getBookingCode())
+                    .transactionId(vnp_TransactionNo)
+                    .amount(savedPayment.getAmount())
+                    .paymentMethod(savedPayment.getPaymentMethod())
+                    .paymentStatus(savedPayment.getPaymentStatus())
+                    .paymentTime(savedPayment.getPaymentTime())
+                    .build();
         } else {
             payment.setPaymentStatus(PaymentStatus.FAILED);
+            Payment savedPayment = paymentRepository.save(payment);
+            return PaymentResponse.builder()
+                    .id(savedPayment.getId())
+                    .bookingId(booking.getId())
+                    .bookingCode(booking.getBookingCode())
+                    .transactionId(vnp_TransactionNo)
+                    .amount(savedPayment.getAmount())
+                    .paymentMethod(savedPayment.getPaymentMethod())
+                    .paymentStatus(savedPayment.getPaymentStatus())
+                    .paymentTime(savedPayment.getPaymentTime())
+                    .build();
         }
-
-        Payment savedPayment = paymentRepository.save(payment);
-
-        return PaymentResponse.builder()
-                .id(savedPayment.getId())
-                .bookingId(booking.getId())
-                .bookingCode(booking.getBookingCode())
-                .transactionId(vnp_TransactionNo)
-                .amount(savedPayment.getAmount())
-                .paymentMethod(savedPayment.getPaymentMethod())
-                .paymentStatus(savedPayment.getPaymentStatus())
-                .paymentTime(savedPayment.getPaymentTime())
-                .build();
     }
 
     // Bộ nhớ đệm lưu trữ các mã đơn hàng đã thanh toán thành công (hỗ trợ Polling phản hồi tức thì 100%)
@@ -217,7 +229,8 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPaymentStatus(PaymentStatus.PAID);
             payment.setTransactionId(txnId);
             payment.setPaymentTime(LocalDateTime.now());
-            paymentRepository.save(payment);
+            Payment savedPayment = paymentRepository.save(payment);
+            emailService.sendETicketEmail(booking, savedPayment);
         }
 
         return true;
@@ -303,7 +316,8 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPaymentStatus(PaymentStatus.PAID);
             payment.setTransactionId("TEST-" + System.currentTimeMillis());
             payment.setPaymentTime(LocalDateTime.now());
-            paymentRepository.save(payment);
+            Payment savedPayment = paymentRepository.save(payment);
+            emailService.sendETicketEmail(booking, savedPayment);
             return true;
         }
         return true;

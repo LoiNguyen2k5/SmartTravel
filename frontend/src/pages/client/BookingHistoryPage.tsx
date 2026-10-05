@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
-import { History, Package, QrCode, XCircle, Star, Globe } from 'lucide-react';
+import { History, Package, QrCode, XCircle, Star, Globe, Mail } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { visaService } from '../../services/visaService';
 import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
@@ -90,6 +90,49 @@ export const BookingHistoryPage: React.FC = () => {
   const [visaApp, setVisaApp] = useState<VisaApplicationResponse | null>(null);
   const [visaReqs, setVisaReqs] = useState<VisaRequirementResponse[]>([]);
   const [loadingVisa, setLoadingVisa] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  const handleResendETicket = async (bookingCode: string, ticket?: Booking) => {
+    try {
+      setSendingEmail(true);
+      await bookingService.resendETicket(bookingCode);
+      alert('Đã gửi lại vé điện tử E-Ticket về hòm thư Email thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc mục Thư rác (Spam).');
+    } catch (err: any) {
+      console.error('Lỗi khi gửi lại E-Ticket:', err);
+      // If 404 and ticket object is available, try to sync to backend and retry
+      if ((err?.response?.status === 404 || err?.status === 404) && ticket) {
+        try {
+          const rawDate = ticket.departureDate || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+          let chosenDate = rawDate;
+          if (rawDate.includes('-')) {
+            const parts = rawDate.split('-');
+            if (parts[0].length === 2 && parts[2].length === 4) chosenDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          }
+          await bookingService.createBooking({
+            tourId: ticket.tourId,
+            numberOfAdults: ticket.numberOfAdults || 1,
+            numberOfChildren: ticket.numberOfChildren || 0,
+            contactName: ticket.contactName || currentName,
+            contactEmail: ticket.contactEmail || currentEmail,
+            contactPhone: ticket.contactPhone || currentPhone,
+            departureDate: chosenDate,
+            bookingCode: ticket.bookingCode,
+            status: ticket.status || 'PAID',
+          });
+          const { paymentService } = await import('../../services/paymentService');
+          await paymentService.markBookingPaid(ticket.bookingCode);
+          alert('Đã gửi lại vé điện tử E-Ticket về hòm thư Email thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc mục Thư rác (Spam).');
+          return;
+        } catch (syncErr) {
+          console.error('Lỗi đồng bộ vé lên máy chủ:', syncErr);
+        }
+      }
+      const errMsg = err?.response?.data?.message || err?.message || 'Có lỗi xảy ra khi gửi email';
+      alert(`Không thể gửi vé qua email: ${errMsg}`);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   const handleOpenVisaTracker = async (b: Booking) => {
     setSelectedVisaBooking(b);
@@ -512,12 +555,23 @@ export const BookingHistoryPage: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className="w-full rounded-xl bg-white/10 hover:bg-white/15 text-white py-2.5 text-xs font-bold transition cursor-pointer"
-              >
-                Đóng
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleResendETicket(selectedTicket.bookingCode, selectedTicket)}
+                  disabled={sendingEmail}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-2.5 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                >
+                  <Mail className="h-4 w-4" />
+                  {sendingEmail ? 'Đang gửi...' : 'Gửi lại vé về Email'}
+                </button>
+                <button
+                  onClick={() => setSelectedTicket(null)}
+                  className="px-5 rounded-xl bg-white/10 hover:bg-white/15 text-white py-2.5 text-xs font-bold transition cursor-pointer"
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         )}

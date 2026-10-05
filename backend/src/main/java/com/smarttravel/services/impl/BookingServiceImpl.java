@@ -32,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
     private final com.smarttravel.services.VoucherService voucherService;
+    private final com.smarttravel.services.EmailService emailService;
 
     @Override
     @Transactional
@@ -233,5 +234,12 @@ public class BookingServiceImpl implements BookingService {
                 .qrCodeUrl(b.getQrCodeUrl())
                 .createdAt(b.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public void resendETicket(String bookingCode) {
+        Booking booking = bookingRepository.findByBookingCode(bookingCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingCode", bookingCode));
+        emailService.sendETicketEmail(booking, booking.getPayment());
     }
 }

@@ -14,4 +14,5 @@ public interface BookingService {
     BookingResponse cancelBooking(Long id, String userEmail);
     BookingResponse updateBookingStatus(Long id, com.smarttravel.enums.BookingStatus status);
     BigDecimal validateAndCalculateVoucher(String voucherCode, BigDecimal originalTotal);
+    void resendETicket(String bookingCode);
 }

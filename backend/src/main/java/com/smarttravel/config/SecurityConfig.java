@@ -57,6 +57,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/destinations/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/vouchers/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/bookings/validate-voucher").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/bookings/*/resend-eticket").permitAll()
                 .requestMatchers("/api/v1/payments/vnpay-callback", "/api/v1/payments/webhook", "/api/v1/payments/sepay-webhook", "/api/v1/payments/check-status/**", "/api/v1/payments/mark-paid/**").permitAll()
                 // Swagger UI & OpenAPI docs
                 .requestMatchers(

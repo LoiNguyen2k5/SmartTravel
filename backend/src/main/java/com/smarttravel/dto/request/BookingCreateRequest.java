@@ -21,6 +21,7 @@ public class BookingCreateRequest {
     @Min(1)
     private Integer numberOfAdults;
     private Integer numberOfChildren = 0;
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.smarttravel.config.MultiFormatLocalDateDeserializer.class)
     private LocalDate departureDate;
     private PaymentMethod paymentMethod;
     private String voucherCode;

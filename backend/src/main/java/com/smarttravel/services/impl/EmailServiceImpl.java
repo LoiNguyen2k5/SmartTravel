@@ -158,5 +158,194 @@ public class EmailServiceImpl implements EmailService {
             log.error("Lỗi khi gửi email liên hệ tới {}: {}", targetSupportEmail, e.getMessage());
         }
     }
+
+    @Override
+    @Async
+    public void sendETicketEmail(com.smarttravel.entities.Booking booking) {
+        sendETicketEmail(booking, null);
+    }
+
+    @Override
+    @Async
+    public void sendETicketEmail(com.smarttravel.entities.Booking booking, com.smarttravel.entities.Payment payment) {
+        if (booking == null) {
+            log.warn("Không thể gửi Vé điện tử: Booking null");
+            return;
+        }
+
+        String toEmail = booking.getContactEmail();
+        if (toEmail == null || toEmail.isBlank()) {
+            if (booking.getUser() != null) {
+                toEmail = booking.getUser().getEmail();
+            }
+        }
+
+        if (toEmail == null || toEmail.isBlank() || !toEmail.contains("@")) {
+            log.warn("Không thể gửi Vé điện tử cho đơn {}: Địa chỉ email không hợp lệ ({})", booking.getBookingCode(), toEmail);
+            return;
+        }
+
+        String bookingCode = booking.getBookingCode();
+        log.info("==================================================");
+        log.info("🎫 ĐANG GỬI VÉ ĐIỆN TỬ (E-TICKET) TỚI: {} - ĐƠN: {}", toEmail, bookingCode);
+        log.info("==================================================");
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Smart Travel E-Ticket");
+            helper.setTo(toEmail);
+            helper.setSubject("[Smart Travel] Vé điện tử (E-Ticket) xác nhận đặt tour thành công - " + bookingCode);
+
+            String customerName = booking.getContactName() != null && !booking.getContactName().isBlank()
+                    ? booking.getContactName()
+                    : (booking.getUser() != null && booking.getUser().getFullName() != null ? booking.getUser().getFullName() : "Quý khách");
+
+            String phone = booking.getContactPhone() != null && !booking.getContactPhone().isBlank()
+                    ? booking.getContactPhone()
+                    : (booking.getUser() != null && booking.getUser().getPhone() != null ? booking.getUser().getPhone() : "N/A");
+
+            String tourTitle = booking.getTour() != null ? booking.getTour().getTitle() : "Tour Du Lịch Smart Travel";
+            String tourCode = booking.getTour() != null && booking.getTour().getTourCode() != null ? booking.getTour().getTourCode() : "ST-TOUR";
+            String departureLocation = booking.getTour() != null && booking.getTour().getDepartureLocation() != null ? booking.getTour().getDepartureLocation() : "TP. Hồ Chí Minh";
+            int days = booking.getTour() != null && booking.getTour().getDurationDays() != null ? booking.getTour().getDurationDays() : 1;
+            int nights = booking.getTour() != null && booking.getTour().getDurationNights() != null ? booking.getTour().getDurationNights() : 0;
+            String durationText = days + " Ngày " + (nights > 0 ? nights + " Đêm" : "");
+
+            String departureDateText = "Theo lịch trình tiêu chuẩn";
+            if (booking.getTourSchedule() != null && booking.getTourSchedule().getStartDate() != null) {
+                departureDateText = booking.getTourSchedule().getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            } else if (booking.getCreatedAt() != null) {
+                departureDateText = booking.getCreatedAt().toLocalDate().plusDays(7).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            }
+
+            int adults = booking.getNumberOfAdults() != null ? booking.getNumberOfAdults() : 1;
+            int children = booking.getNumberOfChildren() != null ? booking.getNumberOfChildren() : 0;
+            String guestsText = adults + " Người lớn" + (children > 0 ? " • " + children + " Trẻ em" : "");
+
+            String roomText = "Tiêu chuẩn tour (ghép phòng đôi)";
+            if (Boolean.TRUE.equals(booking.getSingleRoomSurcharge())) {
+                roomText = "Phụ thu phòng đơn riêng";
+            } else if (booking.getRoomAllocation() != null && !booking.getRoomAllocation().isBlank()) {
+                roomText = booking.getRoomAllocation();
+            }
+
+            java.text.NumberFormat currencyFormatter = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
+            String totalPriceFormatted = currencyFormatter.format(booking.getTotalPrice() != null ? booking.getTotalPrice() : java.math.BigDecimal.ZERO) + " đ";
+
+            String paymentMethodText = "Chuyển khoản VietQR / Ngân hàng";
+            String transactionId = "TXN-" + bookingCode;
+            String paymentTimeText = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy"));
+
+            if (payment != null) {
+                if (payment.getPaymentMethod() != null) {
+                    paymentMethodText = payment.getPaymentMethod().name();
+                }
+                if (payment.getTransactionId() != null && !payment.getTransactionId().isBlank()) {
+                    transactionId = payment.getTransactionId();
+                }
+                if (payment.getPaymentTime() != null) {
+                    paymentTimeText = payment.getPaymentTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy"));
+                }
+            }
+
+            String qrData = "SMARTTRAVEL-E-TICKET|" + bookingCode + "|" + tourCode + "|PAID";
+            String qrCodeUrl = (booking.getQrCodeUrl() != null && !booking.getQrCodeUrl().isBlank())
+                    ? booking.getQrCodeUrl()
+                    : "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + java.net.URLEncoder.encode(qrData, java.nio.charset.StandardCharsets.UTF_8);
+
+            String htmlContent = "<div style=\"font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f5f9; padding: 25px 10px; margin: 0;\">"
+                    + "<div style=\"max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;\">"
+                    // Header
+                    + "<div style=\"background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%); padding: 26px 20px; text-align: center; color: #ffffff;\">"
+                    + "<div style=\"display: inline-block; background-color: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 9999px; padding: 4px 14px; margin-bottom: 10px;\">"
+                    + "<span style=\"color: #34d399; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase;\">✓ XÁC NHẬN ĐẶT TOUR THÀNH CÔNG</span>"
+                    + "</div>"
+                    + "<h1 style=\"margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.5px;\">✈️ VÉ DU LỊCH ĐIỆN TỬ (E-TICKET)</h1>"
+                    + "<p style=\"margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;\">Nền tảng Đặt Tour & Lập Kế Hoạch Thông Minh — Smart Travel</p>"
+                    + "</div>"
+                    // Reference Bar
+                    + "<div style=\"background-color: #f8fafc; padding: 12px 20px; border-bottom: 1px dashed #cbd5e1;\">"
+                    + "<table style=\"width: 100%; border-collapse: collapse; font-size: 12px;\">"
+                    + "<tr>"
+                    + "<td style=\"color: #64748b;\">Mã vé: <strong style=\"color: #0284c7; font-size: 15px; font-family: monospace;\">" + bookingCode + "</strong></td>"
+                    + "<td style=\"text-align: right; color: #64748b;\">Thời gian: <strong style=\"color: #334155;\">" + paymentTimeText + "</strong></td>"
+                    + "</tr>"
+                    + "</table>"
+                    + "</div>"
+                    // Body
+                    + "<div style=\"padding: 22px;\">"
+                    // Tour Info Card
+                    + "<div style=\"background: linear-gradient(to right, #f0f9ff, #e0f2fe); border-left: 4px solid #0284c7; border-radius: 12px; padding: 16px; margin-bottom: 20px;\">"
+                    + "<span style=\"font-size: 11px; font-weight: bold; color: #0284c7; text-transform: uppercase;\">THÔNG TIN HÀNH TRÌNH</span>"
+                    + "<h2 style=\"margin: 6px 0 10px 0; font-size: 17px; color: #0f172a; line-height: 1.4;\">" + tourTitle + "</h2>"
+                    + "<table style=\"width: 100%; font-size: 13px; color: #334155; border-collapse: collapse;\">"
+                    + "<tr>"
+                    + "<td style=\"padding: 3px 0; width: 50%;\">📍 <strong>Điểm khởi hành:</strong> " + departureLocation + "</td>"
+                    + "<td style=\"padding: 3px 0; width: 50%;\">🗓️ <strong>Ngày đi:</strong> <span style=\"color: #0284c7; font-weight: bold;\">" + departureDateText + "</span></td>"
+                    + "</tr>"
+                    + "<tr>"
+                    + "<td style=\"padding: 3px 0;\">⏱️ <strong>Thời lượng:</strong> " + durationText + "</td>"
+                    + "<td style=\"padding: 3px 0;\">🏷️ <strong>Mã tour:</strong> " + tourCode + "</td>"
+                    + "</tr>"
+                    + "</table>"
+                    + "</div>"
+                    // Passenger Details
+                    + "<div style=\"margin-bottom: 20px;\">"
+                    + "<h3 style=\"margin: 0 0 10px 0; font-size: 13px; color: #0f172a; font-weight: bold; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;\">👤 THÔNG TIN HÀNH KHÁCH & LƯU TRÚ</h3>"
+                    + "<table style=\"width: 100%; font-size: 13px; border-collapse: collapse;\">"
+                    + "<tr><td style=\"padding: 5px 0; color: #64748b; width: 35%;\">Hành khách đại diện:</td><td style=\"padding: 5px 0; color: #0f172a; font-weight: bold;\">" + customerName + "</td></tr>"
+                    + "<tr><td style=\"padding: 5px 0; color: #64748b;\">Số điện thoại:</td><td style=\"padding: 5px 0; color: #0f172a; font-weight: bold;\">" + phone + "</td></tr>"
+                    + "<tr><td style=\"padding: 5px 0; color: #64748b;\">Email liên hệ:</td><td style=\"padding: 5px 0; color: #0284c7; font-weight: bold;\">" + toEmail + "</td></tr>"
+                    + "<tr><td style=\"padding: 5px 0; color: #64748b;\">Số lượng khách:</td><td style=\"padding: 5px 0; color: #0f172a; font-weight: bold;\">" + guestsText + "</td></tr>"
+                    + "<tr><td style=\"padding: 5px 0; color: #64748b;\">Quy cách phòng ở:</td><td style=\"padding: 5px 0; color: #0f172a; font-weight: bold;\">" + roomText + "</td></tr>"
+                    + "</table>"
+                    + "</div>"
+                    // QR Code Card
+                    + "<div style=\"background-color: #f8fafc; border: 2px dashed #0284c7; border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 20px;\">"
+                    + "<p style=\"margin: 0 0 10px 0; font-size: 12px; font-weight: bold; color: #0369a1; text-transform: uppercase;\">📱 MÃ QR CHECK-IN LÊN XE & NHẬN PHÒNG</p>"
+                    + "<div style=\"display: inline-block; background-color: #ffffff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;\">"
+                    + "<img src=\"" + qrCodeUrl + "\" alt=\"QR E-Ticket\" width=\"170\" height=\"170\" style=\"display: block; margin: 0 auto;\" />"
+                    + "</div>"
+                    + "<p style=\"margin: 10px 0 0 0; font-size: 11px; color: #64748b;\">Vui lòng xuất trình mã QR này cho Hướng Dẫn Viên hoặc Lễ Tân tại điểm hẹn để làm thủ tục nhanh chóng.</p>"
+                    + "</div>"
+                    // Payment Summary
+                    + "<div style=\"background-color: #0f172a; border-radius: 12px; padding: 16px 18px; color: #ffffff; margin-bottom: 20px;\">"
+                    + "<table style=\"width: 100%; font-size: 12px; border-collapse: collapse;\">"
+                    + "<tr><td style=\"padding: 3px 0; color: #94a3b8;\">Phương thức thanh toán:</td><td style=\"padding: 3px 0; text-align: right; color: #e2e8f0; font-weight: 600;\">" + paymentMethodText + "</td></tr>"
+                    + "<tr><td style=\"padding: 3px 0; color: #94a3b8;\">Mã giao dịch ngân hàng:</td><td style=\"padding: 3px 0; text-align: right; color: #38bdf8; font-family: monospace;\">" + transactionId + "</td></tr>"
+                    + "<tr><td style=\"padding: 3px 0; color: #94a3b8;\">Trạng thái thanh toán:</td><td style=\"padding: 3px 0; text-align: right; color: #34d399; font-weight: bold;\">ĐÃ THANH TOÁN (PAID)</td></tr>"
+                    + "<tr><td colspan=\"2\" style=\"border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; margin-top: 4px;\"></td></tr>"
+                    + "<tr><td style=\"font-size: 14px; font-weight: bold; color: #ffffff;\">TỔNG TIỀN ĐÃ THANH TOÁN:</td><td style=\"font-size: 18px; font-weight: 800; color: #fbbf24; text-align: right;\">" + totalPriceFormatted + "</td></tr>"
+                    + "</table>"
+                    + "</div>"
+                    // Important Notes
+                    + "<div style=\"background-color: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px 14px; font-size: 11px; color: #92400e; line-height: 1.6; margin-bottom: 18px;\">"
+                    + "<strong style=\"font-size: 12px;\">⚠️ Lưu ý quan trọng cho chuyến đi:</strong><br/>"
+                    + "• <strong>Giấy tờ tùy thân:</strong> Quý khách vui lòng mang theo CCCD/Hộ chiếu gốc (còn hạn trên 6 tháng). Đối với tour quốc tế, cần chuẩn bị đầy đủ hồ sơ Visa theo hướng dẫn.<br/>"
+                    + "• <strong>Thời gian tập trung:</strong> Có mặt tại điểm khởi hành trước giờ khởi hành tối thiểu 60 phút (tour trong nước) hoặc 120 phút (tour quốc tế).<br/>"
+                    + "• <strong>Hành lý:</strong> Tuân thủ quy định hành lý xách tay và ký gửi theo hướng dẫn chi tiết của HDV."
+                    + "</div>"
+                    // Support
+                    + "<div style=\"text-align: center; padding: 8px 0;\">"
+                    + "<p style=\"margin: 0; font-size: 12px; color: #475569;\">Cần hỗ trợ gấp? Hotline 24/7: <strong style=\"color: #0284c7; font-size: 14px;\">0941 899 554</strong></p>"
+                    + "</div>"
+                    + "</div>"
+                    // Footer
+                    + "<div style=\"background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11px; color: #94a3b8;\">"
+                    + "<p style=\"margin: 0 0 3px 0;\">© 2026 SmartTravel Platform. Bản quyền thuộc về Đồ Án Chuyên Ngành CNTT - HCMUTE.</p>"
+                    + "<p style=\"margin: 0;\">Email này được tạo và gửi tự động khi đơn hàng hoàn tất thanh toán.</p>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Vé điện tử E-Ticket đã gửi thành công tới email: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Không thể gửi Vé điện tử thực tế tới {}. Lý do: {}. (Hãy kiểm tra cấu hình spring.mail)", toEmail, e.getMessage());
+        }
+    }
 }
 

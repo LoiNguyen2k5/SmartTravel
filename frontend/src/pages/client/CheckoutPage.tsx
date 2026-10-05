@@ -148,13 +148,30 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  const getNormalizedDepartureDate = () => {
+    const defaultFutureDate = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+    const rawDate = stateData.departureDate || defaultFutureDate;
+    if (rawDate.includes('-')) {
+      const parts = rawDate.split('-');
+      if (parts[0].length === 2 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    } else if (rawDate.includes('/')) {
+      const parts = rawDate.split('/');
+      if (parts[0].length === 2 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    return rawDate;
+  };
+
   const handleSavePendingBooking = async () => {
     if (!contactName.trim() || !contactEmail.trim() || !contactPhone.trim()) {
       alert('Vui lòng điền đầy đủ thông tin người liên hệ');
       return;
     }
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const chosenDate = stateData.departureDate || '15-09-2026';
+    const chosenDate = getNormalizedDepartureDate();
     
     // Attempt backend first
     try {
@@ -169,9 +186,15 @@ export const CheckoutPage: React.FC = () => {
         note: note.trim() || undefined,
         paymentMethod: paymentMethod,
         departureDate: chosenDate,
+        bookingCode: code,
+        status: 'PENDING',
+        singleRoomSurcharge: singleRoomRequired,
+        singleRoomSurchargeAmount: singleRoomSurchargeAmount,
+        roomAllocation: roomAllocation,
       });
       // Optionally update status to PENDING if needed via API, but usually it defaults to PENDING
     } catch (err) {
+      console.log('Pre-create booking notice (offline/fallback mode):', err);
       // Fallback local
       const pendingBooking: Booking = {
         id: Date.now(),
@@ -220,7 +243,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const chosenDate = stateData.departureDate || '15-09-2026';
+    const chosenDate = getNormalizedDepartureDate();
 
     // Call backend to persist PENDING booking so Webhook & Polling match it 100%
     try {
