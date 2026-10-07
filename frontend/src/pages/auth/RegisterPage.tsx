@@ -3,11 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { OtpType } from '../../types/auth';
 import { saveAccount } from '../../utils/savedAccounts';
-import { Eye, EyeOff, MailCheck, RefreshCw, Store, UserCheck } from 'lucide-react';
+import { Eye, EyeOff, MailCheck, RefreshCw } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const [step, setStep] = useState<'FORM' | 'OTP'>('FORM');
-  const [selectedRole, setSelectedRole] = useState<'ROLE_USER' | 'ROLE_VENDOR'>('ROLE_USER');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -61,7 +60,7 @@ export const RegisterPage: React.FC = () => {
         email,
         phone,
         password,
-        roles: [selectedRole],
+        roles: ['ROLE_USER'],
       });
       setStep('OTP');
       setTimer(60);
@@ -132,32 +131,6 @@ export const RegisterPage: React.FC = () => {
           <div className="text-center pt-2">
             <h2 className="text-xl font-bold text-white">Register For Free</h2>
             <p className="text-xs text-slate-400 mt-1">Tạo tài khoản mới bằng Email thực tế</p>
-          </div>
-
-          {/* Role Selector Tabs */}
-          <div className="grid grid-cols-2 gap-2 bg-white/[0.04] p-1.5 rounded-xl border border-white/8">
-            <button
-              type="button"
-              onClick={() => setSelectedRole('ROLE_USER')}
-              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition ${
-                selectedRole === 'ROLE_USER'
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30 shadow-[0_0_12px_rgba(14,165,233,0.2)]'
-                  : 'text-slate-400 hover:text-white border border-transparent'
-              }`}
-            >
-              <UserCheck className="h-3.5 w-3.5" /> Khách Du Lịch
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedRole('ROLE_VENDOR')}
-              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition ${
-                selectedRole === 'ROLE_VENDOR'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                  : 'text-slate-400 hover:text-white border border-transparent'
-              }`}
-            >
-              <Store className="h-3.5 w-3.5" /> Nhà Cung Cấp
-            </button>
           </div>
 
           {/* Error Alert */}
@@ -275,10 +248,18 @@ export const RegisterPage: React.FC = () => {
               {isLoading ? 'Đang gửi mã OTP...' : 'Register'}
             </button>
 
-            <div className="text-center pt-1">
-              <Link to="/login" className="text-xs text-slate-400 hover:text-rose-400 transition">
-                Đã có tài khoản? <span className="text-rose-400 underline font-semibold">Đăng nhập ngay</span>
-              </Link>
+            <div className="text-center pt-2 border-t border-white/5 space-y-1.5">
+              <div>
+                <Link to="/login" className="text-xs text-slate-400 hover:text-rose-400 transition">
+                  Đã có tài khoản? <span className="text-rose-400 underline font-semibold">Đăng nhập ngay</span>
+                </Link>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Doanh nghiệp lữ hành? Đăng ký tài khoản và nộp hồ sơ tại mục{' '}
+                <Link to="/become-vendor" className="text-sky-400 hover:underline font-medium">
+                  Trở thành Đối tác
+                </Link>.
+              </p>
             </div>
           </form>
         </>

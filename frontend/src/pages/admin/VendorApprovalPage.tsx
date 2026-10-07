@@ -387,6 +387,17 @@ export const VendorApprovalPage: React.FC = () => {
 
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {app.status === 'PENDING_REVIEW' && (
+                          <button
+                            onClick={() => handleApprove(app)}
+                            disabled={actionLoading}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold transition cursor-pointer"
+                            title="Phê duyệt nhanh hồ sơ này"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Duyệt hồ sơ</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => setSelectedApp(app)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 font-bold transition cursor-pointer"

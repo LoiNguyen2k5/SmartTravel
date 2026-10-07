@@ -12,7 +12,9 @@ import {
   RefreshCw 
 } from 'lucide-react';
 import { bookingService } from '../../services/bookingService';
+import { tourService } from '../../services/tourService';
 import { Booking } from '../../types/booking';
+import { Tour } from '../../types/tour';
 
 export const VendorBookingManagementPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -54,45 +56,39 @@ export const VendorBookingManagementPage: React.FC = () => {
 
   const fetchBookings = async () => {
     setLoading(true);
-    let userBookings: Booking[] = [];
-    try {
-      const userCreatedStr = localStorage.getItem('user_created_bookings');
-      if (userCreatedStr) userBookings = JSON.parse(userCreatedStr);
-    } catch (e) {
-      console.error(e);
-    }
+    const savedUserStr = localStorage.getItem('user');
+    const currentUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+    const isDemoVendor = currentUser?.email === 'vendor@smarttravel.com';
 
     try {
-      const res = await bookingService.getVendorBookings();
+      const [toursRes, res] = await Promise.all([
+        tourService.getMyTours(),
+        bookingService.getVendorBookings(),
+      ]);
+      const myTourIds = new Set((toursRes.data || []).map((t: Tour) => t.id));
+
       let rawList: Booking[] = (res.success && res.data && res.data.length > 0) ? res.data : [];
-      if (rawList.length === 0) {
+      if (rawList.length === 0 && isDemoVendor) {
         const fallbackRes = await bookingService.getMyBookings();
         if (fallbackRes.success && fallbackRes.data) {
           rawList = fallbackRes.data;
         }
       }
-      // If all items in database have COMPLETED status, designate top ones as PAID (ready for check-in)
-      if (rawList.length > 0 && !rawList.some(b => b.status === 'PAID')) {
-        rawList = rawList.map((b, idx) => (idx < 3 ? { ...b, status: 'PAID' as const } : b));
-      }
-      const combined = [...userBookings, ...rawList];
-      setBookings(applyStatusOverrides(combined));
+
+      // Giới hạn chỉ hiển thị các đơn đặt tour thuộc chính danh mục tour của vendor này
+      rawList = rawList.filter((b) => b.tourId && myTourIds.has(b.tourId));
+      setBookings(applyStatusOverrides(rawList));
     } catch (err) {
-      console.error('Lỗi khi tải đơn đặt tour, thử fallback getMyBookings:', err);
-      let fallbackList: Booking[] = [];
-      try {
-        const fallbackRes = await bookingService.getMyBookings();
-        if (fallbackRes.success && fallbackRes.data) {
-          fallbackList = fallbackRes.data;
-        }
-      } catch (e) {
-        console.error('Fallback failed:', e);
+      if (isDemoVendor) {
+        try {
+          const fallbackRes = await bookingService.getMyBookings();
+          if (fallbackRes.success && fallbackRes.data) {
+            setBookings(applyStatusOverrides(fallbackRes.data));
+          }
+        } catch (_) {}
+      } else {
+        setBookings([]);
       }
-      if (fallbackList.length > 0 && !fallbackList.some(b => b.status === 'PAID')) {
-        fallbackList = fallbackList.map((b, idx) => (idx < 3 ? { ...b, status: 'PAID' as const } : b));
-      }
-      const combined = [...userBookings, ...fallbackList];
-      setBookings(applyStatusOverrides(combined));
     } finally {
       setLoading(false);
     }

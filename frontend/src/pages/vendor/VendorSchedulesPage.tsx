@@ -131,14 +131,25 @@ export const VendorSchedulesPage: React.FC = () => {
               <select
                 value={selectedTourId || ''}
                 onChange={(e) => setSelectedTourId(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-900 focus:border-emerald-500 focus:outline-none bg-slate-50"
+                disabled={tours.length === 0}
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-900 focus:border-emerald-500 focus:outline-none bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400"
               >
-                {tours.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.title} ({t.tourCode})
-                  </option>
-                ))}
+                {tours.length === 0 ? (
+                  <option value="">Chưa có tour du lịch nào</option>
+                ) : (
+                  tours.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title} ({t.tourCode})
+                    </option>
+                  ))
+                )}
               </select>
+
+              {tours.length === 0 && (
+                <p className="mt-3 text-xs text-amber-600 font-semibold bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  Bạn chưa đăng tải tour nào. Vui lòng tạo tour trước khi thiết lập lịch khởi hành.
+                </p>
+              )}
 
               {selectedTour && (
                 <div className="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">

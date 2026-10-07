@@ -201,12 +201,19 @@ export const tourService = {
         combined.push(t);
       }
     }
-    for (const m of MOCK_TOURS) {
-      const alreadyExists = combined.some(
-        c => c.id === m.id || c.title.trim().toLowerCase() === m.title.trim().toLowerCase()
-      );
-      if (!alreadyExists) {
-        combined.push(m);
+    const savedUserStr = localStorage.getItem('user');
+    const currentUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+    const isDemoVendor = currentUser?.email === 'vendor@smarttravel.com';
+
+    // Chỉ nạp dữ liệu mẫu ban đầu cho tài khoản demo vendor@smarttravel.com
+    if (isDemoVendor) {
+      for (const m of MOCK_TOURS) {
+        const alreadyExists = combined.some(
+          c => c.id === m.id || c.title.trim().toLowerCase() === m.title.trim().toLowerCase()
+        );
+        if (!alreadyExists) {
+          combined.push(m);
+        }
       }
     }
 

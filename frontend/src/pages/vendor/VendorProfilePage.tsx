@@ -6,20 +6,22 @@ export const VendorProfilePage: React.FC = () => {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
 
+  const isDemo = user?.email === 'vendor@smarttravel.com';
+
   // Form states
-  const [companyName, setCompanyName] = useState(user?.fullName || 'Công Ty TNHH Du Lịch SmartTravel Partner');
-  const [businessLicense, setBusinessLicense] = useState('0316889988-GP');
-  const [taxCode, setTaxCode] = useState('0316889988');
-  const [phone, setPhone] = useState(user?.phone || '0988776655');
-  const [email, setEmail] = useState(user?.email || 'vendor@smarttravel.com');
-  const [address, setAddress] = useState('123 Đường Nguyễn Huệ, Quận 1, TP.Hồ Chí Minh');
-  const [representative, setRepresentative] = useState('Nguyễn Văn Quản Lý');
+  const [companyName, setCompanyName] = useState(isDemo ? 'Công Ty TNHH Du Lịch SmartTravel Partner' : (user?.fullName || ''));
+  const [businessLicense, setBusinessLicense] = useState(isDemo ? '0316889988-GP' : '');
+  const [taxCode, setTaxCode] = useState(isDemo ? '0316889988' : '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [address, setAddress] = useState(isDemo ? '123 Đường Nguyễn Huệ, Quận 1, TP.Hồ Chí Minh' : '');
+  const [representative, setRepresentative] = useState(isDemo ? 'Nguyễn Văn Quản Lý' : (user?.fullName || ''));
 
   // Banking info
-  const [bankName, setBankName] = useState('Vietcombank - Ngân hàng TMCP Ngoại thương Việt Nam');
-  const [accountNumber, setAccountNumber] = useState('998877665544');
-  const [accountHolder, setAccountHolder] = useState('CONG TY TNHH DU LICH SMARTTRAVEL PARTNER');
-  const [bankBranch, setBankBranch] = useState('Chi nhánh TP.Hồ Chí Minh');
+  const [bankName, setBankName] = useState(isDemo ? 'Vietcombank - Ngân hàng TMCP Ngoại thương Việt Nam' : '');
+  const [accountNumber, setAccountNumber] = useState(isDemo ? '998877665544' : '');
+  const [accountHolder, setAccountHolder] = useState(isDemo ? 'CONG TY TNHH DU LICH SMARTTRAVEL PARTNER' : (user?.fullName?.toUpperCase() || ''));
+  const [bankBranch, setBankBranch] = useState(isDemo ? 'Chi nhánh TP.Hồ Chí Minh' : '');
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
