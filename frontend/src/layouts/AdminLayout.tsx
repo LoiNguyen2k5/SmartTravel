@@ -9,22 +9,42 @@ import {
   LogOut, 
   ArrowLeft,
   ShieldCheck,
-  Ticket
+  Ticket,
+  Building2
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import { vendorApplicationService } from '../services/vendorApplicationService';
 
 export const AdminLayout: React.FC = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [pendingVendorCount, setPendingVendorCount] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const loadPending = async () => {
+      try {
+        const res = await vendorApplicationService.getAllApplications('PENDING_REVIEW');
+        if (res.data) {
+          setPendingVendorCount(res.data.length);
+        }
+      } catch {
+        // Ignore
+      }
+    };
+    loadPending();
+    window.addEventListener('smarttravel_vendor_apps_updated', loadPending);
+    return () => window.removeEventListener('smarttravel_vendor_apps_updated', loadPending);
+  }, []);
 
   const navItems = [
     { label: 'Tổng quan (Dashboard)', path: '/admin', icon: LayoutDashboard },
     { label: 'Kiểm duyệt Tour', path: '/admin/tours', icon: Compass },
+    { label: 'Duyệt Đối tác (Vendor)', path: '/admin/vendor-approvals', icon: Building2, badge: pendingVendorCount },
     { label: 'Quản lý Đơn hàng', path: '/admin/bookings', icon: ShoppingBag },
     { label: 'Giao dịch & Đối soát', path: '/admin/settlements', icon: CreditCard },
     { label: 'Quản lý Khuyến mãi', path: '/admin/vouchers', icon: Ticket },
-    { label: 'Tài khoản & Vendor', path: '/admin/users', icon: Users },
+    { label: 'Tài khoản & Phân quyền', path: '/admin/users', icon: Users },
   ];
 
   return (
@@ -62,14 +82,21 @@ export const AdminLayout: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                     isActive
                       ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.25)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? 'text-sky-300' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
+                  <div className="flex items-center gap-3">
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-sky-300' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}

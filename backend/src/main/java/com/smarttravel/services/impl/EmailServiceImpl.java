@@ -347,5 +347,107 @@ public class EmailServiceImpl implements EmailService {
             log.error("Không thể gửi Vé điện tử thực tế tới {}. Lý do: {}. (Hãy kiểm tra cấu hình spring.mail)", toEmail, e.getMessage());
         }
     }
+
+    @Override
+    @Async
+    public void sendVendorApplicationApprovedEmail(String toEmail, String businessName) {
+        log.info("==================================================");
+        log.info("🎉 THÔNG BÁO DUYỆT ĐỐI TÁC VENDOR: {} [{}]", toEmail, businessName);
+        log.info("==================================================");
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Smart Travel Partner Portal");
+            helper.setTo(toEmail);
+            helper.setSubject("🎉 [SmartTravel] Chúc mừng! Hồ sơ đối tác " + businessName + " đã được phê duyệt");
+
+            String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
+                    + "<div style=\"text-align: center; margin-bottom: 24px;\">"
+                    + "<h2 style=\"color: #0284c7; margin: 0; font-size: 24px;\">✈️ Smart Travel Partner Portal</h2>"
+                    + "<p style=\"color: #64748b; font-size: 13px; margin-top: 4px;\">Nền tảng Quản trị & Phân phối Tour Du lịch Thông minh</p>"
+                    + "</div>"
+                    + "<div style=\"background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #a7f3d0; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;\">"
+                    + "<span style=\"font-size: 36px;\">🎉</span>"
+                    + "<h3 style=\"color: #065f46; margin: 8px 0 4px 0; font-size: 18px;\">HỒ SƠ ĐÃ ĐƯỢC PHÊ DUYỆT THÀNH CÔNG!</h3>"
+                    + "<p style=\"color: #047857; margin: 0; font-size: 13px;\">Tài khoản của bạn đã được nâng cấp lên quyền <strong>Nhà Cung Cấp (Vendor)</strong>.</p>"
+                    + "</div>"
+                    + "<div style=\"color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 20px;\">"
+                    + "<p>Kính gửi Quý đối tác <strong>" + businessName + "</strong>,</p>"
+                    + "<p>Ban Quản Trị SmartTravel trân trọng thông báo hồ sơ đăng ký đại lý bán tour của Quý công ty đã được thẩm định và phê duyệt thành công.</p>"
+                    + "<p>Hiện tại, Quý công ty có thể đăng nhập vào hệ thống và bắt đầu sử dụng các tính năng:</p>"
+                    + "<ul style=\"padding-left: 20px; color: #475569;\">"
+                    + "<li>Đăng tải và quản lý Tour du lịch của doanh nghiệp.</li>"
+                    + "<li>Quản lý lịch khởi hành, giá vé người lớn & trẻ em.</li>"
+                    + "<li>Tiếp nhận, xử lý booking và xét duyệt hồ sơ Visa du khách.</li>"
+                    + "<li>Theo dõi báo cáo doanh thu & đối soát thanh toán trực tuyến.</li>"
+                    + "</ul>"
+                    + "</div>"
+                    + "<div style=\"text-align: center; margin: 30px 0;\">"
+                    + "<a href=\"http://localhost:5173/vendor\" style=\"display: inline-block; background-color: #0284c7; color: #ffffff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;\">Truy Cập Kênh Nhà Cung Cấp Ngay</a>"
+                    + "</div>"
+                    + "<hr style=\"border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;\" />"
+                    + "<p style=\"color: #94a3b8; font-size: 12px; text-align: center; margin: 0;\">SmartTravel trân trọng cảm ơn sự đồng hành của Quý đối tác!</p>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Email phê duyệt Vendor đã gửi thành công tới: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Không thể gửi email phê duyệt tới {}. Lý do: {}", toEmail, e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void sendVendorApplicationRejectedEmail(String toEmail, String businessName, String reason) {
+        log.info("==================================================");
+        log.info("⚠️ THÔNG BÁO TỪ CHỐI ĐỐI TÁC VENDOR: {} [Lý do: {}]", toEmail, reason);
+        log.info("==================================================");
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Smart Travel Partner Portal");
+            helper.setTo(toEmail);
+            helper.setSubject("⚠️ [SmartTravel] Thông báo kết quả thẩm định hồ sơ đối tác " + businessName);
+
+            String displayReason = (reason != null && !reason.trim().isEmpty()) ? reason : "Thông tin hoặc hồ sơ pháp lý chưa đầy đủ theo quy định.";
+
+            String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
+                    + "<div style=\"text-align: center; margin-bottom: 24px;\">"
+                    + "<h2 style=\"color: #0284c7; margin: 0; font-size: 24px;\">✈️ Smart Travel Partner Portal</h2>"
+                    + "<p style=\"color: #64748b; font-size: 13px; margin-top: 4px;\">Nền tảng Quản trị & Phân phối Tour Du lịch Thông minh</p>"
+                    + "</div>"
+                    + "<div style=\"background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;\">"
+                    + "<span style=\"font-size: 36px;\">⚠️</span>"
+                    + "<h3 style=\"color: #9f1239; margin: 8px 0 4px 0; font-size: 18px;\">HỒ SƠ CẦN BỔ SUNG HOẶC CHƯA ĐẠT YÊU CẦU</h3>"
+                    + "<p style=\"color: #be123c; margin: 0; font-size: 13px;\">Rất tiếc hồ sơ đăng ký đại lý chưa được phê duyệt trong đợt này.</p>"
+                    + "</div>"
+                    + "<div style=\"color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 20px;\">"
+                    + "<p>Kính gửi Quý đối tác <strong>" + businessName + "</strong>,</p>"
+                    + "<p>Ban Quản Trị SmartTravel đã thẩm định hồ sơ đăng ký của Quý công ty và nhận thấy một số thông tin cần được điều chỉnh:</p>"
+                    + "<div style=\"background-color: #f8fafc; border-left: 4px solid #ef4444; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-weight: 500; color: #1e293b;\">"
+                    + "<strong>Lý do phản hồi từ Ban Quản Trị:</strong><br/>"
+                    + displayReason
+                    + "</div>"
+                    + "<p>Quý đối tác vui lòng cập nhật lại thông tin, tải lên đầy đủ giấy tờ hợp lệ và gửi lại hồ sơ qua cổng đăng ký của chúng tôi.</p>"
+                    + "</div>"
+                    + "<div style=\"text-align: center; margin: 30px 0;\">"
+                    + "<a href=\"http://localhost:5173/become-vendor\" style=\"display: inline-block; background-color: #e11d48; color: #ffffff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;\">Cập Nhật Lại Hồ Sơ</a>"
+                    + "</div>"
+                    + "<hr style=\"border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;\" />"
+                    + "<p style=\"color: #94a3b8; font-size: 12px; text-align: center; margin: 0;\">Nếu có thắc mắc, vui lòng liên hệ Hotline hỗ trợ đối tác: 0941 899 554.</p>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Email từ chối Vendor đã gửi thành công tới: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Không thể gửi email từ chối tới {}. Lý do: {}", toEmail, e.getMessage());
+        }
+    }
 }
 
