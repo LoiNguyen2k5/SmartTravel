@@ -67,6 +67,6 @@ springdoc:
 
 # Google Gemini AI Configuration
 gemini:
-  api-key: "AQ.Ab8RN6LDQC3ymaaS_DtupWHkgQQy1VHv-nbTvZFkulDrBnl-Qg"
+  api-key: "${GEMINI_API_KEY:your-gemini-api-key-here}"
   model: "gemini-2.5-flash"
   api-url: "https://generativelanguage.googleapis.com/v1beta/models"

@@ -1,7 +1,7 @@
 import axiosClient from './axiosClient';
 import { ApiResponse } from '../types/common';
 
-const GEMINI_API_KEY = 'AQ.Ab8RN6LDQC3ymaaS_DtupWHkgQQy1VHv-nbTvZFkulDrBnl-Qg';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 export interface ChatMessage {

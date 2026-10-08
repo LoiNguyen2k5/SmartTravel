@@ -40,7 +40,7 @@ public class AiServiceImpl implements AiService {
     private final ReviewRepository reviewRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${gemini.api-key:AQ.Ab8RN6LDQC3ymaaS_DtupWHkgQQy1VHv-nbTvZFkulDrBnl-Qg}")
+    @Value("${gemini.api-key:}")
     private String geminiApiKey;
 
     @Value("${gemini.model:gemini-2.5-flash}")
