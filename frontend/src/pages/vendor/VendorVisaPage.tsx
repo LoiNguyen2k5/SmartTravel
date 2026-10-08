@@ -6,6 +6,7 @@ import {
   CalendarDays, Users, AlertOctagon
 } from "lucide-react";
 import { visaService } from "../../services/visaService";
+import { tourService } from "../../services/tourService";
 import {
   VisaApplicationResponse, VisaApplicationStatus,
   VisaDocumentStatus, VisaTemplate, VisaTemplateDocument
@@ -126,8 +127,15 @@ export const VendorVisaPage: React.FC = () => {
 
   const fetchApplications = useCallback(async () => {
     try {
-      const res = await visaService.getAllApplications();
-      const enriched = res.map((a, i) => ({
+      const [res, toursRes] = await Promise.all([
+        visaService.getAllApplications(),
+        tourService.getMyTours(),
+      ]);
+      const myTourIds = new Set((toursRes.data || []).map((t: any) => t.id));
+      // Chỉ hiển thị hồ sơ visa thuộc về các tour do vendor này quản lý
+      const filtered = res.filter(a => a.tourId && myTourIds.has(a.tourId));
+
+      const enriched = filtered.map((a, i) => ({
         ...a,
         departureDate: a.departureDate ?? new Date(Date.now() + (10 + i * 5) * 86400000).toISOString(),
         processingDays: a.processingDays ?? 7,
@@ -135,6 +143,7 @@ export const VendorVisaPage: React.FC = () => {
       setApplications(enriched);
     } catch (err) {
       console.error("Lỗi tải hồ sơ visa:", err);
+      setApplications([]);
     } finally {
       setLoadingApps(false);
     }

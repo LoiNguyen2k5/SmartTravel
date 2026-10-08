@@ -60,10 +60,6 @@ public class VendorServiceImpl implements VendorService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
 
         List<Booking> bookings = bookingRepository.findByTourVendorId(vendor.getId());
-        if (bookings.isEmpty()) {
-            bookings = bookingRepository.findAll();
-        }
-
         return bookings.stream()
                 .map(this::mapToBookingResponse)
                 .collect(Collectors.toList());

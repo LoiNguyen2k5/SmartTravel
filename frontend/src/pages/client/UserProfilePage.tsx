@@ -112,6 +112,34 @@ export const UserProfilePage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Vendor Partner Status Card */}
+        <div className="rounded-3xl border border-white/10 bg-[#0a111d]/90 backdrop-blur-xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-sm font-extrabold text-white">
+                {user?.roles?.includes('ROLE_VENDOR') ? 'Đối tác Nhà Cung Cấp (Vendor)' : 'Trở thành Đối tác Du lịch'}
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {user?.roles?.includes('ROLE_VENDOR')
+                  ? 'Tài khoản của bạn đã có quyền đăng bán tour và quản lý lịch khởi hành.'
+                  : 'Tiếp cận hàng triệu du khách và quản lý booking thông minh cùng SmartTravel.'}
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={user?.roles?.includes('ROLE_VENDOR') ? '/vendor' : '/become-vendor'}
+            className="flex-shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.3)] transition"
+          >
+            {user?.roles?.includes('ROLE_VENDOR') ? 'Truy cập Kênh Vendor' : 'Nộp hồ sơ Đối tác'}
+          </a>
+        </div>
       </div>
     </div>
   );

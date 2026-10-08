@@ -365,6 +365,17 @@ export const Navbar: React.FC = () => {
                           )}
                         </button>
 
+                        {!isVendor && !isAdmin && (
+                          <Link
+                            to="/become-vendor"
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition border-t border-white/8 mt-1 pt-2"
+                          >
+                            <Building2 className="h-4 w-4 text-amber-400" />
+                            <span>Đăng ký làm Đại lý (Vendor)</span>
+                          </Link>
+                        )}
+
                         {isVendor && (
                           <Link
                             to="/vendor"

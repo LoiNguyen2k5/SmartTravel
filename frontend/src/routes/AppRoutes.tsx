@@ -15,6 +15,7 @@ import { CheckoutPage } from '../pages/client/CheckoutPage';
 import { PaymentResultPage } from '../pages/client/PaymentResultPage';
 import { BookingHistoryPage } from '../pages/client/BookingHistoryPage';
 import { UserProfilePage } from '../pages/client/UserProfilePage';
+import { BecomeVendorPage } from '../pages/client/BecomeVendorPage';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/LoginPage';
@@ -30,6 +31,7 @@ import { BookingManagementPage } from '../pages/admin/BookingManagementPage';
 import { UserManagementPage } from '../pages/admin/UserManagementPage';
 import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
 import { VoucherManagementPage } from '../pages/admin/VoucherManagementPage';
+import { VendorApprovalPage } from '../pages/admin/VendorApprovalPage';
 
 // Vendor Pages
 import { VendorDashboardPage } from '../pages/vendor/VendorDashboardPage';
@@ -73,6 +75,7 @@ export const AppRoutes: React.FC = () => {
 		  <Route path="/blogs/:id" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
+          <Route path="/become-vendor" element={<BecomeVendorPage />} />
 
           {/* Protected: User phải đăng nhập */}
           <Route element={<ProtectedRoute />}>
@@ -93,6 +96,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
             <Route path="/admin/vouchers" element={<VoucherManagementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/vendor-approvals" element={<VendorApprovalPage />} />
           </Route>
         </Route>
 

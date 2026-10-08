@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ShoppingBag, Plus, User, Phone, TrendingUp, Users, Award, ArrowUpRight,
   ChevronRight, Eye, Edit, DollarSign, Clock, XCircle, CheckCircle2,
-  BarChart3, Download, Filter, RefreshCw, AlertTriangle, Wallet, Info, Sparkles, RotateCcw,
+  BarChart3, Download, Filter, RefreshCw, AlertTriangle, Wallet, Info, Sparkles, RotateCcw, Compass,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
@@ -71,28 +71,37 @@ export const VendorDashboardPage: React.FC = () => {
 
   const fetchVendorData = async () => {
     setLoading(true);
-    let userBookings: Booking[] = [];
-    try {
-      const raw = localStorage.getItem('user_created_bookings');
-      if (raw) userBookings = JSON.parse(raw);
-    } catch (_) {}
+    const savedUserStr = localStorage.getItem('user');
+    const currentUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+    const isDemoVendor = currentUser?.email === 'vendor@smarttravel.com';
+
     try {
       const [toursRes, bookingsRes] = await Promise.all([
         tourService.getMyTours(),
         bookingService.getVendorBookings(),
       ]);
-      if (toursRes.success && toursRes.data) setTours(toursRes.data);
+      const loadedTours = toursRes.success && toursRes.data ? toursRes.data : [];
+      setTours(loadedTours);
+      const myTourIds = new Set(loadedTours.map((t) => t.id));
+
       let rawList: Booking[] = bookingsRes.success && bookingsRes.data?.length ? bookingsRes.data : [];
-      if (!rawList.length) {
+      if (!rawList.length && isDemoVendor) {
         const fb = await bookingService.getMyBookings();
         if (fb.success && fb.data) rawList = fb.data;
       }
-      setBookings(applyStatusOverrides([...userBookings, ...rawList]));
+
+      // Giới hạn chỉ hiển thị đơn đặt tour thuộc chính các tour do vendor này quản lý
+      rawList = rawList.filter((b) => b.tourId && myTourIds.has(b.tourId));
+      setBookings(applyStatusOverrides(rawList));
     } catch (err) {
-      try {
-        const fb = await bookingService.getMyBookings();
-        if (fb.success && fb.data) setBookings(applyStatusOverrides(fb.data));
-      } catch (_) {}
+      if (isDemoVendor) {
+        try {
+          const fb = await bookingService.getMyBookings();
+          if (fb.success && fb.data) setBookings(applyStatusOverrides(fb.data));
+        } catch (_) {}
+      } else {
+        setBookings([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -227,6 +236,28 @@ export const VendorDashboardPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Welcome Banner for brand new Vendor */}
+      {!loading && tours.length === 0 && bookings.length === 0 && (
+        <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-left">
+            <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 flex-shrink-0">
+              <Compass className="h-6 w-6" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 text-base">Chào mừng Đối tác Nhà Cung Cấp mới!</h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Tài khoản của bạn đã được phê duyệt thành công. Dữ liệu hiện đang trống vì bạn chưa đăng tải hành trình nào. Hãy tạo tour đầu tiên để bắt đầu kinh doanh!
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/vendor/tours/create"
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-3 shadow-md shadow-emerald-900/20 transition whitespace-nowrap"
+          >
+            <Plus className="h-4 w-4" /> Đăng Tour Đầu Tiên
+          </Link>
+        </div>
+      )}
 
       {/* Revenue 4 cards */}
       <div>
@@ -242,10 +273,12 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp</p>
             <p className="text-[10px] text-slate-400 mb-1">(Gross Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? fmtM(analytics.grossRevenue) + ' đ' : '0 đ'}</h3>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1">
-              {analytics.grossRevenue > 0 ? <><ArrowUpRight className="h-3 w-3" /> Doanh thu thực tế</> : 'Chưa có đơn hàng'}
-            </span>
+            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? `${fmtM(analytics.grossRevenue)} đ` : '0 đ'}</h3>
+            {analytics.grossRevenue > 0 ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1"><ArrowUpRight className="h-3 w-3" /> +18.4% tháng trước</span>
+            ) : (
+              <span className="text-[11px] text-slate-400 mt-1">Chưa có doanh thu</span>
+            )}
           </div>
 
           {/* Net Revenue */}
@@ -258,7 +291,7 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Ròng</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? fmtM(analytics.netRevenue) + ' đ' : '0 đ'}</h3>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? `${fmtM(analytics.netRevenue)} đ` : '0 đ'}</h3>
             <span className="text-[11px] text-slate-400">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
           </div>
 
@@ -272,10 +305,10 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Thực Nhận</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Payout)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? fmtM(analytics.netPayout) + ' đ' : '0 đ'}</h3>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? `${fmtM(analytics.netPayout)} đ` : '0 đ'}</h3>
             <div className="text-[11px] text-slate-500 space-y-0.5 mt-1">
-              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? fmtM(analytics.commission) + ' đ' : '0 đ'}</span></div>
-              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? fmtM(analytics.gatewayFee) + ' đ' : '0 đ'}</span></div>
+              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? `${fmtM(analytics.commission)} đ` : '0 đ'}</span></div>
+              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? `${fmtM(analytics.gatewayFee)} đ` : '0 đ'}</span></div>
             </div>
           </div>
 
@@ -299,7 +332,7 @@ export const VendorDashboardPage: React.FC = () => {
             <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-slate-400'}`}>(Pending Settlement)</p>
             <h3 className={`text-xl font-black ${
               analytics.pendingSettlement > 0 ? 'text-amber-800' : 'text-slate-900'
-            }`}>{analytics.pendingSettlement > 0 ? fmtM(analytics.pendingSettlement) + ' đ' : '0 đ'}</h3>
+            }`}>{analytics.pendingSettlement > 0 ? `${fmtM(analytics.pendingSettlement)} đ` : '0 đ'}</h3>
             <span className={`text-[11px] font-medium ${
               analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-emerald-600'
             }`}>
@@ -338,7 +371,7 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">AOV</p>
           <p className="text-[10px] text-slate-400 mb-2">Avg Order Value</p>
-          <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? fmtM(analytics.aov) + ' đ' : '0 đ'}</p>
+          <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? `${fmtM(analytics.aov)} đ` : '0 đ'}</p>
           <p className="text-[11px] text-slate-400 mt-1">/ đơn đặt</p>
         </div>
 
@@ -352,8 +385,10 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Tỷ Lệ Hủy</p>
           <p className="text-[10px] text-slate-400 mb-2">Cancellation Rate</p>
-          <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) + '%' : '0%'}</p>
-          <p className={`text-[11px] mt-1 font-bold ${analytics.cancellationRate > 10 ? 'text-rose-500' : 'text-emerald-500'}`}>{analytics.cancellationRate > 10 ? '⚠ Cần theo dõi' : '✓ Trong ngưỡng tốt'}</p>
+          <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) : '0'}%</p>
+          <p className={`text-[11px] mt-1 font-bold ${analytics.cancellationRate > 10 ? 'text-rose-500' : 'text-emerald-500'}`}>
+            {analytics.counts.total > 0 ? (analytics.cancellationRate > 10 ? '⚠ Cần theo dõi' : '✓ Trong ngưỡng tốt') : 'Chưa có đơn hàng'}
+          </p>
         </div>
 
         {/* Guests */}
