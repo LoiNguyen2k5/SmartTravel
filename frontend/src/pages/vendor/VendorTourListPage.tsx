@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, Plus, Search, Edit, CalendarDays, Trash2, Archive, CheckCircle2 } from 'lucide-react';
+import { Compass, Plus, Search, Edit, CalendarDays, Trash2, Archive, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { Tour } from '../../types/tour';
+import { AdminSentimentModal } from '../../components/admin/AdminSentimentModal';
 
 export const VendorTourListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ export const VendorTourListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [lifecycleFilter, setLifecycleFilter] = useState<'ACTIVE' | 'ARCHIVED' | 'ALL'>('ACTIVE');
+  const [sentimentTour, setSentimentTour] = useState<{ id?: number; title: string } | null>(null);
+  const [showSentimentModal, setShowSentimentModal] = useState<boolean>(false);
 
   useEffect(() => {
     fetchMyTours();
@@ -73,12 +76,24 @@ export const VendorTourListPage: React.FC = () => {
             Danh sách tất cả các sản phẩm tour du lịch do đại lý của bạn đăng bán
           </p>
         </div>
-        <Link
-          to="/vendor/tours/create"
-          className="flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20"
-        >
-          <Plus className="h-4 w-4" /> Thêm Tour Mới
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setSentimentTour({ title: 'Tất Cả Tour Của Đại Lý Bạn' });
+              setShowSentimentModal(true);
+            }}
+            className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-3 text-xs font-bold text-white hover:opacity-95 transition shadow-lg shadow-cyan-900/20 cursor-pointer"
+          >
+            <Sparkles className="h-4 w-4 text-amber-300" /> Phân Tích Đánh Giá
+          </button>
+          <Link
+            to="/vendor/tours/create"
+            className="flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20"
+          >
+            <Plus className="h-4 w-4" /> Thêm Tour Mới
+          </Link>
+        </div>
       </div>
 
       {/* LIFECYCLE TABS (Đang mở bán vs Lịch sử đã kết thúc) */}
@@ -215,7 +230,17 @@ export const VendorTourListPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 pt-0 grid grid-cols-3 gap-2 border-t border-slate-100 mt-2">
+                  <div className="p-4 pt-0 grid grid-cols-2 sm:grid-cols-4 gap-2 border-t border-slate-100 mt-2">
+                    <button
+                      onClick={() => {
+                        setSentimentTour({ id: t.id, title: t.title });
+                        setShowSentimentModal(true);
+                      }}
+                      className="flex items-center justify-center gap-1 rounded-xl bg-cyan-50 text-cyan-700 py-2 text-[11px] font-bold hover:bg-cyan-100 transition border border-cyan-200/60"
+                      title="Phân tích cảm xúc & ý kiến du khách đã đi tour này"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 text-cyan-600" /> Cảm Xúc
+                    </button>
                     <button
                       onClick={() => navigate(`/vendor/tours/${t.id}/edit`)}
                       className="flex items-center justify-center gap-1 rounded-xl bg-slate-100 text-slate-700 py-2 text-[11px] font-bold hover:bg-slate-200 transition"
@@ -241,6 +266,15 @@ export const VendorTourListPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* AI Sentiment Analysis Modal for Vendor */}
+      <AdminSentimentModal
+        isOpen={showSentimentModal}
+        onClose={() => setShowSentimentModal(false)}
+        tourId={sentimentTour?.id}
+        tourTitle={sentimentTour?.title}
+        role="VENDOR"
+      />
     </div>
   );
 };

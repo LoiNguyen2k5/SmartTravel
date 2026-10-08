@@ -11,6 +11,10 @@ export const reviewService = {
     return await axiosClient.get(`/reviews/tour/${tourId}`);
   },
 
+  getAllReviews: async (): Promise<ApiResponse<Review[]>> => {
+    return await axiosClient.get('/reviews');
+  },
+
   checkEligibility: async (tourId: number): Promise<ApiResponse<boolean>> => {
     return await axiosClient.get('/reviews/check-eligibility', { params: { tourId } });
   },

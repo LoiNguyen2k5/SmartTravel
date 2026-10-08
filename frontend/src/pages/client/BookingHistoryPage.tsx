@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
-import { History, Package, QrCode, XCircle, Star, Globe, Mail } from 'lucide-react';
+import { History, Package, QrCode, XCircle, Star, Globe, Mail, RotateCcw } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { visaService } from '../../services/visaService';
 import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
@@ -216,9 +216,9 @@ export const BookingHistoryPage: React.FC = () => {
       }
 
       const res = await bookingService.getMyBookings();
-      let rawList: Booking[] = (res.success && res.data && res.data.length > 0)
+      let rawList: Booking[] = (res.success && res.data)
         ? [...localBookings, ...res.data]
-        : [...localBookings, ...MOCK_BOOKINGS];
+        : [...localBookings];
 
       // Sync status from saved vendor status updates & ensure real user info is shown
       try {
@@ -357,16 +357,34 @@ export const BookingHistoryPage: React.FC = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto space-y-8">
         
-        <div>
-          <h1 className="text-3xl font-black text-white flex items-center gap-3 tracking-tight">
-            <span className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
-              <History className="h-7 w-7" />
-            </span>
-            Quản Lý Đơn Đặt Tour & Vé Điện Tử
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Theo dõi trạng thái đơn hàng, xuất trình vé QR Code điện tử và lưu trữ nhật ký trải nghiệm du lịch.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-white flex items-center gap-3 tracking-tight">
+              <span className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
+                <History className="h-7 w-7" />
+              </span>
+              Quản Lý Đơn Đặt Tour & Vé Điện Tử
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-2">
+              Theo dõi trạng thái đơn hàng, xuất trình vé QR Code điện tử và lưu trữ nhật ký trải nghiệm du lịch.
+            </p>
+          </div>
+          {bookings.length > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm('Bạn có muốn xóa dữ liệu đơn đặt thử nghiệm để test lại chức năng đặt tour mới không?')) {
+                  localStorage.removeItem('user_created_bookings');
+                  localStorage.removeItem('vendor_booking_statuses');
+                  setBookings([]);
+                  fetchBookings();
+                }
+              }}
+              title="Xóa đơn đặt thử nghiệm để test lại từ đầu"
+              className="inline-flex items-center gap-1.5 self-start sm:self-auto px-3.5 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold transition cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Xóa Đơn Test
+            </button>
+          )}
         </div>
 
         {loading ? (

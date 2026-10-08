@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ShoppingBag, Plus, User, Phone, TrendingUp, Users, Award, ArrowUpRight,
   ChevronRight, Eye, Edit, DollarSign, Clock, XCircle, CheckCircle2,
-  BarChart3, Download, Filter, RefreshCw, AlertTriangle, Wallet, Info,
+  BarChart3, Download, Filter, RefreshCw, AlertTriangle, Wallet, Info, Sparkles, RotateCcw,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { bookingService } from '../../services/bookingService';
 import { Tour } from '../../types/tour';
 import { Booking } from '../../types/booking';
+import { AdminSentimentModal } from '../../components/admin/AdminSentimentModal';
 
 const COMMISSION_RATE = 0.10;
 const PAYMENT_FEE_RATE = 0.015;
@@ -55,6 +56,7 @@ export const VendorDashboardPage: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [filterMonths, setFilterMonths] = useState<number>(6);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
+  const [showSentimentModal, setShowSentimentModal] = useState<boolean>(false);
 
   const applyStatusOverrides = (list: Booking[]): Booking[] => {
     try {
@@ -158,12 +160,7 @@ export const VendorDashboardPage: React.FC = () => {
     });
   }, [bookings, filterMonths]);
 
-  const mockBase = [8200000, 14500000, 22800000, 31000000, 38500000, 42000000, 35000000, 27000000, 44000000, 51000000, 39000000, 47000000];
-  const chartDataFinal = useMemo(() => {
-    const hasReal = chartData.some((d) => d.total > 0);
-    if (hasReal) return chartData;
-    return chartData.map((d, i) => ({ ...d, settled: Math.round(mockBase[i % 12] * 0.55), pending: Math.round(mockBase[i % 12] * 0.45), total: mockBase[i % 12], bookingCount: Math.round(2 + i * 1.5), guestCount: Math.round(8 + i * 5), netRev: Math.round(mockBase[i % 12] * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE)) }));
-  }, [chartData]);
+  const chartDataFinal = chartData;
 
   const maxChartVal = Math.max(...chartDataFinal.map((d) => d.total), 1);
   const filteredBookings = useMemo(() => filterStatus === 'ALL' ? bookings : bookings.filter((b) => classifyStatus(b.status) === filterStatus), [bookings, filterStatus]);
@@ -197,17 +194,39 @@ export const VendorDashboardPage: React.FC = () => {
           <p className="mt-1 text-sm text-slate-500">Báo cáo tài chính · Quản lý tour · Đối soát doanh thu</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSentimentModal(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition shadow-md shadow-cyan-900/20 cursor-pointer"
+          >
+            <Sparkles className="h-4 w-4 text-amber-300" /> Phân Tích Đánh Giá
+          </button>
           <button onClick={exportCSV} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
             <Download className="h-4 w-4" /> Xuất CSV
           </button>
-          <button onClick={fetchVendorData} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+          <button onClick={fetchVendorData} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm" title="Làm mới dữ liệu">
             <RefreshCw className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => {
+              if (window.confirm('Bạn có chắc muốn đặt lại toàn bộ đơn đặt tour thử nghiệm và doanh thu về 0đ để bắt đầu test lại từ đầu không?')) {
+                localStorage.removeItem('user_created_bookings');
+                localStorage.removeItem('vendor_booking_statuses');
+                localStorage.removeItem('smart_travel_settled_vendor_ids');
+                setBookings([]);
+                fetchVendorData();
+              }
+            }}
+            title="Đặt lại dữ liệu đơn đặt thử nghiệm về 0đ"
+            className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-100 transition shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="h-4 w-4" /> Reset Doanh Thu
           </button>
           <Link to="/vendor/tours/create" className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-md shadow-emerald-900/20">
             <Plus className="h-4 w-4" /> Thêm Tour Mới
           </Link>
         </div>
       </div>
+
 
       {/* Revenue 4 cards */}
       <div>
@@ -223,8 +242,10 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp</p>
             <p className="text-[10px] text-slate-400 mb-1">(Gross Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? fmtM(analytics.grossRevenue) : '258.8M'} đ</h3>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1"><ArrowUpRight className="h-3 w-3" /> +18.4% tháng trước</span>
+            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? fmtM(analytics.grossRevenue) + ' đ' : '0 đ'}</h3>
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1">
+              {analytics.grossRevenue > 0 ? <><ArrowUpRight className="h-3 w-3" /> Doanh thu thực tế</> : 'Chưa có đơn hàng'}
+            </span>
           </div>
 
           {/* Net Revenue */}
@@ -237,7 +258,7 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Ròng</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? fmtM(analytics.netRevenue) : '241.2M'} đ</h3>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? fmtM(analytics.netRevenue) + ' đ' : '0 đ'}</h3>
             <span className="text-[11px] text-slate-400">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
           </div>
 
@@ -251,10 +272,10 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Thực Nhận</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Payout)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? fmtM(analytics.netPayout) : '216.3M'} đ</h3>
+            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? fmtM(analytics.netPayout) + ' đ' : '0 đ'}</h3>
             <div className="text-[11px] text-slate-500 space-y-0.5 mt-1">
-              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? fmtM(analytics.commission) : '19.3M'} đ</span></div>
-              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? fmtM(analytics.gatewayFee) : '3.6M'} đ</span></div>
+              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? fmtM(analytics.commission) + ' đ' : '0 đ'}</span></div>
+              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? fmtM(analytics.gatewayFee) + ' đ' : '0 đ'}</span></div>
             </div>
           </div>
 
@@ -278,7 +299,7 @@ export const VendorDashboardPage: React.FC = () => {
             <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-slate-400'}`}>(Pending Settlement)</p>
             <h3 className={`text-xl font-black ${
               analytics.pendingSettlement > 0 ? 'text-amber-800' : 'text-slate-900'
-            }`}>{analytics.pendingSettlement > 0 ? fmtM(analytics.pendingSettlement) : '0'} đ</h3>
+            }`}>{analytics.pendingSettlement > 0 ? fmtM(analytics.pendingSettlement) + ' đ' : '0 đ'}</h3>
             <span className={`text-[11px] font-medium ${
               analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-emerald-600'
             }`}>
@@ -317,7 +338,7 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">AOV</p>
           <p className="text-[10px] text-slate-400 mb-2">Avg Order Value</p>
-          <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? fmtM(analytics.aov) : '14.2M'} đ</p>
+          <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? fmtM(analytics.aov) + ' đ' : '0 đ'}</p>
           <p className="text-[11px] text-slate-400 mt-1">/ đơn đặt</p>
         </div>
 
@@ -331,7 +352,7 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Tỷ Lệ Hủy</p>
           <p className="text-[10px] text-slate-400 mb-2">Cancellation Rate</p>
-          <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) : '3.2'}%</p>
+          <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) + '%' : '0%'}</p>
           <p className={`text-[11px] mt-1 font-bold ${analytics.cancellationRate > 10 ? 'text-rose-500' : 'text-emerald-500'}`}>{analytics.cancellationRate > 10 ? '⚠ Cần theo dõi' : '✓ Trong ngưỡng tốt'}</p>
         </div>
 
@@ -341,7 +362,7 @@ export const VendorDashboardPage: React.FC = () => {
             <div className="rounded-xl bg-teal-100 p-2 text-teal-700"><Users className="h-4 w-4" /></div>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Tổng Khách</p>
-          <p className="text-2xl font-black text-slate-900">{analytics.totalGuests > 0 ? analytics.totalGuests : 76}</p>
+          <p className="text-2xl font-black text-slate-900">{analytics.totalGuests}</p>
           <p className="text-[11px] text-slate-400 mt-1">du khách đã trải nghiệm</p>
           <div className="mt-2 h-1.5 rounded-full bg-teal-100 overflow-hidden">
             <div className="h-full rounded-full bg-teal-500" style={{ width: `${Math.min(100, (analytics.totalGuests / 200) * 100)}%` }} />
@@ -524,6 +545,14 @@ export const VendorDashboardPage: React.FC = () => {
         </div>
         <ChevronRight className="h-5 w-5 text-sky-400 group-hover:translate-x-1 transition-transform" />
       </Link>
+
+      {/* AI Customer Sentiment Analysis Modal for Vendor */}
+      <AdminSentimentModal
+        isOpen={showSentimentModal}
+        onClose={() => setShowSentimentModal(false)}
+        tourTitle="Tất Cả Tour Của Đại Lý Bạn"
+        role="VENDOR"
+      />
     </div>
   );
 };

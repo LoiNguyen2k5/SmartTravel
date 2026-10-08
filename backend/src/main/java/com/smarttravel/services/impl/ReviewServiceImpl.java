@@ -72,6 +72,13 @@ public class ReviewServiceImpl implements ReviewService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ReviewResponse> getAllReviews() {
+        return reviewRepository.findAll().stream()
+                .map(this::mapToReviewResponse)
+                .collect(Collectors.toList());
+    }
+
     private ReviewResponse mapToReviewResponse(Review review) {
         return ReviewResponse.builder()
                 .id(review.getId())

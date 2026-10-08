@@ -423,7 +423,7 @@ export const LuxuryHero3D: React.FC<LuxuryHero3DProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <Bot className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
-                <span>Trợ lý ảo Gemini AI 24/7</span>
+                <span>Trợ lý ảo AI 24/7</span>
               </div>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />

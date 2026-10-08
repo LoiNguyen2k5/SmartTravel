@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Compass, Save, ArrowLeft, Image, Plus, Trash2 } from 'lucide-react';
+import { Compass, Save, ArrowLeft, Image, Plus, Trash2, Sparkles } from 'lucide-react';
 import { tourService } from '../../services/tourService';
 import { visaService } from '../../services/visaService';
 import { VisaRequirementConfig } from '../../components/visa/VisaRequirementConfig';
 import { VisaRequirementRequest } from '../../types/visa';
+import { AiTourGeneratorModal } from '../../components/vendor/AiTourGeneratorModal';
+import { TourAiGenerateResult } from '../../services/aiService';
 
 export const EditTourPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +16,7 @@ export const EditTourPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [showAiModal, setShowAiModal] = useState<boolean>(false);
 
   // Editable Form Fields
   const [title, setTitle] = useState('');
@@ -114,6 +117,14 @@ export const EditTourPage: React.FC = () => {
     }
   };
 
+  const handleApplyAiContent = (aiData: TourAiGenerateResult) => {
+    if (aiData.title) setTitle(aiData.title);
+    if (aiData.tourCode) setTourCode(aiData.tourCode);
+    if (aiData.description) setDescription(aiData.description);
+    if (aiData.suggestedPrice) setPrice(aiData.suggestedPrice);
+    if (aiData.suggestedChildPrice) setChildPrice(aiData.suggestedChildPrice);
+  };
+
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -142,6 +153,40 @@ export const EditTourPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4" /> Quay lại Danh sách Tour
         </button>
       </div>
+
+      {/* AI GENERATOR BANNER */}
+      <div className="flex items-center justify-between rounded-3xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border border-emerald-500/20 p-5 shadow-sm">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-600/20">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+              Trợ Lý AI Tối Ưu Lại Nội Dung Tour
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">
+                Tự Động
+              </span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Cải tiến tiêu đề, viết lại mô tả chuẩn SEO & tính giá gợi ý chỉ với 1 click
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAiModal(true)}
+          className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white hover:from-emerald-500 hover:to-teal-500 transition shadow-md shadow-emerald-900/20 whitespace-nowrap cursor-pointer"
+        >
+          <Sparkles className="h-4 w-4 text-amber-300" /> Tối ưu bằng AI
+        </button>
+      </div>
+
+      <AiTourGeneratorModal
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        onApply={handleApplyAiContent}
+        defaultDestination={departureLocation || title}
+      />
 
       {error && (
         <div className="rounded-2xl bg-rose-50 p-4 text-xs font-bold text-rose-700 border border-rose-200">

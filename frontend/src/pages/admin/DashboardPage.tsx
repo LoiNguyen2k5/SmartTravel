@@ -19,11 +19,13 @@ import {
   BarChart3,
   ArrowDownRight,
   Info,
+  Sparkles,
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { AdminStats } from '../../types/admin';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { Link } from 'react-router-dom';
+import { AdminSentimentModal } from '../../components/admin/AdminSentimentModal';
 
 // ─── Constants (đồng bộ với VendorDashboard & TransactionSettlementPage) ──────
 const PLATFORM_COMMISSION = 0.10; // 10% hoa hồng sàn
@@ -44,6 +46,7 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [, forceUpdate] = useState(0); // để re-render khi settlement thay đổi
+  const [showSentimentModal, setShowSentimentModal] = useState<boolean>(false);
 
   const fetchStats = async () => {
     try {
@@ -115,14 +118,23 @@ export const DashboardPage: React.FC = () => {
             Giám sát thời gian thực toàn bộ hoạt động kinh doanh, người dùng và đối tác trên sàn SmartTravel
           </p>
         </div>
-        <button
-          onClick={fetchStats}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
-          Làm mới số liệu
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSentimentModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 via-indigo-600 to-fuchsia-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
+          >
+            <Sparkles className="h-4 w-4 text-amber-300" />
+            Phân Tích Đánh Giá
+          </button>
+          <button
+            onClick={fetchStats}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
+            Làm mới số liệu
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -131,6 +143,7 @@ export const DashboardPage: React.FC = () => {
           <span>{error}</span>
         </div>
       )}
+
 
       {/* ── PHÂN TÍCH DOANH THU (góc nhìn Admin — đồng bộ với VendorDashboard) ── */}
       <div>
@@ -451,6 +464,13 @@ export const DashboardPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* AI Sentiment Analysis Modal */}
+      <AdminSentimentModal
+        isOpen={showSentimentModal}
+        onClose={() => setShowSentimentModal(false)}
+        tourTitle="Toàn Sàn SmartTravel (Tổng hợp đánh giá khách hàng)"
+      />
     </div>
   );
 };

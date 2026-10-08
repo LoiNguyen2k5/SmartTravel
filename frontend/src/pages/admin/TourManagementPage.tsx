@@ -9,11 +9,13 @@ import {
   RefreshCw, 
   Building2, 
   AlertCircle, 
-  FileText 
+  FileText,
+  Sparkles
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { Tour, TourStatus } from '../../types/tour';
 import { formatCurrency } from '../../utils/formatters';
+import { AdminSentimentModal } from '../../components/admin/AdminSentimentModal';
 
 export const TourManagementPage: React.FC = () => {
   const [tours, setTours] = useState<Tour[]>([]);
@@ -26,6 +28,10 @@ export const TourManagementPage: React.FC = () => {
   const [inspectTour, setInspectTour] = useState<Tour | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string>('');
   const [showRejectInput, setShowRejectInput] = useState<boolean>(false);
+
+  // AI Sentiment Analysis Modal
+  const [sentimentModalTour, setSentimentModalTour] = useState<{ id?: number; title: string } | null>(null);
+  const [showSentimentModal, setShowSentimentModal] = useState<boolean>(false);
 
   const fetchTours = async () => {
     try {
@@ -99,14 +105,26 @@ export const TourManagementPage: React.FC = () => {
             Phê duyệt bài đăng tour của Vendor trước khi cho phép mở bán và hiển thị công khai trên sàn
           </p>
         </div>
-        <button
-          onClick={fetchTours}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
-          Làm mới
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setSentimentModalTour({ title: 'Toàn Sàn SmartTravel (Tổng hợp đánh giá du khách)' });
+              setShowSentimentModal(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl shadow-md shadow-cyan-600/20 transition active:scale-95"
+          >
+            <Sparkles className="h-4 w-4 text-amber-300" />
+            Phân Tích Đánh Giá
+          </button>
+          <button
+            onClick={fetchTours}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
+            Làm mới
+          </button>
+        </div>
       </div>
 
       {/* Tabs / Filter Status */}
@@ -257,17 +275,30 @@ export const TourManagementPage: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={() => {
-                            setInspectTour(tour);
-                            setShowRejectInput(false);
-                            setRejectionReason('');
-                          }}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition active:scale-95"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          Xem & Duyệt
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => {
+                              setSentimentModalTour({ id: tour.id, title: tour.title });
+                              setShowSentimentModal(true);
+                            }}
+                            title="Phân tích cảm xúc & cảnh báo chất lượng bằng AI"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 text-cyan-700 hover:bg-cyan-100 border border-cyan-200 transition active:scale-95"
+                          >
+                            <Sparkles className="h-3.5 w-3.5 text-cyan-600" />
+                            AI Đánh Giá
+                          </button>
+                          <button
+                            onClick={() => {
+                              setInspectTour(tour);
+                              setShowRejectInput(false);
+                              setRejectionReason('');
+                            }}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition active:scale-95"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            Xem & Duyệt
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -419,6 +450,18 @@ export const TourManagementPage: React.FC = () => {
               )}
 
               <button
+                type="button"
+                onClick={() => {
+                  setSentimentModalTour({ id: inspectTour.id, title: inspectTour.title });
+                  setShowSentimentModal(true);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Sparkles className="h-4 w-4 text-cyan-300" />
+                AI Phân Tích Cảm Xúc
+              </button>
+
+              <button
                 onClick={() => handleModerate(inspectTour.id, TourStatus.ACTIVE)}
                 disabled={actionLoadingId !== null}
                 className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition active:scale-95 disabled:opacity-50 cursor-pointer"
@@ -430,6 +473,14 @@ export const TourManagementPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* AI Sentiment Analysis Modal */}
+      <AdminSentimentModal
+        isOpen={showSentimentModal}
+        onClose={() => setShowSentimentModal(false)}
+        tourId={sentimentModalTour?.id}
+        tourTitle={sentimentModalTour?.title}
+      />
     </div>
   );
 };

@@ -26,8 +26,8 @@ const services = [
     icon: <Bot className="h-7 w-7" />,
     color: 'from-violet-500 to-purple-400',
     glow: 'rgba(139,92,246,0.25)',
-    title: 'Tư Vấn AI Gemini',
-    desc: 'Trợ lý Gemini AI hoạt động 24/7 — phân tích sở thích, ngân sách, thời gian và đề xuất lịch trình cá nhân hoá chính xác cho từng khách hàng.',
+    title: 'Trợ Lý AI Thông Minh',
+    desc: 'Trợ lý AI thông minh hoạt động 24/7 — phân tích sở thích, ngân sách, thời gian và đề xuất lịch trình cá nhân hoá chính xác cho từng khách hàng.',
     features: ['Đề xuất theo sở thích', 'So sánh giá real-time', 'Lịch trình tối ưu chi phí', 'Phản hồi ngay lập tức'],
   },
   {

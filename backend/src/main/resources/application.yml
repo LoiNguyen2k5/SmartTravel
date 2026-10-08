@@ -64,3 +64,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+
+# Google Gemini AI Configuration
+gemini:
+  api-key: "AQ.Ab8RN6LDQC3ymaaS_DtupWHkgQQy1VHv-nbTvZFkulDrBnl-Qg"
+  model: "gemini-2.5-flash"
+  api-url: "https://generativelanguage.googleapis.com/v1beta/models"

@@ -33,6 +33,12 @@ public class ReviewController {
         return ResponseEntity.status(201).body(ApiResponse.created("Đăng đánh giá thành công", review));
     }
 
+    @GetMapping
+    @Operation(summary = "Lấy tất cả đánh giá của hệ thống")
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getAllReviews() {
+        return ResponseEntity.ok(ApiResponse.success(reviewService.getAllReviews()));
+    }
+
     @GetMapping("/tour/{tourId}")
     @Operation(summary = "Lấy danh sách đánh giá của một Tour")
     public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByTourId(@PathVariable Long tourId) {

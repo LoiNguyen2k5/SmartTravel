@@ -8,5 +8,6 @@ import java.util.List;
 public interface ReviewService {
     ReviewResponse createReview(ReviewCreateRequest request, String userEmail);
     List<ReviewResponse> getReviewsByTourId(Long tourId);
+    List<ReviewResponse> getAllReviews();
     boolean checkEligibility(Long tourId, String userEmail);
 }

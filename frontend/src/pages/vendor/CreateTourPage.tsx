@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Compass, ArrowLeft } from 'lucide-react';
+import { Plus, Compass, ArrowLeft, Sparkles } from 'lucide-react';
 import { tourService } from '../../services/tourService';
+import { AiTourGeneratorModal } from '../../components/vendor/AiTourGeneratorModal';
+import { TourAiGenerateResult } from '../../services/aiService';
 
 export const CreateTourPage: React.FC = () => {
   const navigate = useNavigate();
+  const [showAiModal, setShowAiModal] = useState(false);
   const [title, setTitle] = useState('');
   const [tourCode, setTourCode] = useState('');
   const [price, setPrice] = useState<number>(0);
@@ -17,6 +20,14 @@ export const CreateTourPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleApplyAiContent = (aiData: TourAiGenerateResult) => {
+    if (aiData.title) setTitle(aiData.title);
+    if (aiData.tourCode) setTourCode(aiData.tourCode);
+    if (aiData.suggestedPrice) setPrice(aiData.suggestedPrice);
+    if (aiData.suggestedChildPrice) setChildPrice(aiData.suggestedChildPrice);
+    if (aiData.description) setDescription(aiData.description);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +86,39 @@ export const CreateTourPage: React.FC = () => {
           {error}
         </div>
       )}
+
+      {/* AI GENERATOR BANNER */}
+      <div className="flex items-center justify-between rounded-3xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border border-emerald-500/20 p-5 shadow-sm">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-600/20">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+              Trợ Lý AI Tạo Nội Dung Tour
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">
+                Tự Động
+              </span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Tự động viết mô tả hấp dẫn & tạo sẵn lịch trình từng ngày chỉ với 1 click
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAiModal(true)}
+          className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white hover:from-emerald-500 hover:to-teal-500 transition shadow-md shadow-emerald-900/20 whitespace-nowrap"
+        >
+          <Sparkles className="h-4 w-4 text-amber-300" /> Tạo bằng AI
+        </button>
+      </div>
+
+      <AiTourGeneratorModal
+        isOpen={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        onApply={handleApplyAiContent}
+      />
 
       <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div>

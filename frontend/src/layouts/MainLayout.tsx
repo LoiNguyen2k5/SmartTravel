@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
+import { AiChatWidget } from '../components/chat/AiChatWidget';
 
 export const MainLayout: React.FC = () => {
   return (
@@ -16,6 +17,10 @@ export const MainLayout: React.FC = () => {
 
       {/* Footer Component */}
       <Footer />
+
+      {/* Floating AI Chatbot Assistant 24/7 */}
+      <AiChatWidget />
     </div>
   );
 };
+

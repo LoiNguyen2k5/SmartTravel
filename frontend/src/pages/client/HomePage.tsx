@@ -3,10 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { posts } from '../../data/blogPosts';
 import { 
   PhoneCall, Calendar,
-  Phone, CheckCircle2, Map, Instagram, Facebook, ArrowRight, Tag,
+  CheckCircle2, ArrowRight, Tag,
   Star, Eye, Users
 } from 'lucide-react';
-import { ZaloIcon } from '../../components/common/ZaloIcon';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { MOCK_TOURS } from '../../data/mockTours';
 import { tourService } from '../../services/tourService';
@@ -474,57 +473,6 @@ export const HomePage: React.FC = () => {
 	      </Link>
 	    </div>
 	  </section>
-
-      {/* 9. FLOATING CONTACT SPEED DIAL */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5">
-        <a
-          href="https://zalo.me/0941899554"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl overflow-hidden shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center bg-white border border-white/30"
-          title="Tư vấn qua Zalo (0941 899 554)"
-        >
-          <ZaloIcon className="h-11 w-11" />
-        </a>
-
-        <a
-          href="https://www.facebook.com/loiii.nguyen.397715"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
-          title="Trang Facebook"
-        >
-          <Facebook className="h-5 w-5" />
-        </a>
-
-        <a
-          href="https://www.instagram.com/loiiinguyen/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
-          title="Instagram"
-        >
-          <Instagram className="h-5 w-5" />
-        </a>
-
-        <a
-          href="tel:0941899554"
-          className="h-11 w-11 rounded-2xl bg-accent-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
-          title="Gọi Hotline: 0941 899 554"
-        >
-          <Phone className="h-5 w-5 fill-white" />
-        </a>
-
-        <a
-          href="https://maps.google.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-primary-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
-          title="Địa chỉ công ty"
-        >
-          <Map className="h-5 w-5" />
-        </a>
-      </div>
 
     </div>
   );
