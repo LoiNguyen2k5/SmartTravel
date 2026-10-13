@@ -64,10 +64,33 @@ export const TransactionSettlementPage: React.FC = () => {
       if (paymentsRes.data) setPayments(paymentsRes.data);
       if (settlementsRes.data) {
         const settledIds = getSettledVendorIds();
-        const mergedSettlements = settlementsRes.data.map(s => ({
-          ...s,
-          settlementStatus: (settledIds.includes(s.vendorId) || s.settlementStatus === 'SETTLED') ? 'SETTLED' : (s.settlementStatus || 'PENDING')
-        }));
+        let localBookings: any[] = [];
+        try {
+          const localStr = localStorage.getItem('user_created_bookings');
+          if (localStr) localBookings = JSON.parse(localStr);
+        } catch (_) {}
+
+        const mergedSettlements = settlementsRes.data.map(s => {
+          const vendorLocalBookings = localBookings.filter(b => 
+            (b.vendorId === s.vendorId) || (s.vendorId === 2 && (!b.vendorId || b.vendorId === 2))
+          );
+          const localGross = vendorLocalBookings
+            .filter(b => b.status === 'PAID' || b.status === 'CONFIRMED' || b.status === 'COMPLETED')
+            .reduce((sum, b) => sum + (Number(b.totalPrice) || 0), 0);
+          const totalGross = (Number(s.totalGrossRevenue) || 0) + localGross;
+          const commRate = s.commissionRate || 10;
+          const platformFee = Math.round(totalGross * (commRate / 100));
+          const netPayout = totalGross - platformFee;
+
+          return {
+            ...s,
+            totalBookings: (s.totalBookings || 0) + vendorLocalBookings.length,
+            totalGrossRevenue: totalGross,
+            platformFee,
+            netPayout,
+            settlementStatus: (settledIds.includes(s.vendorId) || s.settlementStatus === 'SETTLED') ? 'SETTLED' : (s.settlementStatus || 'PENDING')
+          };
+        });
         setSettlements(mergedSettlements);
       }
     } catch (err) {

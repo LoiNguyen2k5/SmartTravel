@@ -39,6 +39,8 @@ public class BookingResponse {
     private Boolean singleRoomSurcharge;
     private BigDecimal singleRoomSurchargeAmount;
     private String roomAllocation;
+    private Long vendorId;
+    private String vendorName;
     private String qrCodeUrl;
     private LocalDateTime createdAt;
 }

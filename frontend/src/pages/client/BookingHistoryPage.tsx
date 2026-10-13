@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
-import { History, Package, QrCode, XCircle, Star, Globe, Mail, RotateCcw } from 'lucide-react';
+import { History, Package, QrCode, XCircle, Star, Globe, Mail, RotateCcw, Building2 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { visaService } from '../../services/visaService';
 import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
@@ -84,6 +84,7 @@ export const BookingHistoryPage: React.FC = () => {
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [tourCategories, setTourCategories] = useState<Record<number, string>>({});
+  const [tourVendors, setTourVendors] = useState<Record<number, string>>({});
 
   // Visa states
   const [selectedVisaBooking, setSelectedVisaBooking] = useState<Booking | null>(null);
@@ -174,15 +175,20 @@ export const BookingHistoryPage: React.FC = () => {
         const { tourService } = await import('../../services/tourService');
         const uniqueIds = Array.from(new Set(bookings.map(b => b.tourId)));
         const newMap: Record<number, string> = {};
+        const newVendorMap: Record<number, string> = {};
         await Promise.all(uniqueIds.map(async id => {
           try {
             const res = await tourService.getTourById(id);
             if (res?.data?.category) {
               newMap[id] = res.data.category;
             }
+            if (res?.data?.vendorName) {
+              newVendorMap[id] = res.data.vendorName;
+            }
           } catch(e) {}
         }));
         setTourCategories(prev => ({ ...prev, ...newMap }));
+        setTourVendors(prev => ({ ...prev, ...newVendorMap }));
       } catch (e) {
         console.error('Lỗi lấy danh mục tour:', e);
       }
@@ -439,6 +445,14 @@ export const BookingHistoryPage: React.FC = () => {
                         <div>Tổng tiền: <strong className="text-rose-400 font-black text-sm block">{b.totalPrice?.toLocaleString('vi-VN')} đ</strong></div>
                         <div>Ngày đặt: <span className="text-slate-400 block">{new Date(b.createdAt).toLocaleDateString('vi-VN')}</span></div>
                       </div>
+
+                      <div className="flex items-center gap-2 pt-1 text-xs">
+                        <span className="text-slate-400">Đơn vị tổ chức:</span>
+                        <span className="font-bold text-sky-400 flex items-center gap-1.5 bg-sky-500/10 px-2.5 py-0.5 rounded-lg border border-sky-500/20">
+                          <Building2 className="w-3.5 h-3.5" />
+                          {b.vendorName || (tourVendors[b.tourId] || 'NewTour Travel Company')}
+                        </span>
+                      </div>
                       
                       {/* Pending Payment Warning */}
                       {b.status === 'PENDING' && (
@@ -569,6 +583,7 @@ export const BookingHistoryPage: React.FC = () => {
                   <div className="font-extrabold text-white uppercase text-[12px] line-clamp-1">{selectedTicket.tourTitle}</div>
                   <div>Khách hàng: <strong className="text-white">{selectedTicket.contactName}</strong></div>
                   <div>Khởi hành: <strong className="text-cyan-300 font-bold">{selectedTicket.departureDate || '15-09-2026'}</strong></div>
+                  <div>Đơn vị tổ chức: <strong className="text-sky-300 font-semibold">{selectedTicket.vendorName || (tourVendors[selectedTicket.tourId] || 'NewTour Travel Company')}</strong></div>
                   <div>Số lượng: <strong className="text-white">{selectedTicket.numberOfAdults} Người lớn, {selectedTicket.numberOfChildren} Trẻ em</strong></div>
                 </div>
               </div>

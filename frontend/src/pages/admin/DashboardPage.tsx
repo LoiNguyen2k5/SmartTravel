@@ -406,11 +406,7 @@ export const DashboardPage: React.FC = () => {
               <ShoppingBag className="h-5 w-5 text-emerald-600" />
               Đơn Đặt Chỗ Gần Đây
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">Các giao dịch đặt tour mới nhất trên hệ thống</p>
           </div>
-          <Link to="/admin/bookings" className="text-xs font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">
-            Xem tất cả booking <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
         </div>
 
         <div className="overflow-x-auto">

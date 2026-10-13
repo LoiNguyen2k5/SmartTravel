@@ -62,6 +62,8 @@ export const CheckoutPage: React.FC = () => {
 
   const [hasVisaConfig, setHasVisaConfig] = useState(false);
   const [fetchedCategory, setFetchedCategory] = useState('TRONG_NUOC');
+  const [fetchedVendorId, setFetchedVendorId] = useState<number | undefined>(stateData.vendorId);
+  const [fetchedVendorName, setFetchedVendorName] = useState<string>(stateData.vendorName || 'NewTour Travel Company');
 
   useEffect(() => {
     // Sync user data
@@ -81,6 +83,8 @@ export const CheckoutPage: React.FC = () => {
         if (tourRes && tourRes.data) {
            category = String(tourRes.data.category ?? 'TRONG_NUOC');
            setFetchedCategory(category);
+           if (tourRes.data.vendorId) setFetchedVendorId(tourRes.data.vendorId);
+           if (tourRes.data.vendorName) setFetchedVendorName(tourRes.data.vendorName);
         }
 
         if (category === 'NUOC_NGOAI') {
@@ -173,6 +177,7 @@ export const CheckoutPage: React.FC = () => {
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     const chosenDate = getNormalizedDepartureDate();
     
+    const chosenPaymentMethod = paymentMethod === 'BANK' ? 'BANK_TRANSFER' : paymentMethod;
     // Attempt backend first
     try {
       await bookingService.createBooking({
@@ -184,7 +189,7 @@ export const CheckoutPage: React.FC = () => {
         contactEmail: contactEmail.trim(),
         contactPhone: contactPhone.trim(),
         note: note.trim() || undefined,
-        paymentMethod: paymentMethod,
+        paymentMethod: chosenPaymentMethod,
         departureDate: chosenDate,
         bookingCode: code,
         status: 'PENDING',
@@ -209,6 +214,8 @@ export const CheckoutPage: React.FC = () => {
         status: 'PENDING', contactName: contactName.trim(),
         contactEmail: contactEmail.trim(), contactPhone: contactPhone.trim(),
         departureDate: chosenDate,
+        vendorId: fetchedVendorId || 2,
+        vendorName: fetchedVendorName || 'NewTour Travel Company',
         qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=SMARTTRAVEL-E-TICKET%7C${code}%7C${tourCode}%7CPENDING`,
         createdAt: new Date().toISOString(),
       };
@@ -244,6 +251,7 @@ export const CheckoutPage: React.FC = () => {
 
     const code = `BK${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     const chosenDate = getNormalizedDepartureDate();
+    const chosenPaymentMethod = paymentMethod === 'BANK' ? 'BANK_TRANSFER' : paymentMethod;
 
     // Call backend to persist PENDING booking so Webhook & Polling match it 100%
     try {
@@ -256,7 +264,7 @@ export const CheckoutPage: React.FC = () => {
         contactEmail: contactEmail.trim(),
         contactPhone: contactPhone.trim(),
         note: note.trim() || undefined,
-        paymentMethod: paymentMethod,
+        paymentMethod: chosenPaymentMethod,
         departureDate: chosenDate,
         bookingCode: code,
         status: 'PENDING',
@@ -293,6 +301,8 @@ export const CheckoutPage: React.FC = () => {
       contactEmail: contactEmail.trim(),
       contactPhone: contactPhone.trim(),
       departureDate: chosenDate,
+      vendorId: fetchedVendorId || 2,
+      vendorName: fetchedVendorName || 'NewTour Travel Company',
       qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=SMARTTRAVEL-E-TICKET%7C${code}%7C${tourCode}%7CPAID`,
       createdAt: new Date().toISOString(),
     };
@@ -302,7 +312,12 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const handlePaymentSuccess = (booking: Booking) => {
-    const finalBooking = { ...booking, status: 'PAID' as const };
+    const finalBooking = { 
+      ...booking, 
+      status: 'PAID' as const,
+      vendorId: booking.vendorId || fetchedVendorId || 2,
+      vendorName: booking.vendorName || fetchedVendorName || 'NewTour Travel Company'
+    };
     
     try {
       const existingStr = localStorage.getItem('user_created_bookings');
@@ -394,6 +409,13 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-slate-400">Tên Tour:</span>
                 <span className="font-bold text-white">{createdBooking.tourTitle || tourTitle}</span>
+              </div>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-slate-400">Đơn vị tổ chức (Vendor):</span>
+                <span className="font-bold text-sky-400 flex items-center gap-1">
+                  <Building2 className="h-3.5 w-3.5" />
+                  {createdBooking.vendorName || fetchedVendorName || 'NewTour Travel Company'}
+                </span>
               </div>
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-slate-400">Người liên hệ:</span>
@@ -661,6 +683,10 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                   <div className="text-slate-400 font-medium flex items-center gap-1">
                     <span>📅 Khởi hành: <strong className="text-cyan-300">{stateData.departureDate || '15-09-2026'}</strong></span>
+                  </div>
+                  <div className="text-slate-400 font-medium flex items-center gap-1.5 pt-0.5">
+                    <Building2 className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+                    <span>Đơn vị tổ chức: <strong className="text-sky-300 font-bold">{fetchedVendorName || 'NewTour Travel Company'}</strong></span>
                   </div>
                 </div>
 

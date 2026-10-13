@@ -90,6 +90,25 @@ export const VendorDashboardPage: React.FC = () => {
         if (fb.success && fb.data) rawList = fb.data;
       }
 
+      // Merge client local bookings (e.g. newly booked tours)
+      let localBookings: Booking[] = [];
+      try {
+        const localStr = localStorage.getItem('user_created_bookings');
+        if (localStr) {
+          localBookings = JSON.parse(localStr);
+        }
+      } catch (e) {
+        console.error('Lỗi đọc user_created_bookings:', e);
+      }
+
+      const existingCodes = new Set(rawList.map((b) => b.bookingCode));
+      for (const lb of localBookings) {
+        if (!existingCodes.has(lb.bookingCode)) {
+          rawList.unshift(lb);
+          existingCodes.add(lb.bookingCode);
+        }
+      }
+
       // Giới hạn chỉ hiển thị đơn đặt tour thuộc chính các tour do vendor này quản lý
       rawList = rawList.filter((b) => b.tourId && myTourIds.has(b.tourId));
       setBookings(applyStatusOverrides(rawList));
@@ -97,7 +116,21 @@ export const VendorDashboardPage: React.FC = () => {
       if (isDemoVendor) {
         try {
           const fb = await bookingService.getMyBookings();
-          if (fb.success && fb.data) setBookings(applyStatusOverrides(fb.data));
+          let list = (fb.success && fb.data) ? fb.data : [];
+          try {
+            const localStr = localStorage.getItem('user_created_bookings');
+            if (localStr) {
+              const localBookings: Booking[] = JSON.parse(localStr);
+              const existingCodes = new Set(list.map((b) => b.bookingCode));
+              for (const lb of localBookings) {
+                if (!existingCodes.has(lb.bookingCode)) {
+                  list.unshift(lb);
+                  existingCodes.add(lb.bookingCode);
+                }
+              }
+            }
+          } catch (_) {}
+          setBookings(applyStatusOverrides(list));
         } catch (_) {}
       } else {
         setBookings([]);

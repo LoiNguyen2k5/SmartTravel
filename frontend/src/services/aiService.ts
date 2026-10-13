@@ -231,65 +231,226 @@ Yêu cầu trả về đúng định dạng JSON thuần túy (không kèm code 
     tourTitle?: string;
     reviewTexts?: string[];
   }): Promise<ReviewSentimentResult> => {
+    // If no reviews, return empty result directly without calling AI
+    if (!params.reviewTexts || params.reviewTexts.length === 0) {
+      return {
+        overallSentiment: 'NEUTRAL',
+        positivePercentage: 0,
+        negativePercentage: 0,
+        neutralPercentage: 100,
+        summary: 'Chưa có đánh giá để phân tích',
+        keyHighlights: [],
+        keyComplaints: [],
+        qualityAlert: 'STABLE',
+        recommendationsForVendor: 'Chưa có đánh giá nào từ khách hàng để phân tích chất lượng.',
+      };
+    }
+
+    const reviews = params.reviewTexts;
+    const localCheck = analyzeReviewsLocally(reviews, params.tourTitle);
+
     try {
       const res = await axiosClient.post<any, ApiResponse<ReviewSentimentResult>>(
         '/ai/analyze-reviews',
         params
       );
       if (res && res.data && res.data.overallSentiment) {
+        // Sanity check: nếu khách hàng phản ánh tiêu cực/chê rõ rệt, không được hiển thị là POSITIVE
+        if (localCheck.overallSentiment === 'NEGATIVE' && res.data.overallSentiment === 'POSITIVE') {
+          return localCheck;
+        }
         return res.data;
       }
     } catch (err) {
       console.warn('Backend /ai/analyze-reviews không khả dụng, fallback client:', err);
     }
 
-    // Direct Gemini fallback
-    const reviews = (params.reviewTexts && params.reviewTexts.length > 0)
-      ? params.reviewTexts
-      : [
-          'Chuyến đi rất vui, hướng dẫn viên nhiệt tình vui vẻ!',
-          'Khách sạn sạch sẽ, đồ ăn ngon nhưng xe đón hơi trễ 10 phút.',
-          'Rất đáng tiền, gia đình mình sẽ ủng hộ tiếp trong tương lai!',
-        ];
-
-    const prompt = `Phân tích cảm xúc (Sentiment Analysis) của các đánh giá sau cho tour "${params.tourTitle || 'Tour Du Lịch'}":
+    // Try Gemini API if key is valid
+    if (GEMINI_API_KEY && GEMINI_API_KEY.startsWith('AIzaSy')) {
+      try {
+        const prompt = `Phân tích cảm xúc (Sentiment Analysis) của các đánh giá sau cho tour "${params.tourTitle || 'Tour Du Lịch'}":
 ${reviews.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
-Yêu cầu trả về đúng format JSON thuần túy:
+Yêu cầu trả về đúng format JSON thuần túy (không kèm code block markdown hay chữ giải thích):
 {
-  "overallSentiment": "POSITIVE",
+  "overallSentiment": "POSITIVE" (hoặc "NEUTRAL" hoặc "NEGATIVE"),
   "positivePercentage": 85.0,
   "negativePercentage": 10.0,
   "neutralPercentage": 5.0,
-  "summary": "Tóm tắt 2 câu về cảm nhận khách hàng...",
+  "summary": "Tóm tắt ngắn gọn nhận xét của khách hàng...",
   "keyHighlights": ["Điểm khen 1", "Điểm khen 2"],
   "keyComplaints": ["Điểm chê 1"],
-  "qualityAlert": "STABLE",
+  "qualityAlert": "STABLE" (hoặc "WARNING" hoặc "CRITICAL"),
   "recommendationsForVendor": "Lời khuyên cho đại lý tour..."
 }`;
 
-    try {
-      const geminiRes = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-      const json = await geminiRes.json();
-      let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(text);
-    } catch (e) {
-      return {
-        overallSentiment: 'POSITIVE',
-        positivePercentage: 88.0,
-        negativePercentage: 8.0,
-        neutralPercentage: 4.0,
-        summary: 'Đa số khách hàng rất hài lòng về hành trình, khách sạn và dịch vụ chăm sóc của hướng dẫn viên.',
-        keyHighlights: ['Hướng dẫn viên tận tình, am hiểu văn hóa', 'Khách sạn view đẹp, phòng sạch sẽ', 'Lịch trình phong phú'],
-        keyComplaints: ['Thời gian di chuyển bằng xe hơi dài giữa các điểm tham quan'],
-        qualityAlert: 'STABLE',
-        recommendationsForVendor: 'Tiếp tục duy trì chất lượng dịch vụ hiện tại và thông báo rõ thời gian di chuyển cho du khách trước khi khởi hành.',
-      };
+        const geminiRes = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+        });
+        const json = await geminiRes.json();
+        let text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(text);
+        if (parsed.overallSentiment) return parsed;
+      } catch (e) {
+        console.warn('Gemini client call failed, using heuristic analysis:', e);
+      }
     }
+
+    return localCheck;
   },
 };
+
+function analyzeReviewsLocally(reviews: string[], _tourTitle?: string): ReviewSentimentResult {
+  const total = reviews.length;
+  if (total === 0) {
+    return {
+      overallSentiment: 'NEUTRAL',
+      positivePercentage: 0,
+      negativePercentage: 0,
+      neutralPercentage: 100,
+      summary: 'Chưa có đánh giá để phân tích',
+      keyHighlights: [],
+      keyComplaints: [],
+      qualityAlert: 'STABLE',
+      recommendationsForVendor: 'Chưa có đánh giá nào từ khách hàng để phân tích chất lượng.',
+    };
+  }
+
+  let posCount = 0;
+  let negCount = 0;
+  let neuCount = 0;
+
+  const highlights: string[] = [];
+  const complaints: string[] = [];
+
+  reviews.forEach((r) => {
+    const lower = r.toLowerCase();
+    let star = 5;
+    const match = lower.match(/\[(\d+)\s*sao\]/);
+    if (match) {
+      star = parseInt(match[1], 10);
+    }
+
+    const hasNegWords =
+      lower.includes('cọc') ||
+      lower.includes('chưa tốt') ||
+      lower.includes('không tốt') ||
+      lower.includes('tệ') ||
+      lower.includes('dở') ||
+      lower.includes('kém') ||
+      lower.includes('chán') ||
+      lower.includes('thất vọng') ||
+      lower.includes('thô lỗ') ||
+      lower.includes('bẩn') ||
+      lower.includes('dơ') ||
+      lower.includes('trễ') ||
+      lower.includes('muộn') ||
+      lower.includes('ồn') ||
+      lower.includes('đắt') ||
+      lower.includes('khó chịu') ||
+      lower.includes('bất lịch sự');
+
+    const hasPosWords =
+      lower.includes('tuyệt vời') ||
+      lower.includes('hài lòng') ||
+      lower.includes('rất tốt') ||
+      lower.includes('nhiệt tình') ||
+      lower.includes('chu đáo') ||
+      lower.includes('ngon') ||
+      lower.includes('đẹp') ||
+      lower.includes('chuyên nghiệp') ||
+      lower.includes('xuất sắc') ||
+      lower.includes('ưng ý');
+
+    if (star <= 2 || (star === 3 && hasNegWords) || (!hasPosWords && hasNegWords)) {
+      negCount++;
+    } else if (star >= 4 && !hasNegWords) {
+      posCount++;
+    } else {
+      neuCount++;
+    }
+
+    // Trích xuất khiếu nại thực tế từ nhận xét
+    if (lower.includes('cọc') || lower.includes('thô lỗ') || lower.includes('bất lịch sự') || lower.includes('thái độ') || lower.includes('khó chịu')) {
+      const c = 'Hướng dẫn viên có thái độ cọc tính, thiếu nhiệt tình và hòa nhã với du khách';
+      if (!complaints.includes(c)) complaints.push(c);
+    }
+    if (lower.includes('chưa tốt') || lower.includes('không tốt') || lower.includes('tệ') || lower.includes('kém') || lower.includes('thất vọng')) {
+      const c = 'Trải nghiệm chung của chuyến đi chưa tốt, chưa đạt kỳ vọng của du khách';
+      if (!complaints.includes(c)) complaints.push(c);
+    }
+    if (lower.includes('trễ') || lower.includes('muộn') || lower.includes('chờ')) {
+      const c = 'Lịch trình hoặc phương tiện di chuyển bị chậm trễ, thời gian chờ lâu';
+      if (!complaints.includes(c)) complaints.push(c);
+    }
+    if (lower.includes('khách sạn') && (lower.includes('bẩn') || lower.includes('nhỏ') || lower.includes('cũ'))) {
+      const c = 'Cơ sở vật chất lưu trú/khách sạn chưa đảm bảo tiện nghi';
+      if (!complaints.includes(c)) complaints.push(c);
+    }
+    if (lower.includes('ăn') && (lower.includes('dở') || lower.includes('ít') || lower.includes('nguội'))) {
+      const c = 'Chất lượng bữa ăn và ẩm thực chưa phù hợp với khẩu vị du khách';
+      if (!complaints.includes(c)) complaints.push(c);
+    }
+
+    // Trích xuất điểm khen thực tế
+    if (hasPosWords) {
+      if (lower.includes('nhiệt tình') || lower.includes('chu đáo') || lower.includes('tận tâm')) {
+        const h = 'Hướng dẫn viên phục vụ tận tình, chu đáo';
+        if (!highlights.includes(h)) highlights.push(h);
+      }
+      if (lower.includes('đẹp') || lower.includes('cảnh') || lower.includes('tuyệt vời')) {
+        const h = 'Điểm đến và cảnh quan thiên nhiên đẹp, ấn tượng';
+        if (!highlights.includes(h)) highlights.push(h);
+      }
+      if (lower.includes('ngon') || lower.includes('ăn')) {
+        const h = 'Ẩm thực địa phương phong phú, hợp khẩu vị';
+        if (!highlights.includes(h)) highlights.push(h);
+      }
+      if (lower.includes('chuyên nghiệp') || lower.includes('đúng giờ')) {
+        const h = 'Khâu tổ chức chuyên nghiệp, xuất phát đúng giờ';
+        if (!highlights.includes(h)) highlights.push(h);
+      }
+    }
+  });
+
+  const posPct = Math.round((posCount / total) * 100);
+  const negPct = Math.round((negCount / total) * 100);
+  const neuPct = Math.max(0, 100 - posPct - negPct);
+
+  let overallSentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE';
+  let qualityAlert: 'STABLE' | 'WARNING' | 'CRITICAL';
+  let summary = '';
+  let recommendationsForVendor = '';
+
+  if (negPct >= 50) {
+    overallSentiment = 'NEGATIVE';
+    qualityAlert = negPct >= 70 ? 'CRITICAL' : 'WARNING';
+    summary = `Khách hàng phản ánh chưa hài lòng (${negPct}% phản hồi tiêu cực). Đáng chú ý du khách bức xúc về chất lượng trải nghiệm và thái độ phục vụ của hướng dẫn viên.`;
+    recommendationsForVendor = 'Khẩn trương làm việc lại với đội ngũ hướng dẫn viên và điều hành tour, chấn chỉnh thái độ phục vụ và có phương án chăm sóc khách hàng khắc phục ngay.';
+  } else if (negPct > 0 || complaints.length > 0) {
+    overallSentiment = 'NEUTRAL';
+    qualityAlert = 'WARNING';
+    summary = `Đánh giá ở mức trung bình (${posPct}% khen, ${negPct}% chê). Có khiếu nại thực tế từ du khách về thái độ phục vụ và trải nghiệm chuyến đi cần khắc phục.`;
+    recommendationsForVendor = 'Đại lý cần lắng nghe phản hồi chi tiết của du khách, nhắc nhở hướng dẫn viên giữ thái độ hòa nhã, lịch sự và nâng cao chất lượng phục vụ.';
+  } else {
+    overallSentiment = 'POSITIVE';
+    qualityAlert = 'STABLE';
+    summary = 'Đa số khách hàng hài lòng về lịch trình và chất lượng dịch vụ của tour.';
+    recommendationsForVendor = 'Tiếp tục duy trì chất lượng phục vụ ổn định và phát huy điểm mạnh hiện tại.';
+  }
+
+  return {
+    overallSentiment,
+    positivePercentage: posPct,
+    negativePercentage: negPct,
+    neutralPercentage: neuPct,
+    summary,
+    keyHighlights: highlights,
+    keyComplaints: complaints,
+    qualityAlert,
+    recommendationsForVendor,
+  };
+}

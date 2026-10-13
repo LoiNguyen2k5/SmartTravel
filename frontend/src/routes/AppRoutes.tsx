@@ -27,7 +27,6 @@ import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
 // Admin Pages
 import { DashboardPage } from '../pages/admin/DashboardPage';
 import { TourManagementPage } from '../pages/admin/TourManagementPage';
-import { BookingManagementPage } from '../pages/admin/BookingManagementPage';
 import { UserManagementPage } from '../pages/admin/UserManagementPage';
 import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
 import { VoucherManagementPage } from '../pages/admin/VoucherManagementPage';
@@ -92,7 +91,6 @@ export const AppRoutes: React.FC = () => {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<DashboardPage />} />
             <Route path="/admin/tours" element={<TourManagementPage />} />
-            <Route path="/admin/bookings" element={<BookingManagementPage />} />
             <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
             <Route path="/admin/vouchers" element={<VoucherManagementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />

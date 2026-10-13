@@ -10,8 +10,8 @@ import { MOCK_TOURS, findMockTourById } from '../../data/mockTours';
 import { 
   Star, Clock, Calendar, MapPin, 
   HelpCircle, ShieldCheck, ChevronRight, ChevronLeft, PhoneCall, 
-  Send, UserCheck, AlertCircle, Image as ImageIcon, X, Maximize2, Users,
-  Sparkles
+  Send, AlertCircle, Image as ImageIcon, X, Maximize2, Users,
+  Sparkles, Building2, CheckCircle2
 } from 'lucide-react';
 import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
 import { VisaRequirementInfo } from '../../components/visa/VisaRequirementInfo';
@@ -332,35 +332,29 @@ export const TourDetailPage: React.FC = () => {
         setTour(MOCK_DETAIL_TOUR);
       }
 
-      // Fetch Reviews
+      // Fetch Reviews (sync both MySQL database and localStorage)
       if (id) {
+        let localReviews: Review[] = [];
+        try {
+          const saved = localStorage.getItem(`smarttravel_reviews_${tourId}`);
+          if (saved) {
+            localReviews = JSON.parse(saved);
+          }
+        } catch (_) {}
+
         try {
           const revRes = await reviewService.getReviewsByTourId(tourId);
-          let loadedReviews: Review[] = (revRes.success && revRes.data) ? revRes.data : [];
+          const loadedReviews: Review[] = (revRes.success && revRes.data) ? revRes.data : [];
 
-          // Merge with locally stored reviews for this tour
-          const storageKey = `smarttravel_reviews_${tourId}`;
-          const localStored = localStorage.getItem(storageKey);
-          if (localStored) {
-            try {
-              const localList: Review[] = JSON.parse(localStored);
-              loadedReviews = [...localList, ...loadedReviews];
-            } catch (e) {
-              console.error(e);
-            }
-          }
+          // Deduplicate and merge by ID
+          const reviewMap = new Map<number | string, Review>();
+          loadedReviews.forEach((r) => reviewMap.set(r.id, r));
+          localReviews.forEach((r) => reviewMap.set(r.id, r));
 
-          // Deduplicate by ID
-          const uniqueReviews = Array.from(new Map(loadedReviews.map(r => [r.id, r])).values());
-          setReviews(uniqueReviews);
+          const mergedReviews = Array.from(reviewMap.values());
+          setReviews(mergedReviews);
         } catch {
-          const storageKey = `smarttravel_reviews_${tourId}`;
-          const localStored = localStorage.getItem(storageKey);
-          if (localStored) {
-            try {
-              setReviews(JSON.parse(localStored));
-            } catch {}
-          }
+          setReviews(localReviews);
         }
 
         // Always enable review form for authenticated user
@@ -498,7 +492,13 @@ export const TourDetailPage: React.FC = () => {
           ...res.data,
           userName: (res.data.userName && res.data.userName !== 'Khách Hàng SmartTravel') ? res.data.userName : reviewerName
         };
-        setReviews(prev => [apiRev, ...prev.filter(r => r.id !== apiRev.id)]);
+        try {
+          const storageKey = `smarttravel_reviews_${tour.id}`;
+          const existing = localStorage.getItem(storageKey);
+          const list: Review[] = existing ? JSON.parse(existing) : [];
+          localStorage.setItem(storageKey, JSON.stringify([apiRev, ...list.filter(item => item.id !== newRevObj.id && item.id !== apiRev.id)]));
+        } catch (_) {}
+        setReviews(prev => [apiRev, ...prev.filter(r => r.id !== apiRev.id && r.id !== newRevObj.id)]);
       } else {
         setReviews(prev => [newRevObj, ...prev.filter(r => r.id !== newRevObj.id)]);
       }
@@ -964,6 +964,38 @@ export const TourDetailPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Tour Title & Vendor Info Header */}
+        <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                {tour.category === 'NUOC_NGOAI' ? 'Tour Quốc Tế' : 'Tour Trong Nước'}
+              </span>
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" /> Bảo hiểm du lịch trọn gói
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              {tour.title}
+            </h1>
+          </div>
+
+          {/* Vendor Showcase Card */}
+          <div className="flex items-center gap-3.5 p-3.5 bg-white/[0.04] border border-white/10 rounded-xl flex-shrink-0">
+            <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-500 flex items-center justify-center text-white shadow-md">
+              <Building2 className="h-6 w-6" />
+            </div>
+            <div className="text-left space-y-0.5">
+              <div className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Đơn Vị Tổ Chức (Vendor)</div>
+              <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>{tour.vendorName || 'NewTour Travel Company'}</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-[11px] text-sky-400 font-medium">Đối tác lữ hành chính thức SmartTravel</div>
+            </div>
+          </div>
+        </div>
+
         {/* Main Grid: Left Detailed Tabs vs Right Summary Booking Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 pt-2">
           
@@ -973,15 +1005,29 @@ export const TourDetailPage: React.FC = () => {
             {/* Rating Breakdown Card (Matching Screenshot 2) */}
             <div className="bg-[#0a111d]/85 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col md:flex-row items-center gap-8">
               <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0">
-                <div className="text-5xl font-black text-white">{tour.averageRating || 4.9}<span className="text-xl text-slate-400 font-normal">/5</span></div>
-                <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Đánh Giá Kinh Ngạc</div>
-                <div className="text-xs text-slate-400">Dựa trên {tour.totalReviews || 14} lượt đánh giá thực tế</div>
+                <div className="text-5xl font-black text-white">
+                  {reviews.length > 0
+                    ? Number((reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1))
+                    : (tour.totalReviews ? (tour.averageRating || 5.0) : 0)}
+                  <span className="text-xl text-slate-400 font-normal">/5</span>
+                </div>
+                <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+                  {(reviews.length > 0 || (tour.totalReviews && tour.totalReviews > 0)) ? 'Đánh Giá Du Khách' : 'Chưa Có Đánh Giá'}
+                </div>
+                <div className="text-xs text-slate-400">
+                  {(reviews.length > 0 || (tour.totalReviews && tour.totalReviews > 0))
+                    ? `Dựa trên ${reviews.length > 0 ? reviews.length : (tour.totalReviews || 0)} lượt đánh giá thực tế`
+                    : 'Chưa có lượt đánh giá nào'}
+                </div>
               </div>
 
               <div className="flex-1 space-y-2 w-full">
                 {[5, 4, 3, 2, 1].map((star) => {
-                  const count = tour.ratingBreakdown?.[star] || (star === 5 ? 12 : star === 4 ? 2 : 0);
-                  const pct = Math.round((count / (tour.totalReviews || 14)) * 100);
+                  const total = reviews.length > 0 ? reviews.length : (tour.totalReviews || 0);
+                  const count = reviews.length > 0
+                    ? reviews.filter(r => Math.round(r.rating) === star).length
+                    : (tour.ratingBreakdown?.[star] || 0);
+                  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
                   return (
                     <div key={star} className="flex items-center gap-3 text-xs">
                       <span className="font-semibold text-slate-300 w-10">{star} Sao</span>
@@ -1002,7 +1048,7 @@ export const TourDetailPage: React.FC = () => {
                   { id: 'itinerary', label: 'Lịch trình tour' },
                   { id: 'policy', label: 'Chính sách tour' },
                   { id: 'faq', label: 'Câu hỏi thường gặp' },
-                  { id: 'reviews', label: `Đánh giá (${reviews.length || tour.totalReviews || 0})` },
+                  { id: 'reviews', label: `Đánh giá (${reviews.length > 0 ? reviews.length : (tour.totalReviews || 0)})` },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -1389,11 +1435,6 @@ export const TourDetailPage: React.FC = () => {
                   {/* Verified User Review Restriction Notice */}
                   {eligibleToReview ? (
                     <form onSubmit={handleReviewSubmit} className="bg-white/[0.03] p-5 rounded-2xl border border-white/10 space-y-4">
-                      <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
-                        <UserCheck className="h-5 w-5" />
-                        <span>Tài khoản đã hoàn thành tour - Viết Đánh Giá Thực Tế</span>
-                      </div>
-                      
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-slate-300">Số sao:</span>
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -1595,6 +1636,14 @@ export const TourDetailPage: React.FC = () => {
                       )}
                     </>
                   )}
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                  <span className="text-slate-400 flex items-center gap-1.5"><Building2 className="h-4 w-4 text-sky-400" /> Đơn vị tổ chức:</span>
+                  <span className="font-bold text-sky-300 flex items-center gap-1">
+                    {tour.vendorName || 'NewTour Travel Company'}
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">

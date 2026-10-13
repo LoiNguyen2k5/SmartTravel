@@ -78,26 +78,34 @@ export const AdminSentimentModal: React.FC<AdminSentimentModalProps> = ({
         console.warn('API review endpoint error, falling back to local reviews:', apiErr);
       }
 
-      // 2. ALWAYS scan localStorage reviews (guaranteed to load user-written reviews)
+      // 2. Read reviews from localStorage to include in sentiment analysis
       try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('smarttravel_reviews_')) {
-            // If tourId is specified, match specific key; otherwise include all tour reviews
-            if (!tourId || key === `smarttravel_reviews_${tourId}`) {
-              const raw = localStorage.getItem(key);
-              if (raw) {
-                const list = JSON.parse(raw);
-                if (Array.isArray(list)) {
-                  list.forEach((r: any) => {
-                    const reviewer = r.userName || 'Du khách';
-                    const text = `[${r.rating} sao] ${reviewer}: "${r.comment || ''}"`;
-                    if (r.comment && !fetchedTexts.includes(text)) {
-                      fetchedTexts.push(text);
-                    }
-                  });
-                }
+        if (tourId) {
+          const localSaved = localStorage.getItem(`smarttravel_reviews_${tourId}`);
+          if (localSaved) {
+            const localList = JSON.parse(localSaved);
+            localList.forEach((r: any) => {
+              const reviewer = r.userName && r.userName !== 'Khách Hàng SmartTravel' ? r.userName : 'Du khách';
+              const text = `[${r.rating} sao] ${reviewer}: "${r.comment || ''}"`;
+              if (r.comment && !fetchedTexts.includes(text)) {
+                fetchedTexts.push(text);
               }
+            });
+          }
+        } else {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('smarttravel_reviews_')) {
+              try {
+                const localList = JSON.parse(localStorage.getItem(key) || '[]');
+                localList.forEach((r: any) => {
+                  const reviewer = r.userName && r.userName !== 'Khách Hàng SmartTravel' ? r.userName : 'Du khách';
+                  const text = `[${r.rating} sao] ${reviewer}: "${r.comment || ''}"`;
+                  if (r.comment && !fetchedTexts.includes(text)) {
+                    fetchedTexts.push(text);
+                  }
+                });
+              } catch (_) {}
             }
           }
         }
@@ -105,28 +113,11 @@ export const AdminSentimentModal: React.FC<AdminSentimentModalProps> = ({
         console.warn('LocalStorage review read error:', localErr);
       }
 
-      // 3. Fallback to system reviews if still empty
-      if (fetchedTexts.length === 0) {
-        const fallbackSeedReviews = [
-          '[5 sao] Nguyễn Bảo Lợi: "Đi viếng Miếu Bà Chúa Xứ cầu bình an cho gia đình. Rừng tràm Trà Sư mùa nước nổi đẹp ngỡ ngàng, ngồi xuồng len lỏi giữa bèo xanh mướt chụp ảnh siêu đẹp!"',
-          '[4 sao] Khách Hàng: "Bánh xèo rau rừng Núi Cấm và lẩu mắm cá linh bông điên điển ngon xuất sắc, đúng chuẩn hương vị miền Tây."',
-          '[5 sao] Lê Hoàng Nam: "Chuyến đi Phượng Hoàng Cổ Trấn tuyệt vời ngoài mong đợi! Hướng dẫn viên rất chu đáo."',
-          '[5 sao] Trần Thị Mai: "Thượng Hải và Ô Trấn rất đẹp, dịch vụ khách sạn 4 sao chất lượng cao."',
-          '[5 sao] Phạm Minh Đức: "Trương Gia Giới đẹp hùng vĩ như phim Avatar! HDV linh hoạt đổi món ít cay cho đoàn Việt Nam."',
-          '[4 sao] Nguyễn Văn Tuấn: "Hành trình tham quan phong phú, khách sạn sạch sẽ. Thời gian ngồi xe hơi nhiều nhưng cảnh đẹp."',
-          '[3 sao] Vũ Thu Hà: "Cảnh Phượng Hoàng Cổ Trấn về đêm lung linh, khâu hải quan hơi đông nên phải chờ một chút."',
-          '[5 sao] Đỗ Kim Ngân: "Tour không bị dắt vào các điểm mua sắm (No Shopping) nên có nhiều thời gian chụp ảnh và dạo bến Thượng Hải."',
-          '[5 sao] Bùi Quang Huy: "Đà Lạt mùa này muôn hoa khoe sắc, không khí se lạnh dễ chịu. Khách sạn gần chợ đêm đi dạo rất tiện."',
-          '[2 sao] Hoàng Yến: "Hôm đoàn lên đỉnh Langbiang trời mưa tầm tã nên đường đất trơn trượt, xe Jeep chạy dằn xóc."'
-        ];
-        // If analyzing specific tour, filter or include relevant reviews
-        fetchedTexts.push(...fallbackSeedReviews);
-      }
-
       setReviewTexts(fetchedTexts);
 
       // If no real reviews exist yet, stop loading and do not call AI with empty data
       if (fetchedTexts.length === 0) {
+        setResult(null);
         setLoading(false);
         return;
       }
@@ -236,20 +227,20 @@ export const AdminSentimentModal: React.FC<AdminSentimentModalProps> = ({
         )}
 
         {/* Empty state when no customer reviews exist */}
-        {!loading && !result && reviewTexts.length === 0 && (
+        {!loading && reviewTexts.length === 0 && (
           <div className="rounded-3xl bg-white/[0.03] border border-dashed border-white/15 p-8 sm:p-10 text-center space-y-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 mx-auto">
               <MessageSquare className="h-6 w-6" />
             </div>
-            <h4 className="text-base font-bold text-white">Chưa Có Đánh Giá Thực Tế Từ Du Khách</h4>
+            <h4 className="text-base font-bold text-white">Chưa có đánh giá để phân tích</h4>
             <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-              Tour này hiện chưa nhận được bình luận nào từ khách hàng trên hệ thống. Bạn có thể nhập thử đánh giá của khách vào khung bên dưới để AI phân tích thử nghiệm ngay!
+              Tour này hiện chưa có đánh giá nào từ khách hàng để phân tích cảm xúc. Khi du khách hoàn tất chuyến đi và để lại nhận xét, hệ thống AI sẽ tự động phân tích mức độ hài lòng tại đây.
             </p>
           </div>
         )}
 
         {/* AI Results */}
-        {!loading && result && (
+        {!loading && result && reviewTexts.length > 0 && (
           <div className="space-y-5 animate-in fade-in duration-300">
             {/* Top Stat Row: Sentiment & Quality Alert */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">

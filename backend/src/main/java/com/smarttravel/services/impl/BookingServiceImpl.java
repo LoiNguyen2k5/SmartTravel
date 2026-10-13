@@ -231,6 +231,8 @@ public class BookingServiceImpl implements BookingService {
                 .singleRoomSurcharge(b.getSingleRoomSurcharge())
                 .singleRoomSurchargeAmount(b.getSingleRoomSurchargeAmount())
                 .roomAllocation(b.getRoomAllocation())
+                .vendorId(b.getTour() != null && b.getTour().getVendor() != null ? b.getTour().getVendor().getId() : null)
+                .vendorName(b.getTour() != null && b.getTour().getVendor() != null ? b.getTour().getVendor().getFullName() : null)
                 .qrCodeUrl(b.getQrCodeUrl())
                 .createdAt(b.getCreatedAt())
                 .build();

@@ -522,7 +522,10 @@ export const TourListPage: React.FC = () => {
                             <Eye className="h-3.5 w-3.5" /> {tour.viewCount || 100} Lượt xem
                           </span>
                           <span className="flex items-center gap-1 font-semibold text-amber-400">
-                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {tour.averageRating || 5.0}/5 ({tour.totalReviews || 0})
+                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                            {tour.totalReviews && tour.totalReviews > 0
+                              ? `${tour.averageRating || 5.0}/5 (${tour.totalReviews})`
+                              : 'Chưa có đánh giá'}
                           </span>
                           <span className="flex items-center gap-1 font-medium">
                             📌 Đã chốt ({tour.totalReviews || 0})

@@ -25,6 +25,8 @@ export interface Booking {
   contactEmail?: string;
   contactPhone?: string;
   departureDate?: string;
+  vendorId?: number;
+  vendorName?: string;
   qrCodeUrl?: string;
   createdAt: string;
 }

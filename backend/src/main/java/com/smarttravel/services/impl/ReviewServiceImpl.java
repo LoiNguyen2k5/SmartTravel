@@ -33,9 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
     public boolean checkEligibility(Long tourId, String userEmail) {
         if (userEmail == null) return false;
         User user = userRepository.findByEmail(userEmail).orElse(null);
-        if (user == null) return false;
-
-        return bookingRepository.existsByUserIdAndTourIdAndStatus(user.getId(), tourId, BookingStatus.COMPLETED);
+        return user != null;
     }
 
     @Override
@@ -46,12 +44,6 @@ public class ReviewServiceImpl implements ReviewService {
 
         Tour tour = tourRepository.findById(request.getTourId())
                 .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", request.getTourId()));
-
-        // Mandatory requirement check: Only accounts with COMPLETED bookings can leave reviews!
-        boolean hasCompleted = bookingRepository.existsByUserIdAndTourIdAndStatus(user.getId(), tour.getId(), BookingStatus.COMPLETED);
-        if (!hasCompleted) {
-            throw new BadRequestException("Chỉ những tài khoản đã hoàn thành tour (COMPLETED) mới được phép gửi đánh giá và nhận xét.");
-        }
 
         Review review = Review.builder()
                 .user(user)

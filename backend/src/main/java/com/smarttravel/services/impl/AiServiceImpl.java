@@ -294,9 +294,11 @@ public class AiServiceImpl implements AiService {
                         .positivePercentage(0.0)
                         .negativePercentage(0.0)
                         .neutralPercentage(100.0)
-                        .summary("Tour hiện chưa có đánh giá nào từ khách hàng để phân tích cảm xúc.")
+                        .summary("Chưa có đánh giá để phân tích")
                         .qualityAlert("STABLE")
-                        .recommendationsForVendor("Khuyến khích du khách để lại đánh giá sau chuyến đi để có thêm dữ liệu phân tích chất lượng.")
+                        .keyHighlights(List.of())
+                        .keyComplaints(List.of())
+                        .recommendationsForVendor("Chưa có đánh giá từ khách hàng. Khuyến khích du khách để lại đánh giá để bắt đầu phân tích chất lượng.")
                         .build();
             }
 
@@ -364,18 +366,137 @@ public class AiServiceImpl implements AiService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Lỗi khi phân tích cảm xúc đánh giá bằng AI: {}", e.getMessage(), e);
+            log.warn("Gemini API phân tích cảm xúc gặp lỗi ({}), chuyển sang bộ phân tích nội dung thực tế (NLP rule-based): {}", e.getMessage(), e.toString());
+            return analyzeLocally(reviewsToAnalyze, request.getTourTitle());
+        }
+    }
+
+    private AiReviewAnalysisResponse analyzeLocally(List<String> reviews, String tourTitle) {
+        int total = reviews.size();
+        if (total == 0) {
             return AiReviewAnalysisResponse.builder()
-                    .overallSentiment("POSITIVE")
-                    .positivePercentage(85.0)
-                    .negativePercentage(10.0)
-                    .neutralPercentage(5.0)
-                    .summary("Đa số khách hàng hài lòng về hành trình và trải nghiệm tour.")
-                    .keyHighlights(List.of("Khách sạn tiện nghi", "Ăn uống ngon miệng, phong phú"))
-                    .keyComplaints(Collections.emptyList())
+                    .overallSentiment("NEUTRAL")
+                    .positivePercentage(0.0)
+                    .negativePercentage(0.0)
+                    .neutralPercentage(100.0)
+                    .summary("Chưa có đánh giá để phân tích")
                     .qualityAlert("STABLE")
-                    .recommendationsForVendor("Tiếp tục phát huy chất lượng phục vụ và đảm bảo thời gian đón khách đúng giờ.")
+                    .keyHighlights(List.of())
+                    .keyComplaints(List.of())
+                    .recommendationsForVendor("Chưa có đánh giá từ khách hàng. Khuyến khích du khách để lại đánh giá để bắt đầu phân tích chất lượng.")
                     .build();
         }
+
+        int posCount = 0;
+        int negCount = 0;
+        int neuCount = 0;
+
+        List<String> highlights = new ArrayList<>();
+        List<String> complaints = new ArrayList<>();
+
+        for (String r : reviews) {
+            String lower = r.toLowerCase();
+            int star = 5;
+            Matcher m = Pattern.compile("\\[(\\d+)\\s*sao\\]").matcher(lower);
+            if (m.find()) {
+                try {
+                    star = Integer.parseInt(m.group(1));
+                } catch (Exception ignored) {}
+            }
+
+            boolean hasNegativeWords = lower.contains("cọc") || lower.contains("chưa tốt") || lower.contains("không tốt")
+                    || lower.contains("tệ") || lower.contains("dở") || lower.contains("kém") || lower.contains("chán")
+                    || lower.contains("thất vọng") || lower.contains("thô lỗ") || lower.contains("bẩn") || lower.contains("trễ")
+                    || lower.contains("bất lịch sự") || lower.contains("khó chịu");
+
+            boolean hasPositiveWords = lower.contains("tuyệt vời") || lower.contains("hài lòng") || lower.contains("rất tốt")
+                    || lower.contains("nhiệt tình") || lower.contains("ngon") || lower.contains("đẹp") || lower.contains("chu đáo")
+                    || lower.contains("chuyên nghiệp") || lower.contains("xuất sắc");
+
+            if (star <= 2 || (star == 3 && hasNegativeWords) || (!hasPositiveWords && hasNegativeWords)) {
+                negCount++;
+            } else if (star >= 4 && !hasNegativeWords) {
+                posCount++;
+            } else {
+                neuCount++;
+            }
+
+            // Trích xuất khiếu nại thực tế từ nhận xét
+            if (lower.contains("cọc") || lower.contains("thô lỗ") || lower.contains("thái độ") || lower.contains("bất lịch sự")) {
+                String c = "Hướng dẫn viên có thái độ cọc tính, thiếu nhiệt tình và hòa nhã với du khách";
+                if (!complaints.contains(c)) complaints.add(c);
+            }
+            if (lower.contains("chưa tốt") || lower.contains("không tốt") || lower.contains("kém") || lower.contains("thất vọng") || lower.contains("tệ")) {
+                String c = "Trải nghiệm chung của chuyến đi chưa tốt, chưa đạt kỳ vọng của khách hàng";
+                if (!complaints.contains(c)) complaints.add(c);
+            }
+            if (lower.contains("trễ") || lower.contains("muộn") || lower.contains("chờ")) {
+                String c = "Lịch trình di chuyển hoặc khởi hành bị chậm trễ, thời gian chờ lâu";
+                if (!complaints.contains(c)) complaints.add(c);
+            }
+            if (lower.contains("khách sạn") && (lower.contains("bẩn") || lower.contains("nhỏ") || lower.contains("cũ"))) {
+                String c = "Cơ sở vật chất lưu trú/khách sạn chưa đảm bảo tiện nghi";
+                if (!complaints.contains(c)) complaints.add(c);
+            }
+            if (lower.contains("ăn") && (lower.contains("dở") || lower.contains("ít") || lower.contains("nguội"))) {
+                String c = "Chất lượng bữa ăn và ẩm thực chưa phù hợp khẩu vị";
+                if (!complaints.contains(c)) complaints.add(c);
+            }
+
+            // Trích xuất điểm khen thực tế
+            if (hasPositiveWords) {
+                if (lower.contains("nhiệt tình") || lower.contains("chu đáo") || lower.contains("tận tâm")) {
+                    String h = "Hướng dẫn viên phục vụ tận tình, chu đáo";
+                    if (!highlights.contains(h)) highlights.add(h);
+                }
+                if (lower.contains("đẹp") || lower.contains("cảnh")) {
+                    String h = "Điểm tham quan đẹp, cảnh quan ấn tượng";
+                    if (!highlights.contains(h)) highlights.add(h);
+                }
+                if (lower.contains("ngon") || lower.contains("ăn")) {
+                    String h = "Ẩm thực địa phương phong phú, vừa miệng";
+                    if (!highlights.contains(h)) highlights.add(h);
+                }
+            }
+        }
+
+        double posPct = Math.round((posCount * 100.0) / total);
+        double negPct = Math.round((negCount * 100.0) / total);
+        double neuPct = Math.max(0.0, 100.0 - posPct - negPct);
+
+        String overall;
+        String alert;
+        String summary;
+        String recommendation;
+
+        if (negPct >= 50.0) {
+            overall = "NEGATIVE";
+            alert = negPct >= 70.0 ? "CRITICAL" : "WARNING";
+            summary = String.format("Khách hàng phản ánh chưa hài lòng (%.0f%% phản hồi tiêu cực). Đáng chú ý du khách bức xúc về chất lượng trải nghiệm và thái độ phục vụ.", negPct);
+            recommendation = "Khẩn trương làm việc lại với đội ngũ hướng dẫn viên và điều hành tour, chấn chỉnh thái độ phục vụ và có giải pháp chăm sóc khách hàng ngay lập tức.";
+        } else if (negPct > 0.0 || !complaints.isEmpty()) {
+            overall = "NEUTRAL";
+            alert = "WARNING";
+            summary = String.format("Đánh giá ở mức trung bình (%.0f%% khen, %.0f%% chê). Có khiếu nại thực tế từ du khách về thái độ phục vụ và trải nghiệm chuyến đi cần khắc phục.", posPct, negPct);
+            recommendation = "Đại lý cần lắng nghe phản hồi chi tiết của du khách, nhắc nhở hướng dẫn viên giữ thái độ hòa nhã, lịch sự và nâng cao chất lượng phục vụ.";
+        } else {
+            overall = "POSITIVE";
+            alert = "STABLE";
+            summary = "Đa số khách hàng hài lòng về lịch trình và chất lượng dịch vụ của tour.";
+            recommendation = "Tiếp tục duy trì chất lượng dịch vụ hiện tại và giữ vững phong độ phục vụ du khách.";
+        }
+
+        return AiReviewAnalysisResponse.builder()
+                .overallSentiment(overall)
+                .positivePercentage(posPct)
+                .negativePercentage(negPct)
+                .neutralPercentage(neuPct)
+                .summary(summary)
+                .keyHighlights(highlights)
+                .keyComplaints(complaints)
+                .qualityAlert(alert)
+                .recommendationsForVendor(recommendation)
+                .build();
+    }
     }
 }

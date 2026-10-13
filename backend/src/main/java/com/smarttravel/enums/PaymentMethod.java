@@ -5,5 +5,6 @@ public enum PaymentMethod {
     MOMO,
     ZALOPAY,
     BANK_TRANSFER,
+    BANK,
     CASH
 }

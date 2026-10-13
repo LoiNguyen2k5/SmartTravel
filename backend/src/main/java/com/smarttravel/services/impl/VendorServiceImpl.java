@@ -89,6 +89,8 @@ public class VendorServiceImpl implements VendorService {
                 .contactName(b.getContactName())
                 .contactEmail(b.getContactEmail())
                 .contactPhone(b.getContactPhone())
+                .vendorId(b.getTour() != null && b.getTour().getVendor() != null ? b.getTour().getVendor().getId() : null)
+                .vendorName(b.getTour() != null && b.getTour().getVendor() != null ? b.getTour().getVendor().getFullName() : null)
                 .qrCodeUrl(b.getQrCodeUrl())
                 .createdAt(b.getCreatedAt())
                 .build();

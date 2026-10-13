@@ -75,6 +75,25 @@ export const VendorBookingManagementPage: React.FC = () => {
         }
       }
 
+      // Merge client local bookings (e.g. newly booked tours)
+      let localBookings: Booking[] = [];
+      try {
+        const localStr = localStorage.getItem('user_created_bookings');
+        if (localStr) {
+          localBookings = JSON.parse(localStr);
+        }
+      } catch (e) {
+        console.error('Lỗi đọc user_created_bookings:', e);
+      }
+
+      const existingCodes = new Set(rawList.map((b) => b.bookingCode));
+      for (const lb of localBookings) {
+        if (!existingCodes.has(lb.bookingCode)) {
+          rawList.unshift(lb);
+          existingCodes.add(lb.bookingCode);
+        }
+      }
+
       // Giới hạn chỉ hiển thị các đơn đặt tour thuộc chính danh mục tour của vendor này
       rawList = rawList.filter((b) => b.tourId && myTourIds.has(b.tourId));
       setBookings(applyStatusOverrides(rawList));
@@ -82,9 +101,21 @@ export const VendorBookingManagementPage: React.FC = () => {
       if (isDemoVendor) {
         try {
           const fallbackRes = await bookingService.getMyBookings();
-          if (fallbackRes.success && fallbackRes.data) {
-            setBookings(applyStatusOverrides(fallbackRes.data));
-          }
+          let list = (fallbackRes.success && fallbackRes.data) ? fallbackRes.data : [];
+          try {
+            const localStr = localStorage.getItem('user_created_bookings');
+            if (localStr) {
+              const localBookings: Booking[] = JSON.parse(localStr);
+              const existingCodes = new Set(list.map((b) => b.bookingCode));
+              for (const lb of localBookings) {
+                if (!existingCodes.has(lb.bookingCode)) {
+                  list.unshift(lb);
+                  existingCodes.add(lb.bookingCode);
+                }
+              }
+            }
+          } catch (_) {}
+          setBookings(applyStatusOverrides(list));
         } catch (_) {}
       } else {
         setBookings([]);
@@ -108,6 +139,18 @@ export const VendorBookingManagementPage: React.FC = () => {
       localStorage.setItem('vendor_booking_statuses', JSON.stringify(savedStatuses));
     } catch (e) {
       console.error('Lỗi lưu localStorage:', e);
+    }
+
+    // 2.1 Update status in user_created_bookings so customer portal syncs immediately
+    try {
+      const localStr = localStorage.getItem('user_created_bookings');
+      if (localStr) {
+        const localList: Booking[] = JSON.parse(localStr);
+        const updatedList = localList.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b));
+        localStorage.setItem('user_created_bookings', JSON.stringify(updatedList));
+      }
+    } catch (e) {
+      console.error('Lỗi cập nhật user_created_bookings:', e);
     }
 
     // 3. Persist to MySQL Backend API
