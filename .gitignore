@@ -12,6 +12,8 @@ build/
 .env
 .env.local
 .env.*.local
+application-local.yml
+**/application-local.yml
 
 # Java / Maven / Backend Builds
 target/
