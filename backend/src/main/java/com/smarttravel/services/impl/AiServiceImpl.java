@@ -277,9 +277,8 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public AiReviewAnalysisResponse analyzeReviews(AiReviewAnalysisRequest request) {
+        List<String> reviewsToAnalyze = request.getReviewTexts() != null ? new ArrayList<>(request.getReviewTexts()) : new ArrayList<>();
         try {
-            List<String> reviewsToAnalyze = new ArrayList<>(request.getReviewTexts());
-
             // Nếu không truyền reviewTexts mà có tourId, tự query reviews từ DB
             if (reviewsToAnalyze.isEmpty() && request.getTourId() != null) {
                 List<Review> dbReviews = reviewRepository.findByTourId(request.getTourId());
@@ -497,6 +496,5 @@ public class AiServiceImpl implements AiService {
                 .qualityAlert(alert)
                 .recommendationsForVendor(recommendation)
                 .build();
-    }
     }
 }

@@ -53,6 +53,7 @@ Thumbs.db
 *.doc
 *.xlsx
 *.pptx
+*.pdf
 read_docx.ps1
 docx_content.txt
 
@@ -65,3 +66,10 @@ vertex_demo.html
 SmartTravel_UseCase_Diagram.mdj
 SmartTravel_UseCase_Diagram_backup.mdj
 *.mdj
+
+# AI Agents & Assistants Configuration
+.agents/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
