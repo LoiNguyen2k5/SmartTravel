@@ -75,3 +75,10 @@ AGENTS.md
 CLAUDE.md
 GEMINI.md
 
+# Planning, Prompts & Use Case Documentation
+Usecase/
+plans/
+prompt_templates/
+/*.sql
+
+
