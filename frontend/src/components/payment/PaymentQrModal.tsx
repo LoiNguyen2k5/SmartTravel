@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Clock, Check, Copy, Building2, Wallet, CheckCircle, Loader2, Zap } from 'lucide-react';
 import { paymentService } from '../../services/paymentService';
 import { Booking } from '../../types/booking';
@@ -8,6 +9,8 @@ interface PaymentQrModalProps {
   onClose: () => void;
   booking: Booking | null;
   onPaymentSuccess: (booking: Booking) => void;
+  isRemainingPayment?: boolean;
+  customAmount?: number;
 }
 
 const BANK_CONFIG = {
@@ -20,7 +23,7 @@ const BANK_CONFIG = {
   realTestAmount: 5000,
 };
 
-export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose, booking, onPaymentSuccess }) => {
+export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose, booking, onPaymentSuccess, isRemainingPayment = false, customAmount }) => {
   const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
   const [qrGatewayTab, setQrGatewayTab] = useState<'VIETQR' | 'MOMO'>('VIETQR');
   const [copiedStk, setCopiedStk] = useState(false);
@@ -50,9 +53,19 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
     pollingRef.current = setInterval(async () => {
       try {
         const res = await paymentService.checkPaymentStatus(booking.bookingCode);
-        if (res?.data?.isPaid) {
-          clearInterval(pollingRef.current);
-          handleAutoPaymentSuccess();
+        const data = res?.data as any;
+        if (isRemainingPayment) {
+          // Khi thanh toán 70% còn lại: CHỈ hoàn tất khi backend xác nhận đã tất toán xong 100% (isFullyPaid === true)
+          if (data?.isFullyPaid === true) {
+            clearInterval(pollingRef.current);
+            handleAutoPaymentSuccess();
+          }
+        } else {
+          // Khi thanh toán cọc hoặc đơn thông thường
+          if (data?.isPaid === true) {
+            clearInterval(pollingRef.current);
+            handleAutoPaymentSuccess();
+          }
         }
       } catch (e) {
         // Continue polling silently
@@ -70,20 +83,79 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
 
     setTimeout(() => {
       if (booking) {
-        onPaymentSuccess(booking);
+        if (isRemainingPayment) {
+          onPaymentSuccess({
+            ...booking,
+            status: 'PAID',
+            isDeposit: false,
+            remainingAmount: 0,
+            depositAmount: (booking.depositAmount && booking.depositAmount < booking.totalPrice) ? booking.depositAmount : Math.round(booking.totalPrice * 0.3),
+          });
+        } else {
+          onPaymentSuccess(booking);
+        }
       }
       onClose();
     }, 2200);
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handleSimulateBankWebhook = async () => {
-    if (!booking) return;
-    try {
-      await paymentService.markBookingPaid(booking.bookingCode);
-    } catch (e) {
-      console.log('Simulate webhook trigger', e);
+    if (!booking || isProcessing) return;
+    // Ngay lập tức hủy polling để tránh gửi request trùng lặp
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
     }
-    handleAutoPaymentSuccess();
+    try {
+      setIsProcessing(true);
+      if (isRemainingPayment) {
+        try {
+          await paymentService.payRemainingAmount(booking.bookingCode);
+        } catch (payErr: any) {
+          if (payErr?.response?.status === 404 || payErr?.status === 404) {
+            try {
+              const { bookingService } = await import('../../services/bookingService');
+              const rawDate = booking.departureDate || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+              let chosenDate = rawDate;
+              if (rawDate.includes('-')) {
+                const parts = rawDate.split('-');
+                if (parts[0].length === 2 && parts[2].length === 4) chosenDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+              }
+              await bookingService.createBooking({
+                tourId: booking.tourId,
+                numberOfAdults: booking.numberOfAdults || 1,
+                numberOfChildren: booking.numberOfChildren || 0,
+                contactName: booking.contactName,
+                contactEmail: booking.contactEmail,
+                contactPhone: booking.contactPhone,
+                departureDate: chosenDate,
+                bookingCode: booking.bookingCode,
+                status: 'DEPOSITED',
+                isDeposit: true,
+                depositAmount: booking.depositAmount || Math.round(booking.totalPrice * 0.3),
+                remainingAmount: booking.remainingAmount || (booking.totalPrice - Math.round(booking.totalPrice * 0.3)),
+              });
+              await paymentService.payRemainingAmount(booking.bookingCode);
+            } catch (syncErr) {
+              console.error('Lỗi đồng bộ cọc trước khi tất toán:', syncErr);
+            }
+          } else {
+            throw payErr;
+          }
+        }
+      } else {
+        await paymentService.markBookingPaid(booking.bookingCode);
+      }
+      handleAutoPaymentSuccess();
+    } catch (e) {
+      console.error('Simulate webhook error:', e);
+      // Fallback: still complete locally
+      handleAutoPaymentSuccess();
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCopy = (text: string, type: 'stk' | 'amount' | 'content') => {
@@ -109,15 +181,21 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
   if (!isOpen || !booking) return null;
 
   const transferContent = `SMARTTRAVEL ${booking.bookingCode}`;
-  const vietQrBankUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-compact2.png?amount=${BANK_CONFIG.realTestAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
-  const vietQrMomoUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-qr_only.png?amount=${BANK_CONFIG.realTestAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+  const payableAmount = isRemainingPayment
+    ? (customAmount || booking.remainingAmount || (booking.totalPrice - Math.round(booking.totalPrice * 0.3)))
+    : ((booking.isDeposit || booking.status === 'DEPOSITED')
+        ? (booking.depositAmount || Math.round(booking.totalPrice * 0.3))
+        : (booking.totalPrice || BANK_CONFIG.realTestAmount));
+
+  const vietQrBankUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-compact2.png?amount=${payableAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+  const vietQrMomoUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNumber}-qr_only.png?amount=${payableAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  return (
-    <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-4 sm:p-6 animate-in fade-in" style={{ zIndex: 9999 }}>
+  return createPortal(
+    <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-4 sm:p-6 animate-in fade-in" style={{ zIndex: 99999 }}>
       <div className="min-h-full flex items-start sm:items-center justify-center py-4 sm:py-6">
         <div className="w-full max-w-lg bg-[#0a111d] rounded-3xl p-5 sm:p-7 shadow-[0_25px_60px_rgba(0,0,0,0.8)] space-y-4 border border-white/15 text-white relative">
           
@@ -133,10 +211,14 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
                 Mã QR đã hết hạn giữ chỗ (3 phút)
               </div>
             )}
-            <h3 className="text-lg sm:text-xl font-black text-white pt-0.5">Quét Mã QR Thanh Toán Trực Tiếp</h3>
+            <h3 className="text-lg sm:text-xl font-black text-white pt-0.5">
+              {isRemainingPayment ? 'Thanh Toán 70% Còn Lại (Tất Toán Đơn Hàng)' : 'Quét Mã QR Thanh Toán Trực Tiếp'}
+            </h3>
             <p className="text-xs text-slate-400">
               {timeLeft > 0
-                ? 'Mở ứng dụng Ngân hàng (Agribank, MB, VCB...) hoặc Ví MoMo để quét mã'
+                ? (isRemainingPayment
+                    ? 'Quét mã để hoàn tất 70% số tiền còn lại. Hệ thống sẽ phát hành Hóa Đơn VAT và Vé Điện Tử chính thức.'
+                    : 'Mở ứng dụng Ngân hàng (Agribank, MB, VCB...) hoặc Ví MoMo để quét mã')
                 : 'Đã hết thời hạn giữ chỗ. Chỗ đặt đã được tự động hoàn trả lại tour.'}
             </p>
           </div>
@@ -204,12 +286,14 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
               <span className="font-black text-white uppercase">{BANK_CONFIG.accountName}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-white/10">
-              <span className="text-slate-400 font-medium">Số tiền thanh toán:</span>
+              <span className="text-slate-400 font-medium">
+                {isRemainingPayment ? 'Số tiền 70% còn lại:' : ((booking.isDeposit || booking.status === 'DEPOSITED') ? 'Số tiền cọc 30%:' : 'Số tiền thanh toán:')}
+              </span>
               <div className="flex items-center gap-2">
-                <span className="font-black text-rose-400 text-base">{formatCurrency(BANK_CONFIG.realTestAmount)}</span>
+                <span className="font-black text-rose-400 text-base">{formatCurrency(payableAmount)}</span>
                 <button
                   type="button"
-                  onClick={() => handleCopy(BANK_CONFIG.realTestAmount.toString(), 'amount')}
+                  onClick={() => handleCopy(payableAmount.toString(), 'amount')}
                   className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
                 >
                   {copiedAmount ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
@@ -285,6 +369,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({ isOpen, onClose,
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

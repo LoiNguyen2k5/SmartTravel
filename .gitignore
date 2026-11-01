@@ -65,3 +65,6 @@ vertex_demo.html
 SmartTravel_UseCase_Diagram.mdj
 SmartTravel_UseCase_Diagram_backup.mdj
 *.mdj
+
+# Scratch & temporary scripts
+scratch/

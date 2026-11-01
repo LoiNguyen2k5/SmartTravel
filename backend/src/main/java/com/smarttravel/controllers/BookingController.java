@@ -84,8 +84,10 @@ public class BookingController {
 
     @PostMapping("/{bookingCode}/resend-eticket")
     @Operation(summary = "Gửi lại Vé điện tử E-Ticket qua email")
-    public ResponseEntity<ApiResponse<String>> resendETicket(@PathVariable String bookingCode) {
-        bookingService.resendETicket(bookingCode);
-        return ResponseEntity.ok(ApiResponse.success("Đã gửi vé điện tử E-Ticket về email liên hệ của đơn hàng thành công!", null));
+    public ResponseEntity<ApiResponse<String>> resendETicket(
+            @PathVariable String bookingCode,
+            @RequestParam(required = false) String email) {
+        String msg = bookingService.resendETicket(bookingCode, email);
+        return ResponseEntity.ok(ApiResponse.success(msg, msg));
     }
 }

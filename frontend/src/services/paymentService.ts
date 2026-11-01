@@ -18,5 +18,20 @@ export const paymentService = {
   markBookingPaid: async (bookingCode: string): Promise<ApiResponse<boolean>> => {
     return await axiosClient.post(`/payments/mark-paid/${bookingCode}`);
   },
-};
 
+  payRemainingAmount: async (bookingCode: string): Promise<ApiResponse<boolean>> => {
+    return await axiosClient.post(`/payments/${bookingCode}/pay-remaining`);
+  },
+
+  downloadInvoicePdf: async (bookingCode: string): Promise<Blob> => {
+    const res = await axiosClient.get(`/payments/${bookingCode}/invoice`, {
+      responseType: 'blob',
+    });
+    return res as unknown as Blob;
+  },
+
+  resendInvoiceEmail: async (bookingCode: string, email?: string): Promise<ApiResponse<string>> => {
+    const url = email ? `/payments/${bookingCode}/resend-invoice?email=${encodeURIComponent(email)}` : `/payments/${bookingCode}/resend-invoice`;
+    return await axiosClient.post(url);
+  },
+};

@@ -11,4 +11,10 @@ public interface PaymentService {
     boolean processSepayWebhook(Map<String, Object> webhookData);
     Map<String, Object> checkPaymentStatus(String bookingCode);
     boolean markBookingAsPaid(String bookingCode);
+    boolean payRemainingAmount(String bookingCode);
+    byte[] getInvoicePdf(String bookingCode);
+    String resendInvoiceEmail(String bookingCode, String targetEmail);
+    default void resendInvoiceEmail(String bookingCode) {
+        resendInvoiceEmail(bookingCode, null);
+    }
 }
