@@ -31,7 +31,8 @@ export const bookingService = {
     return await axiosClient.post('/bookings/validate-voucher', { code, originalTotal });
   },
 
-  resendETicket: async (bookingCode: string): Promise<ApiResponse<string>> => {
-    return await axiosClient.post(`/bookings/${bookingCode}/resend-eticket`);
+  resendETicket: async (bookingCode: string, email?: string): Promise<ApiResponse<string>> => {
+    const url = email ? `/bookings/${bookingCode}/resend-eticket?email=${encodeURIComponent(email)}` : `/bookings/${bookingCode}/resend-eticket`;
+    return await axiosClient.post(url);
   },
 };

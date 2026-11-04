@@ -194,6 +194,18 @@ export const VendorBookingManagementPage: React.FC = () => {
         return;
       }
 
+      if (found.status === 'DEPOSITED' || found.isDeposit) {
+        const depAmt = (found.depositAmount || Math.round(found.totalPrice * 0.3)).toLocaleString('vi-VN');
+        const remAmt = (found.remainingAmount || (found.totalPrice - Math.round(found.totalPrice * 0.3))).toLocaleString('vi-VN');
+        handleUpdateStatus(found.id, 'COMPLETED');
+        setVerificationResult({
+          success: true,
+          message: `⚠️ Khách hàng ${found.contactName || found.userName} đã cọc 30% (${depAmt} đ). Vui lòng thu nốt 70% còn lại (${remAmt} đ) nếu chưa thanh toán trực tiếp. Đã hoàn tất check-in lên tour!`,
+          booking: found,
+        });
+        return;
+      }
+
       // Automatically mark as COMPLETED upon valid check-in
       handleUpdateStatus(found.id, 'COMPLETED');
       setVerificationResult({
@@ -212,7 +224,8 @@ export const VendorBookingManagementPage: React.FC = () => {
   const filteredBookings = bookings.filter((b) => {
     const matchesStatus =
       filterStatus === 'ALL' ||
-      (filterStatus === 'PAID' && (b.status === 'PAID' || b.status === 'CONFIRMED')) ||
+      (filterStatus === 'DEPOSITED' && (b.status === 'DEPOSITED' || b.isDeposit)) ||
+      (filterStatus === 'PAID' && (b.status === 'PAID' || b.status === 'CONFIRMED' || b.status === 'DEPOSITED')) ||
       (filterStatus === 'COMPLETED' && b.status === 'COMPLETED') ||
       (filterStatus === 'CANCELLED' && (b.status === 'CANCELLED' || (b.status as string) === 'REFUNDED'));
     const q = searchQuery.toLowerCase();
@@ -257,6 +270,7 @@ export const VendorBookingManagementPage: React.FC = () => {
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto">
           {[
             { id: 'ALL', label: 'Tất cả đơn' },
+            { id: 'DEPOSITED', label: 'Đã cọc 30%' },
             { id: 'PAID', label: 'Đã thanh toán (Chờ Check-in)' },
             { id: 'COMPLETED', label: 'Đã hoàn thành tour' },
             { id: 'CANCELLED', label: 'Đã hủy / Hoàn tiền' },
@@ -327,7 +341,9 @@ export const VendorBookingManagementPage: React.FC = () => {
                       </span>
                       <span
                         className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg ${
-                          b.status === 'PAID'
+                          b.status === 'DEPOSITED' || b.isDeposit
+                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                            : b.status === 'PAID'
                             ? 'bg-emerald-100 text-emerald-700'
                             : b.status === 'COMPLETED'
                             ? 'bg-blue-100 text-blue-700'
@@ -335,10 +351,12 @@ export const VendorBookingManagementPage: React.FC = () => {
                             ? 'bg-rose-100 text-rose-700'
                             : (b.status as string) === 'REFUNDED'
                             ? 'bg-purple-100 text-purple-700'
-                            : 'bg-amber-100 text-amber-700'
+                            : 'bg-slate-100 text-slate-700'
                         }`}
                       >
-                        {b.status === 'PAID'
+                        {b.status === 'DEPOSITED' || b.isDeposit
+                          ? 'ĐÃ CỌC 30% (CÒN NỢ 70%)'
+                          : b.status === 'PAID'
                           ? 'ĐÃ THANH TOÁN'
                           : b.status === 'COMPLETED'
                           ? 'ĐÃ HOÀN THÀNH'
@@ -346,7 +364,7 @@ export const VendorBookingManagementPage: React.FC = () => {
                           ? 'ĐÃ HỦY (CHỜ HOÀN TIỀN)'
                           : (b.status as string) === 'REFUNDED'
                           ? 'ĐÃ HOÀN TIỀN'
-                          : 'CHỜ XỬ LÝ'}
+                          : 'CHỜ THANH TOÁN'}
                       </span>
                     </div>
 
@@ -375,6 +393,12 @@ export const VendorBookingManagementPage: React.FC = () => {
                     <div className="text-base font-black text-rose-600">
                       {(b.totalPrice || 0).toLocaleString('vi-VN')} đ
                     </div>
+                    {(b.status === 'DEPOSITED' || b.isDeposit) && (
+                      <div className="text-[11px] text-amber-700 font-bold space-y-0.5 mt-0.5">
+                        <div>Đã cọc 30%: {(b.depositAmount || Math.round(b.totalPrice * 0.3)).toLocaleString('vi-VN')} đ</div>
+                        <div className="text-rose-600 font-extrabold">Còn nợ: {(b.remainingAmount || (b.totalPrice - Math.round(b.totalPrice * 0.3))).toLocaleString('vi-VN')} đ</div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions */}

@@ -3,12 +3,13 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
 import { Booking } from '../../types/booking';
-import { History, Package, QrCode, XCircle, Star, Globe, Mail, RotateCcw, Building2 } from 'lucide-react';
+import { History, Package, QrCode, XCircle, Star, Globe, Mail, RotateCcw, Building2, FileText, Sparkles, Download, CreditCard } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { visaService } from '../../services/visaService';
 import { MyVisaTracker } from '../../components/visa/MyVisaTracker';
 import { VisaApplicationResponse, VisaRequirementResponse } from '../../types/visa';
 import { PaymentQrModal } from '../../components/payment/PaymentQrModal';
+import { paymentService } from '../../services/paymentService';
 
 const MOCK_BOOKINGS: Booking[] = [
   {
@@ -83,6 +84,7 @@ export const BookingHistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
+  const [remainingPaymentBooking, setRemainingPaymentBooking] = useState<Booking | null>(null);
   const [tourCategories, setTourCategories] = useState<Record<number, string>>({});
   const [tourVendors, setTourVendors] = useState<Record<number, string>>({});
 
@@ -94,10 +96,14 @@ export const BookingHistoryPage: React.FC = () => {
   const [sendingEmail, setSendingEmail] = useState(false);
 
   const handleResendETicket = async (bookingCode: string, ticket?: Booking) => {
+    const defaultEmail = ticket?.contactEmail || currentEmail;
+    const inputEmail = window.prompt('Vui lòng xác nhận hoặc nhập địa chỉ email nhận Vé điện tử E-Ticket:', defaultEmail);
+    if (!inputEmail || !inputEmail.trim()) return;
+    const destEmail = inputEmail.trim();
     try {
       setSendingEmail(true);
-      await bookingService.resendETicket(bookingCode);
-      alert('Đã gửi lại vé điện tử E-Ticket về hòm thư Email thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc mục Thư rác (Spam).');
+      const res = await bookingService.resendETicket(bookingCode, destEmail);
+      alert(res?.data || res?.message || `Đã gửi lại vé điện tử E-Ticket về hòm thư ${destEmail} thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc Thư rác (Spam).`);
     } catch (err: any) {
       console.error('Lỗi khi gửi lại E-Ticket:', err);
       // If 404 and ticket object is available, try to sync to backend and retry
@@ -114,15 +120,19 @@ export const BookingHistoryPage: React.FC = () => {
             numberOfAdults: ticket.numberOfAdults || 1,
             numberOfChildren: ticket.numberOfChildren || 0,
             contactName: ticket.contactName || currentName,
-            contactEmail: ticket.contactEmail || currentEmail,
+            contactEmail: destEmail,
             contactPhone: ticket.contactPhone || currentPhone,
             departureDate: chosenDate,
             bookingCode: ticket.bookingCode,
             status: ticket.status || 'PAID',
+            isDeposit: ticket.status === 'DEPOSITED' || ticket.isDeposit,
+            depositAmount: ticket.depositAmount,
+            remainingAmount: ticket.remainingAmount,
           });
           const { paymentService } = await import('../../services/paymentService');
           await paymentService.markBookingPaid(ticket.bookingCode);
-          alert('Đã gửi lại vé điện tử E-Ticket về hòm thư Email thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc mục Thư rác (Spam).');
+          const retryRes = await bookingService.resendETicket(ticket.bookingCode, destEmail);
+          alert(retryRes?.data || retryRes?.message || `Đã gửi lại vé điện tử E-Ticket về hòm thư ${destEmail} thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc Thư rác (Spam).`);
           return;
         } catch (syncErr) {
           console.error('Lỗi đồng bộ vé lên máy chủ:', syncErr);
@@ -207,6 +217,15 @@ export const BookingHistoryPage: React.FC = () => {
           // Migrate any old dummy email to the real registered user email
           let hasMigration = false;
           localBookings = localBookings.map(b => {
+            const isDep = b.status === 'DEPOSITED' || b.isDeposit;
+            if (isDep) {
+              const dep = b.depositAmount || 0;
+              const rem = b.remainingAmount || 0;
+              if (dep > 0 && rem > 0 && b.totalPrice < dep + rem) {
+                b.totalPrice = dep + rem;
+                hasMigration = true;
+              }
+            }
             if (b.contactEmail === 'baoloi@smarttravel.com' || b.contactEmail === 'nguyenbaoloi@gmail.com' || !b.contactEmail) {
               hasMigration = true;
               return { ...b, contactEmail: currentEmail, contactName: currentName, userName: currentName, contactPhone: b.contactPhone || currentPhone };
@@ -222,9 +241,26 @@ export const BookingHistoryPage: React.FC = () => {
       }
 
       const res = await bookingService.getMyBookings();
-      let rawList: Booking[] = (res.success && res.data)
-        ? [...localBookings, ...res.data]
-        : [...localBookings];
+      
+      // Deduplicate bookings: Mỗi mã đơn hàng bookingCode chỉ xuất hiện đúng 1 lần duy nhất
+      const uniqueMap = new Map<string, Booking>();
+      if (res.success && Array.isArray(res.data)) {
+        res.data.forEach((b: Booking) => {
+          const key = b.bookingCode || `ID-${b.id}`;
+          uniqueMap.set(key, b);
+        });
+      }
+      localBookings.forEach((b: Booking) => {
+        const key = b.bookingCode || `ID-${b.id}`;
+        if (uniqueMap.has(key)) {
+          const serverB = uniqueMap.get(key)!;
+          const trueTotalPrice = Math.max(serverB.totalPrice || 0, b.totalPrice || 0, (b.depositAmount || 0) + (b.remainingAmount || 0));
+          uniqueMap.set(key, { ...serverB, ...b, totalPrice: trueTotalPrice, id: serverB.id });
+        } else {
+          uniqueMap.set(key, b);
+        }
+      });
+      let rawList: Booking[] = Array.from(uniqueMap.values());
 
       // Sync status from saved vendor status updates & ensure real user info is shown
       try {
@@ -257,7 +293,13 @@ export const BookingHistoryPage: React.FC = () => {
         if (localStr) localBookings = JSON.parse(localStr);
       } catch (e) { console.error(e); }
       
-      let allBookings = [...localBookings, ...MOCK_BOOKINGS];
+      const fallbackMap = new Map<string, Booking>();
+      localBookings.forEach((b: Booking) => fallbackMap.set(b.bookingCode || `ID-${b.id}`, b));
+      MOCK_BOOKINGS.forEach((b: Booking) => {
+        const key = b.bookingCode || `ID-${b.id}`;
+        if (!fallbackMap.has(key)) fallbackMap.set(key, b);
+      });
+      let allBookings = Array.from(fallbackMap.values());
       try {
         const savedStatusesStr = localStorage.getItem('vendor_booking_statuses');
         const savedStatuses: Record<number, string> = savedStatusesStr ? JSON.parse(savedStatusesStr) : {};
@@ -325,6 +367,77 @@ export const BookingHistoryPage: React.FC = () => {
     }
   };
 
+  const [downloadingInvoice, setDownloadingInvoice] = useState<string | null>(null);
+  const [resendingInvoice, setResendingInvoice] = useState<string | null>(null);
+
+  const handleDownloadInvoice = async (booking: Booking) => {
+    try {
+      setDownloadingInvoice(booking.bookingCode);
+      const blob = await paymentService.downloadInvoicePdf(booking.bookingCode);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const isDep = booking.status === 'DEPOSITED' || booking.isDeposit;
+      a.download = isDep ? `Hoa-Don-Dat-Coc-30-${booking.bookingCode}.pdf` : `Hoa-Don-Dien-Tu-${booking.bookingCode}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Không thể tải hóa đơn điện tử lúc này.');
+    } finally {
+      setDownloadingInvoice(null);
+    }
+  };
+
+  const handleResendInvoice = async (bookingCode: string, ticket?: Booking) => {
+    const defaultEmail = ticket?.contactEmail || currentEmail;
+    const inputEmail = window.prompt('Vui lòng xác nhận hoặc nhập địa chỉ email nhận Hóa đơn điện tử PDF:', defaultEmail);
+    if (!inputEmail || !inputEmail.trim()) return;
+    const destEmail = inputEmail.trim();
+    try {
+      setResendingInvoice(bookingCode);
+      const res = await paymentService.resendInvoiceEmail(bookingCode, destEmail);
+      alert(res?.data || res?.message || `Hóa đơn điện tử PDF đã được gửi tới email ${destEmail} thành công! Quý khách vui lòng kiểm tra hộp thư đến (Inbox) hoặc Thư rác (Spam).`);
+    } catch (err: any) {
+      console.error('Lỗi khi gửi lại hóa đơn:', err);
+      if ((err?.response?.status === 404 || err?.status === 404) && ticket) {
+        try {
+          const rawDate = ticket.departureDate || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+          let chosenDate = rawDate;
+          if (rawDate.includes('-')) {
+            const parts = rawDate.split('-');
+            if (parts[0].length === 2 && parts[2].length === 4) chosenDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          }
+          await bookingService.createBooking({
+            tourId: ticket.tourId,
+            numberOfAdults: ticket.numberOfAdults || 1,
+            numberOfChildren: ticket.numberOfChildren || 0,
+            contactName: ticket.contactName || currentName,
+            contactEmail: destEmail,
+            contactPhone: ticket.contactPhone || currentPhone,
+            departureDate: chosenDate,
+            bookingCode: ticket.bookingCode,
+            status: ticket.status || 'PAID',
+            isDeposit: ticket.status === 'DEPOSITED' || ticket.isDeposit,
+            depositAmount: ticket.depositAmount,
+            remainingAmount: ticket.remainingAmount,
+          });
+          const { paymentService: paySvc } = await import('../../services/paymentService');
+          await paySvc.markBookingPaid(ticket.bookingCode);
+          const retryRes = await paymentService.resendInvoiceEmail(ticket.bookingCode, destEmail);
+          alert(retryRes?.data || retryRes?.message || `Hóa đơn điện tử PDF đã được gửi tới email ${destEmail} thành công!`);
+          return;
+        } catch (syncErr) {
+          console.error('Lỗi đồng bộ hóa đơn lên máy chủ:', syncErr);
+        }
+      }
+      alert(err?.response?.data?.message || 'Không thể gửi lại hóa đơn lúc này.');
+    } finally {
+      setResendingInvoice(null);
+    }
+  };
+
   const handlePaymentSuccess = (booking: Booking) => {
     try {
       const localStr = localStorage.getItem('user_created_bookings');
@@ -342,6 +455,38 @@ export const BookingHistoryPage: React.FC = () => {
     // Automatically display E-Ticket after payment
     setTimeout(() => {
         setSelectedTicket({ ...booking, status: 'PAID' });
+    }, 500);
+
+    fetchBookings();
+  };
+
+  const handleRemainingPaymentSuccess = (booking: Booking) => {
+    try {
+      const localStr = localStorage.getItem('user_created_bookings');
+      if (localStr) {
+        let localBookings: Booking[] = JSON.parse(localStr);
+        localBookings = localBookings.map((b) =>
+          b.id === booking.id || b.bookingCode === booking.bookingCode
+            ? { 
+                ...b, 
+                status: 'PAID' as const, 
+                isDeposit: false, 
+                remainingAmount: 0,
+                depositAmount: b.depositAmount || Math.round(b.totalPrice * 0.3),
+                notes: (b.notes || '') + ' [DAT_COC_30%] [TAT_TOAN_70%]'
+              }
+            : b
+        );
+        localStorage.setItem('user_created_bookings', JSON.stringify(localBookings));
+      }
+    } catch (e) {
+      console.error('Error updating local booking remaining payment status:', e);
+    }
+
+    alert('Tất toán 70% còn lại thành công! Hóa đơn điện tử VAT 100% và Vé điện tử chính thức đã được xuất và gửi tới email của bạn.');
+
+    setTimeout(() => {
+      setSelectedTicket({ ...booking, status: 'PAID', isDeposit: false, remainingAmount: 0 });
     }, 500);
 
     fetchBookings();
@@ -454,6 +599,22 @@ export const BookingHistoryPage: React.FC = () => {
                         </span>
                       </div>
                       
+                                            {/* Deposited 30% Notice */}
+                      {b.status === 'DEPOSITED' && (
+                        <div className="mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex items-start gap-3 shadow-[0_0_15px_rgba(245,158,11,0.08)]">
+                          <div className="h-7 w-7 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                            <Sparkles className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <h4 className="font-bold text-amber-400 text-xs uppercase">Đã đặt cọc giữ chỗ 30% (Chỗ ngồi & phòng đã được bảo đảm)</h4>
+                            <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                              Đã thanh toán cọc: <strong className="text-white">{(b.depositAmount || Math.round(b.totalPrice * 0.3)).toLocaleString('vi-VN')} đ</strong> • Số tiền còn lại cần nộp: <strong className="text-rose-400 font-bold">{(b.remainingAmount || (b.totalPrice - Math.round(b.totalPrice * 0.3))).toLocaleString('vi-VN')} đ</strong>.
+                              Vui lòng hoàn tất trước ngày khởi hành tối thiểu 03 - 15 ngày!
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Pending Payment Warning */}
                       {b.status === 'PENDING' && (
                         <div className="mt-4 bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
@@ -497,12 +658,31 @@ export const BookingHistoryPage: React.FC = () => {
                           )}
                           
                           {['DEPOSITED', 'CONFIRMED', 'PAID', 'COMPLETED'].includes(b.status) && (
-                            <button
-                              onClick={() => setSelectedTicket(b)}
-                              className="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] cursor-pointer"
-                            >
-                              <QrCode className="h-4 w-4" /> Xem Vé QR Code
-                            </button>
+                            <>
+                              {b.status === 'DEPOSITED' && (
+                                <button
+                                  onClick={() => setRemainingPaymentBooking(b)}
+                                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-pointer"
+                                >
+                                  <CreditCard className="h-4 w-4" /> Thanh Toán 70% Còn Lại
+                                </button>
+                              )}
+                              <button
+                                onClick={() => setSelectedTicket(b)}
+                                className="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] cursor-pointer"
+                              >
+                                <QrCode className="h-4 w-4" /> Xem Vé QR Code
+                              </button>
+                              <button
+                                onClick={() => handleDownloadInvoice(b)}
+                                disabled={downloadingInvoice === b.bookingCode}
+                                className="rounded-xl border border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 px-3.5 py-2.5 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                title="Tải về hóa đơn điện tử dạng PDF"
+                              >
+                                <FileText className="h-4 w-4" />
+                                {downloadingInvoice === b.bookingCode ? 'Đang tải...' : 'Tải Hóa Đơn PDF'}
+                              </button>
+                            </>
                           )}
 
                           {requiresVisa && (
@@ -549,10 +729,20 @@ export const BookingHistoryPage: React.FC = () => {
           onPaymentSuccess={handlePaymentSuccess}
         />
 
-        {/* E-TICKET QR MODAL */}
-        {selectedTicket && (
-          <div className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
-            <div className="bg-[#0a111d] border border-white/15 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-[0_24px_60px_rgba(0,0,0,0.8)] text-white">
+        {/* REMAINING 70% PAYMENT MODAL */}
+        <PaymentQrModal 
+          isOpen={!!remainingPaymentBooking}
+          onClose={() => setRemainingPaymentBooking(null)}
+          booking={remainingPaymentBooking}
+          isRemainingPayment={true}
+          customAmount={remainingPaymentBooking?.remainingAmount}
+          onPaymentSuccess={handleRemainingPaymentSuccess}
+        />
+
+        {/* E-TICKET QR MODAL (Mounted via Portal to avoid being covered by navbar) */}
+        {selectedTicket && createPortal(
+          <div className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in">
+            <div className="bg-[#0a111d] border border-white/15 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-[0_24px_60px_rgba(0,0,0,0.9)] text-white max-h-[92vh] overflow-y-auto my-auto">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2 text-cyan-300 font-bold text-base">
                   <QrCode className="h-5 w-5" /> Vé Điện Tử E-Ticket
@@ -565,12 +755,37 @@ export const BookingHistoryPage: React.FC = () => {
                 </button>
               </div>
 
-              <div className="text-center space-y-4">
-                <div className="bg-white p-4 rounded-2xl border border-white/20 inline-block shadow-xl">
+              {/* Notice in Ticket if Deposited */}
+              {selectedTicket.status === 'DEPOSITED' && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between gap-2 text-xs">
+                  <div>
+                    <div className="font-bold text-amber-400 flex items-center gap-1">
+                      <Sparkles className="h-3.5 w-3.5" /> Vé giữ chỗ tạm thời (Cọc 30%)
+                    </div>
+                    <div className="text-[11px] text-amber-200/80">
+                      Còn lại: <strong className="text-rose-400 font-bold">{(selectedTicket.remainingAmount || (selectedTicket.totalPrice - Math.round(selectedTicket.totalPrice * 0.3))).toLocaleString('vi-VN')} đ</strong>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = selectedTicket;
+                      setSelectedTicket(null);
+                      setRemainingPaymentBooking(target);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-[11px] transition cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.3)] whitespace-nowrap"
+                  >
+                    Thanh toán 70%
+                  </button>
+                </div>
+              )}
+
+              <div className="text-center space-y-3.5">
+                <div className="bg-white p-3.5 rounded-2xl border border-white/20 inline-block shadow-xl">
                   <img 
                     src={selectedTicket.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${selectedTicket.bookingCode}`} 
                     alt="E-Ticket QR" 
-                    className="h-48 w-48 rounded-xl mx-auto"
+                    className="h-40 w-40 sm:h-44 sm:w-44 rounded-xl mx-auto"
                   />
                 </div>
 
@@ -585,28 +800,56 @@ export const BookingHistoryPage: React.FC = () => {
                   <div>Khởi hành: <strong className="text-cyan-300 font-bold">{selectedTicket.departureDate || '15-09-2026'}</strong></div>
                   <div>Đơn vị tổ chức: <strong className="text-sky-300 font-semibold">{selectedTicket.vendorName || (tourVendors[selectedTicket.tourId] || 'NewTour Travel Company')}</strong></div>
                   <div>Số lượng: <strong className="text-white">{selectedTicket.numberOfAdults} Người lớn, {selectedTicket.numberOfChildren} Trẻ em</strong></div>
+                  {selectedTicket.status === 'DEPOSITED' && (
+                    <div className="text-amber-400 font-semibold pt-1 border-t border-white/10">
+                      Trạng thái vé: Đã cọc 30% • Cần tất toán 70% trước ngày đi
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="grid grid-cols-3 gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => handleResendETicket(selectedTicket.bookingCode, selectedTicket)}
                   disabled={sendingEmail}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-2.5 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                  className="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white py-2 text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                  title="Gửi lại vé điện tử E-Ticket về hòm thư"
                 >
-                  <Mail className="h-4 w-4" />
-                  {sendingEmail ? 'Đang gửi...' : 'Gửi lại vé về Email'}
+                  <Mail className="h-3.5 w-3.5" />
+                  {sendingEmail ? 'Đang gửi...' : 'Gửi lại Vé'}
                 </button>
                 <button
-                  onClick={() => setSelectedTicket(null)}
-                  className="px-5 rounded-xl bg-white/10 hover:bg-white/15 text-white py-2.5 text-xs font-bold transition cursor-pointer"
+                  type="button"
+                  onClick={() => handleDownloadInvoice(selectedTicket)}
+                  disabled={downloadingInvoice === selectedTicket.bookingCode}
+                  className="rounded-xl border border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 py-2 text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                  title="Tải trực tiếp hóa đơn điện tử dạng PDF"
                 >
-                  Đóng
+                  <Download className="h-3.5 w-3.5" />
+                  {downloadingInvoice === selectedTicket.bookingCode ? 'Đang tải...' : 'Tải Hóa Đơn'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleResendInvoice(selectedTicket.bookingCode, selectedTicket)}
+                  disabled={resendingInvoice === selectedTicket.bookingCode}
+                  className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 py-2 text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                  title="Gửi hóa đơn điện tử đính kèm PDF về email"
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  {resendingInvoice === selectedTicket.bookingCode ? 'Đang gửi...' : 'Gửi Hóa Đơn'}
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTicket(null)}
+                className="w-full rounded-xl bg-white/10 hover:bg-white/15 text-white py-2 text-xs font-bold transition cursor-pointer"
+              >
+                Đóng
+              </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* VISA TRACKER MODAL */}

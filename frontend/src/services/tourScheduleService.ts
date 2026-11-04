@@ -17,7 +17,7 @@ export interface TourScheduleItem {
   status?: TourScheduleStatus;
 }
 
-const STORAGE_PREFIX = 'smart_travel_tour_schedules_v4_';
+const STORAGE_PREFIX = 'smart_travel_tour_schedules_v5_';
 
 // Tính số ngày còn lại từ hôm nay đến ngày khởi hành
 export const getDaysUntilDeparture = (dateStr: string): number => {
@@ -143,245 +143,217 @@ export const formatScheduleDate = (dStr: string): string => {
   return dStr;
 };
 
-// Lịch khởi hành trải dài từ cuối tháng 10 đến hết tháng 11/2026 cho toàn bộ 20 tour
-// Đa dạng trạng thái: Đủ người khởi hành, Dư người (Full chỗ), Thiếu số người tối thiểu (Đang gom khách)
+// Lịch khởi hành mẫu phong phú theo từng tour (tháng 11 & 12/2026 và đầu năm 2027)
 const TOUR_SCHEDULES: Record<number, TourScheduleItem[]> = {
-  // ─── Tour 1: Ân Thi – Phượng Hoàng Cổ Trấn – Trương Gia Giới 6N5Đ (Quốc tế) ───
+  // ─── Tour 1: Ân Thi – Phượng Hoàng Cổ Trấn – Trương Gia Giới 6N5Đ ───
   1: [
-    { id: 10101, tourId: 1, startDate: '2026-10-25', endDate: '2026-10-30', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 25/10 — Full chỗ (Đã chốt danh sách visa)' },
-    { id: 10102, tourId: 1, startDate: '2026-11-02', endDate: '2026-11-07', maxParticipants: 35, bookedCount: 4,  note: 'Khởi hành 02/11 — Thiếu khách tối thiểu' },
-    { id: 10103, tourId: 1, startDate: '2026-11-09', endDate: '2026-11-14', maxParticipants: 40, bookedCount: 26, note: 'Khởi hành 09/11 — Đủ điều kiện khởi hành (Còn 14 chỗ)' },
-    { id: 10104, tourId: 1, startDate: '2026-11-16', endDate: '2026-11-21', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 16/11 — Hết chỗ (Dư người đăng ký chờ)' },
-    { id: 10105, tourId: 1, startDate: '2026-11-23', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 23/11 — Đang gom khách (5/10 khách tối thiểu)' },
-    { id: 10106, tourId: 1, startDate: '2026-11-29', endDate: '2026-12-04', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 29/11 — Đợt mới mở bán cuối tháng 11' },
+    { id: 10101, tourId: 1, startDate: '2026-11-06', endDate: '2026-11-11', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 06/11 — Trương Gia Giới mùa thu vàng' },
+    { id: 10102, tourId: 1, startDate: '2026-11-16', endDate: '2026-11-21', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 16/11 — Phượng Hoàng Cổ Trấn lung linh (+5%)', seasonalPriceMultiplier: 1.05 },
+    { id: 10103, tourId: 1, startDate: '2026-11-26', endDate: '2026-12-01', maxParticipants: 35, bookedCount: 8,  note: 'Khởi hành 26/11 — Mùa tuyết đầu đông Hồ Nam' },
+    { id: 10104, tourId: 1, startDate: '2026-12-08', endDate: '2026-12-13', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 08/12 — Đón đông xứ Trung' },
   ],
-
-  // ─── Tour 2: Thượng Hải – Ô Trấn 4N4Đ (Quốc tế) ───
+  // ─── Tour 2: Thượng Hải – Ô Trấn 4N4Đ ───
   2: [
-    { id: 10201, tourId: 2, startDate: '2026-10-26', endDate: '2026-10-29', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 26/10 — Hết chỗ (Đã khóa sổ làm visa)' },
-    { id: 10202, tourId: 2, startDate: '2026-11-04', endDate: '2026-11-07', maxParticipants: 35, bookedCount: 3,  note: 'Khởi hành 04/11 — Thiếu số người tối thiểu' },
-    { id: 10203, tourId: 2, startDate: '2026-11-11', endDate: '2026-11-14', maxParticipants: 35, bookedCount: 22, note: 'Khởi hành 11/11 — Đủ người khởi hành (Còn 13 chỗ)' },
-    { id: 10204, tourId: 2, startDate: '2026-11-18', endDate: '2026-11-21', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 18/11 — Full slot (Dư người chờ hủy)' },
-    { id: 10205, tourId: 2, startDate: '2026-11-25', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 25/11 — Đủ điều kiện khởi hành (Còn 25 chỗ)' },
-    { id: 10206, tourId: 2, startDate: '2026-11-30', endDate: '2026-12-03', maxParticipants: 40, bookedCount: 2,  note: 'Khởi hành 30/11 — Đang gom khách đợt cuối tháng' },
+    { id: 10201, tourId: 2, startDate: '2026-11-07', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 07/11 — Thượng Hải mùa thu mát mẻ' },
+    { id: 10202, tourId: 2, startDate: '2026-11-17', endDate: '2026-11-20', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 17/11 — Ô Trấn cổ kính sương mai', seasonalPriceMultiplier: 1.05 },
+    { id: 10203, tourId: 2, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 10, note: 'Khởi hành 27/11 — Cuối tháng 11' },
+    { id: 10204, tourId: 2, startDate: '2026-12-10', endDate: '2026-12-13', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 10/12 — Giáng sinh rực rỡ' },
   ],
-
-  // ─── Tour 3: Núi Chứa Chan (Gia Lào) & Dinh Thầy Thím 1N (Nội địa) ───
+  // ─── Tour 3: Núi Chứa Chan (Gia Lào) & Dinh Thầy Thím ───
   3: [
-    { id: 10301, tourId: 3, startDate: '2026-10-25', endDate: '2026-10-25', maxParticipants: 45, bookedCount: 45, note: 'Khởi hành 25/10 — Hết chỗ (Full slot Chủ Nhật tuần này)' },
-    { id: 10302, tourId: 3, startDate: '2026-10-29', endDate: '2026-10-29', maxParticipants: 45, bookedCount: 4,  note: 'Khởi hành 29/10 — Thiếu người tối thiểu (Cần 10 khách)' },
-    { id: 10303, tourId: 3, startDate: '2026-11-01', endDate: '2026-11-01', maxParticipants: 50, bookedCount: 32, note: 'Khởi hành 01/11 — Đủ điều kiện khởi hành (Còn 18 chỗ)' },
-    { id: 10304, tourId: 3, startDate: '2026-11-08', endDate: '2026-11-08', maxParticipants: 50, bookedCount: 50, note: 'Khởi hành 08/11 — Dư người (Đã full 50/50 chỗ)' },
-    { id: 10305, tourId: 3, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 45, bookedCount: 20, note: 'Khởi hành 15/11 — Đủ điều kiện khởi hành (Còn 25 chỗ)' },
-    { id: 10306, tourId: 3, startDate: '2026-11-22', endDate: '2026-11-22', maxParticipants: 45, bookedCount: 5,  note: 'Khởi hành 22/11 — Đang gom khách (5/10 khách)' },
-    { id: 10307, tourId: 3, startDate: '2026-11-29', endDate: '2026-11-29', maxParticipants: 45, bookedCount: 0,  note: 'Khởi hành 29/11 — Mới mở bán cuối tuần tháng 11' },
+    { id: 10301, tourId: 3, startDate: '2026-11-08', endDate: '2026-11-08', maxParticipants: 45, bookedCount: 22, note: 'Khởi hành 08/11 — Tour 1 ngày cuối tuần' },
+    { id: 10302, tourId: 3, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 45, bookedCount: 15, note: 'Khởi hành 15/11 — Viếng chùa Gia Lào cầu an' },
+    { id: 10303, tourId: 3, startDate: '2026-11-22', endDate: '2026-11-22', maxParticipants: 50, bookedCount: 35, note: 'Khởi hành 22/11 — Dinh Thầy Thím & biển Cam Bình' },
+    { id: 10304, tourId: 3, startDate: '2026-11-29', endDate: '2026-11-29', maxParticipants: 45, bookedCount: 10, note: 'Khởi hành 29/11 — Cuối tuần cuối tháng' },
+    { id: 10305, tourId: 3, startDate: '2026-12-06', endDate: '2026-12-06', maxParticipants: 45, bookedCount: 5,  note: 'Khởi hành 06/12 — Đầu tháng 12' },
   ],
-
-  // ─── Tour 4: Châu Đốc – Núi Cấm – Chùa Tà Pạ 2N1Đ (Nội địa) ───
+  // ─── Tour 4: Châu Đốc – Núi Cấm – Chùa Tà Pạ ───
   4: [
-    { id: 10401, tourId: 4, startDate: '2026-10-25', endDate: '2026-10-26', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 25/10 — Hết chỗ (Full 40 khách)' },
-    { id: 10402, tourId: 4, startDate: '2026-10-31', endDate: '2026-11-01', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 31/10 — Thiếu người tối thiểu (Đang gom khách)' },
-    { id: 10403, tourId: 4, startDate: '2026-11-07', endDate: '2026-11-08', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 07/11 — Đủ điều kiện khởi hành (Còn 12 chỗ)' },
-    { id: 10404, tourId: 4, startDate: '2026-11-14', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 14/11 — Dư người (Hết chỗ, nhận danh sách chờ)' },
-    { id: 10405, tourId: 4, startDate: '2026-11-21', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 21/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 10406, tourId: 4, startDate: '2026-11-28', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 3,  note: 'Khởi hành 28/11 — Đang gom khách (Cần thêm người)' },
+    { id: 10401, tourId: 4, startDate: '2026-11-07', endDate: '2026-11-08', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 07/11 — 2N1Đ cuối tuần' },
+    { id: 10402, tourId: 4, startDate: '2026-11-14', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 14/11 — Miếu Bà Chúa Xứ linh thiêng' },
+    { id: 10403, tourId: 4, startDate: '2026-11-21', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 12, note: 'Khởi hành 21/11 — Cánh đồng Tà Pạ mùa gặt lúa' },
+    { id: 10404, tourId: 4, startDate: '2026-11-28', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 28/11 — Núi Cấm Thất Sơn' },
   ],
-
-  // ─── Tour 5: Mỹ Tho – Bến Tre – Cần Thơ – Cà Mau 4N3Đ (Nội địa) ───
+  // ─── Tour 5: Mỹ Tho – Bến Tre – Cần Thơ – Cà Mau ───
   5: [
-    { id: 10501, tourId: 5, startDate: '2026-10-26', endDate: '2026-10-29', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 26/10 — Full chỗ mùa nước nổi' },
-    { id: 10502, tourId: 5, startDate: '2026-11-02', endDate: '2026-11-05', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 02/11 — Thiếu số người tối thiểu (6/10 khách)' },
-    { id: 10503, tourId: 5, startDate: '2026-11-09', endDate: '2026-11-12', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 09/11 — Đủ điều kiện khởi hành (Còn 15 chỗ)' },
-    { id: 10504, tourId: 5, startDate: '2026-11-16', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 16/11 — Hết chỗ (Dư người)' },
-    { id: 10505, tourId: 5, startDate: '2026-11-23', endDate: '2026-11-26', maxParticipants: 40, bookedCount: 16, note: 'Khởi hành 23/11 — Đủ người khởi hành (Còn 24 chỗ)' },
-    { id: 10506, tourId: 5, startDate: '2026-11-28', endDate: '2026-12-01', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 28/11 — Mới mở bán cuối tháng' },
+    { id: 10501, tourId: 5, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 45, bookedCount: 30, note: 'Khởi hành 06/11 — Miền Tây sông nước miệt vườn' },
+    { id: 10502, tourId: 5, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 45, bookedCount: 38, note: 'Khởi hành 13/11 — Chợ nổi Cái Răng & Đất Mũi Cà Mau', seasonalPriceMultiplier: 1.05 },
+    { id: 10503, tourId: 5, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 20/11 — Trải nghiệm chèo xuồng ba lá' },
+    { id: 10504, tourId: 5, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 8,  note: 'Khởi hành 27/11 — Cuối tháng 11' },
   ],
-
-  // ─── Tour 6: Đà Lạt 4N3Đ (Nội địa) ───
+  // ─── Tour 6: Đà Lạt 4N3Đ ───
   6: [
-    { id: 10601, tourId: 6, startDate: '2026-10-25', endDate: '2026-10-28', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 25/10 — Hết chỗ (Dư người mùa dã quỳ)' },
-    { id: 10602, tourId: 6, startDate: '2026-10-30', endDate: '2026-11-02', maxParticipants: 40, bookedCount: 4,  note: 'Khởi hành 30/10 — Thiếu người tối thiểu (4/10 khách)' },
-    { id: 10603, tourId: 6, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 30, note: 'Khởi hành 06/11 — Đủ điều kiện khởi hành (Còn 10 chỗ)' },
-    { id: 10604, tourId: 6, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 13/11 — Dư người (Full 40/40 chỗ)' },
-    { id: 10605, tourId: 6, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 20/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 10606, tourId: 6, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 3,  note: 'Khởi hành 27/11 — Đang gom khách (Cần thêm người)' },
+    { id: 10601, tourId: 6, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Đà Lạt mùa hoa dã quỳ vàng rực' },
+    { id: 10602, tourId: 6, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 13/11 — Đồi cỏ hồng & săn mây Trại Mát' },
+    { id: 10603, tourId: 6, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 35, note: 'Khởi hành 20/11 — Mùa lạnh cao nguyên (+10%)', seasonalPriceMultiplier: 1.1 },
+    { id: 10604, tourId: 6, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 27/11 — Thung lũng Tình Yêu' },
+    { id: 10605, tourId: 6, startDate: '2026-12-05', endDate: '2026-12-08', maxParticipants: 40, bookedCount: 10, note: 'Khởi hành 05/12 — Festival Hoa Đà Lạt 2026' },
   ],
-
-  // ─── Tour 7: Đảo Nam Du 3N3Đ (Nội địa) ───
+  // ─── Tour 7: Đảo Nam Du 3N3Đ ───
   7: [
-    { id: 10701, tourId: 7, startDate: '2026-10-26', endDate: '2026-10-28', maxParticipants: 30, bookedCount: 30, note: 'Khởi hành 26/10 — Hết chỗ (Full 30 vé)' },
-    { id: 10702, tourId: 7, startDate: '2026-11-02', endDate: '2026-11-04', maxParticipants: 30, bookedCount: 3,  note: 'Khởi hành 02/11 — Thiếu người tối thiểu' },
-    { id: 10703, tourId: 7, startDate: '2026-11-09', endDate: '2026-11-11', maxParticipants: 35, bookedCount: 22, note: 'Khởi hành 09/11 — Đủ điều kiện khởi hành (Còn 13 chỗ)' },
-    { id: 10704, tourId: 7, startDate: '2026-11-16', endDate: '2026-11-18', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 16/11 — Dư người (Full slot tàu cao tốc)' },
-    { id: 10705, tourId: 7, startDate: '2026-11-23', endDate: '2026-11-25', maxParticipants: 30, bookedCount: 14, note: 'Khởi hành 23/11 — Đủ người khởi hành (Còn 16 chỗ)' },
-    { id: 10706, tourId: 7, startDate: '2026-11-28', endDate: '2026-11-30', maxParticipants: 30, bookedCount: 2,  note: 'Khởi hành 28/11 — Mới mở bán' },
+    { id: 10701, tourId: 7, startDate: '2026-11-06', endDate: '2026-11-08', maxParticipants: 30, bookedCount: 18, note: 'Khởi hành 06/11 — Biển xanh Nam Du mùa sóng êm' },
+    { id: 10702, tourId: 7, startDate: '2026-11-13', endDate: '2026-11-15', maxParticipants: 30, bookedCount: 12, note: 'Khởi hành 13/11 — Lặn ngắm san hô Hòn Dầu' },
+    { id: 10703, tourId: 7, startDate: '2026-11-20', endDate: '2026-11-22', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 20/11 — Thưởng thức hải sản tươi sống' },
+    { id: 10704, tourId: 7, startDate: '2026-11-27', endDate: '2026-11-29', maxParticipants: 30, bookedCount: 8,  note: 'Khởi hành 27/11 — Đảo vắng thanh bình' },
   ],
-
-  // ─── Tour 8: Biển Vũng Tàu & Sun World 1N (Nội địa) ───
+  // ─── Tour 8: Biển Vũng Tàu & Sun World ───
   8: [
-    { id: 10801, tourId: 8, startDate: '2026-10-25', endDate: '2026-10-25', maxParticipants: 50, bookedCount: 50, note: 'Khởi hành 25/10 — Hết chỗ (Full 50 vé xe đời mới)' },
-    { id: 10802, tourId: 8, startDate: '2026-10-31', endDate: '2026-10-31', maxParticipants: 50, bookedCount: 5,  note: 'Khởi hành 31/10 — Thiếu người tối thiểu' },
-    { id: 10803, tourId: 8, startDate: '2026-11-07', endDate: '2026-11-07', maxParticipants: 50, bookedCount: 36, note: 'Khởi hành 07/11 — Đủ điều kiện khởi hành (Còn 14 chỗ)' },
-    { id: 10804, tourId: 8, startDate: '2026-11-14', endDate: '2026-11-14', maxParticipants: 50, bookedCount: 50, note: 'Khởi hành 14/11 — Dư người (Hết chỗ, nhận danh sách chờ)' },
-    { id: 10805, tourId: 8, startDate: '2026-11-21', endDate: '2026-11-21', maxParticipants: 50, bookedCount: 24, note: 'Khởi hành 21/11 — Đủ người khởi hành (Còn 26 chỗ)' },
-    { id: 10806, tourId: 8, startDate: '2026-11-28', endDate: '2026-11-28', maxParticipants: 50, bookedCount: 4,  note: 'Khởi hành 28/11 — Đang gom khách (Cần thêm người)' },
+    { id: 10801, tourId: 8, startDate: '2026-11-08', endDate: '2026-11-08', maxParticipants: 50, bookedCount: 35, note: 'Khởi hành 08/11 — Tour 1 ngày nghỉ dưỡng cuối tuần' },
+    { id: 10802, tourId: 8, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 50, bookedCount: 20, note: 'Khởi hành 15/11 — Tắm biển Bãi Sau & ngọn hải đăng' },
+    { id: 10803, tourId: 8, startDate: '2026-11-22', endDate: '2026-11-22', maxParticipants: 50, bookedCount: 48, note: 'Khởi hành 22/11 — Buffet hải sản view biển' },
+    { id: 10804, tourId: 8, startDate: '2026-11-29', endDate: '2026-11-29', maxParticipants: 50, bookedCount: 22, note: 'Khởi hành 29/11 — Cuối tuần thảnh thơi' },
   ],
-
-  // ─── Tour 9: Phú Yên – Quy Nhơn 3N3Đ (Nội địa) ───
+  // ─── Tour 9: Phú Yên – Quy Nhơn 3N3Đ ───
   9: [
-    { id: 10901, tourId: 9, startDate: '2026-10-26', endDate: '2026-10-28', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 26/10 — Hết chỗ (Full slot)' },
-    { id: 10902, tourId: 9, startDate: '2026-11-01', endDate: '2026-11-03', maxParticipants: 40, bookedCount: 4,  note: 'Khởi hành 01/11 — Thiếu số người tối thiểu' },
-    { id: 10903, tourId: 9, startDate: '2026-11-08', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 26, note: 'Khởi hành 08/11 — Đủ điều kiện khởi hành (Còn 14 chỗ)' },
-    { id: 10904, tourId: 9, startDate: '2026-11-15', endDate: '2026-11-17', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 15/11 — Dư người (Đã full chỗ)' },
-    { id: 10905, tourId: 9, startDate: '2026-11-22', endDate: '2026-11-24', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 22/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 10906, tourId: 9, startDate: '2026-11-29', endDate: '2026-12-01', maxParticipants: 40, bookedCount: 2,  note: 'Khởi hành 29/11 — Mới mở bán' },
+    { id: 10901, tourId: 9, startDate: '2026-11-06', endDate: '2026-11-08', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 06/11 — Xứ sở hoa vàng trên cỏ xanh' },
+    { id: 10902, tourId: 9, startDate: '2026-11-13', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 16, note: 'Khởi hành 13/11 — Gành Đá Đĩa kiệt tác thiên nhiên' },
+    { id: 10903, tourId: 9, startDate: '2026-11-20', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 32, note: 'Khởi hành 20/11 — Kỳ Co – Eo Gió Maldives Việt Nam' },
+    { id: 10904, tourId: 9, startDate: '2026-11-27', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 14, note: 'Khởi hành 27/11 — Đón bình minh Mũi Điện' },
   ],
-
-  // ─── Tour 10: Thái Lan Bangkok – Pattaya 5N4Đ (Quốc tế) ───
+  // ─── Tour 10: Thái Lan Bangkok – Pattaya 5N4Đ ───
   10: [
-    { id: 11001, tourId: 10, startDate: '2026-10-28', endDate: '2026-11-01', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 28/10 — Hết chỗ (Đã chốt vé máy bay)' },
-    { id: 11002, tourId: 10, startDate: '2026-11-04', endDate: '2026-11-08', maxParticipants: 35, bookedCount: 5,  note: 'Khởi hành 04/11 — Thiếu số người tối thiểu' },
-    { id: 11003, tourId: 10, startDate: '2026-11-11', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 11/11 — Đủ điều kiện khởi hành (Còn 12 chỗ)' },
-    { id: 11004, tourId: 10, startDate: '2026-11-18', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 18/11 — Dư người (Full slot 40 khách)' },
-    { id: 11005, tourId: 10, startDate: '2026-11-25', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 16, note: 'Khởi hành 25/11 — Đủ người khởi hành (Còn 24 chỗ)' },
-    { id: 11006, tourId: 10, startDate: '2026-11-30', endDate: '2026-12-04', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 30/11 — Mới mở bán' },
+    { id: 11001, tourId: 10, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 30, note: 'Khởi hành 06/11 — Bangkok – Pattaya thiên đường du lịch' },
+    { id: 11002, tourId: 10, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 38, note: 'Khởi hành 15/11 — Lễ hội hoa đăng Loy Krathong (+10%)', seasonalPriceMultiplier: 1.1 },
+    { id: 11003, tourId: 10, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 15, note: 'Khởi hành 24/11 — Đảo San Hô Coral Island' },
+    { id: 11004, tourId: 10, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 4,  note: 'Khởi hành 05/12 — Mua sắm Siam Paragon cuối năm' },
   ],
-
-  // ─── Tour 11: [DEMO] Thanh Toán VietQR 5.000đ (Nội địa) ───
+  // ─── Tour 11: [DEMO] Thanh Toán VietQR ───
   11: [
-    { id: 11101, tourId: 11, startDate: '2026-10-25', endDate: '2026-10-25', maxParticipants: 99, bookedCount: 8,  note: 'Test thanh toán VietQR 5.000đ — Luôn mở' },
-    { id: 11102, tourId: 11, startDate: '2026-11-05', endDate: '2026-11-05', maxParticipants: 99, bookedCount: 12, note: 'Test thanh toán VietQR 5.000đ — Đủ người' },
-    { id: 11103, tourId: 11, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 99, bookedCount: 99, note: 'Test thanh toán VietQR 5.000đ — Giả lập Full chỗ' },
-    { id: 11104, tourId: 11, startDate: '2026-11-25', endDate: '2026-11-25', maxParticipants: 99, bookedCount: 2,  note: 'Test thanh toán VietQR 5.000đ — Thiếu người' },
-    { id: 11105, tourId: 11, startDate: '2026-11-30', endDate: '2026-11-30', maxParticipants: 99, bookedCount: 0,  note: 'Test thanh toán VietQR 5.000đ — Luôn mở' },
+    { id: 11101, tourId: 11, startDate: '2026-11-01', endDate: '2026-11-01', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
+    { id: 11102, tourId: 11, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
+    { id: 11103, tourId: 11, startDate: '2026-12-01', endDate: '2026-12-01', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
   ],
-
-  // ─── Tour 12: Hà Nội – Hạ Long – Ninh Bình 4N3Đ (Nội địa) ───
+  // ─── Tour 12: Hà Nội – Hạ Long – Ninh Bình 4N3Đ ───
   12: [
-    { id: 11201, tourId: 12, startDate: '2026-10-26', endDate: '2026-10-29', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 26/10 — Hết chỗ (Du thuyền Hạ Long full)' },
-    { id: 11202, tourId: 12, startDate: '2026-11-02', endDate: '2026-11-05', maxParticipants: 40, bookedCount: 4,  note: 'Khởi hành 02/11 — Thiếu số người tối thiểu' },
-    { id: 11203, tourId: 12, startDate: '2026-11-09', endDate: '2026-11-12', maxParticipants: 40, bookedCount: 27, note: 'Khởi hành 09/11 — Đủ điều kiện khởi hành (Còn 13 chỗ)' },
-    { id: 11204, tourId: 12, startDate: '2026-11-16', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 16/11 — Dư người (Full slot)' },
-    { id: 11205, tourId: 12, startDate: '2026-11-23', endDate: '2026-11-26', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 23/11 — Đủ người khởi hành (Còn 25 chỗ)' },
-    { id: 11206, tourId: 12, startDate: '2026-11-29', endDate: '2026-12-02', maxParticipants: 40, bookedCount: 1,  note: 'Khởi hành 29/11 — Đang gom khách đợt cuối tháng' },
+    { id: 11201, tourId: 12, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 22, note: 'Khởi hành 06/11 — Vịnh Hạ Long di sản thế giới' },
+    { id: 11202, tourId: 12, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 34, note: 'Khởi hành 13/11 — Tràng An – Bái Đính Ninh Bình' },
+    { id: 11203, tourId: 12, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 20/11 — Thưởng thức ẩm thực Hà Thành' },
+    { id: 11204, tourId: 12, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 27/11 — Cuối tháng 11' },
   ],
-
-  // ─── Tour 13: Hà Nội – Sapa – Fansipan 4N3Đ (Nội địa) ───
+  // ─── Tour 13: Hà Nội – Sapa – Fansipan 4N3Đ ───
   13: [
-    { id: 11301, tourId: 13, startDate: '2026-10-25', endDate: '2026-10-28', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 25/10 — Hết chỗ mùa mây Fansipan' },
-    { id: 11302, tourId: 13, startDate: '2026-10-31', endDate: '2026-11-03', maxParticipants: 35, bookedCount: 5,  note: 'Khởi hành 31/10 — Thiếu người tối thiểu' },
-    { id: 11303, tourId: 13, startDate: '2026-11-07', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 26, note: 'Khởi hành 07/11 — Đủ điều kiện khởi hành (Còn 9 chỗ)' },
-    { id: 11304, tourId: 13, startDate: '2026-11-14', endDate: '2026-11-17', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 14/11 — Dư người (Full 35 khách)' },
-    { id: 11305, tourId: 13, startDate: '2026-11-21', endDate: '2026-11-24', maxParticipants: 35, bookedCount: 14, note: 'Khởi hành 21/11 — Đủ người khởi hành (Còn 21 chỗ)' },
-    { id: 11306, tourId: 13, startDate: '2026-11-28', endDate: '2026-12-01', maxParticipants: 35, bookedCount: 2,  note: 'Khởi hành 28/11 — Mới mở bán' },
+    { id: 11301, tourId: 13, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 35, bookedCount: 28, note: 'Khởi hành 06/11 — Sapa sương mờ & mùa lạnh bắt đầu' },
+    { id: 11302, tourId: 13, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 13/11 — Chinh phục đỉnh Fansipan 3.143m' },
+    { id: 11303, tourId: 13, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 35, bookedCount: 33, note: 'Khởi hành 20/11 — Bản Cát Cát mùa hoa mận' },
+    { id: 11304, tourId: 13, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 25, note: 'Khởi hành 27/11 — Đèo Ô Quy Hồ ngắm hoàng hôn' },
+    { id: 11305, tourId: 13, startDate: '2026-12-05', endDate: '2026-12-08', maxParticipants: 35, bookedCount: 10, note: 'Khởi hành 05/12 — Săn tuyết mùa đông Sapa' },
   ],
-
-  // ─── Tour 14: Hà Giang – Đồng Văn – Mã Pí Lèng 5N4Đ (Nội địa) ───
+  // ─── Tour 14: Hà Giang – Đồng Văn – Mã Pí Lèng 5N4Đ ───
   14: [
-    { id: 11401, tourId: 14, startDate: '2026-10-25', endDate: '2026-10-29', maxParticipants: 30, bookedCount: 30, note: 'Khởi hành 25/10 — Hết chỗ (Mùa hoa tam giác mạch HOT)' },
-    { id: 11402, tourId: 14, startDate: '2026-10-31', endDate: '2026-11-04', maxParticipants: 30, bookedCount: 4,  note: 'Khởi hành 31/10 — Thiếu người tối thiểu' },
-    { id: 11403, tourId: 14, startDate: '2026-11-07', endDate: '2026-11-11', maxParticipants: 30, bookedCount: 22, note: 'Khởi hành 07/11 — Đủ điều kiện khởi hành (Còn 8 chỗ)' },
-    { id: 11404, tourId: 14, startDate: '2026-11-14', endDate: '2026-11-18', maxParticipants: 30, bookedCount: 30, note: 'Khởi hành 14/11 — Dư người (Full slot)' },
-    { id: 11405, tourId: 14, startDate: '2026-11-21', endDate: '2026-11-25', maxParticipants: 30, bookedCount: 12, note: 'Khởi hành 21/11 — Đủ người khởi hành (Còn 18 chỗ)' },
-    { id: 11406, tourId: 14, startDate: '2026-11-28', endDate: '2026-12-02', maxParticipants: 30, bookedCount: 0,  note: 'Khởi hành 28/11 — Mới mở bán' },
+    { id: 11401, tourId: 14, startDate: '2026-11-05', endDate: '2026-11-09', maxParticipants: 30, bookedCount: 26, note: 'Khởi hành 05/11 — Lễ hội hoa tam giác mạch Hà Giang' },
+    { id: 11402, tourId: 14, startDate: '2026-11-12', endDate: '2026-11-16', maxParticipants: 30, bookedCount: 30, note: 'Khởi hành 12/11 — Đệ nhất hùng quan Mã Pí Lèng' },
+    { id: 11403, tourId: 14, startDate: '2026-11-19', endDate: '2026-11-23', maxParticipants: 30, bookedCount: 22, note: 'Khởi hành 19/11 — Du thuyền trên hẻm vực Tu Sản' },
+    { id: 11404, tourId: 14, startDate: '2026-11-26', endDate: '2026-11-30', maxParticipants: 30, bookedCount: 8,  note: 'Khởi hành 26/11 — Cột cờ Lũng Cú cực Bắc Tổ quốc' },
   ],
-
-  // ─── Tour 15: Đà Nẵng – Hội An – Huế 4N3Đ (Nội địa) ───
+  // ─── Tour 15: Đà Nẵng – Hội An – Huế 4N3Đ ───
   15: [
-    { id: 11501, tourId: 15, startDate: '2026-10-25', endDate: '2026-10-28', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 25/10 — Hết chỗ (Full slot Bà Nà)' },
-    { id: 11502, tourId: 15, startDate: '2026-10-31', endDate: '2026-11-03', maxParticipants: 40, bookedCount: 3,  note: 'Khởi hành 31/10 — Thiếu người tối thiểu' },
-    { id: 11503, tourId: 15, startDate: '2026-11-07', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 07/11 — Đủ điều kiện khởi hành (Còn 12 chỗ)' },
-    { id: 11504, tourId: 15, startDate: '2026-11-14', endDate: '2026-11-17', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 14/11 — Dư người (Full chỗ)' },
-    { id: 11505, tourId: 15, startDate: '2026-11-21', endDate: '2026-11-24', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 21/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 11506, tourId: 15, startDate: '2026-11-28', endDate: '2026-12-01', maxParticipants: 40, bookedCount: 4,  note: 'Khởi hành 28/11 — Đang gom khách (Cần thêm người)' },
+    { id: 11501, tourId: 15, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 30, note: 'Khởi hành 06/11 — Phố cổ Hội An lung linh hoa đăng' },
+    { id: 11502, tourId: 15, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 13/11 — Cầu Vàng Bà Nà Hills bồng bềnh mây' },
+    { id: 11503, tourId: 15, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 20/11 — Thăm Đại Nội & lăng tẩm Cố Đô Huế' },
+    { id: 11504, tourId: 15, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 24, note: 'Khởi hành 27/11 — Bán đảo Sơn Trà & chùa Linh Ứng' },
   ],
-
-  // ─── Tour 16: Phú Quốc – Nam Đảo 4N3Đ (Nội địa) ───
+  // ─── Tour 16: Phú Quốc – Nam Đảo 4N3Đ ───
   16: [
-    { id: 11601, tourId: 16, startDate: '2026-10-26', endDate: '2026-10-29', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 26/10 — Hết chỗ (Full slot ngắm hoàng hôn)' },
-    { id: 11602, tourId: 16, startDate: '2026-11-02', endDate: '2026-11-05', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 02/11 — Thiếu số người tối thiểu' },
-    { id: 11603, tourId: 16, startDate: '2026-11-09', endDate: '2026-11-12', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 09/11 — Đủ điều kiện khởi hành (Còn 15 chỗ)' },
-    { id: 11604, tourId: 16, startDate: '2026-11-16', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 16/11 — Dư người (Full slot)' },
-    { id: 11605, tourId: 16, startDate: '2026-11-23', endDate: '2026-11-26', maxParticipants: 40, bookedCount: 16, note: 'Khởi hành 23/11 — Đủ người khởi hành (Còn 24 chỗ)' },
-    { id: 11606, tourId: 16, startDate: '2026-11-29', endDate: '2026-12-02', maxParticipants: 40, bookedCount: 2,  note: 'Khởi hành 29/11 — Mới mở bán' },
+    { id: 11601, tourId: 16, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Phú Quốc mùa khô biển đẹp nhất năm' },
+    { id: 11602, tourId: 16, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 13/11 — Cáp treo Hòn Thơm vượt biển dài nhất' },
+    { id: 11603, tourId: 16, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 38, note: 'Khởi hành 20/11 — Sunset Town & cầu Hôn Phú Quốc' },
+    { id: 11604, tourId: 16, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 27/11 — Lặn ngắm san hô Bãi Sao' },
   ],
-
-  // ─── Tour 17: Singapore & Malaysia 5N4Đ (Quốc tế) ───
+  // ─── Tour 17: Singapore – Malaysia 5N4Đ ───
   17: [
-    { id: 11701, tourId: 17, startDate: '2026-10-27', endDate: '2026-10-31', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 27/10 — Hết chỗ (Đã xuất vé đoàn)' },
-    { id: 11702, tourId: 17, startDate: '2026-11-03', endDate: '2026-11-07', maxParticipants: 40, bookedCount: 4,  note: 'Khởi hành 03/11 — Thiếu số người tối thiểu' },
-    { id: 11703, tourId: 17, startDate: '2026-11-10', endDate: '2026-11-14', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 10/11 — Đủ điều kiện khởi hành (Còn 12 chỗ)' },
-    { id: 11704, tourId: 17, startDate: '2026-11-17', endDate: '2026-11-21', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 17/11 — Dư người (Full 40 khách)' },
-    { id: 11705, tourId: 17, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 24/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 11706, tourId: 17, startDate: '2026-11-29', endDate: '2026-12-03', maxParticipants: 40, bookedCount: 2,  note: 'Khởi hành 29/11 — Mới mở bán' },
+    { id: 11701, tourId: 17, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Gardens by the Bay & Marina Bay Sands' },
+    { id: 11702, tourId: 17, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 15/11 — Tháp đôi Petronas & phố cổ Malacca' },
+    { id: 11703, tourId: 17, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 24/11 — Cao nguyên Genting & Động Batu' },
+    { id: 11704, tourId: 17, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 05/12 — Không khí Noel sớm tại Orchard' },
   ],
-
-  // ─── Tour 18: Seoul & Đảo Nami Hàn Quốc 5N4Đ (Quốc tế) ───
+  // ─── Tour 18: Hàn Quốc – Seoul – Nami 5N4Đ ───
   18: [
-    { id: 11801, tourId: 18, startDate: '2026-10-28', endDate: '2026-11-01', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 28/10 — Hết chỗ (Lá đỏ Đảo Nami đỉnh điểm)' },
-    { id: 11802, tourId: 18, startDate: '2026-11-04', endDate: '2026-11-08', maxParticipants: 35, bookedCount: 5,  note: 'Khởi hành 04/11 — Thiếu số người tối thiểu' },
-    { id: 11803, tourId: 18, startDate: '2026-11-11', endDate: '2026-11-15', maxParticipants: 35, bookedCount: 27, note: 'Khởi hành 11/11 — Đủ điều kiện khởi hành (Còn 8 chỗ)' },
-    { id: 11804, tourId: 18, startDate: '2026-11-18', endDate: '2026-11-22', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 18/11 — Dư người (Full slot mùa chớm đông)' },
-    { id: 11805, tourId: 18, startDate: '2026-11-25', endDate: '2026-11-29', maxParticipants: 35, bookedCount: 15, note: 'Khởi hành 25/11 — Đủ người khởi hành (Còn 20 chỗ)' },
-    { id: 11806, tourId: 18, startDate: '2026-11-30', endDate: '2026-12-04', maxParticipants: 35, bookedCount: 1,  note: 'Khởi hành 30/11 — Mới mở bán' },
+    { id: 11801, tourId: 18, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 06/11 — Đảo Nami mùa lá ngân hạnh vàng' },
+    { id: 11802, tourId: 18, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 15/11 — Cung điện Gyeongbokgung mùa thu lá đỏ' },
+    { id: 11803, tourId: 18, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 28, note: 'Khởi hành 24/11 — Tháp N Seoul & chợ đêm Myeongdong' },
+    { id: 11804, tourId: 18, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 12, note: 'Khởi hành 05/12 — Trượt tuyết mùa đông xứ Hàn' },
   ],
-
-  // ─── Tour 19: Tokyo & Núi Phú Sĩ Nhật Bản 5N4Đ (Quốc tế) ───
+  // ─── Tour 19: Nhật Bản – Tokyo – Phú Sĩ 5N4Đ ───
   19: [
-    { id: 11901, tourId: 19, startDate: '2026-10-27', endDate: '2026-10-31', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 27/10 — Hết chỗ (Mùa lá đỏ Kohyo Phú Sĩ)' },
-    { id: 11902, tourId: 19, startDate: '2026-11-04', endDate: '2026-11-08', maxParticipants: 35, bookedCount: 4,  note: 'Khởi hành 04/11 — Thiếu số người tối thiểu' },
-    { id: 11903, tourId: 19, startDate: '2026-11-11', endDate: '2026-11-15', maxParticipants: 35, bookedCount: 26, note: 'Khởi hành 11/11 — Đủ điều kiện khởi hành (Còn 9 chỗ)' },
-    { id: 11904, tourId: 19, startDate: '2026-11-18', endDate: '2026-11-22', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 18/11 — Dư người (Full 35 khách)' },
-    { id: 11905, tourId: 19, startDate: '2026-11-25', endDate: '2026-11-29', maxParticipants: 35, bookedCount: 16, note: 'Khởi hành 25/11 — Đủ người khởi hành (Còn 19 chỗ)' },
-    { id: 11906, tourId: 19, startDate: '2026-11-30', endDate: '2026-12-04', maxParticipants: 35, bookedCount: 0,  note: 'Khởi hành 30/11 — Mới mở bán' },
+    { id: 11901, tourId: 19, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 32, note: 'Khởi hành 06/11 — Núi Phú Sĩ & hồ Kawaguchi mùa lá đỏ' },
+    { id: 11902, tourId: 19, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 15/11 — Chùa Sensoji Asakusa & phố cổ Tokyo' },
+    { id: 11903, tourId: 19, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 25, note: 'Khởi hành 24/11 — Thung lũng Owakudani luộc trứng đen' },
+    { id: 11904, tourId: 19, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 8,  note: 'Khởi hành 05/12 — Trải nghiệm tắm Onsen mùa đông' },
   ],
-
-  // ─── Tour 20: Indonesia – Bali 5N4Đ (Quốc tế) ───
+  // ─── Tour 20: Indonesia – Bali 5N4Đ ───
   20: [
-    { id: 12001, tourId: 20, startDate: '2026-10-26', endDate: '2026-10-30', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 26/10 — Hết chỗ (Full 40 khách)' },
-    { id: 12002, tourId: 20, startDate: '2026-11-03', endDate: '2026-11-07', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 03/11 — Thiếu số người tối thiểu' },
-    { id: 12003, tourId: 20, startDate: '2026-11-10', endDate: '2026-11-14', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 10/11 — Đủ điều kiện khởi hành (Còn 12 chỗ)' },
-    { id: 12004, tourId: 20, startDate: '2026-11-17', endDate: '2026-11-21', maxParticipants: 40, bookedCount: 40, note: 'Khởi hành 17/11 — Dư người (Full slot hoàng hôn Jimbaran)' },
-    { id: 12005, tourId: 20, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 24/11 — Đủ người khởi hành (Còn 22 chỗ)' },
-    { id: 12006, tourId: 20, startDate: '2026-11-29', endDate: '2026-12-03', maxParticipants: 40, bookedCount: 2,  note: 'Khởi hành 29/11 — Mới mở bán' },
+    { id: 12001, tourId: 20, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 26, note: 'Khởi hành 06/11 — Cổng trời Lempuyang & đền Tanah Lot' },
+    { id: 12002, tourId: 20, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 15/11 — Xích đu Bali Swing & ruộng bậc thang Tegallalang' },
+    { id: 12003, tourId: 20, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 24/11 — Đảo ngọc Nusa Penida sống lưng khủng long' },
+    { id: 12004, tourId: 20, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 05/12 — Hoàng hôn biển Jimbaran' },
   ],
 };
 
-// Default template schedules for any tour (fallback nếu tourId chưa có lịch cụ thể)
-const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
-  // Nếu đã có lịch cố định, trả về ngay
-  if (TOUR_SCHEDULES[tourId]) {
-    return TOUR_SCHEDULES[tourId];
-  }
-
-  // Fallback: tạo 4 lịch tương lai cho bất kỳ tour nào chưa được định nghĩa
+// Hàm tự động sinh lịch tương lai động liên tục theo thời gian thực (Real-time dynamic rolling schedules)
+// Đảm bảo không bao giờ bị tình trạng 0 tour dù qua tháng hay qua năm
+const generateDynamicFutureSchedules = (tourId: number, baseHistory: TourScheduleItem[] = []): TourScheduleItem[] => {
   const toDateString = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  const make = (offset: number, dur: number, note: string, booked: number): TourScheduleItem => {
-    const s = new Date(); s.setHours(12, 0, 0, 0); s.setDate(s.getDate() + offset);
-    const e = new Date(s); e.setDate(e.getDate() + dur);
-    return { id: Number(`${tourId}${String(offset).padStart(2,'0')}`), tourId, startDate: toDateString(s), endDate: toDateString(e), maxParticipants: 40, bookedCount: booked, note };
+
+  const make = (offsetDays: number, durationDays: number, note: string, booked: number, multiplier = 1.0): TourScheduleItem => {
+    const s = new Date();
+    s.setHours(12, 0, 0, 0);
+    s.setDate(s.getDate() + offsetDays);
+    const e = new Date(s);
+    e.setDate(e.getDate() + durationDays);
+    return {
+      id: Number(`${tourId}${String(offsetDays).padStart(2, "0")}`),
+      tourId,
+      startDate: toDateString(s),
+      endDate: toDateString(e),
+      minParticipants: 10,
+      maxParticipants: 40,
+      bookedCount: booked,
+      note,
+      seasonalPriceMultiplier: multiplier,
+    };
   };
-  return [
-    make(7,  3, 'Khởi hành đợt 1 — Sắp khởi hành', 12),
-    make(14, 4, 'Khởi hành đợt 2 — Giữa tháng',     8),
-    make(21, 4, 'Khởi hành đợt 3',                   0),
-    make(30, 4, 'Khởi hành đợt 4 — Tháng tới',       0),
+
+  const generated: TourScheduleItem[] = [
+    make(6, 4, 'Khởi hành đợt 1 — Đang nhận khách', 15),
+    make(14, 4, 'Khởi hành đợt 2 — Lịch HOT giữa tháng', 24, 1.05),
+    make(22, 5, 'Khởi hành đợt 3 — Cuối tháng', 8),
+    make(35, 5, 'Khởi hành đợt 4 — Tháng kế tiếp', 0),
   ];
+
+  return [...baseHistory, ...generated];
+};
+
+// Lấy lịch mặc định cho tour (kết hợp lịch định nghĩa sẵn và cơ chế tự động bù lịch tương lai)
+const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
+  const predefined = TOUR_SCHEDULES[tourId];
+  if (predefined) {
+    const upcoming = predefined.filter((s) => isUpcomingSchedule(s.startDate));
+    // Nếu có ít nhất 2 đợt khởi hành tương lai, dùng danh sách mẫu
+    if (upcoming.length >= 2) {
+      return predefined;
+    }
+    // Nếu tất cả lịch mẫu đã quá hạn (hoặc còn quá ít), tự động sinh lịch mới trong tương lai
+    return generateDynamicFutureSchedules(tourId, predefined);
+  }
+
+  // Fallback: tạo lịch tương lai động cho tour mới
+  return generateDynamicFutureSchedules(tourId);
 };
 
 export const tourScheduleService = {
   // Lấy tất cả lịch khởi hành của tour (dành cho Vendor quản lý & hiển thị)
   getSchedulesForTour: (tourId: number): TourScheduleItem[] => {
     try {
-      // Dọn dẹp cache cũ nếu tồn tại để đồng bộ lịch mới tháng 10 - 11/2026
+      // Dọn dẹp cache cũ v1, v2, v3, v4 nếu tồn tại
       localStorage.removeItem('smart_travel_tour_schedules_' + tourId);
       localStorage.removeItem('smart_travel_tour_schedules_v2_' + tourId);
       localStorage.removeItem('smart_travel_tour_schedules_v3_' + tourId);
+      localStorage.removeItem('smart_travel_tour_schedules_v4_' + tourId);
 
       const stored = localStorage.getItem(STORAGE_PREFIX + tourId);
       if (stored) {
@@ -393,7 +365,9 @@ export const tourScheduleService = {
             s.note.includes('kiểm tra giao diện') ||
             s.id < 10000
         );
-        if (!isLegacy && Array.isArray(parsed) && parsed.length > 0) {
+        // Kiểm tra xem cache còn bất kỳ lịch nào trong tương lai không
+        const hasUpcoming = parsed.some((s) => isUpcomingSchedule(s.startDate));
+        if (!isLegacy && Array.isArray(parsed) && parsed.length > 0 && hasUpcoming) {
           return parsed;
         }
       }

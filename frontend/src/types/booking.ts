@@ -28,6 +28,11 @@ export interface Booking {
   vendorId?: number;
   vendorName?: string;
   qrCodeUrl?: string;
+  isDeposit?: boolean;
+  depositAmount?: number;
+  remainingAmount?: number;
+  note?: string;
+  notes?: string;
   createdAt: string;
 }
 
@@ -45,8 +50,10 @@ export interface BookingCreateRequest {
   note?: string;
   bookingCode?: string;
   status?: BookingStatusType;
+  isDeposit?: boolean;
+  depositAmount?: number;
+  remainingAmount?: number;
   singleRoomSurcharge?: boolean;
   singleRoomSurchargeAmount?: number;
   roomAllocation?: string;
 }
-

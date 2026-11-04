@@ -1,38 +1,40 @@
-package com.smarttravel.dto.request;
-
-import com.smarttravel.enums.BookingStatus;
-import com.smarttravel.enums.PaymentMethod;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class BookingCreateRequest {
-    @NotNull
-    private Long tourId;
-    private Long tourScheduleId;
-    @NotNull
-    @Min(1)
-    private Integer numberOfAdults;
-    private Integer numberOfChildren = 0;
-    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.smarttravel.config.MultiFormatLocalDateDeserializer.class)
-    private LocalDate departureDate;
-    private PaymentMethod paymentMethod;
-    private String voucherCode;
-    private String contactName;
-    private String contactEmail;
-    private String contactPhone;
-    private String note;
-    private Boolean singleRoomSurcharge = false;
-    private java.math.BigDecimal singleRoomSurchargeAmount = java.math.BigDecimal.ZERO;
-    private String roomAllocation;
-    private String bookingCode;
-    private BookingStatus status;
-}
-
+package com.smarttravel.dto.request;
+
+import com.smarttravel.enums.BookingStatus;
+import com.smarttravel.enums.PaymentMethod;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookingCreateRequest {
+    @NotNull
+    private Long tourId;
+    private Long tourScheduleId;
+    @NotNull
+    @Min(1)
+    private Integer numberOfAdults;
+    private Integer numberOfChildren = 0;
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.smarttravel.config.MultiFormatLocalDateDeserializer.class)
+    private LocalDate departureDate;
+    private PaymentMethod paymentMethod;
+    private String voucherCode;
+    private String contactName;
+    private String contactEmail;
+    private String contactPhone;
+    private String note;
+    private Boolean singleRoomSurcharge = false;
+    private java.math.BigDecimal singleRoomSurchargeAmount = java.math.BigDecimal.ZERO;
+    private String roomAllocation;
+    private String bookingCode;
+    private BookingStatus status;
+    private Boolean isDeposit = false;
+    private java.math.BigDecimal depositAmount;
+}
+

@@ -81,4 +81,5 @@ plans/
 prompt_templates/
 /*.sql
 
-
+# Scratch & temporary scripts
+scratch/
