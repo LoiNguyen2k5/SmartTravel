@@ -263,9 +263,6 @@ export const VendorDashboardPage: React.FC = () => {
           >
             <RotateCcw className="h-4 w-4" /> Reset Doanh Thu
           </button>
-          <Link to="/vendor/tours/create" className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-md shadow-emerald-900/20">
-            <Plus className="h-4 w-4" /> Thêm Tour Mới
-          </Link>
         </div>
       </div>
 
@@ -575,7 +572,7 @@ export const VendorDashboardPage: React.FC = () => {
           <span className="text-xs font-semibold text-slate-500">Tổng: {tours.length} tour</span>
         </div>
         {tours.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">Chưa có tour. Bấm "Thêm Tour Mới" để bắt đầu!</p>
+          <p className="text-sm text-slate-400 text-center py-8">Chưa có tour nào.</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {tours.map((t) => (
