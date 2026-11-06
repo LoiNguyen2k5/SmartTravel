@@ -562,5 +562,33 @@ public class BookingServiceImpl implements BookingService {
         resendETicket(bookingCode, null);
     }
 
+    @Override
+    @Transactional
+    public int resetBookings(String vendorEmail) {
+        List<Booking> targets;
+        if (vendorEmail == null) {
+            targets = bookingRepository.findAll();
+        } else {
+            User vendor = userRepository.findByEmail(vendorEmail)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
+            targets = bookingRepository.findByTourVendorId(vendor.getId());
+        }
+
+        // Hoàn lại số chỗ cho các đơn chưa hủy (đơn hủy đã được hoàn chỗ trước đó)
+        for (Booking b : targets) {
+            Tour tour = b.getTour();
+            if (b.getStatus() != BookingStatus.CANCELLED && tour != null && tour.getRemainingSeats() != null) {
+                int guests = (b.getNumberOfAdults() != null ? b.getNumberOfAdults() : 0)
+                        + (b.getNumberOfChildren() != null ? b.getNumberOfChildren() : 0);
+                tour.setRemainingSeats(tour.getRemainingSeats() + guests);
+                tourRepository.save(tour);
+            }
+        }
+
+        // Payment được xóa theo cascade (orphanRemoval) của Booking
+        bookingRepository.deleteAll(targets);
+        return targets.size();
+    }
+
 }
 

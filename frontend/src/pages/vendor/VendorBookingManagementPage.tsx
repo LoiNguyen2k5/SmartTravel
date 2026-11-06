@@ -75,22 +75,15 @@ export const VendorBookingManagementPage: React.FC = () => {
         }
       }
 
-      // Merge client local bookings (e.g. newly booked tours)
-      let localBookings: Booking[] = [];
-      try {
-        const localStr = localStorage.getItem('user_created_bookings');
-        if (localStr) {
-          localBookings = JSON.parse(localStr);
-        }
-      } catch (e) {
-        console.error('Lỗi đọc user_created_bookings:', e);
-      }
-
-      const existingCodes = new Set(rawList.map((b) => b.bookingCode));
-      for (const lb of localBookings) {
-        if (!existingCodes.has(lb.bookingCode)) {
-          rawList.unshift(lb);
-          existingCodes.add(lb.bookingCode);
+      // Chỉ dùng dữ liệu localStorage dự phòng khi API Backend không trả về đơn nào
+      if (rawList.length === 0) {
+        try {
+          const localStr = localStorage.getItem('user_created_bookings');
+          if (localStr) {
+            rawList = JSON.parse(localStr);
+          }
+        } catch (e) {
+          console.error('Lỗi đọc user_created_bookings:', e);
         }
       }
 

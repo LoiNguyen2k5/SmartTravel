@@ -91,6 +91,8 @@ export const BookingManagementPage: React.FC = () => {
           className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 font-medium text-slate-700"
         >
           <option value="ALL">Tất cả trạng thái</option>
+          <option value="PAID">Đã thanh toán 100% (PAID)</option>
+          <option value="DEPOSITED">Đã đặt cọc 30% (DEPOSITED)</option>
           <option value="CONFIRMED">Đã xác nhận (CONFIRMED)</option>
           <option value="COMPLETED">Hoàn tất (COMPLETED)</option>
           <option value="PENDING">Chờ xử lý (PENDING)</option>
@@ -145,16 +147,22 @@ export const BookingManagementPage: React.FC = () => {
                       {b.numberOfAdults || 1} Lớn {b.numberOfChildren ? `, ${b.numberOfChildren} Nhỏ` : ''}
                     </td>
 
-                    <td className="py-3.5 px-4 font-black text-slate-900">
-                      {formatCurrency(b.totalPrice)}
+                    <td className="py-3.5 px-4">
+                      <div className="font-black text-slate-900">{formatCurrency(b.totalPrice)}</div>
+                      {b.status === 'DEPOSITED' && (
+                        <div className="text-[11px] font-semibold text-sky-600">
+                          Đã cọc: {formatCurrency(b.depositAmount || Math.round((b.totalPrice || 0) * 0.3))}
+                        </div>
+                      )}
                     </td>
 
                     <td className="py-3.5 px-4">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                        b.status === 'CONFIRMED' || b.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' :
+                        b.status === 'CONFIRMED' || b.status === 'COMPLETED' || b.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' :
+                        b.status === 'DEPOSITED' ? 'bg-sky-100 text-sky-700' :
                         b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
                       }`}>
-                        {b.status}
+                        {b.status === 'DEPOSITED' ? 'DEPOSITED (30%)' : b.status}
                       </span>
                     </td>
 

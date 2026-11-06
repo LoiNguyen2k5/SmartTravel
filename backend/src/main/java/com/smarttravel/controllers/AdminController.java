@@ -79,6 +79,13 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(bookingService.getAllBookings()));
     }
 
+    @DeleteMapping("/revenue/reset")
+    @Operation(summary = "Reset doanh thu toàn sàn (xóa toàn bộ đơn đặt tour & giao dịch thử nghiệm)")
+    public ResponseEntity<ApiResponse<Integer>> resetRevenue() {
+        int deleted = bookingService.resetBookings(null);
+        return ResponseEntity.ok(ApiResponse.success("Đã reset doanh thu toàn sàn, xóa " + deleted + " đơn", deleted));
+    }
+
     @GetMapping("/payments")
     @Operation(summary = "Theo dõi danh sách giao dịch thanh toán toàn sàn")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getAllPayments() {

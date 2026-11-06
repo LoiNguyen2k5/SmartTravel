@@ -15,6 +15,7 @@ const COMMISSION_RATE = 0.10;
 const PAYMENT_FEE_RATE = 0.015;
 
 const fmt = (n: number) => n.toLocaleString('vi-VN');
+const formatCurrency = (amount: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 const fmtM = (n: number) => `${(n / 1_000_000).toFixed(1)}M`;
 
 function getMonthLabel(offset: number): string {
@@ -24,7 +25,7 @@ function getMonthLabel(offset: number): string {
 }
 
 const STATUS_GROUPS = {
-  confirmed: ['CONFIRMED', 'PAID', 'DA THANH TOAN', 'CONFIRMED_PAID'],
+  confirmed: ['CONFIRMED', 'PAID', 'DEPOSITED', 'DA THANH TOAN', 'CONFIRMED_PAID'],
   pending: ['PENDING', 'AWAITING_PAYMENT', 'CHO THANH TOAN'],
   completed: ['COMPLETED', 'DA HOAN THANH', 'DONE'],
   cancelled: ['CANCELLED', 'REFUNDED', 'DA HUY', 'HOAN TIEN'],
@@ -90,22 +91,15 @@ export const VendorDashboardPage: React.FC = () => {
         if (fb.success && fb.data) rawList = fb.data;
       }
 
-      // Merge client local bookings (e.g. newly booked tours)
-      let localBookings: Booking[] = [];
-      try {
-        const localStr = localStorage.getItem('user_created_bookings');
-        if (localStr) {
-          localBookings = JSON.parse(localStr);
-        }
-      } catch (e) {
-        console.error('Lỗi đọc user_created_bookings:', e);
-      }
-
-      const existingCodes = new Set(rawList.map((b) => b.bookingCode));
-      for (const lb of localBookings) {
-        if (!existingCodes.has(lb.bookingCode)) {
-          rawList.unshift(lb);
-          existingCodes.add(lb.bookingCode);
+      // Chỉ dùng dữ liệu localStorage dự phòng khi API Backend không trả về đơn nào
+      if (rawList.length === 0) {
+        try {
+          const localStr = localStorage.getItem('user_created_bookings');
+          if (localStr) {
+            rawList = JSON.parse(localStr);
+          }
+        } catch (e) {
+          console.error('Lỗi đọc user_created_bookings:', e);
         }
       }
 
@@ -149,7 +143,9 @@ export const VendorDashboardPage: React.FC = () => {
       const raw = localStorage.getItem(SETTLED_VENDORS_KEY);
       if (!raw) return false;
       const ids: number[] = JSON.parse(raw);
-      return ids.includes(VENDOR_ID);
+      const savedUserStr = localStorage.getItem('user');
+      const currentUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+      return ids.includes(currentUser?.id) || ids.includes(VENDOR_ID) || ids.includes(2);
     } catch (_) { return false; }
   };
 
@@ -167,14 +163,19 @@ export const VendorDashboardPage: React.FC = () => {
     const pending = bookings.filter((b) => classifyStatus(b.status) === 'pending');
     const completed = bookings.filter((b) => classifyStatus(b.status) === 'completed');
     const cancelled = bookings.filter((b) => classifyStatus(b.status) === 'cancelled');
-    const grossRevenue = bookings.reduce((s, b) => s + (b.totalPrice || 0), 0);
-    const cancelledTotal = cancelled.reduce((s, b) => s + (b.totalPrice || 0), 0);
-    const netRevenue = grossRevenue - cancelledTotal;
+    const getRecognizedAmount = (b: Booking): number => {
+      if ((b.status || '').toUpperCase() === 'DEPOSITED') {
+        return b.depositAmount && b.depositAmount > 0 ? b.depositAmount : Math.round((b.totalPrice || 0) * 0.3);
+      }
+      return b.totalPrice || 0;
+    };
+    const grossRevenue = bookings.reduce((s, b) => s + getRecognizedAmount(b), 0);
+    const netRevenue = [...confirmed, ...completed].reduce((s, b) => s + getRecognizedAmount(b), 0);
     const commission = netRevenue * COMMISSION_RATE;
     const gatewayFee = netRevenue * PAYMENT_FEE_RATE;
     const netPayout = netRevenue - commission - gatewayFee;
     // Nếu admin đã quyết toán → pendingSettlement = 0
-    const rawPendingSettlement = completed.reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const rawPendingSettlement = netPayout;
     const pendingSettlement = isAdminSettled() ? 0 : rawPendingSettlement;
     const adminSettled = isAdminSettled();
     const paidCount = confirmed.length + completed.length;
@@ -249,8 +250,15 @@ export const VendorDashboardPage: React.FC = () => {
             <RefreshCw className="h-4 w-4" />
           </button>
           <button
-            onClick={() => {
-              if (window.confirm('Bạn có chắc muốn đặt lại toàn bộ đơn đặt tour thử nghiệm và doanh thu về 0đ để bắt đầu test lại từ đầu không?')) {
+            onClick={async () => {
+              if (window.confirm('Bạn có chắc muốn XÓA toàn bộ đơn đặt tour thuộc các tour của bạn và đưa doanh thu về 0đ không? Hành động này không thể hoàn tác.')) {
+                try {
+                  await bookingService.resetVendorRevenue();
+                } catch (err) {
+                  console.error('Lỗi reset doanh thu:', err);
+                  alert('Reset doanh thu thất bại. Vui lòng kiểm tra Backend.');
+                  return;
+                }
                 localStorage.removeItem('user_created_bookings');
                 localStorage.removeItem('vendor_booking_statuses');
                 localStorage.removeItem('smart_travel_settled_vendor_ids');
@@ -303,7 +311,7 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp</p>
             <p className="text-[10px] text-slate-400 mb-1">(Gross Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.grossRevenue > 0 ? `${fmtM(analytics.grossRevenue)} đ` : '0 đ'}</h3>
+            <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.grossRevenue)}</h3>
             {analytics.grossRevenue > 0 ? (
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1"><ArrowUpRight className="h-3 w-3" /> +18.4% tháng trước</span>
             ) : (
@@ -321,7 +329,7 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Ròng</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Revenue)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netRevenue > 0 ? `${fmtM(analytics.netRevenue)} đ` : '0 đ'}</h3>
+            <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.netRevenue)}</h3>
             <span className="text-[11px] text-slate-400">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
           </div>
 
@@ -335,10 +343,10 @@ export const VendorDashboardPage: React.FC = () => {
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Thực Nhận</p>
             <p className="text-[10px] text-slate-400 mb-1">(Net Payout)</p>
-            <h3 className="text-xl font-black text-slate-900">{analytics.netPayout > 0 ? `${fmtM(analytics.netPayout)} đ` : '0 đ'}</h3>
+            <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.netPayout)}</h3>
             <div className="text-[11px] text-slate-500 space-y-0.5 mt-1">
-              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{analytics.commission > 0 ? `${fmtM(analytics.commission)} đ` : '0 đ'}</span></div>
-              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{analytics.gatewayFee > 0 ? `${fmtM(analytics.gatewayFee)} đ` : '0 đ'}</span></div>
+              <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{formatCurrency(analytics.commission)}</span></div>
+              <div>Phí GW {PAYMENT_FEE_RATE * 100}%: <span className="text-rose-500">−{formatCurrency(analytics.gatewayFee)}</span></div>
             </div>
           </div>
 
@@ -362,7 +370,7 @@ export const VendorDashboardPage: React.FC = () => {
             <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-slate-400'}`}>(Pending Settlement)</p>
             <h3 className={`text-xl font-black ${
               analytics.pendingSettlement > 0 ? 'text-amber-800' : 'text-slate-900'
-            }`}>{analytics.pendingSettlement > 0 ? `${fmtM(analytics.pendingSettlement)} đ` : '0 đ'}</h3>
+            }`}>{formatCurrency(analytics.pendingSettlement)}</h3>
             <span className={`text-[11px] font-medium ${
               analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-emerald-600'
             }`}>

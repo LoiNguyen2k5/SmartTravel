@@ -3,6 +3,7 @@ package com.smarttravel.controllers;
 import com.smarttravel.dto.response.ApiResponse;
 import com.smarttravel.dto.response.BookingResponse;
 import com.smarttravel.dto.response.TourResponse;
+import com.smarttravel.services.BookingService;
 import com.smarttravel.services.VendorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class VendorController {
 
     private final VendorService vendorService;
+    private final BookingService bookingService;
 
     @GetMapping("/dashboard")
     @Operation(summary = "Lấy thống kê bảng điều khiển Vendor")
@@ -46,5 +49,12 @@ public class VendorController {
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getVendorBookings(@AuthenticationPrincipal UserDetails userDetails) {
         List<BookingResponse> bookings = vendorService.getVendorBookings(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(bookings));
+    }
+
+    @DeleteMapping("/revenue/reset")
+    @Operation(summary = "Reset doanh thu của Vendor (xóa các đơn đặt tour thử nghiệm thuộc tour của Vendor)")
+    public ResponseEntity<ApiResponse<Integer>> resetRevenue(@AuthenticationPrincipal UserDetails userDetails) {
+        int deleted = bookingService.resetBookings(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Đã reset doanh thu, xóa " + deleted + " đơn", deleted));
     }
 }

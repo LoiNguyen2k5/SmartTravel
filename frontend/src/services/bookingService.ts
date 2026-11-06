@@ -27,6 +27,10 @@ export const bookingService = {
     return await axiosClient.get('/vendor/bookings');
   },
 
+  resetVendorRevenue: async (): Promise<ApiResponse<number>> => {
+    return await axiosClient.delete('/vendor/revenue/reset');
+  },
+
   validateVoucher: async (code: string, originalTotal: number): Promise<ApiResponse<{ voucherCode: string; discountAmount: number; finalTotal: number }>> => {
     return await axiosClient.post('/bookings/validate-voucher', { code, originalTotal });
   },

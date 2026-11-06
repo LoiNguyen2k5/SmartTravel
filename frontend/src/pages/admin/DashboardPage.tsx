@@ -20,6 +20,7 @@ import {
   ArrowDownRight,
   Info,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { AdminStats } from '../../types/admin';
@@ -127,12 +128,26 @@ export const DashboardPage: React.FC = () => {
             Phân Tích Đánh Giá
           </button>
           <button
-            onClick={fetchStats}
+            onClick={async () => {
+              if (!window.confirm('Bạn có chắc muốn XÓA toàn bộ đơn đặt tour & giao dịch trên toàn sàn và đưa doanh thu về 0đ không? Hành động này không thể hoàn tác.')) return;
+              try {
+                await adminService.resetRevenue();
+              } catch (err) {
+                console.error('Lỗi reset doanh thu:', err);
+                alert('Reset doanh thu thất bại. Vui lòng kiểm tra Backend.');
+                return;
+              }
+              localStorage.removeItem('user_created_bookings');
+              localStorage.removeItem('vendor_booking_statuses');
+              localStorage.removeItem(SETTLED_VENDORS_KEY);
+              fetchStats();
+            }}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
+            title="Xóa toàn bộ đơn đặt tour thử nghiệm và đưa doanh thu về 0đ"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-600' : ''}`} />
-            Làm mới số liệu
+            <RotateCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Reset Doanh Thu
           </button>
         </div>
       </div>
@@ -435,15 +450,30 @@ export const DashboardPage: React.FC = () => {
                       <div className="font-medium text-slate-800">{b.contactName || b.userName || 'Khách vãng lai'}</div>
                       <div className="text-xs text-slate-500">{b.contactPhone || b.contactEmail}</div>
                     </td>
-                    <td className="py-3 px-4 font-bold text-slate-900">{formatCurrency(b.totalPrice || 0)}</td>
-                    <td className="py-3 px-4 font-bold text-amber-600 text-xs">{formatCurrency((b.totalPrice || 0) * PLATFORM_COMMISSION)}</td>
+                    <td className="py-3 px-4">
+                      <div className="font-bold text-slate-900">{formatCurrency(b.totalPrice || 0)}</div>
+                      {b.status === 'DEPOSITED' && (
+                        <div className="text-[11px] font-semibold text-sky-600">
+                          Đã cọc: {formatCurrency(b.depositAmount || Math.round((b.totalPrice || 0) * 0.3))}
+                        </div>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-amber-600 text-xs">
+                      {formatCurrency(
+                        (b.status === 'DEPOSITED'
+                          ? (b.depositAmount || Math.round((b.totalPrice || 0) * 0.3))
+                          : (b.totalPrice || 0)) * PLATFORM_COMMISSION
+                      )}
+                    </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        b.status === 'CONFIRMED' || b.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' :
+                        b.status === 'CONFIRMED' || b.status === 'COMPLETED' || b.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' :
+                        b.status === 'DEPOSITED' ? 'bg-sky-100 text-sky-700' :
                         b.status === 'CANCELLED' ? 'bg-red-100 text-red-600' :
                         'bg-amber-100 text-amber-700'
                       }`}>
-                        {(b.status === 'CONFIRMED' || b.status === 'COMPLETED') ? '✓ ' : ''}{b.status}
+                        {(b.status === 'CONFIRMED' || b.status === 'COMPLETED' || b.status === 'PAID') ? '✓ ' : ''}
+                        {b.status === 'DEPOSITED' ? '● DEPOSITED (30%)' : b.status}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-xs text-slate-500">

@@ -32,6 +32,25 @@ public class AdminServiceImpl implements AdminService {
 
     private static final double DEFAULT_COMMISSION_RATE = 10.0; // 10%
 
+    private boolean isRevenueBooking(Booking b) {
+        if (b == null || b.getStatus() == null) return false;
+        return b.getStatus() == BookingStatus.CONFIRMED
+                || b.getStatus() == BookingStatus.COMPLETED
+                || b.getStatus() == BookingStatus.PAID
+                || b.getStatus() == BookingStatus.DEPOSITED;
+    }
+
+    private BigDecimal getRecognizedRevenue(Booking b) {
+        if (b == null || b.getTotalPrice() == null) return BigDecimal.ZERO;
+        if (b.getStatus() == BookingStatus.DEPOSITED) {
+            if (b.getDepositAmount() != null && b.getDepositAmount().compareTo(BigDecimal.ZERO) > 0) {
+                return b.getDepositAmount();
+            }
+            return b.getTotalPrice().multiply(new BigDecimal("0.30")).setScale(0, RoundingMode.HALF_UP);
+        }
+        return b.getTotalPrice();
+    }
+
     @Override
     public AdminStatsResponse getDashboardAnalytics() {
         List<User> allUsers = userRepository.findAll();
@@ -49,12 +68,12 @@ public class AdminServiceImpl implements AdminService {
         List<Booking> allBookings = bookingRepository.findAllByOrderByCreatedAtDesc();
         long totalBookings = allBookings.size();
         List<Booking> successfulBookingsList = allBookings.stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.COMPLETED)
+                .filter(this::isRevenueBooking)
                 .collect(Collectors.toList());
         long successfulBookings = successfulBookingsList.size();
 
         BigDecimal totalGrossRevenue = successfulBookingsList.stream()
-                .map(Booking::getTotalPrice)
+                .map(this::getRecognizedRevenue)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -66,9 +85,10 @@ public class AdminServiceImpl implements AdminService {
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
         Map<String, BigDecimal> monthlyRevenue = new TreeMap<>();
         for (Booking b : successfulBookingsList) {
-            if (b.getCreatedAt() != null && b.getTotalPrice() != null) {
+            BigDecimal recognizedRev = getRecognizedRevenue(b);
+            if (b.getCreatedAt() != null && recognizedRev != null) {
                 String monthKey = b.getCreatedAt().format(monthFormatter);
-                monthlyRevenue.put(monthKey, monthlyRevenue.getOrDefault(monthKey, BigDecimal.ZERO).add(b.getTotalPrice()));
+                monthlyRevenue.put(monthKey, monthlyRevenue.getOrDefault(monthKey, BigDecimal.ZERO).add(recognizedRev));
             }
         }
 
@@ -192,8 +212,8 @@ public class AdminServiceImpl implements AdminService {
                     .collect(Collectors.toList());
 
             BigDecimal grossRevenue = vendorBookings.stream()
-                    .filter(b -> b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.COMPLETED)
-                    .map(Booking::getTotalPrice)
+                    .filter(this::isRevenueBooking)
+                    .map(this::getRecognizedRevenue)
                     .filter(Objects::nonNull)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -251,6 +271,7 @@ public class AdminServiceImpl implements AdminService {
                 .tourId(booking.getTour() != null ? booking.getTour().getId() : null)
                 .tourTitle(booking.getTour() != null ? booking.getTour().getTitle() : null)
                 .tourThumbnailUrl(booking.getTour() != null ? booking.getTour().getThumbnailUrl() : null)
+                .tourCode(booking.getTour() != null ? booking.getTour().getTourCode() : null)
                 .userId(booking.getUser() != null ? booking.getUser().getId() : null)
                 .userName(booking.getUser() != null ? booking.getUser().getFullName() : null)
                 .contactName(booking.getContactName())
@@ -258,7 +279,20 @@ public class AdminServiceImpl implements AdminService {
                 .contactPhone(booking.getContactPhone())
                 .numberOfAdults(booking.getNumberOfAdults())
                 .numberOfChildren(booking.getNumberOfChildren())
+                .adultPrice(booking.getAdultPrice())
+                .childPrice(booking.getChildPrice())
+                .voucherCode(booking.getVoucherCode())
+                .discountAmount(booking.getDiscountAmount())
                 .totalPrice(booking.getTotalPrice())
+                .isDeposit(booking.getIsDeposit())
+                .depositAmount(booking.getDepositAmount())
+                .remainingAmount(booking.getRemainingAmount())
+                .singleRoomSurcharge(booking.getSingleRoomSurcharge())
+                .singleRoomSurchargeAmount(booking.getSingleRoomSurchargeAmount())
+                .roomAllocation(booking.getRoomAllocation())
+                .notes(booking.getNotes())
+                .vendorId(booking.getTour() != null && booking.getTour().getVendor() != null ? booking.getTour().getVendor().getId() : null)
+                .vendorName(booking.getTour() != null && booking.getTour().getVendor() != null ? booking.getTour().getVendor().getFullName() : null)
                 .status(booking.getStatus())
                 .qrCodeUrl(booking.getQrCodeUrl())
                 .createdAt(booking.getCreatedAt())

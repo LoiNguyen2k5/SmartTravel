@@ -148,4 +148,8 @@ export const adminService = {
   getVendorSettlements: async (): Promise<ApiResponse<VendorSettlement[]>> => {
     return await axiosClient.get('/admin/settlements');
   },
+
+  resetRevenue: async (): Promise<ApiResponse<number>> => {
+    return await axiosClient.delete('/admin/revenue/reset');
+  },
 };

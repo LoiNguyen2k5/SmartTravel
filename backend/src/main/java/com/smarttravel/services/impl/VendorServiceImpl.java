@@ -4,6 +4,7 @@ import com.smarttravel.dto.response.BookingResponse;
 import com.smarttravel.dto.response.TourResponse;
 import com.smarttravel.entities.Booking;
 import com.smarttravel.entities.User;
+import com.smarttravel.enums.BookingStatus;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.BookingRepository;
 import com.smarttravel.repositories.TourRepository;
@@ -14,9 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,25 @@ public class VendorServiceImpl implements VendorService {
     private final BookingRepository bookingRepository;
     private final TourService tourService;
 
+    private boolean isRevenueBooking(Booking b) {
+        if (b == null || b.getStatus() == null) return false;
+        return b.getStatus() == BookingStatus.CONFIRMED
+                || b.getStatus() == BookingStatus.COMPLETED
+                || b.getStatus() == BookingStatus.PAID
+                || b.getStatus() == BookingStatus.DEPOSITED;
+    }
+
+    private BigDecimal getRecognizedRevenue(Booking b) {
+        if (b == null || b.getTotalPrice() == null) return BigDecimal.ZERO;
+        if (b.getStatus() == BookingStatus.DEPOSITED) {
+            if (b.getDepositAmount() != null && b.getDepositAmount().compareTo(BigDecimal.ZERO) > 0) {
+                return b.getDepositAmount();
+            }
+            return b.getTotalPrice().multiply(new BigDecimal("0.30")).setScale(0, RoundingMode.HALF_UP);
+        }
+        return b.getTotalPrice();
+    }
+
     @Override
     public Map<String, Object> getVendorDashboardStats(String vendorEmail) {
         User vendor = userRepository.findByEmail(vendorEmail)
@@ -37,8 +59,9 @@ public class VendorServiceImpl implements VendorService {
         List<Booking> vendorBookings = bookingRepository.findByTourVendorId(vendor.getId());
 
         BigDecimal totalRevenue = vendorBookings.stream()
-                .filter(b -> b.getTotalPrice() != null)
-                .map(Booking::getTotalPrice)
+                .filter(this::isRevenueBooking)
+                .map(this::getRecognizedRevenue)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Map<String, Object> stats = new HashMap<>();
@@ -85,6 +108,13 @@ public class VendorServiceImpl implements VendorService {
                 .voucherCode(b.getVoucherCode())
                 .discountAmount(b.getDiscountAmount())
                 .totalPrice(b.getTotalPrice())
+                .isDeposit(b.getIsDeposit())
+                .depositAmount(b.getDepositAmount())
+                .remainingAmount(b.getRemainingAmount())
+                .singleRoomSurcharge(b.getSingleRoomSurcharge())
+                .singleRoomSurchargeAmount(b.getSingleRoomSurchargeAmount())
+                .roomAllocation(b.getRoomAllocation())
+                .notes(b.getNotes())
                 .status(b.getStatus())
                 .contactName(b.getContactName())
                 .contactEmail(b.getContactEmail())
