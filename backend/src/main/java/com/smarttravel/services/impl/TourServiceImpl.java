@@ -63,10 +63,18 @@ public class TourServiceImpl implements TourService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .price(request.getPrice())
+                .childPrice(request.getChildPrice() != null ? request.getChildPrice() : request.getPrice().multiply(new BigDecimal("0.7")))
                 .durationDays(request.getDurationDays())
                 .durationNights(request.getDurationNights())
                 .departureLocation(request.getDepartureLocation())
                 .thumbnailUrl(request.getThumbnailUrl())
+                .tourCode(request.getTourCode())
+                .category(request.getCategory() != null ? request.getCategory() : TourCategory.DOMESTIC)
+                .includedServices(request.getIncludedServices())
+                .excludedServices(request.getExcludedServices())
+                .cancellationPolicy(request.getCancellationPolicy())
+                .itineraryDetails(request.getItineraryDetails())
+                .remainingSeats(request.getRemainingSeats() != null ? request.getRemainingSeats() : 20)
                 .status(TourStatus.ACTIVE)
                 .vendor(vendor)
                 .destination(destination)
@@ -74,6 +82,44 @@ public class TourServiceImpl implements TourService {
 
         Tour savedTour = tourRepository.save(tour);
         return mapToTourResponse(savedTour);
+    }
+
+    @Override
+    @Transactional
+    public TourResponse updateTour(Long id, TourCreateRequest request, String vendorEmail) {
+        Tour tour = tourRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", id));
+
+        User user = userRepository.findByEmail(vendorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
+
+        boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName() == RoleEnum.ROLE_ADMIN);
+        if (!isAdmin && (tour.getVendor() == null || !tour.getVendor().getId().equals(user.getId()))) {
+            throw new BadRequestException("Bạn không có quyền chỉnh sửa tour này.");
+        }
+
+        if (request.getTitle() != null) tour.setTitle(request.getTitle());
+        if (request.getDescription() != null) tour.setDescription(request.getDescription());
+        if (request.getPrice() != null) tour.setPrice(request.getPrice());
+        if (request.getChildPrice() != null) tour.setChildPrice(request.getChildPrice());
+        if (request.getDurationDays() != null) tour.setDurationDays(request.getDurationDays());
+        if (request.getDurationNights() != null) tour.setDurationNights(request.getDurationNights());
+        if (request.getDepartureLocation() != null) tour.setDepartureLocation(request.getDepartureLocation());
+        if (request.getThumbnailUrl() != null) tour.setThumbnailUrl(request.getThumbnailUrl());
+        if (request.getTourCode() != null) tour.setTourCode(request.getTourCode());
+        if (request.getCategory() != null) tour.setCategory(request.getCategory());
+        if (request.getIncludedServices() != null) tour.setIncludedServices(request.getIncludedServices());
+        if (request.getExcludedServices() != null) tour.setExcludedServices(request.getExcludedServices());
+        if (request.getCancellationPolicy() != null) tour.setCancellationPolicy(request.getCancellationPolicy());
+        if (request.getItineraryDetails() != null) tour.setItineraryDetails(request.getItineraryDetails());
+        if (request.getRemainingSeats() != null) tour.setRemainingSeats(request.getRemainingSeats());
+        if (request.getDestinationId() != null) {
+            Destination destination = destinationRepository.findById(request.getDestinationId()).orElse(null);
+            tour.setDestination(destination);
+        }
+
+        Tour saved = tourRepository.save(tour);
+        return mapToTourResponse(saved);
     }
 
     @Override

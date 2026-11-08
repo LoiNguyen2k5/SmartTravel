@@ -7,6 +7,7 @@ import com.smarttravel.enums.BookingStatus;
 
 import com.smarttravel.enums.RoleEnum;
 import com.smarttravel.enums.TourStatus;
+import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.*;
 import com.smarttravel.services.AdminService;
@@ -140,7 +141,14 @@ public class AdminServiceImpl implements AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        user.setEnabled(enabled != null ? enabled : !Boolean.TRUE.equals(user.getEnabled()));
+        boolean targetStatus = enabled != null ? enabled : !Boolean.TRUE.equals(user.getEnabled());
+        boolean isAdminAccount = user.getRoles() != null
+                && user.getRoles().stream().anyMatch(r -> r.getName() == RoleEnum.ROLE_ADMIN);
+        if (isAdminAccount && !targetStatus) {
+            throw new BadRequestException("Không thể khóa tài khoản Quản trị viên (Admin) gốc của hệ thống.");
+        }
+
+        user.setEnabled(targetStatus);
         User updated = userRepository.save(user);
 
         Set<String> roleNames = updated.getRoles() != null

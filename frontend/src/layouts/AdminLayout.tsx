@@ -9,7 +9,8 @@ import {
   ArrowLeft,
   ShieldCheck,
   Ticket,
-  Building2
+  Building2,
+  MapPin
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { vendorApplicationService } from '../services/vendorApplicationService';
@@ -39,6 +40,7 @@ export const AdminLayout: React.FC = () => {
   const navItems = [
     { label: 'Tổng quan (Dashboard)', path: '/admin', icon: LayoutDashboard },
     { label: 'Kiểm duyệt Tour', path: '/admin/tours', icon: Compass },
+    { label: 'Quản trị Địa danh', path: '/admin/destinations', icon: MapPin },
     { label: 'Duyệt Đối tác (Vendor)', path: '/admin/vendor-approvals', icon: Building2, badge: pendingVendorCount },
     { label: 'Giao dịch & Đối soát', path: '/admin/settlements', icon: CreditCard },
     { label: 'Quản lý Khuyến mãi', path: '/admin/vouchers', icon: Ticket },

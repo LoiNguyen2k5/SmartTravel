@@ -31,6 +31,7 @@ import { UserManagementPage } from '../pages/admin/UserManagementPage';
 import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementPage';
 import { VoucherManagementPage } from '../pages/admin/VoucherManagementPage';
 import { VendorApprovalPage } from '../pages/admin/VendorApprovalPage';
+import { DestinationManagementPage } from '../pages/admin/DestinationManagementPage';
 
 // Vendor Pages
 import { VendorDashboardPage } from '../pages/vendor/VendorDashboardPage';
@@ -71,7 +72,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/tours/:id" element={<TourDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/blogs" element={<BlogsPage />} />
-		  <Route path="/blogs/:id" element={<BlogDetailPage />} />
+          <Route path="/blogs/:id" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
           <Route path="/become-vendor" element={<BecomeVendorPage />} />
@@ -91,6 +92,7 @@ export const AppRoutes: React.FC = () => {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<DashboardPage />} />
             <Route path="/admin/tours" element={<TourManagementPage />} />
+            <Route path="/admin/destinations" element={<DestinationManagementPage />} />
             <Route path="/admin/settlements" element={<TransactionSettlementPage />} />
             <Route path="/admin/vouchers" element={<VoucherManagementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />

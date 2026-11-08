@@ -1,6 +1,7 @@
 package com.smarttravel.services.impl;
 
 import com.smarttravel.entities.Destination;
+import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.DestinationRepository;
 import com.smarttravel.services.DestinationService;
@@ -28,6 +29,9 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public Destination createDestination(Destination destination) {
+        if (destination.getName() != null && destinationRepository.existsByNameIgnoreCase(destination.getName().trim())) {
+            throw new BadRequestException("Tên địa danh đã tồn tại trong danh mục hệ thống.");
+        }
         return destinationRepository.save(destination);
     }
 

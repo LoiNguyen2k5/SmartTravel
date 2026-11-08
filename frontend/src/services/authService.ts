@@ -39,4 +39,12 @@ export const authService = {
   getCurrentUser: async (): Promise<ApiResponse<User>> => {
     return await axiosClient.get('/auth/me');
   },
+
+  updateProfile: async (data: { fullName: string; phone?: string; avatarUrl?: string }): Promise<ApiResponse<User>> => {
+    return await axiosClient.put('/users/me', data);
+  },
+
+  changePassword: async (data: { oldPassword: string; newPassword: string }): Promise<ApiResponse<void>> => {
+    return await axiosClient.put('/users/change-password', data);
+  },
 };

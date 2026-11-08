@@ -1,5 +1,6 @@
 package com.smarttravel.dto.request;
 
+import com.smarttravel.enums.TourCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,8 @@ public class TourCreateRequest {
     @Min(value = 0, message = "Giá tour phải lớn hơn hoặc bằng 0")
     private BigDecimal price;
 
+    private BigDecimal childPrice;
+
     @NotNull(message = "Số ngày tour không được để trống")
     @Min(value = 1, message = "Số ngày tour tối thiểu là 1")
     private Integer durationDays;
@@ -35,6 +38,20 @@ public class TourCreateRequest {
     private String departureLocation;
 
     private String thumbnailUrl;
+
+    private String tourCode;
+
+    private TourCategory category;
+
+    private String includedServices;
+
+    private String excludedServices;
+
+    private String cancellationPolicy;
+
+    private String itineraryDetails;
+
+    private Integer remainingSeats;
 
     private Long destinationId;
 }

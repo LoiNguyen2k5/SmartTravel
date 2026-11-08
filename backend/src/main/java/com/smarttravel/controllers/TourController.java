@@ -65,6 +65,18 @@ public class TourController {
         return ResponseEntity.status(201).body(ApiResponse.created("Tạo tour du lịch thành công", tour));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
+    @Operation(summary = "Cập nhật thông tin Tour du lịch (Vendor sở hữu hoặc Admin)")
+    public ResponseEntity<ApiResponse<TourResponse>> updateTour(
+            @PathVariable Long id,
+            @Valid @RequestBody TourCreateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        TourResponse tour = tourService.updateTour(id, request, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật tour du lịch thành công", tour));
+    }
+
     @GetMapping("/my-tours")
     @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
     @Operation(summary = "Lấy danh sách Tour do Vendor quản lý")
