@@ -1271,13 +1271,13 @@ export const CheckoutPage: React.FC = () => {
 
                         id: 'BANK', 
 
-                        name: 'Quét mã VietQR (Chuyển khoản Ngân hàng 24/7)', 
+                        name: 'Quét mã VietQR — MBBank (Chuyển khoản 24/7)', 
 
                         icon: Building2, 
 
                         color: 'bg-emerald-600', 
 
-                        sub: 'Quét mã QR bằng mọi App Ngân hàng (Agribank, VCB, MB, TCB...) - Tự động điền tiền và nội dung' 
+                        sub: 'Quét mã QR bằng mọi App Ngân hàng (MBBank, VCB, Agribank, TCB...) - Tự động điền tiền và nội dung SePay' 
 
                       },
 
@@ -1299,13 +1299,13 @@ export const CheckoutPage: React.FC = () => {
 
                         id: 'VNPAY', 
 
-                        name: 'Cổng thanh toán VNPay', 
+                        name: 'Thẻ Quốc Tế Visa / MasterCard / JCB', 
 
                         icon: CreditCard, 
 
                         color: 'bg-red-600', 
 
-                        sub: 'Thẻ ATM nội địa, Thẻ quốc tế Visa/Mastercard' 
+                        sub: 'Nhập thông tin thẻ quốc tế Visa / MasterCard / JCB & xác thực bảo mật 3D-Secure OTP' 
 
                       },
 
@@ -1553,7 +1553,7 @@ export const CheckoutPage: React.FC = () => {
 
                     <QrCode className="h-4 w-4" />
 
-                    Thanh Toán Ngay (Quét mã QR)
+                    {paymentMethod === 'VNPAY' ? 'Thanh Toán Ngay (Thẻ Visa / MasterCard)' : 'Thanh Toán Ngay (Quét mã QR)'}
 
                   </button>
 
@@ -1590,6 +1590,7 @@ export const CheckoutPage: React.FC = () => {
           booking={paymentBooking}
 
           onPaymentSuccess={handlePaymentSuccess}
+          initialTab={paymentMethod === 'VNPAY' ? 'VISA' : paymentMethod === 'MOMO' ? 'MOMO' : 'VIETQR'}
 
         />
 
