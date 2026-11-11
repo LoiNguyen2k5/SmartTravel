@@ -78,6 +78,8 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
     }
 
     setQrGatewayTab(initialTab);
+    setCardError('');
+    setOtpStep(false);
     if (booking?.contactName) {
       const normalized = booking.contactName
         .normalize('NFD')
@@ -268,8 +270,13 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
 
   const handleConfirmVisaPayment = async () => {
     setCardError('');
-    if (otpCode.replace(/\D/g, '').length < 6) {
+    const cleanOtp = otpCode.replace(/\D/g, '');
+    if (cleanOtp.length < 6) {
       setCardError('Vui lòng nhập mã xác thực 3D-Secure OTP gồm 6 chữ số.');
+      return;
+    }
+    if (cleanOtp !== generatedOtp) {
+      setCardError('Mã xác thực 3D-Secure OTP không chính xác. Quý khách vui lòng kiểm tra lại.');
       return;
     }
     await handleSimulateBankWebhook();

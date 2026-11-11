@@ -928,10 +928,13 @@ public class PaymentServiceImpl implements PaymentService {
                     && (booking.getRemainingAmount() == null || booking.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0);
 
             boolean isDeposited = booking.getStatus() == BookingStatus.DEPOSITED
-                    || (isDepositChoice && !isAlreadyFullyPaid);
+                    || (isPaidFromCache && isDepositChoice && !isFullyPaidFromCache);
 
             boolean isFullyPaid = isFullyPaidFromCache || isAlreadyFullyPaid;
-            boolean isPaid = isPaidFromCache || isDeposited || isFullyPaid;
+            boolean isPaid = isPaidFromCache 
+                    || booking.getStatus() == BookingStatus.DEPOSITED 
+                    || booking.getStatus() == BookingStatus.PAID 
+                    || booking.getStatus() == BookingStatus.COMPLETED;
 
             Map<String, Object> result = new HashMap<>();
             result.put("bookingCode", booking.getBookingCode());
