@@ -518,6 +518,17 @@ public class PaymentServiceImpl implements PaymentService {
                 BookingStatus targetStatus = isDepositChoice ? BookingStatus.DEPOSITED : BookingStatus.PAID;
                 boolean isAlreadyPaid = (booking.getStatus() == BookingStatus.PAID) || (payment.getPaymentStatus() == PaymentStatus.PAID);
 
+                if (isDepositChoice) {
+                    if (booking.getDepositAmount() == null || booking.getDepositAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                        booking.setDepositAmount(actualPayAmount);
+                    }
+                    if (booking.getRemainingAmount() == null || booking.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                        booking.setRemainingAmount(totalAmount.subtract(actualPayAmount));
+                    }
+                } else {
+                    booking.setRemainingAmount(BigDecimal.ZERO);
+                }
+
                 booking.setStatus(targetStatus);
                 bookingRepository.save(booking);
 
@@ -825,6 +836,16 @@ public class PaymentServiceImpl implements PaymentService {
             boolean isCurrentlyDeposited = booking.getStatus() == BookingStatus.DEPOSITED;
 
             if (isCurrentlyDeposited) {
+                Payment existingPayment = paymentRepository.findByBookingId(booking.getId()).orElse(null);
+                String oldTxnId = (existingPayment != null && existingPayment.getTransactionId() != null)
+                        ? existingPayment.getTransactionId().trim()
+                        : "";
+                // Kiểm tra bảo vệ: Nếu txnId này trùng với giao dịch đã dùng cho đợt cọc thì bỏ qua ngay
+                if (!oldTxnId.isEmpty() && (oldTxnId.equals(txnId) || oldTxnId.contains(txnId) || ("SEPAY-REMAIN-" + txnId).equals(oldTxnId))) {
+                    log.warn("processSepayWebhook: Giao dịch SePay {} đã được dùng cho đợt cọc của đơn {}, bỏ qua để tránh tất toán trùng lặp.", txnId, booking.getBookingCode());
+                    return false;
+                }
+
                 // ĐỢT 2: TẤT TOÁN 70% CÒN LẠI VÀ QUYẾT TOÁN HỢP ĐỒNG 100%
                 booking.setStatus(BookingStatus.PAID);
                 booking.setIsDeposit(false);
@@ -869,6 +890,17 @@ public class PaymentServiceImpl implements PaymentService {
                         : totalAmount;
                 BookingStatus targetStatus = isDepositChoice ? BookingStatus.DEPOSITED : BookingStatus.PAID;
                 boolean isAlreadyPaid = (booking.getStatus() == BookingStatus.PAID) || (booking.getStatus() == BookingStatus.DEPOSITED);
+
+                if (isDepositChoice) {
+                    if (booking.getDepositAmount() == null || booking.getDepositAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                        booking.setDepositAmount(actualPayAmount);
+                    }
+                    if (booking.getRemainingAmount() == null || booking.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                        booking.setRemainingAmount(totalAmount.subtract(actualPayAmount));
+                    }
+                } else {
+                    booking.setRemainingAmount(BigDecimal.ZERO);
+                }
 
                 booking.setStatus(targetStatus);
                 bookingRepository.save(booking);
@@ -918,6 +950,20 @@ public class PaymentServiceImpl implements PaymentService {
         }
         lastSepayPollTime = now;
 
+        Optional<Booking> optBooking = findBookingFlexible(cleanCode);
+        if (optBooking.isEmpty()) {
+            return;
+        }
+        Booking booking = optBooking.get();
+        if (booking.getStatus() == BookingStatus.PAID || booking.getStatus() == BookingStatus.COMPLETED) {
+            return;
+        }
+
+        Payment existingPayment = paymentRepository.findByBookingId(booking.getId()).orElse(null);
+        String usedTxnId = (existingPayment != null && existingPayment.getTransactionId() != null)
+                ? existingPayment.getTransactionId().trim()
+                : "";
+
         try {
             java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                     .uri(java.net.URI.create("https://my.sepay.vn/userapi/transactions/list?limit=20"))
@@ -938,13 +984,19 @@ public class PaymentServiceImpl implements PaymentService {
                 if (transactions != null && transactions.isArray()) {
                     String normalizedTarget = cleanCode.replace("-", "").toUpperCase();
                     for (com.fasterxml.jackson.databind.JsonNode tx : transactions) {
+                        String txId = tx.path("id").asText("").trim();
+                        // Nếu giao dịch này đã được ghi nhận trước đó cho booking này (ví dụ đợt cọc 30%), bỏ qua!
+                        if (!usedTxnId.isEmpty() && !txId.isEmpty() && (usedTxnId.equals(txId) || usedTxnId.contains(txId) || ("SEPAY-REMAIN-" + txId).equals(usedTxnId))) {
+                            continue;
+                        }
+
                         String txContent = tx.path("transaction_content").asText("") + " "
                                 + tx.path("content").asText("") + " "
                                 + tx.path("code").asText("");
                         String normalizedTx = txContent.replaceAll("[^A-Za-z0-9]", "").toUpperCase();
                         if (normalizedTx.contains(normalizedTarget)) {
                             Map<String, Object> webhookPayload = new HashMap<>();
-                            webhookPayload.put("id", tx.path("id").asText(UUID.randomUUID().toString()));
+                            webhookPayload.put("id", txId.isEmpty() ? UUID.randomUUID().toString() : txId);
                             webhookPayload.put("content", txContent);
                             webhookPayload.put("transactionContent", tx.path("transaction_content").asText(""));
                             webhookPayload.put("transferAmount", tx.path("amount_in").asText("5000"));
@@ -965,7 +1017,12 @@ public class PaymentServiceImpl implements PaymentService {
             return Map.of("isPaid", false, "status", "UNKNOWN");
         }
 
-        String cleanCode = bookingCode.trim().replaceAll("\s+", "").toUpperCase();
+        String cleanCode = bookingCode.trim().replaceAll("\\s+", "").toUpperCase();
+
+        // Tự động đồng bộ trực tiếp từ SePay UserAPI (giúp mọi máy trong nhóm không cần chạy Ngrok vẫn nhận được giao dịch)
+        if (!PAID_CODES_CACHE.containsKey(cleanCode) || !REMAINING_PAID_CODES_CACHE.containsKey(cleanCode)) {
+            syncWithSepayApiIfNeeded(cleanCode);
+        }
 
         boolean isPaidFromCache = PAID_CODES_CACHE.containsKey(cleanCode)
                 || PAID_CODES_CACHE.containsKey(cleanCode.replace("-", ""))
@@ -1051,40 +1108,17 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     public boolean markBookingAsPaid(String bookingCode) {
-
-
-
         if (bookingCode == null) return false;
-
-
 
         String cleanCode = bookingCode.trim().replaceAll("\s+", "").toUpperCase();
 
-
-
         PAID_CODES_CACHE.put(cleanCode, System.currentTimeMillis());
 
-
-
         if (cleanCode.contains("-")) {
-
-
-
             PAID_CODES_CACHE.put(cleanCode.replace("-", ""), System.currentTimeMillis());
-
-
-
         } else if (cleanCode.startsWith("BK")) {
-
-
-
             PAID_CODES_CACHE.put("BK-" + cleanCode.substring(2), System.currentTimeMillis());
-
-
-
         }
-
-
 
         Optional<Booking> optionalBooking = findBookingFlexible(cleanCode);
 
@@ -1177,6 +1211,17 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
 
+
+            if (isDeposit) {
+                if (booking.getDepositAmount() == null || booking.getDepositAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                    booking.setDepositAmount(actualPayAmount);
+                }
+                if (booking.getRemainingAmount() == null || booking.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                    booking.setRemainingAmount(totalAmount.subtract(actualPayAmount));
+                }
+            } else {
+                booking.setRemainingAmount(BigDecimal.ZERO);
+            }
 
             booking.setStatus(targetStatus);
 
@@ -1276,31 +1321,16 @@ public class PaymentServiceImpl implements PaymentService {
 
         String cleanCode = bookingCode.trim().replaceAll("\s+", "").toUpperCase();
 
-
-
         PAID_CODES_CACHE.put(cleanCode, System.currentTimeMillis());
-
-
+        REMAINING_PAID_CODES_CACHE.put(cleanCode, System.currentTimeMillis());
 
         if (cleanCode.contains("-")) {
-
-
-
             PAID_CODES_CACHE.put(cleanCode.replace("-", ""), System.currentTimeMillis());
-
-
-
+            REMAINING_PAID_CODES_CACHE.put(cleanCode.replace("-", ""), System.currentTimeMillis());
         } else if (cleanCode.startsWith("BK")) {
-
-
-
             PAID_CODES_CACHE.put("BK-" + cleanCode.substring(2), System.currentTimeMillis());
-
-
-
+            REMAINING_PAID_CODES_CACHE.put("BK-" + cleanCode.substring(2), System.currentTimeMillis());
         }
-
-
 
         Optional<Booking> optionalBooking = findBookingFlexible(cleanCode);
 
