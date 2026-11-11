@@ -128,6 +128,15 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final com.smarttravel.services.InvoicePdfService invoicePdfService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.sepay.api-token:}")
+    private String sepayApiToken;
+
+    private static volatile long lastSepayPollTime = 0L;
+    private static final java.net.http.HttpClient SEPAY_HTTP_CLIENT = java.net.http.HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(4))
+            .build();
+    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = new com.fasterxml.jackson.databind.ObjectMapper();
+
 
 
     @Override
@@ -899,6 +908,57 @@ public class PaymentServiceImpl implements PaymentService {
 
 
 
+    private void syncWithSepayApiIfNeeded(String cleanCode) {
+        if (sepayApiToken == null || sepayApiToken.trim().isEmpty()) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - lastSepayPollTime < 1800) {
+            return;
+        }
+        lastSepayPollTime = now;
+
+        try {
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://my.sepay.vn/userapi/transactions/list?limit=20"))
+                    .timeout(java.time.Duration.ofSeconds(4))
+                    .header("Authorization", "Bearer " + sepayApiToken.trim())
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+
+            java.net.http.HttpResponse<String> response = SEPAY_HTTP_CLIENT.send(
+                    request,
+                    java.net.http.HttpResponse.BodyHandlers.ofString()
+            );
+
+            if (response.statusCode() == 200 && response.body() != null) {
+                com.fasterxml.jackson.databind.JsonNode root = OBJECT_MAPPER.readTree(response.body());
+                com.fasterxml.jackson.databind.JsonNode transactions = root.get("transactions");
+                if (transactions != null && transactions.isArray()) {
+                    String normalizedTarget = cleanCode.replace("-", "").toUpperCase();
+                    for (com.fasterxml.jackson.databind.JsonNode tx : transactions) {
+                        String txContent = tx.path("transaction_content").asText("") + " "
+                                + tx.path("content").asText("") + " "
+                                + tx.path("code").asText("");
+                        String normalizedTx = txContent.replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+                        if (normalizedTx.contains(normalizedTarget)) {
+                            Map<String, Object> webhookPayload = new HashMap<>();
+                            webhookPayload.put("id", tx.path("id").asText(UUID.randomUUID().toString()));
+                            webhookPayload.put("content", txContent);
+                            webhookPayload.put("transactionContent", tx.path("transaction_content").asText(""));
+                            webhookPayload.put("transferAmount", tx.path("amount_in").asText("5000"));
+                            processSepayWebhook(webhookPayload);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("SePay API direct polling skipped: {}", e.getMessage());
+        }
+    }
+
     @Override
     public Map<String, Object> checkPaymentStatus(String bookingCode) {
         if (bookingCode == null || bookingCode.trim().isEmpty()) {
@@ -1433,6 +1493,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 
         String cleanCode = bookingCode.trim().replaceAll("\\s+", "").toUpperCase();
+
+        // Tự động đồng bộ trực tiếp từ SePay UserAPI (giúp mọi máy trong nhóm không cần chạy Ngrok vẫn nhận được giao dịch)
+        if (!PAID_CODES_CACHE.containsKey(cleanCode) || !REMAINING_PAID_CODES_CACHE.containsKey(cleanCode)) {
+            syncWithSepayApiIfNeeded(cleanCode);
+        }
 
 
 

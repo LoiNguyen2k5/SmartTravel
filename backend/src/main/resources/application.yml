@@ -59,6 +59,10 @@ app:
     allowed-headers: "*"
     allow-credentials: true
 
+  sepay:
+    # Điền API Token lấy từ trang my.sepay.vn -> Cấu hình công ty -> API Access để mọi máy trong nhóm tự nhận giao dịch không cần Ngrok
+    api-token: ${SEPAY_API_TOKEN:SCDUHPJ2BLSG0V6FXCAC4WI7GWTIXNAFY26QM5CVNP3UGWB1TRQHTYWMRE7LMPXA}
+
 # SpringDoc OpenAPI / Swagger UI
 springdoc:
   api-docs:
