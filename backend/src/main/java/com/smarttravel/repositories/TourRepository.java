@@ -3,6 +3,7 @@ package com.smarttravel.repositories;
 import com.smarttravel.entities.Tour;
 import com.smarttravel.enums.TourCategory;
 import com.smarttravel.enums.TourStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,15 +11,25 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface TourRepository extends JpaRepository<Tour, Long> {
+    @EntityGraph(attributePaths = {"vendor", "destination", "visaTemplate", "reviews"})
     List<Tour> findByStatus(TourStatus status);
+
+    @EntityGraph(attributePaths = {"vendor", "destination", "visaTemplate", "reviews"})
     List<Tour> findByVendorId(Long vendorId);
+
+    @Override
+    @EntityGraph(attributePaths = {"vendor", "destination", "visaTemplate", "reviews"})
+    Optional<Tour> findById(Long id);
+
     long countByStatus(TourStatus status);
     long countByVisaTemplateId(Long visaTemplateId);
     List<Tour> findByVisaTemplateId(Long visaTemplateId);
 
+    @EntityGraph(attributePaths = {"vendor", "destination", "visaTemplate", "reviews"})
     @Query("SELECT t FROM Tour t WHERE t.status = 'ACTIVE' " +
            "AND (:departure IS NULL OR LOWER(t.departureLocation) LIKE LOWER(CONCAT('%', :departure, '%'))) " +
            "AND (:destination IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :destination, '%')) OR (t.destination IS NOT NULL AND LOWER(t.destination.name) LIKE LOWER(CONCAT('%', :destination, '%')))) " +

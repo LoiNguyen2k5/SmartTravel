@@ -23,10 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,13 +42,13 @@ public class TourServiceImpl implements TourService {
     private final VisaRequirementRepository visaRequirementRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<TourResponse> getAllActiveTours() {
-        return tourRepository.findByStatus(TourStatus.ACTIVE).stream()
-                .map(this::mapToTourResponse)
-                .collect(Collectors.toList());
+        return mapToursToResponses(tourRepository.findByStatus(TourStatus.ACTIVE));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TourResponse getTourById(Long id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", id));
@@ -141,16 +143,16 @@ public class TourServiceImpl implements TourService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TourResponse> getToursByVendor(String vendorEmail) {
         User vendor = userRepository.findByEmail(vendorEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
 
-        return tourRepository.findByVendorId(vendor.getId()).stream()
-                .map(this::mapToTourResponse)
-                .collect(Collectors.toList());
+        return mapToursToResponses(tourRepository.findByVendorId(vendor.getId()));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TourResponse> searchTours(
             String departure,
             String destination,
@@ -183,7 +185,7 @@ public class TourServiceImpl implements TourService {
                 maxDays
         );
 
-        return tours.stream().map(this::mapToTourResponse).collect(Collectors.toList());
+        return mapToursToResponses(tours);
     }
 
     @Override
@@ -228,7 +230,28 @@ public class TourServiceImpl implements TourService {
         return null;
     }
 
+    private List<TourResponse> mapToursToResponses(List<Tour> tours) {
+        if (tours == null || tours.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> tourIds = tours.stream()
+                .map(Tour::getId)
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
+        Set<Long> customVisaTourIds = tourIds.isEmpty()
+                ? Collections.emptySet()
+                : visaRequirementRepository.findTourIdsWithCustomRequirements(tourIds);
+        return tours.stream()
+                .map(tour -> mapToTourResponse(tour, tour.getId() != null && customVisaTourIds.contains(tour.getId())))
+                .collect(Collectors.toList());
+    }
+
     private TourResponse mapToTourResponse(Tour tour) {
+        boolean hasCustomVisaReqs = tour.getId() != null && visaRequirementRepository.existsByTourId(tour.getId());
+        return mapToTourResponse(tour, hasCustomVisaReqs);
+    }
+
+    private TourResponse mapToTourResponse(Tour tour, boolean hasCustomVisaReqs) {
         double avgRating = 0.0;
         Map<Integer, Long> ratingBreakdown = new HashMap<>();
         for (int i = 1; i <= 5; i++) {
@@ -248,7 +271,6 @@ public class TourServiceImpl implements TourService {
         }
 
         VisaTemplate tpl = tour.getVisaTemplate();
-        boolean hasCustomVisaReqs = tour.getId() != null && visaRequirementRepository.existsByTourId(tour.getId());
         boolean requiresVisa = tpl != null || hasCustomVisaReqs;
 
         return TourResponse.builder()
