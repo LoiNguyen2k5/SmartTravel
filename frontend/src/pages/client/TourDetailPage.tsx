@@ -178,6 +178,7 @@ export const TourDetailPage: React.FC = () => {
     const targetId = tour?.id || (id ? Number(id) : null);
     if (targetId) {
       loadSchedules(targetId, tour?.category);
+      void tourScheduleService.fetchSchedulesForTour(targetId);
     }
   }, [tour?.id, tour?.category, id]);
 

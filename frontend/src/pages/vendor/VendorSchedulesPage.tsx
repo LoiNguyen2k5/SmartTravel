@@ -31,7 +31,7 @@ export const VendorSchedulesPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedTourId) {
-      loadSchedulesForTour(selectedTourId);
+      void loadSchedulesForTour(selectedTourId);
     }
   }, [selectedTourId]);
 
@@ -50,34 +50,41 @@ export const VendorSchedulesPage: React.FC = () => {
     }
   };
 
-  const loadSchedulesForTour = (tourId: number) => {
-    const items = tourScheduleService.getSchedulesForTour(tourId);
+  const loadSchedulesForTour = async (tourId: number) => {
+    const items = await tourScheduleService.fetchSchedulesForTour(tourId);
     setSchedules(items);
   };
 
-  const handleAddSchedule = (e: React.FormEvent) => {
+  const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!startDate || !endDate || !selectedTourId) return;
 
-    tourScheduleService.addSchedule(selectedTourId, {
-      startDate,
-      endDate,
-      minParticipants: minSeats,
-      maxParticipants: maxSeats,
-      note: seasonalNote,
-    });
-
-    loadSchedulesForTour(selectedTourId);
-    setStartDate('');
-    setEndDate('');
-    setMinSeats(10);
-    setSeasonalNote('Khởi hành định kỳ');
+    try {
+      await tourScheduleService.addSchedule(selectedTourId, {
+        startDate,
+        endDate,
+        minParticipants: minSeats,
+        maxParticipants: maxSeats,
+        note: seasonalNote,
+      });
+      await loadSchedulesForTour(selectedTourId);
+      setStartDate('');
+      setEndDate('');
+      setMinSeats(10);
+      setSeasonalNote('Khởi hành định kỳ');
+    } catch (err) {
+      console.error('Lỗi thêm lịch khởi hành:', err);
+    }
   };
 
-  const handleDeleteSchedule = (id: number) => {
+  const handleDeleteSchedule = async (id: number) => {
     if (!selectedTourId) return;
-    tourScheduleService.deleteSchedule(selectedTourId, id);
-    loadSchedulesForTour(selectedTourId);
+    try {
+      await tourScheduleService.deleteSchedule(selectedTourId, id);
+      await loadSchedulesForTour(selectedTourId);
+    } catch (err) {
+      console.error('Lỗi xóa lịch khởi hành:', err);
+    }
   };
 
   const selectedTour = tours.find((t) => t.id === selectedTourId);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { tourService, getDeletedTourIds } from '../../services/tourService';
+import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
@@ -168,28 +168,18 @@ export const TourListPage: React.FC = () => {
   const fetchTours = async () => {
     setLoading(true);
     try {
+      await tourScheduleService.syncFromServer();
       const res = await tourService.getAllTours();
-      let liveTours: Tour[] = res.success && res.data && res.data.length > 0 ? [...res.data] : [...MOCK_TOURS];
+      let liveTours: Tour[] = res.success && Array.isArray(res.data) ? [...res.data] : [];
 
-      // Đảm bảo luôn đầy đủ toàn bộ tour (kể cả 9 tour mới chuẩn HCM & quốc tế)
-      const deletedIds = getDeletedTourIds();
-      for (const m of MOCK_TOURS) {
-        if (!deletedIds.includes(m.id) && !liveTours.some(t => t.id === m.id || t.title.trim().toLowerCase() === m.title.trim().toLowerCase())) {
-          liveTours.push(m);
-        }
-      }
-
-      // Luôn loại bỏ tất cả tour đã bị xóa
-      liveTours = liveTours.filter(t => !deletedIds.includes(t.id));
-
-      // Chuẩn hóa đường dẫn hình ảnh thực tế từ thư mục public/images/tours/
+      // Chuẩn hóa ảnh gallery phụ nếu tour chưa có gallery từ API
       liveTours = liveTours.map(t => {
-        const fallback = MOCK_TOURS.find(m => m.id === t.id);
-        if (fallback) {
+        const assetMeta = MOCK_TOURS.find(m => m.id === t.id);
+        if (assetMeta) {
           return {
             ...t,
-            thumbnailUrl: (t.thumbnailUrl && !t.thumbnailUrl.includes('unsplash')) ? t.thumbnailUrl : fallback.thumbnailUrl,
-            gallery: (t.gallery && t.gallery.length > 0) ? t.gallery : fallback.gallery,
+            thumbnailUrl: (t.thumbnailUrl && !t.thumbnailUrl.includes('unsplash')) ? t.thumbnailUrl : assetMeta.thumbnailUrl,
+            gallery: (t.gallery && t.gallery.length > 0) ? t.gallery : assetMeta.gallery,
           };
         }
         return t;
@@ -237,8 +227,7 @@ export const TourListPage: React.FC = () => {
       setTours(liveTours);
     } catch (err) {
       console.error('Lỗi nạp danh sách tour:', err);
-      const deletedIds = getDeletedTourIds();
-      setTours(MOCK_TOURS.filter(t => !deletedIds.includes(t.id)));
+      setTours([]);
     } finally {
       setLoading(false);
     }

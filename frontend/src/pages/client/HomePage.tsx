@@ -7,7 +7,6 @@ import {
   Star, Eye, Users
 } from 'lucide-react';
 import { tourScheduleService } from '../../services/tourScheduleService';
-import { MOCK_TOURS } from '../../data/mockTours';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { LuxuryHero3D } from '../../components/home/LuxuryHero3D';
@@ -19,16 +18,17 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const [, setScheduleVer] = useState(0);
-  const [allTours, setAllTours] = useState<Tour[]>(MOCK_TOURS);
+  const [allTours, setAllTours] = useState<Tour[]>([]);
 
   useEffect(() => {
-	tourService.getAllTours().then(response => {
-	  if (response.success && response.data?.length > 0) {
-	    setAllTours(response.data);
-	  }
-	}).catch(err => {
-	  console.warn("Using mock tours fallback:", err);
-	});
+    void tourScheduleService.syncFromServer();
+    tourService.getAllTours().then(response => {
+      if (response.success && Array.isArray(response.data)) {
+        setAllTours(response.data);
+      }
+    }).catch(err => {
+      console.error("Lỗi tải danh sách tour từ máy chủ:", err);
+    });
 
     const handleScheduleUpdate = () => {
       setScheduleVer(v => v + 1);
@@ -48,17 +48,23 @@ export const HomePage: React.FC = () => {
     navigate(`/tours?departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&type=${searchTab}`);
   };
 
-  // Real domestic tours (Núi Chứa Chan id 3, Châu Đốc id 4, Miền Tây 6 tỉnh id 5)
+  // Real domestic tours from DB (ưu tiên ID 3, 4, 5 hoặc 3 tour nội địa đầu tiên)
   const domesticTourIds = [3, 4, 5];
-  const domesticTours = domesticTourIds
-    .map(id => allTours.find(t => t.id === id) || MOCK_TOURS.find(t => t.id === id))
+  const matchedDomestic = domesticTourIds
+    .map(id => allTours.find(t => t.id === id))
     .filter(Boolean) as Tour[];
+  const domesticTours = matchedDomestic.length > 0
+    ? matchedDomestic
+    : allTours.filter(t => t.category !== 'NUOC_NGOAI').slice(0, 3);
 
-  // Real international tours (Ân Thi id 1, Thượng Hải Ô Trấn id 2)
+  // Real international tours from DB (ưu tiên ID 1, 2 hoặc 2 tour quốc tế đầu tiên)
   const internationalTourIds = [1, 2];
-  const internationalTours = internationalTourIds
-    .map(id => allTours.find(t => t.id === id) || MOCK_TOURS.find(t => t.id === id))
+  const matchedInternational = internationalTourIds
+    .map(id => allTours.find(t => t.id === id))
     .filter(Boolean) as Tour[];
+  const internationalTours = matchedInternational.length > 0
+    ? matchedInternational
+    : allTours.filter(t => t.category === 'NUOC_NGOAI').slice(0, 2);
 
   return (
     <div className="bg-[#020204] text-white min-h-screen space-y-20 pb-24 relative overflow-hidden font-sans">
