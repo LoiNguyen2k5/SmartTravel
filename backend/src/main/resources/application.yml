@@ -29,6 +29,11 @@ spring:
       write-dates-as-timestamps: false
     default-property-inclusion: non_null
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
   # Configuration for sending Emails via Gmail SMTP
   mail:
     host: smtp.gmail.com
@@ -52,6 +57,11 @@ app:
 
   otp:
     expiration-seconds: 60 # Mã OTP có hiệu lực trong 60 giây theo yêu cầu
+
+  visa:
+    storage-dir: ${VISA_STORAGE_DIR:uploads/visa-documents}
+    retention-days: ${VISA_RETENTION_DAYS:30}
+    max-file-bytes: 5242880
 
   cors:
     allowed-origins: "http://localhost:5173,http://localhost:3000"

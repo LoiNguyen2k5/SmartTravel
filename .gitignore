@@ -83,3 +83,5 @@ prompt_templates/
 
 # Scratch & temporary scripts
 scratch/
+uploads/
+**/uploads/

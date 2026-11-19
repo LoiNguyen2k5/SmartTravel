@@ -33,6 +33,11 @@ export interface Booking {
   remainingAmount?: number;
   note?: string;
   notes?: string;
+  requiresVisa?: boolean;
+  visaOptIn?: boolean;
+  visaFee?: number;
+  consularFee?: number;
+  visaDeadline?: string;
   createdAt: string;
 }
 
@@ -56,4 +61,5 @@ export interface BookingCreateRequest {
   singleRoomSurcharge?: boolean;
   singleRoomSurchargeAmount?: number;
   roomAllocation?: string;
+  visaOptIn?: boolean;
 }

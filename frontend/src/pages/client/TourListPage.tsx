@@ -535,7 +535,7 @@ export const TourListPage: React.FC = () => {
                         <div className="space-y-1.5 text-xs text-slate-400 pt-1">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
-                            <span>Khởi hành: <strong className="text-slate-200">{tourScheduleService.getTourDepartureDateDisplay(tour.id)}</strong></span>
+                            <span>Khởi hành: <strong className="text-slate-200">{tourScheduleService.getTourDepartureDateDisplay(tour.id, tour.category)}</strong></span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
@@ -555,7 +555,7 @@ export const TourListPage: React.FC = () => {
                           </div>
                           {(() => {
                             const ratio = tourScheduleService.getTourSeatRatioDisplay(tour.id, tour.category);
-                            const avail = tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats ?? 40);
+                            const avail = tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats ?? 40, tour.category);
                             return (
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                                 avail > 0 ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'

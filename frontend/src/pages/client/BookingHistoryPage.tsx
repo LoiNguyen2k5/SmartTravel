@@ -85,8 +85,9 @@ export const BookingHistoryPage: React.FC = () => {
   const [selectedTicket, setSelectedTicket] = useState<Booking | null>(null);
   const [paymentBooking, setPaymentBooking] = useState<Booking | null>(null);
   const [remainingPaymentBooking, setRemainingPaymentBooking] = useState<Booking | null>(null);
-  const [tourCategories, setTourCategories] = useState<Record<number, string>>({});
   const [tourVendors, setTourVendors] = useState<Record<number, string>>({});
+  const [tourRequiresVisa, setTourRequiresVisa] = useState<Record<number, boolean>>({});
+  const [tourVisaLeadDays, setTourVisaLeadDays] = useState<Record<number, number>>({});
 
   // Visa states
   const [selectedVisaBooking, setSelectedVisaBooking] = useState<Booking | null>(null);
@@ -184,21 +185,26 @@ export const BookingHistoryPage: React.FC = () => {
       try {
         const { tourService } = await import('../../services/tourService');
         const uniqueIds = Array.from(new Set(bookings.map(b => b.tourId)));
-        const newMap: Record<number, string> = {};
         const newVendorMap: Record<number, string> = {};
+        const newVisaMap: Record<number, boolean> = {};
+        const newLeadMap: Record<number, number> = {};
         await Promise.all(uniqueIds.map(async id => {
           try {
             const res = await tourService.getTourById(id);
-            if (res?.data?.category) {
-              newMap[id] = res.data.category;
-            }
             if (res?.data?.vendorName) {
               newVendorMap[id] = res.data.vendorName;
             }
+            if (res?.data?.requiresVisa !== undefined) {
+              newVisaMap[id] = Boolean(res.data.requiresVisa);
+            }
+            if (res?.data?.visaProcessingDays != null) {
+              newLeadMap[id] = Number(res.data.visaProcessingDays) + Number(res.data.visaBufferDays ?? 3);
+            }
           } catch(e) {}
         }));
-        setTourCategories(prev => ({ ...prev, ...newMap }));
         setTourVendors(prev => ({ ...prev, ...newVendorMap }));
+        setTourRequiresVisa(prev => ({ ...prev, ...newVisaMap }));
+        setTourVisaLeadDays(prev => ({ ...prev, ...newLeadMap }));
       } catch (e) {
         console.error('Lỗi lấy danh mục tour:', e);
       }
@@ -552,9 +558,22 @@ export const BookingHistoryPage: React.FC = () => {
           <div className="space-y-6">
             {bookings.filter(b => b.status !== 'CANCELLED' && b.status !== 'REFUNDED').map((b) => {
               const badge = statusBadges[b.status] || { label: b.status, style: 'bg-white/10 text-slate-300 border-white/15' };
-              const requiresVisa = tourCategories[b.tourId] 
-                ? tourCategories[b.tourId] === 'NUOC_NGOAI' 
-                : (b.tourCategory === 'NUOC_NGOAI' || b.tourTitle?.toLowerCase().match(/hàn quốc|châu âu|nhật bản|đài loan|visa|trung hoa|trung quốc|thái lan|singapore|malaysia|bali|indonesia|phượng hoàng cổ trấn|cửu trại câu|lệ giang|hồng kông|hong kong|mỹ|úc|pháp|anh|quốc tế/i) != null);
+              const requiresVisa = b.requiresVisa !== undefined
+                ? Boolean(b.requiresVisa)
+                : Boolean(tourRequiresVisa[b.tourId]);
+              const dynamicVisaDeadlineText = (() => {
+                if (b.visaDeadline) {
+                  return new Date(b.visaDeadline).toLocaleDateString('vi-VN');
+                }
+                if (b.departureDate) {
+                  const d = new Date(b.departureDate);
+                  if (!isNaN(d.getTime())) {
+                    d.setDate(d.getDate() - (tourVisaLeadDays[b.tourId] ?? 10));
+                    return d.toLocaleDateString('vi-VN');
+                  }
+                }
+                return null;
+              })();
               return (
                 <div 
                   key={b.id} 
@@ -639,7 +658,7 @@ export const BookingHistoryPage: React.FC = () => {
                           <div className="space-y-0.5">
                             <h4 className="font-bold text-red-400 text-xs uppercase">Cảnh báo: Hạn chót nộp hồ sơ Visa sắp tới</h4>
                             <p className="text-[11px] text-red-200/80 leading-relaxed">
-                              Tour của bạn yêu cầu nộp hồ sơ Visa trước ngày <strong>15/10/2026</strong>. Vui lòng bấm vào "Hồ sơ Visa" bên dưới để bổ sung ngay, tránh việc bị hủy tour và mất cọc!
+                              Tour của bạn có sử dụng dịch vụ ủy quyền làm Visa{dynamicVisaDeadlineText ? (<> — hạn chót gửi bản mềm cho Đại lý trước ngày <strong>{dynamicVisaDeadlineText}</strong></>) : ''}. Vui lòng bấm vào "Hồ sơ Visa" bên dưới để tải giấy tờ cho chuyên viên Đại lý sơ duyệt kịp tiến độ nộp Lãnh sự!
                             </p>
                           </div>
                         </div>
@@ -876,13 +895,11 @@ export const BookingHistoryPage: React.FC = () => {
                     application={visaApp}
                     requirements={visaReqs}
                     onUploadFile={async (reqId, file) => {
-                       await visaService.uploadDocument(visaApp.id, reqId, file);
-                       const updatedApp = await visaService.getApplication(selectedVisaBooking.id);
+                       const updatedApp = await visaService.uploadDocument(visaApp.id, reqId, file);
                        setVisaApp(updatedApp);
                     }}
                     onSubmitApplication={async () => {
-                       await visaService.updateApplicationStatus(visaApp.id, 'PROCESSING', 'Khách hàng đã nộp đầy đủ hồ sơ trực tuyến.');
-                       const updatedApp = await visaService.getApplication(selectedVisaBooking.id);
+                       const updatedApp = await visaService.submitApplication(visaApp.id);
                        setVisaApp(updatedApp);
                     }}
                   />
@@ -890,17 +907,16 @@ export const BookingHistoryPage: React.FC = () => {
               ) : visaReqs.length > 0 ? (
                 <div className="text-center py-12 text-slate-400 space-y-4">
                   <Globe className="h-12 w-12 mx-auto mb-3 text-blue-400 opacity-80" />
-                  <p className="text-white text-lg font-bold">Hồ sơ Visa của bạn chưa được khởi tạo.</p>
-                  <p className="text-sm">Tour này yêu cầu cung cấp {visaReqs.length} loại giấy tờ Visa.</p>
+                  <p className="text-white text-lg font-bold">Hồ sơ ủy quyền xin Visa chưa được khởi tạo.</p>
+                  <p className="text-sm">Tour này cần cung cấp {visaReqs.length} loại giấy tờ bản mềm để chuyên viên Đại lý sơ duyệt.</p>
                   <button 
                     onClick={async () => {
                        try {
                           setLoadingVisa(true);
-                          await visaService.createApplication(selectedVisaBooking.id, selectedVisaBooking);
-                          const app = await visaService.getApplication(selectedVisaBooking.id);
-                          setVisaApp(app);
-                       } catch(e) {
-                          alert("Lỗi khi khởi tạo hồ sơ Visa!");
+                          const created = await visaService.createApplication(selectedVisaBooking.id);
+                          setVisaApp(created);
+                       } catch(e: any) {
+                          alert(e?.message || "Lỗi khi khởi tạo hồ sơ Visa!");
                        } finally {
                           setLoadingVisa(false);
                        }

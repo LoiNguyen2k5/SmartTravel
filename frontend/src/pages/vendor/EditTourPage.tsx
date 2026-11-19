@@ -32,6 +32,8 @@ export const EditTourPage: React.FC = () => {
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [initialRequirements, setInitialRequirements] = useState<VisaRequirementRequest[]>([]);
+  const [visaTemplateId, setVisaTemplateId] = useState<number | null>(null);
+  const [destinationCountry, setDestinationCountry] = useState<string>('');
 
   useEffect(() => {
     if (id) {
@@ -56,6 +58,8 @@ export const EditTourPage: React.FC = () => {
         setCategory((t.category as any) || 'DOMESTIC');
         setDescription(t.description || '');
         setGalleryImages(t.gallery || (t.thumbnailUrl ? [t.thumbnailUrl] : []));
+        setVisaTemplateId(t.visaTemplateId ?? null);
+        setDestinationCountry(t.destinationCountry || '');
       }
       
       try {
@@ -106,6 +110,8 @@ export const EditTourPage: React.FC = () => {
         thumbnailUrl: thumbnailUrl.trim(),
         category: category as any,
         description: description.trim(),
+        visaTemplateId: category === 'NUOC_NGOAI' ? visaTemplateId : null,
+        clearVisaTemplate: category !== 'NUOC_NGOAI' || visaTemplateId == null,
       });
 
       setSuccessMsg('Đã cập nhật thông tin tour thành công!');
@@ -374,13 +380,24 @@ export const EditTourPage: React.FC = () => {
         {/* CẤU HÌNH VISA */}
         {category === 'NUOC_NGOAI' && (
           <VisaRequirementConfig 
-            initialRequirements={initialRequirements} 
+            initialRequirements={initialRequirements}
+            selectedTemplateId={visaTemplateId}
+            suggestCountry={destinationCountry || title}
+            onSelectTemplate={async (tplId) => {
+              setVisaTemplateId(tplId);
+              try {
+                await visaService.assignTemplateToTour(Number(id), tplId);
+                setSuccessMsg(tplId ? 'Đã gắn mẫu Visa quốc gia cho Tour!' : 'Đã gỡ mẫu Visa (Tour miễn thị thực).');
+              } catch (err: any) {
+                setError(err?.message || 'Không thể cập nhật mẫu Visa cho Tour.');
+              }
+            }}
             onSave={async (reqs) => {
               try {
                 await visaService.saveRequirements(Number(id), reqs);
                 setSuccessMsg('Đã lưu cấu hình hồ sơ Visa thành công!');
               } catch (err: any) {
-                setError(err?.response?.data?.message || 'Không thể lưu cấu hình Visa.');
+                setError(err?.response?.data?.message || err?.message || 'Không thể lưu cấu hình Visa.');
               }
             }} 
           />

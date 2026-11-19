@@ -200,7 +200,7 @@ export const HomePage: React.FC = () => {
                   <div className="space-y-1.5 text-xs text-slate-300">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-sky-400" />
-                      <span>Khởi hành: <strong className="text-white font-bold">{tourScheduleService.getTourDepartureDateDisplay(tour.id)}</strong></span>
+                      <span>Khởi hành: <strong className="text-white font-bold">{tourScheduleService.getTourDepartureDateDisplay(tour.id, tour.category)}</strong></span>
                     </div>
                   </div>
 
@@ -284,7 +284,7 @@ export const HomePage: React.FC = () => {
                   <div className="space-y-1.5 text-xs text-slate-300">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-sky-400" />
-                      <span>Khởi hành: <strong className="text-white font-bold">{tourScheduleService.getTourDepartureDateDisplay(tour.id)}</strong></span>
+                      <span>Khởi hành: <strong className="text-white font-bold">{tourScheduleService.getTourDepartureDateDisplay(tour.id, tour.category)}</strong></span>
                     </div>
                   </div>
 

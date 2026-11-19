@@ -54,4 +54,8 @@ public class TourCreateRequest {
     private Integer remainingSeats;
 
     private Long destinationId;
+
+    private Long visaTemplateId;
+
+    private Boolean clearVisaTemplate;
 }

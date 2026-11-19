@@ -1565,22 +1565,11 @@ export const TourDetailPage: React.FC = () => {
                       onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
                       className="w-full rounded-xl border border-white/15 bg-slate-900/90 p-2.5 text-xs font-bold text-white focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 shadow-inner cursor-pointer"
                     >
-                      {schedulesWithDynamicSeats.map((sch) => {
-                        let labelSuffix = '';
-                        if (sch.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS') {
-                          labelSuffix = ' - ❌ [HỦY: ĐOÀN < 10 KHÁCH]';
-                        } else if (sch.status === 'CLOSED_BOOKING') {
-                          labelSuffix = ' - 🔒 [HẾT HẠN ĐẶT]';
-                        } else if (sch.seats <= 0) {
-                          labelSuffix = ' - ⛔ [HẾT CHỖ]';
-                        }
-
-                        return (
-                          <option key={sch.id} value={sch.id} className="bg-slate-900 text-white">
-                            📅 {sch.startDate} - {sch.endDate} ({sch.bookedCount}/{sch.maxParticipants} chỗ){labelSuffix} - {sch.note}
-                          </option>
-                        );
-                      })}
+                      {schedulesWithDynamicSeats.map((sch) => (
+                        <option key={sch.id} value={sch.id} className="bg-slate-900 text-white">
+                          {sch.startDate} - {sch.endDate} ({sch.bookedCount}/{sch.maxParticipants} chỗ){sch.note ? ` - ${sch.note}` : ''}
+                        </option>
+                      ))}
                     </select>
                   )}
 
@@ -1611,27 +1600,42 @@ export const TourDetailPage: React.FC = () => {
                           </p>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-sky-300 mt-2 gap-2 whitespace-nowrap">
-                          {(() => {
-                            const daysLeftToBook = Math.max(0, selectedSchedule.daysRemaining - selectedSchedule.minLeadDays);
-                            return (
-                              <>
-                                <span className="flex items-center gap-1.5 flex-shrink-0">
-                                  <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
-                                  <span>
-                                    {daysLeftToBook > 0 ? (
-                                      <>Còn <strong className="text-white font-bold">{daysLeftToBook} ngày</strong> đặt vé</>
-                                    ) : (
-                                      <strong className="text-amber-300 font-bold">Hôm nay hạn chót đặt vé</strong>
-                                    )}
+                        <div className="space-y-1.5 mt-2">
+                          <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-sky-300 gap-2 whitespace-nowrap">
+                            {(() => {
+                              const daysLeftToBook = Math.max(0, selectedSchedule.daysRemaining - selectedSchedule.minLeadDays);
+                              return (
+                                <>
+                                  <span className="flex items-center gap-1.5 flex-shrink-0">
+                                    <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+                                    <span>
+                                      {daysLeftToBook > 0 ? (
+                                        <>Còn <strong className="text-white font-bold">{daysLeftToBook} ngày</strong> đặt vé</>
+                                      ) : (
+                                        <strong className="text-amber-300 font-bold">Hôm nay hạn chót đặt vé</strong>
+                                      )}
+                                    </span>
                                   </span>
-                                </span>
-                                <span className="font-semibold text-white flex-shrink-0">
-                                  Đã đặt: <strong className="text-sky-300">{selectedSchedule.bookedCount}/{selectedSchedule.maxParticipants} chỗ</strong>
-                                </span>
-                              </>
-                            );
-                          })()}
+                                  <span className="font-semibold text-white flex-shrink-0">
+                                    Đã đặt: <strong className="text-sky-300">{selectedSchedule.bookedCount}/{selectedSchedule.maxParticipants} chỗ</strong>
+                                  </span>
+                                </>
+                              );
+                            })()}
+                          </div>
+                          {selectedSchedule.seats <= 4 ? (
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300">
+                              Sắp hết chỗ — Chỉ còn <strong>{selectedSchedule.seats} chỗ trống</strong> cuối cùng
+                            </div>
+                          ) : selectedSchedule.bookedCount >= selectedSchedule.minParticipants ? (
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
+                              Đã đủ khách khởi hành ({selectedSchedule.bookedCount}/{selectedSchedule.minParticipants} khách tối thiểu)
+                            </div>
+                          ) : (
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300">
+                              Đang ghép đoàn — Cần thêm <strong>{selectedSchedule.minParticipants - selectedSchedule.bookedCount} khách</strong> nữa để đủ {selectedSchedule.minParticipants} khách khởi hành
+                            </div>
+                          )}
                         </div>
                       )}
                     </>

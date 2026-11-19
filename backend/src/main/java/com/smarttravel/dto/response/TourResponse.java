@@ -38,6 +38,14 @@ public class TourResponse {
     private String vendorName;
     private Long destinationId;
     private String destinationName;
+    private String destinationCountry;
+    private Long visaTemplateId;
+    private String visaCountry;
+    private Boolean requiresVisa;
+    private BigDecimal visaFee;
+    private BigDecimal consularFee;
+    private Integer visaProcessingDays;
+    private Integer visaBufferDays;
     private Double averageRating;
     private Integer totalReviews;
     private Map<Integer, Long> ratingBreakdown;

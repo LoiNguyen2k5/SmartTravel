@@ -1,7 +1,7 @@
-export type TourScheduleStatus = 
-  | 'ACTIVE' 
-  | 'CLOSED_BOOKING' 
-  | 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' 
+export type TourScheduleStatus =
+  | 'ACTIVE'
+  | 'CLOSED_BOOKING'
+  | 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
   | 'COMPLETED';
 
 export interface TourScheduleItem {
@@ -17,7 +17,15 @@ export interface TourScheduleItem {
   status?: TourScheduleStatus;
 }
 
-const STORAGE_PREFIX = 'smart_travel_tour_schedules_v5_';
+const STORAGE_PREFIX = 'smart_travel_tour_schedules_v7_';
+const LEGACY_PREFIXES = [
+  'smart_travel_tour_schedules_',
+  'smart_travel_tour_schedules_v2_',
+  'smart_travel_tour_schedules_v3_',
+  'smart_travel_tour_schedules_v4_',
+  'smart_travel_tour_schedules_v5_',
+  'smart_travel_tour_schedules_v6_',
+];
 
 // Tính số ngày còn lại từ hôm nay đến ngày khởi hành
 export const getDaysUntilDeparture = (dateStr: string): number => {
@@ -120,8 +128,8 @@ export const computeScheduleStatus = (
     status: 'ACTIVE',
     daysRemaining,
     minLeadDays,
-    reason: daysLeftToBook > 0 
-      ? `Đang mở bán (Còn ${daysLeftToBook} ngày để đặt vé)` 
+    reason: daysLeftToBook > 0
+      ? `Đang mở bán (Còn ${daysLeftToBook} ngày để đặt vé)`
       : 'Đang mở bán (Hạn chót đặt vé hôm nay)',
     isBookable: true,
   };
@@ -143,188 +151,209 @@ export const formatScheduleDate = (dStr: string): string => {
   return dStr;
 };
 
-// Lịch khởi hành mẫu phong phú theo từng tour (tháng 11 & 12/2026 và đầu năm 2027)
-const TOUR_SCHEDULES: Record<number, TourScheduleItem[]> = {
-  // ─── Tour 1: Ân Thi – Phượng Hoàng Cổ Trấn – Trương Gia Giới 6N5Đ ───
-  1: [
-    { id: 10101, tourId: 1, startDate: '2026-11-06', endDate: '2026-11-11', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 06/11 — Trương Gia Giới mùa thu vàng' },
-    { id: 10102, tourId: 1, startDate: '2026-11-16', endDate: '2026-11-21', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 16/11 — Phượng Hoàng Cổ Trấn lung linh (+5%)', seasonalPriceMultiplier: 1.05 },
-    { id: 10103, tourId: 1, startDate: '2026-11-26', endDate: '2026-12-01', maxParticipants: 35, bookedCount: 8,  note: 'Khởi hành 26/11 — Mùa tuyết đầu đông Hồ Nam' },
-    { id: 10104, tourId: 1, startDate: '2026-12-08', endDate: '2026-12-13', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 08/12 — Đón đông xứ Trung' },
-  ],
-  // ─── Tour 2: Thượng Hải – Ô Trấn 4N4Đ ───
-  2: [
-    { id: 10201, tourId: 2, startDate: '2026-11-07', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 07/11 — Thượng Hải mùa thu mát mẻ' },
-    { id: 10202, tourId: 2, startDate: '2026-11-17', endDate: '2026-11-20', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 17/11 — Ô Trấn cổ kính sương mai', seasonalPriceMultiplier: 1.05 },
-    { id: 10203, tourId: 2, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 10, note: 'Khởi hành 27/11 — Cuối tháng 11' },
-    { id: 10204, tourId: 2, startDate: '2026-12-10', endDate: '2026-12-13', maxParticipants: 40, bookedCount: 0,  note: 'Khởi hành 10/12 — Giáng sinh rực rỡ' },
-  ],
-  // ─── Tour 3: Núi Chứa Chan (Gia Lào) & Dinh Thầy Thím ───
-  3: [
-    { id: 10301, tourId: 3, startDate: '2026-11-08', endDate: '2026-11-08', maxParticipants: 45, bookedCount: 22, note: 'Khởi hành 08/11 — Tour 1 ngày cuối tuần' },
-    { id: 10302, tourId: 3, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 45, bookedCount: 15, note: 'Khởi hành 15/11 — Viếng chùa Gia Lào cầu an' },
-    { id: 10303, tourId: 3, startDate: '2026-11-22', endDate: '2026-11-22', maxParticipants: 50, bookedCount: 35, note: 'Khởi hành 22/11 — Dinh Thầy Thím & biển Cam Bình' },
-    { id: 10304, tourId: 3, startDate: '2026-11-29', endDate: '2026-11-29', maxParticipants: 45, bookedCount: 10, note: 'Khởi hành 29/11 — Cuối tuần cuối tháng' },
-    { id: 10305, tourId: 3, startDate: '2026-12-06', endDate: '2026-12-06', maxParticipants: 45, bookedCount: 5,  note: 'Khởi hành 06/12 — Đầu tháng 12' },
-  ],
-  // ─── Tour 4: Châu Đốc – Núi Cấm – Chùa Tà Pạ ───
-  4: [
-    { id: 10401, tourId: 4, startDate: '2026-11-07', endDate: '2026-11-08', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 07/11 — 2N1Đ cuối tuần' },
-    { id: 10402, tourId: 4, startDate: '2026-11-14', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 14/11 — Miếu Bà Chúa Xứ linh thiêng' },
-    { id: 10403, tourId: 4, startDate: '2026-11-21', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 12, note: 'Khởi hành 21/11 — Cánh đồng Tà Pạ mùa gặt lúa' },
-    { id: 10404, tourId: 4, startDate: '2026-11-28', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 28/11 — Núi Cấm Thất Sơn' },
-  ],
-  // ─── Tour 5: Mỹ Tho – Bến Tre – Cần Thơ – Cà Mau ───
-  5: [
-    { id: 10501, tourId: 5, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 45, bookedCount: 30, note: 'Khởi hành 06/11 — Miền Tây sông nước miệt vườn' },
-    { id: 10502, tourId: 5, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 45, bookedCount: 38, note: 'Khởi hành 13/11 — Chợ nổi Cái Răng & Đất Mũi Cà Mau', seasonalPriceMultiplier: 1.05 },
-    { id: 10503, tourId: 5, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 20/11 — Trải nghiệm chèo xuồng ba lá' },
-    { id: 10504, tourId: 5, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 8,  note: 'Khởi hành 27/11 — Cuối tháng 11' },
-  ],
-  // ─── Tour 6: Đà Lạt 4N3Đ ───
-  6: [
-    { id: 10601, tourId: 6, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Đà Lạt mùa hoa dã quỳ vàng rực' },
-    { id: 10602, tourId: 6, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 13/11 — Đồi cỏ hồng & săn mây Trại Mát' },
-    { id: 10603, tourId: 6, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 35, note: 'Khởi hành 20/11 — Mùa lạnh cao nguyên (+10%)', seasonalPriceMultiplier: 1.1 },
-    { id: 10604, tourId: 6, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 27/11 — Thung lũng Tình Yêu' },
-    { id: 10605, tourId: 6, startDate: '2026-12-05', endDate: '2026-12-08', maxParticipants: 40, bookedCount: 10, note: 'Khởi hành 05/12 — Festival Hoa Đà Lạt 2026' },
-  ],
-  // ─── Tour 7: Đảo Nam Du 3N3Đ ───
-  7: [
-    { id: 10701, tourId: 7, startDate: '2026-11-06', endDate: '2026-11-08', maxParticipants: 30, bookedCount: 18, note: 'Khởi hành 06/11 — Biển xanh Nam Du mùa sóng êm' },
-    { id: 10702, tourId: 7, startDate: '2026-11-13', endDate: '2026-11-15', maxParticipants: 30, bookedCount: 12, note: 'Khởi hành 13/11 — Lặn ngắm san hô Hòn Dầu' },
-    { id: 10703, tourId: 7, startDate: '2026-11-20', endDate: '2026-11-22', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 20/11 — Thưởng thức hải sản tươi sống' },
-    { id: 10704, tourId: 7, startDate: '2026-11-27', endDate: '2026-11-29', maxParticipants: 30, bookedCount: 8,  note: 'Khởi hành 27/11 — Đảo vắng thanh bình' },
-  ],
-  // ─── Tour 8: Biển Vũng Tàu & Sun World ───
-  8: [
-    { id: 10801, tourId: 8, startDate: '2026-11-08', endDate: '2026-11-08', maxParticipants: 50, bookedCount: 35, note: 'Khởi hành 08/11 — Tour 1 ngày nghỉ dưỡng cuối tuần' },
-    { id: 10802, tourId: 8, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 50, bookedCount: 20, note: 'Khởi hành 15/11 — Tắm biển Bãi Sau & ngọn hải đăng' },
-    { id: 10803, tourId: 8, startDate: '2026-11-22', endDate: '2026-11-22', maxParticipants: 50, bookedCount: 48, note: 'Khởi hành 22/11 — Buffet hải sản view biển' },
-    { id: 10804, tourId: 8, startDate: '2026-11-29', endDate: '2026-11-29', maxParticipants: 50, bookedCount: 22, note: 'Khởi hành 29/11 — Cuối tuần thảnh thơi' },
-  ],
-  // ─── Tour 9: Phú Yên – Quy Nhơn 3N3Đ ───
-  9: [
-    { id: 10901, tourId: 9, startDate: '2026-11-06', endDate: '2026-11-08', maxParticipants: 40, bookedCount: 25, note: 'Khởi hành 06/11 — Xứ sở hoa vàng trên cỏ xanh' },
-    { id: 10902, tourId: 9, startDate: '2026-11-13', endDate: '2026-11-15', maxParticipants: 40, bookedCount: 16, note: 'Khởi hành 13/11 — Gành Đá Đĩa kiệt tác thiên nhiên' },
-    { id: 10903, tourId: 9, startDate: '2026-11-20', endDate: '2026-11-22', maxParticipants: 40, bookedCount: 32, note: 'Khởi hành 20/11 — Kỳ Co – Eo Gió Maldives Việt Nam' },
-    { id: 10904, tourId: 9, startDate: '2026-11-27', endDate: '2026-11-29', maxParticipants: 40, bookedCount: 14, note: 'Khởi hành 27/11 — Đón bình minh Mũi Điện' },
-  ],
-  // ─── Tour 10: Thái Lan Bangkok – Pattaya 5N4Đ ───
-  10: [
-    { id: 11001, tourId: 10, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 30, note: 'Khởi hành 06/11 — Bangkok – Pattaya thiên đường du lịch' },
-    { id: 11002, tourId: 10, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 38, note: 'Khởi hành 15/11 — Lễ hội hoa đăng Loy Krathong (+10%)', seasonalPriceMultiplier: 1.1 },
-    { id: 11003, tourId: 10, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 15, note: 'Khởi hành 24/11 — Đảo San Hô Coral Island' },
-    { id: 11004, tourId: 10, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 4,  note: 'Khởi hành 05/12 — Mua sắm Siam Paragon cuối năm' },
-  ],
-  // ─── Tour 11: [DEMO] Thanh Toán VietQR ───
-  11: [
-    { id: 11101, tourId: 11, startDate: '2026-11-01', endDate: '2026-11-01', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
-    { id: 11102, tourId: 11, startDate: '2026-11-15', endDate: '2026-11-15', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
-    { id: 11103, tourId: 11, startDate: '2026-12-01', endDate: '2026-12-01', maxParticipants: 99, bookedCount: 0, note: 'Test thanh toán VietQR 5.000đ — luôn mở' },
-  ],
-  // ─── Tour 12: Hà Nội – Hạ Long – Ninh Bình 4N3Đ ───
-  12: [
-    { id: 11201, tourId: 12, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 22, note: 'Khởi hành 06/11 — Vịnh Hạ Long di sản thế giới' },
-    { id: 11202, tourId: 12, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 34, note: 'Khởi hành 13/11 — Tràng An – Bái Đính Ninh Bình' },
-    { id: 11203, tourId: 12, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 20/11 — Thưởng thức ẩm thực Hà Thành' },
-    { id: 11204, tourId: 12, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 27/11 — Cuối tháng 11' },
-  ],
-  // ─── Tour 13: Hà Nội – Sapa – Fansipan 4N3Đ ───
-  13: [
-    { id: 11301, tourId: 13, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 35, bookedCount: 28, note: 'Khởi hành 06/11 — Sapa sương mờ & mùa lạnh bắt đầu' },
-    { id: 11302, tourId: 13, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 35, bookedCount: 20, note: 'Khởi hành 13/11 — Chinh phục đỉnh Fansipan 3.143m' },
-    { id: 11303, tourId: 13, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 35, bookedCount: 33, note: 'Khởi hành 20/11 — Bản Cát Cát mùa hoa mận' },
-    { id: 11304, tourId: 13, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 35, bookedCount: 25, note: 'Khởi hành 27/11 — Đèo Ô Quy Hồ ngắm hoàng hôn' },
-    { id: 11305, tourId: 13, startDate: '2026-12-05', endDate: '2026-12-08', maxParticipants: 35, bookedCount: 10, note: 'Khởi hành 05/12 — Săn tuyết mùa đông Sapa' },
-  ],
-  // ─── Tour 14: Hà Giang – Đồng Văn – Mã Pí Lèng 5N4Đ ───
-  14: [
-    { id: 11401, tourId: 14, startDate: '2026-11-05', endDate: '2026-11-09', maxParticipants: 30, bookedCount: 26, note: 'Khởi hành 05/11 — Lễ hội hoa tam giác mạch Hà Giang' },
-    { id: 11402, tourId: 14, startDate: '2026-11-12', endDate: '2026-11-16', maxParticipants: 30, bookedCount: 30, note: 'Khởi hành 12/11 — Đệ nhất hùng quan Mã Pí Lèng' },
-    { id: 11403, tourId: 14, startDate: '2026-11-19', endDate: '2026-11-23', maxParticipants: 30, bookedCount: 22, note: 'Khởi hành 19/11 — Du thuyền trên hẻm vực Tu Sản' },
-    { id: 11404, tourId: 14, startDate: '2026-11-26', endDate: '2026-11-30', maxParticipants: 30, bookedCount: 8,  note: 'Khởi hành 26/11 — Cột cờ Lũng Cú cực Bắc Tổ quốc' },
-  ],
-  // ─── Tour 15: Đà Nẵng – Hội An – Huế 4N3Đ ───
-  15: [
-    { id: 11501, tourId: 15, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 30, note: 'Khởi hành 06/11 — Phố cổ Hội An lung linh hoa đăng' },
-    { id: 11502, tourId: 15, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 13/11 — Cầu Vàng Bà Nà Hills bồng bềnh mây' },
-    { id: 11503, tourId: 15, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 20/11 — Thăm Đại Nội & lăng tẩm Cố Đô Huế' },
-    { id: 11504, tourId: 15, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 24, note: 'Khởi hành 27/11 — Bán đảo Sơn Trà & chùa Linh Ứng' },
-  ],
-  // ─── Tour 16: Phú Quốc – Nam Đảo 4N3Đ ───
-  16: [
-    { id: 11601, tourId: 16, startDate: '2026-11-06', endDate: '2026-11-09', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Phú Quốc mùa khô biển đẹp nhất năm' },
-    { id: 11602, tourId: 16, startDate: '2026-11-13', endDate: '2026-11-16', maxParticipants: 40, bookedCount: 15, note: 'Khởi hành 13/11 — Cáp treo Hòn Thơm vượt biển dài nhất' },
-    { id: 11603, tourId: 16, startDate: '2026-11-20', endDate: '2026-11-23', maxParticipants: 40, bookedCount: 38, note: 'Khởi hành 20/11 — Sunset Town & cầu Hôn Phú Quốc' },
-    { id: 11604, tourId: 16, startDate: '2026-11-27', endDate: '2026-11-30', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 27/11 — Lặn ngắm san hô Bãi Sao' },
-  ],
-  // ─── Tour 17: Singapore – Malaysia 5N4Đ ───
-  17: [
-    { id: 11701, tourId: 17, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 28, note: 'Khởi hành 06/11 — Gardens by the Bay & Marina Bay Sands' },
-    { id: 11702, tourId: 17, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 15/11 — Tháp đôi Petronas & phố cổ Malacca' },
-    { id: 11703, tourId: 17, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 18, note: 'Khởi hành 24/11 — Cao nguyên Genting & Động Batu' },
-    { id: 11704, tourId: 17, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 40, bookedCount: 6,  note: 'Khởi hành 05/12 — Không khí Noel sớm tại Orchard' },
-  ],
-  // ─── Tour 18: Hàn Quốc – Seoul – Nami 5N4Đ ───
-  18: [
-    { id: 11801, tourId: 18, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 30, note: 'Khởi hành 06/11 — Đảo Nami mùa lá ngân hạnh vàng' },
-    { id: 11802, tourId: 18, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 15/11 — Cung điện Gyeongbokgung mùa thu lá đỏ' },
-    { id: 11803, tourId: 18, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 28, note: 'Khởi hành 24/11 — Tháp N Seoul & chợ đêm Myeongdong' },
-    { id: 11804, tourId: 18, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 12, note: 'Khởi hành 05/12 — Trượt tuyết mùa đông xứ Hàn' },
-  ],
-  // ─── Tour 19: Nhật Bản – Tokyo – Phú Sĩ 5N4Đ ───
-  19: [
-    { id: 11901, tourId: 19, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 35, bookedCount: 32, note: 'Khởi hành 06/11 — Núi Phú Sĩ & hồ Kawaguchi mùa lá đỏ' },
-    { id: 11902, tourId: 19, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 35, bookedCount: 35, note: 'Khởi hành 15/11 — Chùa Sensoji Asakusa & phố cổ Tokyo' },
-    { id: 11903, tourId: 19, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 35, bookedCount: 25, note: 'Khởi hành 24/11 — Thung lũng Owakudani luộc trứng đen' },
-    { id: 11904, tourId: 19, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 35, bookedCount: 8,  note: 'Khởi hành 05/12 — Trải nghiệm tắm Onsen mùa đông' },
-  ],
-  // ─── Tour 20: Indonesia – Bali 5N4Đ ───
-  20: [
-    { id: 12001, tourId: 20, startDate: '2026-11-06', endDate: '2026-11-10', maxParticipants: 40, bookedCount: 26, note: 'Khởi hành 06/11 — Cổng trời Lempuyang & đền Tanah Lot' },
-    { id: 12002, tourId: 20, startDate: '2026-11-15', endDate: '2026-11-19', maxParticipants: 40, bookedCount: 36, note: 'Khởi hành 15/11 — Xích đu Bali Swing & ruộng bậc thang Tegallalang' },
-    { id: 12003, tourId: 20, startDate: '2026-11-24', endDate: '2026-11-28', maxParticipants: 40, bookedCount: 20, note: 'Khởi hành 24/11 — Đảo ngọc Nusa Penida sống lưng khủng long' },
-    { id: 12004, tourId: 20, startDate: '2026-12-05', endDate: '2026-12-09', maxParticipants: 40, bookedCount: 5,  note: 'Khởi hành 05/12 — Hoàng hôn biển Jimbaran' },
-  ],
+// ─────────────────────────────────────────────────────────────────────────────
+// Bộ sinh lịch khởi hành trải đều từ cuối 11/2026 đến hết tháng 02/2027
+// Chia đều 3 trạng thái thực tế:
+//   - 'ENOUGH'   : Đã đủ khách để khởi hành (>= 10 khách, còn nhiều chỗ)
+//   - 'NEAR_MIN' : Thiếu 1-3 khách để đủ đoàn khởi hành (7-9/max)
+//   - 'NEAR_FULL': Gần full chỗ (chỉ còn 2-4 chỗ trống)
+// ─────────────────────────────────────────────────────────────────────────────
+type OccupancyTier = 'ENOUGH' | 'NEAR_MIN' | 'NEAR_FULL';
+
+interface TourSeedMeta {
+  durationOffset: number; // endDate = startDate + durationOffset
+  maxParticipants: number;
+  theme: string;
+  isInternational?: boolean;
+  isDemo?: boolean;
+}
+
+const TOUR_META: Record<number, TourSeedMeta> = {
+  1:  { durationOffset: 5, maxParticipants: 40, theme: 'Phượng Hoàng Cổ Trấn – Trương Gia Giới', isInternational: true },
+  2:  { durationOffset: 3, maxParticipants: 35, theme: 'Thượng Hải – Ô Trấn', isInternational: true },
+  3:  { durationOffset: 0, maxParticipants: 45, theme: 'Núi Chứa Chan & Dinh Thầy Thím' },
+  4:  { durationOffset: 1, maxParticipants: 40, theme: 'Châu Đốc – Núi Cấm – Tà Pạ' },
+  5:  { durationOffset: 3, maxParticipants: 40, theme: 'Miền Tây Sông Nước – Cà Mau' },
+  6:  { durationOffset: 3, maxParticipants: 40, theme: 'Đà Lạt Ngàn Hoa' },
+  7:  { durationOffset: 2, maxParticipants: 30, theme: 'Đảo Nam Du Biển Xanh' },
+  8:  { durationOffset: 0, maxParticipants: 50, theme: 'Biển Vũng Tàu & Sun World' },
+  9:  { durationOffset: 2, maxParticipants: 40, theme: 'Phú Yên – Quy Nhơn' },
+  10: { durationOffset: 4, maxParticipants: 40, theme: 'Bangkok – Pattaya', isInternational: true },
+  11: { durationOffset: 0, maxParticipants: 99, theme: 'Test thanh toán VietQR 5.000đ — luôn mở', isDemo: true },
+  12: { durationOffset: 3, maxParticipants: 40, theme: 'Hà Nội – Hạ Long – Ninh Bình' },
+  13: { durationOffset: 3, maxParticipants: 35, theme: 'Sapa – Fansipan Săn Mây' },
+  14: { durationOffset: 4, maxParticipants: 30, theme: 'Hà Giang – Đồng Văn – Mã Pí Lèng' },
+  15: { durationOffset: 3, maxParticipants: 40, theme: 'Đà Nẵng – Hội An – Huế' },
+  16: { durationOffset: 3, maxParticipants: 40, theme: 'Phú Quốc – Nam Đảo' },
+  17: { durationOffset: 4, maxParticipants: 40, theme: 'Singapore – Malaysia', isInternational: true },
+  18: { durationOffset: 4, maxParticipants: 35, theme: 'Seoul – Đảo Nami Xứ Hàn', isInternational: true },
+  19: { durationOffset: 4, maxParticipants: 35, theme: 'Tokyo – Núi Phú Sĩ', isInternational: true },
+  20: { durationOffset: 4, maxParticipants: 40, theme: 'Đảo Ngọc Bali', isInternational: true },
 };
 
-// Hàm tự động sinh lịch tương lai động liên tục theo thời gian thực (Real-time dynamic rolling schedules)
-// Đảm bảo không bao giờ bị tình trạng 0 tour dù qua tháng hay qua năm
-const generateDynamicFutureSchedules = (tourId: number, baseHistory: TourScheduleItem[] = []): TourScheduleItem[] => {
-  const toDateString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+interface DepartureWave {
+  baseDate: string; // YYYY-MM-DD
+  seasonLabel: string;
+  multiplier?: number;
+  forcePeak?: boolean;
+}
 
-  const make = (offsetDays: number, durationDays: number, note: string, booked: number, multiplier = 1.0): TourScheduleItem => {
-    const s = new Date();
-    s.setHours(12, 0, 0, 0);
-    s.setDate(s.getDate() + offsetDays);
-    const e = new Date(s);
-    e.setDate(e.getDate() + durationDays);
+const SEASONAL_WAVES_TO_FEB_2027: DepartureWave[] = [
+  { baseDate: '2026-11-26', seasonLabel: 'Cuối tháng 11' },
+  { baseDate: '2026-12-06', seasonLabel: 'Đầu đông tháng 12' },
+  { baseDate: '2026-12-15', seasonLabel: 'Giữa tháng 12' },
+  { baseDate: '2026-12-23', seasonLabel: 'Đón Giáng Sinh (+5%)', multiplier: 1.05 },
+  { baseDate: '2026-12-30', seasonLabel: 'Tết Dương Lịch 2027 (+10%)', multiplier: 1.1, forcePeak: true },
+  { baseDate: '2027-01-08', seasonLabel: 'Đầu năm mới 2027' },
+  { baseDate: '2027-01-17', seasonLabel: 'Giữa tháng 01' },
+  { baseDate: '2027-01-26', seasonLabel: 'Du xuân cận Tết' },
+  { baseDate: '2027-02-05', seasonLabel: 'Tết Nguyên Đán 2027 (+10%)', multiplier: 1.1, forcePeak: true },
+  { baseDate: '2027-02-14', seasonLabel: 'Du xuân Valentine & Đầu năm (+5%)', multiplier: 1.05 },
+  { baseDate: '2027-02-23', seasonLabel: 'Cuối tháng 02' },
+];
+
+const toIsoDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const toShortDayMonth = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+};
+
+const addDays = (date: Date, days: number): Date => {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  return d;
+};
+
+const parseIsoLocal = (iso: string): Date => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d, 12, 0, 0, 0);
+};
+
+const computeBookedCount = (
+  tier: OccupancyTier,
+  maxParticipants: number,
+  seed: number
+): number => {
+  if (tier === 'NEAR_FULL') {
+    const remaining = 2 + (seed % 3); // còn 2, 3 hoặc 4 chỗ
+    return Math.max(10, maxParticipants - remaining);
+  }
+  if (tier === 'NEAR_MIN') {
+    return 7 + (seed % 3); // 7, 8 hoặc 9 khách (thiếu 1-3 khách để đạt mốc 10)
+  }
+  // ENOUGH: đã đủ khách khởi hành (>= 10), tỷ lệ khoảng 42% - 62%
+  const ratio = 0.42 + ((seed % 5) * 0.05);
+  return Math.min(maxParticipants - 8, Math.max(14, Math.round(maxParticipants * ratio)));
+};
+
+const buildSchedulesThroughFeb2027 = (tourId: number, meta: TourSeedMeta): TourScheduleItem[] => {
+  const tierCycle: OccupancyTier[] = ['ENOUGH', 'NEAR_MIN', 'NEAR_FULL'];
+  // Xoay nhẹ ngày khởi hành 0..2 ngày theo tourId để các tour không trùng y hệt nhau, vẫn nằm gọn trong tháng 02/2027
+  const dayShift = tourId % 3;
+  // Dịch pha trạng thái theo tourId để các tour ngoài trang chủ/danh sách chia đều 3 nhóm trạng thái
+  const phaseOffset = meta.isInternational ? (tourId % 3) + 2 : tourId % 3;
+
+  return SEASONAL_WAVES_TO_FEB_2027.map((wave, idx) => {
+    const rawStart = addDays(parseIsoLocal(wave.baseDate), dayShift);
+    // Đảm bảo ngày khởi hành cuối cùng không vượt quá 28/02/2027
+    const febEnd = parseIsoLocal('2027-02-28');
+    const start = rawStart > febEnd ? parseIsoLocal('2027-02-26') : rawStart;
+    const end = addDays(start, meta.durationOffset);
+    const id = 100000 + tourId * 100 + (idx + 1);
+
+    if (meta.isDemo) {
+      return {
+        id,
+        tourId,
+        startDate: toIsoDate(start),
+        endDate: toIsoDate(end),
+        minParticipants: 10,
+        maxParticipants: meta.maxParticipants,
+        bookedCount: idx % 3 === 0 ? 12 : idx % 3 === 1 ? 8 : 0,
+        note: `Khởi hành ${toShortDayMonth(start)} — ${meta.theme}`,
+      };
+    }
+
+    // Với tour quốc tế đợt cuối tháng 11 (< 15 ngày), để >= 12 khách để hiển thị đúng trạng thái chốt sổ lịch sự
+    let tier: OccupancyTier;
+    if (idx === 0 && meta.isInternational) {
+      tier = 'ENOUGH';
+    } else if (wave.forcePeak && idx % 2 === tourId % 2) {
+      tier = 'NEAR_FULL';
+    } else {
+      tier = tierCycle[(idx + phaseOffset) % 3];
+    }
+
+    const bookedCount = computeBookedCount(tier, meta.maxParticipants, tourId * 7 + idx * 3);
+
     return {
-      id: Number(`${tourId}${String(offsetDays).padStart(2, "0")}`),
+      id,
       tourId,
-      startDate: toDateString(s),
-      endDate: toDateString(e),
+      startDate: toIsoDate(start),
+      endDate: toIsoDate(end),
       minParticipants: 10,
-      maxParticipants: 40,
-      bookedCount: booked,
-      note,
-      seasonalPriceMultiplier: multiplier,
+      maxParticipants: meta.maxParticipants,
+      bookedCount,
+      note: wave.seasonLabel,
+      seasonalPriceMultiplier: wave.multiplier,
     };
-  };
+  });
+};
 
-  const generated: TourScheduleItem[] = [
-    make(6, 4, 'Khởi hành đợt 1 — Đang nhận khách', 15),
-    make(14, 4, 'Khởi hành đợt 2 — Lịch HOT giữa tháng', 24, 1.05),
-    make(22, 5, 'Khởi hành đợt 3 — Cuối tháng', 8),
-    make(35, 5, 'Khởi hành đợt 4 — Tháng kế tiếp', 0),
-  ];
+// Lịch khởi hành mẫu phong phú cho tất cả 20 tour từ cuối 11/2026 đến hết 02/2027
+const TOUR_SCHEDULES: Record<number, TourScheduleItem[]> = Object.fromEntries(
+  Object.entries(TOUR_META).map(([idStr, meta]) => {
+    const id = Number(idStr);
+    return [id, buildSchedulesThroughFeb2027(id, meta)];
+  })
+);
 
+// Hàm tự động sinh lịch tương lai cho tour mới do Vendor tạo (hoặc khi lịch mẫu cũ đã qua hết)
+const generateDynamicFutureSchedules = (tourId: number, baseHistory: TourScheduleItem[] = []): TourScheduleItem[] => {
+  const febEnd = parseIsoLocal('2027-02-28');
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+
+  // Nếu hôm nay vẫn trước 2027-02-15 -> dùng luôn bộ 11 đợt chuẩn tới hết tháng 02/2027
+  if (today < parseIsoLocal('2027-02-15')) {
+    const fallbackMeta: TourSeedMeta = {
+      durationOffset: 3,
+      maxParticipants: 40,
+      theme: 'Lịch khởi hành định kỳ',
+    };
+    const built = buildSchedulesThroughFeb2027(tourId, fallbackMeta);
+    return [...baseHistory, ...built];
+  }
+
+  // Fallback động nếu thời gian thực đã vượt qua tháng 02/2027
+  const tierCycle: OccupancyTier[] = ['ENOUGH', 'NEAR_MIN', 'NEAR_FULL'];
+  const generated: TourScheduleItem[] = [7, 16, 25, 34, 45, 56, 68, 80, 92].map((offsetDays, idx) => {
+    const s = addDays(today, offsetDays);
+    const e = addDays(s, 3);
+    const tier = tierCycle[(idx + tourId) % 3];
+    const maxParticipants = 40;
+    return {
+      id: 200000 + tourId * 100 + (idx + 1),
+      tourId,
+      startDate: toIsoDate(s),
+      endDate: toIsoDate(e),
+      minParticipants: 10,
+      maxParticipants,
+      bookedCount: computeBookedCount(tier, maxParticipants, tourId * 5 + idx),
+      note: `Khởi hành ${toShortDayMonth(s)} — Đợt ${idx + 1}`,
+      seasonalPriceMultiplier: idx % 4 === 3 ? 1.05 : 1.0,
+    };
+  });
+
+  // Đảm bảo không lỗi unused variable
+  void febEnd;
   return [...baseHistory, ...generated];
 };
 
@@ -333,15 +362,12 @@ const getDefaultSchedulesForTour = (tourId: number): TourScheduleItem[] => {
   const predefined = TOUR_SCHEDULES[tourId];
   if (predefined) {
     const upcoming = predefined.filter((s) => isUpcomingSchedule(s.startDate));
-    // Nếu có ít nhất 2 đợt khởi hành tương lai, dùng danh sách mẫu
     if (upcoming.length >= 2) {
       return predefined;
     }
-    // Nếu tất cả lịch mẫu đã quá hạn (hoặc còn quá ít), tự động sinh lịch mới trong tương lai
     return generateDynamicFutureSchedules(tourId, predefined);
   }
 
-  // Fallback: tạo lịch tương lai động cho tour mới
   return generateDynamicFutureSchedules(tourId);
 };
 
@@ -349,11 +375,9 @@ export const tourScheduleService = {
   // Lấy tất cả lịch khởi hành của tour (dành cho Vendor quản lý & hiển thị)
   getSchedulesForTour: (tourId: number): TourScheduleItem[] => {
     try {
-      // Dọn dẹp cache cũ v1, v2, v3, v4 nếu tồn tại
-      localStorage.removeItem('smart_travel_tour_schedules_' + tourId);
-      localStorage.removeItem('smart_travel_tour_schedules_v2_' + tourId);
-      localStorage.removeItem('smart_travel_tour_schedules_v3_' + tourId);
-      localStorage.removeItem('smart_travel_tour_schedules_v4_' + tourId);
+      for (const prefix of LEGACY_PREFIXES) {
+        localStorage.removeItem(prefix + tourId);
+      }
 
       const stored = localStorage.getItem(STORAGE_PREFIX + tourId);
       if (stored) {
@@ -365,7 +389,6 @@ export const tourScheduleService = {
             s.note.includes('kiểm tra giao diện') ||
             s.id < 10000
         );
-        // Kiểm tra xem cache còn bất kỳ lịch nào trong tương lai không
         const hasUpcoming = parsed.some((s) => isUpcomingSchedule(s.startDate));
         if (!isLegacy && Array.isArray(parsed) && parsed.length > 0 && hasUpcoming) {
           return parsed;
@@ -386,10 +409,8 @@ export const tourScheduleService = {
   // Lấy các lịch khởi hành tương lai (chưa qua ngày đi) dành cho User / Khách hàng
   getUpcomingSchedulesForUser: (tourId: number, category?: string): TourScheduleItem[] => {
     const all = tourScheduleService.getSchedulesForTour(tourId);
-    // Tự động loại bỏ các lịch đã qua ngày theo thời gian thực (daysRemaining < 0)
     let upcoming = all.filter((s) => isUpcomingSchedule(s.startDate));
     if (upcoming.length === 0) {
-      // Tự động tái tạo lịch tương lai nếu lịch cũ đã hết hạn
       const fresh = getDefaultSchedulesForTour(tourId);
       try {
         localStorage.setItem(STORAGE_PREFIX + tourId, JSON.stringify(fresh));
@@ -398,15 +419,16 @@ export const tourScheduleService = {
       }
       upcoming = fresh.filter((s) => isUpcomingSchedule(s.startDate));
     }
-    // Gán trạng thái vòng đời động cho từng lịch
-    return upcoming.map((s) => {
-      const computed = computeScheduleStatus(s, category);
-      return {
-        ...s,
-        minParticipants: s.minParticipants || 10,
-        status: computed.status,
-      };
-    });
+    return upcoming
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
+      .map((s) => {
+        const computed = computeScheduleStatus(s, category);
+        return {
+          ...s,
+          minParticipants: s.minParticipants || 10,
+          status: computed.status,
+        };
+      });
   },
 
   // Phân loại toàn bộ lịch theo vòng đời (Đang mở bán, Đã đóng, Đã hủy, Đã hoàn tất) - Cho Vendor & Admin
@@ -434,7 +456,6 @@ export const tourScheduleService = {
   getNearestUpcomingSchedule: (tourId: number, category?: string): TourScheduleItem | null => {
     const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
     if (upcoming.length === 0) return null;
-    // Ưu tiên lịch ACTIVE trước, sau đó sắp xếp theo ngày tăng dần
     const sorted = [...upcoming].sort((a, b) => {
       if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1;
       if (a.status !== 'ACTIVE' && b.status === 'ACTIVE') return 1;
@@ -483,7 +504,6 @@ export const tourScheduleService = {
   saveSchedulesForTour: (tourId: number, schedules: TourScheduleItem[]): void => {
     try {
       localStorage.setItem(STORAGE_PREFIX + tourId, JSON.stringify(schedules));
-      // Notify other components/tabs
       window.dispatchEvent(new CustomEvent('tour_schedules_updated', { detail: { tourId } }));
     } catch (e) {
       console.error('Error saving tour schedules', e);
@@ -492,7 +512,7 @@ export const tourScheduleService = {
 
   // Thêm lịch khởi hành mới (từ Vendor)
   addSchedule: (
-    tourId: number, 
+    tourId: number,
     data: Omit<TourScheduleItem, 'id' | 'tourId' | 'bookedCount'>
   ): TourScheduleItem => {
     const current = tourScheduleService.getSchedulesForTour(tourId);
@@ -501,6 +521,7 @@ export const tourScheduleService = {
       tourId,
       startDate: data.startDate,
       endDate: data.endDate,
+      minParticipants: data.minParticipants || 10,
       maxParticipants: data.maxParticipants,
       bookedCount: 0,
       note: data.note || 'Khởi hành định kỳ',

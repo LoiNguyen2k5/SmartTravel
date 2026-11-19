@@ -19,7 +19,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<lombok.version>1.18.38</lombok.version>
-		<maven.test.skip>true</maven.test.skip>
+		<skipTests>false</skipTests>
 		<jjwt.version>0.12.5</jjwt.version>
 		<springdoc.version>2.5.0</springdoc.version>
 	</properties>
@@ -114,7 +114,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.4</version>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>${skipTests}</skipTests>
+					<forkCount>0</forkCount>
 				</configuration>
 			</plugin>
 			<plugin>

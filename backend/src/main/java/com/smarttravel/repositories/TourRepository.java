@@ -16,6 +16,8 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
     List<Tour> findByStatus(TourStatus status);
     List<Tour> findByVendorId(Long vendorId);
     long countByStatus(TourStatus status);
+    long countByVisaTemplateId(Long visaTemplateId);
+    List<Tour> findByVisaTemplateId(Long visaTemplateId);
 
     @Query("SELECT t FROM Tour t WHERE t.status = 'ACTIVE' " +
            "AND (:departure IS NULL OR LOWER(t.departureLocation) LIKE LOWER(CONCAT('%', :departure, '%'))) " +

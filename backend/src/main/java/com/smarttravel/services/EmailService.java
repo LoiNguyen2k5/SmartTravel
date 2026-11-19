@@ -11,4 +11,5 @@ public interface EmailService {
     void sendInvoiceEmail(Booking booking, Payment payment, byte[] pdfInvoice);
     void sendVendorApplicationApprovedEmail(String toEmail, String businessName);
     void sendVendorApplicationRejectedEmail(String toEmail, String businessName, String reason);
+    void sendVisaStatusUpdateEmail(String toEmail, String customerName, String bookingCode, String tourTitle, String statusLabel, String note);
 }

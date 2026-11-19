@@ -2288,14 +2288,45 @@ public class EmailServiceImpl implements EmailService {
 
             log.error("Không thể gửi email từ chối tới {}. Lý do: {}", toEmail, e.getMessage());
 
-
-
         }
-
-
 
     }
 
+    @Override
+    @Async
+    public void sendVisaStatusUpdateEmail(String toEmail, String customerName, String bookingCode, String tourTitle, String statusLabel, String note) {
+        if (toEmail == null || toEmail.isBlank()) {
+            return;
+        }
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail, "Smart Travel Visa Support");
+            helper.setTo(toEmail);
+            helper.setSubject("[Smart Travel] Cập nhật tiến độ hồ sơ Visa #" + bookingCode + " - " + statusLabel);
 
+            String safeName = customerName != null && !customerName.isBlank() ? customerName : "Quý khách";
+            String safeTour = tourTitle != null ? tourTitle : "Tour du lịch quốc tế";
+            String noteBlock = (note != null && !note.isBlank())
+                    ? "<div style=\"background-color:#f8fafc;border-left:4px solid #0284c7;padding:12px 16px;border-radius:8px;margin:16px 0;color:#1e293b;\"><strong>Ghi chú từ chuyên viên Đại lý:</strong><br/>" + note + "</div>"
+                    : "";
+
+            String htmlContent = "<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e2e8f0;border-radius:12px;\">"
+                    + "<h2 style=\"color:#0f172a;margin-top:0;\">Thông báo tiến độ dịch vụ ủy quyền hồ sơ Visa</h2>"
+                    + "<p>Xin chào <strong>" + safeName + "</strong>,</p>"
+                    + "<p>Đại lý du lịch phụ trách hành trình <strong>" + safeTour + "</strong> (Mã đặt chỗ: <strong>" + bookingCode + "</strong>) vừa cập nhật trạng thái hồ sơ Visa của bạn:</p>"
+                    + "<p style=\"font-size:15px;\">Trạng thái hiện tại: <strong style=\"color:#0284c7;\">" + statusLabel + "</strong></p>"
+                    + noteBlock
+                    + "<p style=\"font-size:13px;color:#475569;\">Lưu ý: Mọi quyết định xét duyệt và cấp thị thực đều do Đại sứ quán / Lãnh sự quán thực hiện trực tiếp. Chuyên viên Đại lý chỉ đóng vai trò sơ duyệt bản mềm, nộp hộ hồ sơ theo đoàn và cập nhật kết quả trả về để Quý khách tiện theo dõi.</p>"
+                    + "<div style=\"margin-top:24px;text-align:center;\"><a href=\"http://localhost:5173/my-bookings\" style=\"display:inline-block;background-color:#0284c7;color:#ffffff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:bold;\">Xem Chi Tiết Hồ Sơ</a></div>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Đã gửi email cập nhật trạng thái Visa [{}] tới {}", statusLabel, toEmail);
+        } catch (Exception e) {
+            log.warn("Không thể gửi email cập nhật Visa tới {}: {}", toEmail, e.getMessage());
+        }
+    }
 
 }

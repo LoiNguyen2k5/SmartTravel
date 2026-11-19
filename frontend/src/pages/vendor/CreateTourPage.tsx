@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Compass, ArrowLeft, Sparkles } from 'lucide-react';
 import { tourService } from '../../services/tourService';
+import { visaService } from '../../services/visaService';
+import { VisaTemplate } from '../../types/visa';
 import { AiTourGeneratorModal } from '../../components/vendor/AiTourGeneratorModal';
 import { TourAiGenerateResult } from '../../services/aiService';
 
@@ -17,9 +19,26 @@ export const CreateTourPage: React.FC = () => {
   const [departureLocation, setDepartureLocation] = useState('TP.Hồ Chí Minh');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [category, setCategory] = useState<'DOMESTIC' | 'NUOC_NGOAI'>('DOMESTIC');
+  const [visaTemplates, setVisaTemplates] = useState<VisaTemplate[]>([]);
+  const [selectedVisaTemplateId, setSelectedVisaTemplateId] = useState<number | null>(null);
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if (category === 'NUOC_NGOAI') {
+      visaService.getTemplates(title).then((list) => {
+        setVisaTemplates(list);
+        if (selectedVisaTemplateId === null && list.length > 0 && title.trim()) {
+          const lower = title.toLowerCase();
+          const matched = list.find((t) => lower.includes(t.country.toLowerCase()));
+          if (matched) setSelectedVisaTemplateId(matched.id);
+        }
+      }).catch(() => {});
+    } else {
+      setSelectedVisaTemplateId(null);
+    }
+  }, [category, title]);
 
   const handleApplyAiContent = (aiData: TourAiGenerateResult) => {
     if (aiData.title) setTitle(aiData.title);
@@ -53,7 +72,8 @@ export const CreateTourPage: React.FC = () => {
         thumbnailUrl: thumbnailUrl.trim(),
         category: category as any,
         remainingSeats: 40,
-      } as any);
+        visaTemplateId: category === 'NUOC_NGOAI' ? selectedVisaTemplateId : null,
+      });
 
       alert('Tạo Tour du lịch mới thành công! Tour đã được gửi lên hệ thống.');
       navigate('/vendor/tours');
@@ -156,6 +176,26 @@ export const CreateTourPage: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {category === 'NUOC_NGOAI' && (
+          <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-4 space-y-1.5">
+            <label className="block text-xs font-bold text-slate-800">
+              Mẫu Hồ Sơ Visa Quốc Gia (Bỏ trống nếu tour thuộc diện miễn Visa như Thái Lan, Singapore)
+            </label>
+            <select
+              value={selectedVisaTemplateId ?? ''}
+              onChange={(e) => setSelectedVisaTemplateId(e.target.value ? Number(e.target.value) : null)}
+              className="w-full rounded-xl border border-sky-300 px-3 py-2 text-xs font-semibold bg-white focus:outline-none"
+            >
+              <option value="">-- Miễn Visa / Không yêu cầu hồ sơ --</option>
+              {visaTemplates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.flagEmoji} {t.country} — {t.processingDays} ngày ĐSQ + {t.bufferDays ?? 3} ngày sơ duyệt • Phí DV: {t.visaFee.toLocaleString('vi-VN')}đ
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>

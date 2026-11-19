@@ -1,73 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, BookOpen, Check } from 'lucide-react';
-import { VisaRequirementRequest } from '../../types/visa';
-
-const TEMPLATES_KEY = 'smart_travel_visa_templates';
-const DEFAULT_TEMPLATES_MINIMAL = [
-  {
-    country: 'Nhật Bản', flagEmoji: '🇯🇵',
-    documents: [
-      { documentName: 'Hộ chiếu (còn hạn ít nhất 6 tháng)', description: 'Scan trang thông tin rõ nét.', isMandatory: true },
-      { documentName: 'Ảnh thẻ 4x6 (nền trắng)', description: 'Chụp trong vòng 6 tháng, không đeo kính.', isMandatory: true },
-      { documentName: 'Sao kê tài khoản 3 tháng', description: 'Số dư tối thiểu 30 triệu VND, có đóng dấu ngân hàng.', isMandatory: true },
-      { documentName: 'Căn cước công dân (2 mặt)', description: 'Chụp rõ, không bị che.', isMandatory: true },
-      { documentName: 'Giấy phép lao động / Hợp đồng việc làm', description: 'Xác nhận công tác.', isMandatory: false },
-    ],
-  },
-  {
-    country: 'Hàn Quốc', flagEmoji: '🇰🇷',
-    documents: [
-      { documentName: 'Hộ chiếu (còn hạn ít nhất 6 tháng)', description: 'Scan trang ảnh đầy đủ.', isMandatory: true },
-      { documentName: 'Ảnh thẻ 3.5x4.5 (nền trắng)', description: 'Chụp trong vòng 6 tháng.', isMandatory: true },
-      { documentName: 'Đơn xin cấp Visa (điền sẵn)', description: 'Mẫu do SmartTravel cung cấp.', isMandatory: true },
-      { documentName: 'Sao kê tài khoản 3 tháng', description: 'Tối thiểu 15 triệu VND.', isMandatory: true },
-    ],
-  },
-  {
-    country: 'Khối Schengen (Châu Âu)', flagEmoji: '🇪🇺',
-    documents: [
-      { documentName: 'Hộ chiếu (còn hạn ít nhất 3 tháng sau ngày về)', description: 'Scan đầy đủ các trang có dấu.', isMandatory: true },
-      { documentName: 'Bảo hiểm du lịch Schengen (30.000 EUR+)', description: 'Có hiệu lực toàn bộ hành trình.', isMandatory: true },
-      { documentName: 'Xác nhận đặt phòng khách sạn', description: 'Toàn bộ hành trình.', isMandatory: true },
-      { documentName: 'Sao kê tài khoản 6 tháng', description: 'Tối thiểu 50 triệu VND.', isMandatory: true },
-    ],
-  },
-  {
-    country: 'Trung Quốc', flagEmoji: '🇨🇳',
-    documents: [
-      { documentName: 'Hộ chiếu (còn hạn ít nhất 6 tháng)', description: 'Scan rõ nét trang ảnh.', isMandatory: true },
-      { documentName: 'Ảnh thẻ 3.3x4.8 (nền trắng)', description: 'Ảnh màu, chụp trong 6 tháng.', isMandatory: true },
-      { documentName: 'Đơn xin cấp Visa Trung Quốc', description: 'Điền chính xác, ký tên.', isMandatory: true },
-      { documentName: 'Xác nhận đặt tour / Vé máy bay', description: 'Từ công ty du lịch.', isMandatory: true },
-    ],
-  },
-];
+import { VisaRequirementRequest, VisaTemplate } from '../../types/visa';
+import { visaService } from '../../services/visaService';
 
 interface Props {
   initialRequirements?: VisaRequirementRequest[];
+  selectedTemplateId?: number | null;
+  suggestCountry?: string;
+  onSelectTemplate?: (templateId: number | null) => void;
   onSave: (requirements: VisaRequirementRequest[]) => void;
 }
 
-export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [], onSave }) => {
+export const VisaRequirementConfig: React.FC<Props> = ({
+  initialRequirements = [],
+  selectedTemplateId,
+  suggestCountry,
+  onSelectTemplate,
+  onSave,
+}) => {
   const [requirements, setRequirements] = useState<VisaRequirementRequest[]>(initialRequirements);
-  const [selectedTemplateCountry, setSelectedTemplateCountry] = useState<string>('');
+  const [templates, setTemplates] = useState<VisaTemplate[]>([]);
+  const [chosenTemplateId, setChosenTemplateId] = useState<string>(
+    selectedTemplateId != null ? String(selectedTemplateId) : ''
+  );
   const [templateAppliedMsg, setTemplateAppliedMsg] = useState<string>('');
 
-  // Load templates from localStorage or fallback
-  const getAvailableTemplates = () => {
-    try {
-      const stored = localStorage.getItem(TEMPLATES_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      // fallback
-    }
-    return DEFAULT_TEMPLATES_MINIMAL;
-  };
+  useEffect(() => {
+    visaService
+      .getTemplates(suggestCountry)
+      .then((list) => setTemplates(list))
+      .catch(() => setTemplates([]));
+  }, [suggestCountry]);
 
-  const availableTemplates = getAvailableTemplates();
+  useEffect(() => {
+    if (selectedTemplateId != null) {
+      setChosenTemplateId(String(selectedTemplateId));
+    }
+  }, [selectedTemplateId]);
 
   useEffect(() => {
     if (initialRequirements && initialRequirements.length > 0) {
@@ -75,21 +44,26 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
     }
   }, [initialRequirements]);
 
-  const handleApplyTemplate = (country: string) => {
-    if (!country) return;
-    const tpl = availableTemplates.find((t: any) => t.country === country);
+  const handleApplyTemplate = (val: string) => {
+    setChosenTemplateId(val);
+    if (!val) {
+      onSelectTemplate?.(null);
+      return;
+    }
+    const tpl = templates.find((t) => String(t.id) === val);
     if (!tpl) return;
-    
-    const docs = tpl.documents.map((d: any) => ({
+
+    onSelectTemplate?.(tpl.id);
+    const docs = (tpl.documents || []).map((d) => ({
       documentName: d.documentName,
       description: d.description || '',
       isMandatory: d.isMandatory !== false,
     }));
-
     setRequirements(docs);
-    setSelectedTemplateCountry(country);
-    setTemplateAppliedMsg(`Đã áp dụng mẫu giấy tờ visa ${tpl.country} (${docs.length} giấy tờ)`);
-    setTimeout(() => setTemplateAppliedMsg(''), 4000);
+    setTemplateAppliedMsg(
+      `Đã gắn mẫu Visa ${tpl.country} (${tpl.processingDays} ngày ĐSQ + ${tpl.bufferDays ?? 3} ngày sơ duyệt, ${docs.length} giấy tờ)`
+    );
+    setTimeout(() => setTemplateAppliedMsg(''), 5000);
   };
 
   const handleAdd = () => {
@@ -97,23 +71,25 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
   };
 
   const handleRemove = (index: number) => {
-    const newReqs = [...requirements];
-    newReqs.splice(index, 1);
-    setRequirements(newReqs);
+    setRequirements(requirements.filter((_, i) => i !== index));
   };
 
   const handleChange = (index: number, field: keyof VisaRequirementRequest, value: string | boolean) => {
-    const newReqs = [...requirements];
-    newReqs[index] = { ...newReqs[index], [field]: value };
-    setRequirements(newReqs);
+    const next = [...requirements];
+    next[index] = { ...next[index], [field]: value };
+    setRequirements(next);
   };
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-6">
       <div className="flex justify-between items-center border-b border-slate-100 pb-3">
         <div>
-          <h3 className="font-extrabold text-slate-900 text-lg flex items-center gap-2">Cấu hình Hồ sơ Visa</h3>
-          <p className="text-sm text-slate-500 mt-1">Thiết lập các giấy tờ bắt buộc khách hàng cần nộp để xin Visa cho tour này.</p>
+          <h3 className="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+            Cấu hình Mẫu & Danh mục Hồ sơ Visa
+          </h3>
+          <p className="text-sm text-slate-500 mt-1">
+            Gắn mẫu Visa theo quốc gia (nếu tour cần xin thị thực) hoặc để trống với tour miễn Visa (VD: Thái Lan, Singapore).
+          </p>
         </div>
         <button
           type="button"
@@ -121,11 +97,11 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
           className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
         >
           <Plus size={16} />
-          Thêm giấy tờ
+          Thêm giấy tờ riêng
         </button>
       </div>
 
-      {/* Chọn từ mẫu có sẵn */}
+      {/* Chọn từ mẫu Backend */}
       <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -133,20 +109,22 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
               <BookOpen size={16} />
             </span>
             <div>
-              <p className="text-xs font-bold text-slate-800">Chọn nhanh từ Thư Viện Mẫu Visa</p>
-              <p className="text-[11px] text-slate-500">Áp dụng mẫu giấy tờ chuẩn theo quốc gia thay vì tự nhập lại</p>
+              <p className="text-xs font-bold text-slate-800">Thư Viện Mẫu Visa Quốc Gia (Từ hệ thống)</p>
+              <p className="text-[11px] text-slate-500">
+                Tự động đồng bộ số ngày xử lý, phí dịch vụ Đại lý và lệ phí Lãnh sự
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <select
-              value={selectedTemplateCountry}
+              value={chosenTemplateId}
               onChange={(e) => handleApplyTemplate(e.target.value)}
               className="bg-white border border-sky-200 text-xs font-semibold text-slate-700 rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500 shadow-sm"
             >
-              <option value="">-- Chọn quốc gia / Mẫu Visa --</option>
-              {availableTemplates.map((t: any, idx: number) => (
-                <option key={idx} value={t.country}>
-                  {t.flagEmoji || '🌐'} Mẫu Visa {t.country} ({t.documents?.length || 0} giấy tờ)
+              <option value="">-- Miễn Visa / Không gắn mẫu --</option>
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.flagEmoji || '🌐'} {t.country} ({t.processingDays} ngày xử lý • DV: {t.visaFee.toLocaleString('vi-VN')}đ)
                 </option>
               ))}
             </select>
@@ -162,7 +140,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
 
       {requirements.length === 0 ? (
         <div className="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-xs">
-          Chưa có cấu hình giấy tờ Visa nào. Chọn mẫu phía trên hoặc bấm "Thêm giấy tờ" để bắt đầu.
+          Tour này hiện không yêu cầu nộp hồ sơ Visa (Miễn thị thực). Chọn một Mẫu Visa phía trên nếu hành trình yêu cầu xin Visa.
         </div>
       ) : (
         <div className="space-y-4">
@@ -176,7 +154,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
                       type="text"
                       value={req.documentName}
                       onChange={(e) => handleChange(index, 'documentName', e.target.value)}
-                      placeholder="VD: Hộ chiếu bản gốc"
+                      placeholder="VD: Hộ chiếu gốc còn hạn 6 tháng"
                       className="w-full px-4 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -197,7 +175,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
                   <textarea
                     value={req.description}
                     onChange={(e) => handleChange(index, 'description', e.target.value)}
-                    placeholder="VD: Hộ chiếu phải còn hạn ít nhất 6 tháng..."
+                    placeholder="VD: Scan rõ nét trang thông tin có chữ ký..."
                     className="w-full px-4 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-500 resize-none"
                     rows={2}
                   />
@@ -223,7 +201,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({ initialRequirements = [
           className="flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition"
         >
           <Save size={16} />
-          Lưu cấu hình Visa
+          Lưu danh mục giấy tờ riêng cho Tour
         </button>
       </div>
     </div>

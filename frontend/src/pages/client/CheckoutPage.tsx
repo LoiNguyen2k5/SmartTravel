@@ -46,6 +46,7 @@ import { notificationService } from '../../services/notificationService';
 import { voucherService } from '../../services/voucherService';
 
 import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
+import { CheckoutVisaAddon } from '../../components/visa/CheckoutVisaAddon';
 
 
 
@@ -122,6 +123,10 @@ export const CheckoutPage: React.FC = () => {
 
 
   const [hasVisaConfig, setHasVisaConfig] = useState(false);
+  const [isVisaOptedIn, setIsVisaOptedIn] = useState(true);
+  const [visaFeePerPerson, setVisaFeePerPerson] = useState<number>(0);
+  const [consularFeePerPerson, setConsularFeePerPerson] = useState<number>(0);
+  const [visaLeadDays, setVisaLeadDays] = useState<number>(10);
 
   const [fetchedCategory, setFetchedCategory] = useState('TRONG_NUOC');
 
@@ -170,6 +175,14 @@ export const CheckoutPage: React.FC = () => {
            if (tourRes.data.vendorId) setFetchedVendorId(tourRes.data.vendorId);
 
            if (tourRes.data.vendorName) setFetchedVendorName(tourRes.data.vendorName);
+           if (tourRes.data.requiresVisa) {
+             setHasVisaConfig(true);
+             setVisaFeePerPerson(Number(tourRes.data.visaFee || 0));
+             setConsularFeePerPerson(Number(tourRes.data.consularFee || 0));
+             setVisaLeadDays(Number(tourRes.data.visaProcessingDays || 7) + Number(tourRes.data.visaBufferDays || 3));
+           } else {
+             setHasVisaConfig(false);
+           }
 
         }
 
@@ -184,6 +197,9 @@ export const CheckoutPage: React.FC = () => {
           if (reqs && reqs.length > 0) {
 
             setHasVisaConfig(true);
+            if (reqs[0]?.visaFee != null) setVisaFeePerPerson(Number(reqs[0].visaFee));
+            if (reqs[0]?.consularFee != null) setConsularFeePerPerson(Number(reqs[0].consularFee));
+            if (reqs[0]?.processingDays != null) setVisaLeadDays(Number(reqs[0].processingDays) + Number(reqs[0].bufferDays ?? 3));
 
           }
 
@@ -223,7 +239,9 @@ export const CheckoutPage: React.FC = () => {
 
   const subtotal = (adultPrice * adults) + (childPrice * children) + singleRoomSurchargeAmount;
 
-  const totalAfterDiscount = Math.max(0, subtotal - currentDiscountAmount);
+  const totalGuestsCount = (adults || 1) + (children || 0);
+  const visaServiceFeeTotal = (hasVisaConfig && isVisaOptedIn) ? (visaFeePerPerson * totalGuestsCount) : 0;
+  const totalAfterDiscount = Math.max(0, subtotal - currentDiscountAmount) + visaServiceFeeTotal;
 
   const finalPayAmount = paymentOption === 'DEPOSIT' ? Math.round(totalAfterDiscount * 0.3) : totalAfterDiscount;
 
@@ -396,6 +414,7 @@ export const CheckoutPage: React.FC = () => {
         singleRoomSurchargeAmount: singleRoomSurchargeAmount,
 
         roomAllocation: roomAllocation,
+        visaOptIn: hasVisaConfig && isVisaOptedIn,
 
       });
 
@@ -556,6 +575,7 @@ export const CheckoutPage: React.FC = () => {
         singleRoomSurchargeAmount: singleRoomSurchargeAmount,
 
         roomAllocation: roomAllocation,
+        visaOptIn: hasVisaConfig && isVisaOptedIn,
 
       });
 
@@ -1137,7 +1157,22 @@ export const CheckoutPage: React.FC = () => {
 
 
 
-              {hasVisaConfig && (
+              <CheckoutVisaAddon
+                hasVisaConfig={hasVisaConfig}
+                isOptedIn={isVisaOptedIn}
+                onToggleOptIn={setIsVisaOptedIn}
+                visaFeePerPerson={visaFeePerPerson}
+                consularFeePerPerson={consularFeePerPerson}
+                totalGuests={totalGuestsCount}
+                visaDeadlineText={(() => {
+                  const norm = getNormalizedDepartureDate();
+                  const d = new Date(norm);
+                  if (isNaN(d.getTime())) return null;
+                  d.setDate(d.getDate() - visaLeadDays);
+                  return d.toLocaleDateString('vi-VN');
+                })()}
+              />
+              {false && hasVisaConfig && (
 
                 <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 flex items-start gap-3">
 
@@ -1489,6 +1524,12 @@ export const CheckoutPage: React.FC = () => {
 
                   </div>
 
+                  {visaServiceFeeTotal > 0 && (
+                    <div className="flex justify-between pt-2 text-xs font-bold text-sky-300">
+                      <span>Phí dịch vụ ủy quyền Visa ({totalGuestsCount} khách):</span>
+                      <span>+{formatCurrency(visaServiceFeeTotal)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between pt-2 border-t border-white/10 text-sm font-black text-white">
 
                     <span>Tổng đơn hàng:</span>

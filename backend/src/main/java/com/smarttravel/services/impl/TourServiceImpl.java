@@ -6,6 +6,7 @@ import com.smarttravel.entities.Destination;
 import com.smarttravel.entities.Review;
 import com.smarttravel.entities.Tour;
 import com.smarttravel.entities.User;
+import com.smarttravel.entities.VisaTemplate;
 import com.smarttravel.enums.RoleEnum;
 import com.smarttravel.enums.TourCategory;
 import com.smarttravel.enums.TourStatus;
@@ -14,6 +15,8 @@ import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.DestinationRepository;
 import com.smarttravel.repositories.TourRepository;
 import com.smarttravel.repositories.UserRepository;
+import com.smarttravel.repositories.VisaRequirementRepository;
+import com.smarttravel.repositories.VisaTemplateRepository;
 import com.smarttravel.services.TourService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,8 @@ public class TourServiceImpl implements TourService {
     private final TourRepository tourRepository;
     private final UserRepository userRepository;
     private final DestinationRepository destinationRepository;
+    private final VisaTemplateRepository visaTemplateRepository;
+    private final VisaRequirementRepository visaRequirementRepository;
 
     @Override
     public List<TourResponse> getAllActiveTours() {
@@ -59,6 +65,9 @@ public class TourServiceImpl implements TourService {
                     .orElse(null);
         }
 
+        TourCategory category = request.getCategory() != null ? request.getCategory() : TourCategory.DOMESTIC;
+        VisaTemplate visaTemplate = resolveVisaTemplateForCreate(request.getVisaTemplateId(), category, destination);
+
         Tour tour = Tour.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -69,7 +78,7 @@ public class TourServiceImpl implements TourService {
                 .departureLocation(request.getDepartureLocation())
                 .thumbnailUrl(request.getThumbnailUrl())
                 .tourCode(request.getTourCode())
-                .category(request.getCategory() != null ? request.getCategory() : TourCategory.DOMESTIC)
+                .category(category)
                 .includedServices(request.getIncludedServices())
                 .excludedServices(request.getExcludedServices())
                 .cancellationPolicy(request.getCancellationPolicy())
@@ -78,6 +87,7 @@ public class TourServiceImpl implements TourService {
                 .status(TourStatus.ACTIVE)
                 .vendor(vendor)
                 .destination(destination)
+                .visaTemplate(visaTemplate)
                 .build();
 
         Tour savedTour = tourRepository.save(tour);
@@ -116,6 +126,14 @@ public class TourServiceImpl implements TourService {
         if (request.getDestinationId() != null) {
             Destination destination = destinationRepository.findById(request.getDestinationId()).orElse(null);
             tour.setDestination(destination);
+        }
+
+        if (Boolean.TRUE.equals(request.getClearVisaTemplate()) || tour.getCategory() == TourCategory.DOMESTIC) {
+            tour.setVisaTemplate(null);
+        } else if (request.getVisaTemplateId() != null) {
+            VisaTemplate tpl = visaTemplateRepository.findById(request.getVisaTemplateId())
+                    .orElseThrow(() -> new ResourceNotFoundException("VisaTemplate", "id", request.getVisaTemplateId()));
+            tour.setVisaTemplate(tpl);
         }
 
         Tour saved = tourRepository.save(tour);
@@ -190,6 +208,26 @@ public class TourServiceImpl implements TourService {
         }
     }
 
+    private VisaTemplate resolveVisaTemplateForCreate(Long visaTemplateId, TourCategory category, Destination destination) {
+        if (category == TourCategory.DOMESTIC) {
+            return null;
+        }
+        if (visaTemplateId != null) {
+            return visaTemplateRepository.findById(visaTemplateId)
+                    .orElseThrow(() -> new ResourceNotFoundException("VisaTemplate", "id", visaTemplateId));
+        }
+        if (destination != null && destination.getCountry() != null && !destination.getCountry().isBlank()) {
+            String countryLower = destination.getCountry().trim().toLowerCase(Locale.ROOT);
+            return visaTemplateRepository.findAllByOrderByCountryAsc().stream()
+                    .filter(t -> t.getCountry() != null && (
+                            t.getCountry().toLowerCase(Locale.ROOT).contains(countryLower)
+                            || countryLower.contains(t.getCountry().toLowerCase(Locale.ROOT))))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
     private TourResponse mapToTourResponse(Tour tour) {
         double avgRating = 0.0;
         Map<Integer, Long> ratingBreakdown = new HashMap<>();
@@ -208,6 +246,10 @@ public class TourServiceImpl implements TourService {
                 ratingBreakdown.put(rVal, ratingBreakdown.get(rVal) + 1);
             }
         }
+
+        VisaTemplate tpl = tour.getVisaTemplate();
+        boolean hasCustomVisaReqs = tour.getId() != null && visaRequirementRepository.existsByTourId(tour.getId());
+        boolean requiresVisa = tpl != null || hasCustomVisaReqs;
 
         return TourResponse.builder()
                 .id(tour.getId())
@@ -232,6 +274,14 @@ public class TourServiceImpl implements TourService {
                 .vendorName(tour.getVendor() != null ? tour.getVendor().getFullName() : null)
                 .destinationId(tour.getDestination() != null ? tour.getDestination().getId() : null)
                 .destinationName(tour.getDestination() != null ? tour.getDestination().getName() : null)
+                .destinationCountry(tour.getDestination() != null ? tour.getDestination().getCountry() : null)
+                .visaTemplateId(tpl != null ? tpl.getId() : null)
+                .visaCountry(tpl != null ? tpl.getCountry() : null)
+                .requiresVisa(requiresVisa)
+                .visaFee(tpl != null ? tpl.getVisaFee() : null)
+                .consularFee(tpl != null ? tpl.getConsularFee() : null)
+                .visaProcessingDays(tpl != null ? tpl.getProcessingDays() : null)
+                .visaBufferDays(tpl != null ? tpl.getBufferDays() : null)
                 .averageRating(avgRating)
                 .totalReviews(tour.getReviews() != null ? tour.getReviews().size() : 0)
                 .ratingBreakdown(ratingBreakdown)

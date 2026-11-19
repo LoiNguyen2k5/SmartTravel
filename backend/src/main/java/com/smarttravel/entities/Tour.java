@@ -83,6 +83,10 @@ public class Tour extends BaseEntity {
     @JoinColumn(name = "destination_id")
     private Destination destination;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "visa_template_id")
+    private VisaTemplate visaTemplate;
+
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<TourSchedule> schedules = new ArrayList<>();

@@ -46,6 +46,14 @@ export interface Tour {
   vendorName?: string;
   destinationId?: number;
   destinationName?: string;
+  destinationCountry?: string;
+  visaTemplateId?: number;
+  visaCountry?: string;
+  requiresVisa?: boolean;
+  visaFee?: number;
+  consularFee?: number;
+  visaProcessingDays?: number;
+  visaBufferDays?: number;
   averageRating?: number;
   totalReviews?: number;
   ratingBreakdown?: Record<number, number>;
@@ -76,5 +84,6 @@ export interface TourCreateRequest {
   category?: TourCategory;
   tourCode?: string;
   remainingSeats?: number;
+  visaTemplateId?: number | null;
+  clearVisaTemplate?: boolean;
 }
-
