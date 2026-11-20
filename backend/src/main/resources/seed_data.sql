@@ -33,16 +33,16 @@ INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 (6, 3); -- Nguyen Bao Loi
 
 -- 4. Insert Destinations
-INSERT IGNORE INTO destinations (id, created_at, updated_at, name, city, country, description, image_url, latitude, longitude) VALUES 
-(1, NOW(), NOW(), 'Phượng Hoàng Cổ Trấn', 'Trương Gia Giới', 'Trung Quốc', 'Cổ trấn ngàn năm tuổi bên dòng Đà Giang lung linh huyền ảo', 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png', 27.9483, 109.5986),
+INSERT INTO destinations (id, created_at, updated_at, name, city, country, description, image_url, latitude, longitude) VALUES 
+(1, NOW(), NOW(), 'Phượng Hoàng Cổ Trấn', 'Trương Gia Giới', 'Trung Quốc', 'Cổ trấn ngàn năm tuổi bên dòng Đà Giang lung linh huyền ảo', '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg', 27.9483, 109.5986),
 (2, NOW(), NOW(), 'Thượng Hải & Ô Trấn', 'Thượng Hải', 'Trung Quốc', 'Thành phố hiện đại bậc nhất kết hợp Cổ trấn Tây Sách mộng mơ', '/images/tours/tour-2-thuong-hai-o-tran/image 1 thuong-hai-o-tran.jpg', 31.2304, 121.4737),
-(3, NOW(), NOW(), 'Núi Chứa Chan', 'Đồng Nai', 'Việt Nam', 'Ngọn núi tâm linh chiêm bái Chùa Bửu Quang (Gia Lào)', 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80', 10.9634, 107.3758),
+(3, NOW(), NOW(), 'Núi Chứa Chan', 'Đồng Nai', 'Việt Nam', 'Ngọn núi tâm linh chiêm bái Chùa Bửu Quang (Gia Lào)', '/images/tours/nui-chua-chan-dinh-thay-thim/01.png', 10.9634, 107.3758),
 (4, NOW(), NOW(), 'Châu Đốc - Núi Cấm', 'An Giang', 'Việt Nam', 'Vùng đất tâm linh viếng Miếu Bà Chúa Xứ và chinh phục Núi Cấm', '/images/tours/tour-4-chau-doc-an-giang/mieu-ba-chua-xu-nui-sam.jpg', 10.7005, 105.1192),
 (5, NOW(), NOW(), 'Miền Tây Sông Nước', 'Cần Thơ', 'Việt Nam', 'Hành trình trọn vẹn 6 tỉnh miền Tây sông nước Đất Mũi Cà Mau', '/images/tours/tour-5-mien-tay-6-tinh/Tour-Du-Lịch-Mỹ-Tho-Bến-Tre-Cần-Thơ-Cà-Mau-Đất-Mũi.jpg', 10.0452, 105.7469),
 (6, NOW(), NOW(), 'Đà Lạt Thành Phố Sương Mờ', 'Đà Lạt', 'Việt Nam', 'Thành phố ngàn hoa với khí hậu se lạnh và cảnh sắc thơ mộng', '/images/tours/tour-6-da-lat-4n3d/dnt-da-lat.jpg', 11.9404, 108.4583),
-(7, NOW(), NOW(), 'Đảo Nam Du', 'Kiên Giang', 'Việt Nam', 'Thiên đường biển đảo hoang sơ với bãi biển xanh trong vắt', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80', 9.6789, 104.3541),
-(8, NOW(), NOW(), 'Biển Vũng Tàu', 'Vũng Tàu', 'Việt Nam', 'Thành phố biển năng động với Công viên nước Sun World hiện đại', 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80', 10.3460, 107.0843),
-(9, NOW(), NOW(), 'Phú Yên - Quy Nhơn', 'Phú Yên', 'Việt Nam', 'Xứ nẫu hoang sơ với Gành Đá Đĩa, Tháp Nghinh Phong & Kỳ Co', 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80', 13.0882, 109.3134),
+(7, NOW(), NOW(), 'Đảo Nam Du', 'Kiên Giang', 'Việt Nam', 'Thiên đường biển đảo hoang sơ với bãi biển xanh trong vắt', '/images/tours/dao-nam-du/01.jpg', 9.6789, 104.3541),
+(8, NOW(), NOW(), 'Biển Vũng Tàu', 'Vũng Tàu', 'Việt Nam', 'Thành phố biển năng động với Công viên nước Sun World hiện đại', '/images/tours/bien-vung-tau-sun-world/01.webp', 10.3460, 107.0843),
+(9, NOW(), NOW(), 'Phú Yên - Quy Nhơn', 'Phú Yên', 'Việt Nam', 'Xứ nẫu hoang sơ với Gành Đá Đĩa, Tháp Nghinh Phong & Kỳ Co', '/images/tours/phu-yen-quy-nhon/01.jpg', 13.0882, 109.3134),
 (10, NOW(), NOW(), 'Mỹ Tho - Cần Thơ', 'Tiền Giang', 'Việt Nam', 'Dạo Chợ nổi Cái Răng, đi xuồng máy cù lao Thới Sơn', 'https://images.unsplash.com/photo-1626014903708-ec4f67c2e3dd?auto=format&fit=crop&w=800&q=80', 10.3542, 106.3653),
 (11, NOW(), NOW(), 'Hạ Long & Ninh Bình', 'Quảng Ninh', 'Việt Nam', 'Kỳ quan thiên nhiên thế giới Vịnh Hạ Long và quần thể danh thắng Tràng An', '/images/tours/ha-noi-ha-long-ninh-binh/01.jpg', 20.9101, 107.1839),
 (12, NOW(), NOW(), 'Sa Pa & Fansipan', 'Lào Cai', 'Việt Nam', 'Thị trấn sương mù Sa Pa, thung lũng Mường Hoa và nóc nhà Đông Dương Fansipan', '/images/tours/ha-noi-sapa-fansipan/01.png', 22.3364, 103.8438),
@@ -52,7 +52,10 @@ INSERT IGNORE INTO destinations (id, created_at, updated_at, name, city, country
 (16, NOW(), NOW(), 'Singapore & Malaysia', 'Singapore', 'Singapore', 'Gardens by the Bay hiện đại, tháp đôi Petronas và động Batu huyền bí', '/images/tours/singapore-malaysia/01.jpg', 1.3521, 103.8198),
 (17, NOW(), NOW(), 'Seoul & Đảo Nami', 'Seoul', 'Hàn Quốc', 'Cung điện Gyeongbokgung cổ kính, đảo Nami lãng mạn và phố Myeongdong sầm uất', '/images/tours/han-quoc-seoul-nami/01.jpg', 37.5665, 126.9780),
 (18, NOW(), NOW(), 'Tokyo & Núi Phú Sĩ', 'Tokyo', 'Nhật Bản', 'Thủ đô Tokyo hiện đại, chùa Sensoji, hồ Kawaguchi và ngắm núi Phú Sĩ hùng vĩ', '/images/tours/nhat-ban-tokyo-phu-si/01.jpg', 35.6762, 139.6503),
-(19, NOW(), NOW(), 'Đảo Thiên Đường Bali', 'Bali', 'Indonesia', 'Đền Tanah Lot linh thiêng, ruộng bậc thang Tegallalang và biển xanh Nusa Dua', '/images/tours/indonesia-bali/01.jpg', -8.4095, 115.1889);
+(19, NOW(), NOW(), 'Đảo Thiên Đường Bali', 'Bali', 'Indonesia', 'Đền Tanah Lot linh thiêng, ruộng bậc thang Tegallalang và biển xanh Nusa Dua', '/images/tours/indonesia-bali/01.jpg', -8.4095, 115.1889)
+ON DUPLICATE KEY UPDATE
+  image_url = VALUES(image_url),
+  updated_at = NOW();
 
 -- 5. Insert All 10 Tours
 INSERT INTO tours (
@@ -63,7 +66,7 @@ INSERT INTO tours (
   'TOUR ÂN THI - PHƯỢNG HOÀNG CỔ TRẤN - TRƯƠNG GIA GIỚI 6N5Đ | DẤU ẤN XỨ TRUNG HOA',
   'Khám phá thiên đường hạ giới Trương Gia Giới, Phượng Hoàng Cổ Trấn lung linh về đêm và trải nghiệm văn hóa Thổ Gia độc đáo.',
   17990000.00, 14850000.00, 6, 5, 'TP.Hồ Chí Minh',
-  'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png',
+  '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg',
   'NUOC_NGOAI', 20, 512, 'ACTIVE', 2, 1,
   '• Vé máy bay khứ hồi theo đoàn\n• Khách sạn 4 sao tiêu chuẩn (2 người/phòng)\n• Các bữa ăn theo chương trình\n• Hướng dẫn viên tiếng Việt nhiệt tình suốt tuyến',
   '• Hộ chiếu còn hạn trên 6 tháng\n• Chi phí cá nhân, hành lý quá cước\n• Tiền Tip cho HDV và tài xế (5 USD/ngày/khách)',
@@ -87,7 +90,7 @@ INSERT INTO tours (
   'TOUR KHÁM PHÁ NÚI CHỨA CHAN (GIA LÀO) VÀ DINH THẦY THÍM',
   'Hành trình kết hợp chiêm bái tâm linh tại Chùa Bửu Quang (Gia Lào) và viếng Dinh Thầy Thím cầu an lành, tài lộc.',
   790000.00, 550000.00, 1, 0, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+  '/images/tours/nui-chua-chan-dinh-thay-thim/01.png',
   'DOMESTIC', 40, 334, 'ACTIVE', 2, 3,
   '• Xe du lịch ghế ngồi cao cấp\n• 01 bữa ăn trưa đặc sản địa phương\n• Nước uống & khăn lạnh',
   '• Vé cáp treo Núi Chứa Chan\n• Chi phí cúng lễ cá nhân',
@@ -135,7 +138,7 @@ INSERT INTO tours (
   'TOUR DU LỊCH ĐẢO NAM DU 3 NGÀY 3 ĐÊM - CHẠM SÓNG BIỂN XANH',
   'Khám phá thiên đường biển đảo hoang sơ Nam Du, tắm biển Hòn Mấu, lặn ngắm san hô và thưởng thức hải sản tươi ngon.',
   2450000.00, 1715000.00, 3, 3, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+  '/images/tours/dao-nam-du/01.jpg',
   'DOMESTIC', 40, 450, 'ACTIVE', 2, 7,
   '• Vé tàu cao tốc khứ hồi Rạch Giá - Nam Du\n• Nhà nghỉ/Khách sạn view biển\n• Tàu du lịch lặn ngắm san hô & ăn tiệc cháo nhum\n• Xe máy tham quan quanh đảo',
   '• Tiền mua hải sản cá nhân',
@@ -147,7 +150,7 @@ INSERT INTO tours (
   'TOUR DU LỊCH BIỂN VŨNG TÀU | CÔNG VIÊN NƯỚC SUN WORLD | BUFFET TRƯA',
   'Trải nghiệm công viên nước hiện đại Sun World Vũng Tàu, tắm biển Bãi Sau và thưởng thức đại tiệc Buffet trưa phong phú.',
   1050000.00, 735000.00, 1, 0, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80',
+  '/images/tours/bien-vung-tau-sun-world/01.webp',
   'DOMESTIC', 40, 309, 'ACTIVE', 2, 8,
   '• Xe du lịch đưa đón khứ hồi\n• Vé vào cổng Công viên nước Sun World\n• 01 bữa trưa đại tiệc Buffet hải sản',
   '• Đồ uống cá nhân & đồ chơi thuê bãi biển',
@@ -159,7 +162,7 @@ INSERT INTO tours (
   'TOUR DU LỊCH 3 NGÀY 3 ĐÊM KHÁM PHÁ TRỌN VẸN PHÚ YÊN - QUY NHƠN',
   'Hành trình xứ nẫu Phú Yên - Quy Nhơn: Gành Đá Đĩa, Tháp Nghinh Phong, Eo Gió, Kỳ Co và Tháp Bánh Ít.',
   2790000.00, 1953000.00, 3, 3, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80',
+  '/images/tours/phu-yen-quy-nhon/01.jpg',
   'DOMESTIC', 40, 580, 'ACTIVE', 2, 9,
   '• Xe giường nằm/Xe du lịch chất lượng cao\n• Vé tham quan Gành Đá Đĩa, Eo Gió, Kỳ Co\n• Khách sạn 3 sao sát biển\n• Ăn uống hải sản tươi sống đặc sản Xứ Nẫu',
   '• Tiền Tip và dịch vụ môtô nước cá nhân',
@@ -171,7 +174,7 @@ INSERT INTO tours (
   'TOUR THÁI LAN 5N4Đ: BANGKOK - PATTAYA | THIÊN ĐƯỜNG XỨ SỞ CHÙA VÀNG',
   'Khám phá Chùa Phật Vàng Wat Traimit, dạo thuyền sông Chaophraya, vui chơi Đảo San Hô Coral Pattaya và thưởng thức đại tiệc buffet Baiyoke Sky 86 tầng.',
   6990000.00, 5590000.00, 5, 4, 'TP.Hồ Chí Minh',
-  'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=800&q=80',
+  '/images/tours/thai-lan-bangkok-pattaya/01.jpg',
   'NUOC_NGOAI', 35, 460, 'ACTIVE', 2, 2,
   '• Vé máy bay khứ hồi SGN - BKK - SGN (hành lý 20kg ký gửi + 7kg xách tay)\n• Khách sạn 4 sao tiêu chuẩn Thái Lan\n• Bữa ăn theo chương trình gồm Buffet 86 tầng Baiyoke Sky\n• Xe máy lạnh đưa đón tham quan suốt tuyến\n• Hướng dẫn viên Việt Nam và Thái Lan nhiệt tình\n• Bảo hiểm du lịch quốc tế',
   '• Tiền Tip cho HDV và tài xế (5 USD/khách/ngày)\n• Chi phí cá nhân: giặt ủi, điện thoại, thức uống ngoài chương trình',
@@ -439,7 +442,7 @@ ON DUPLICATE KEY UPDATE
 
 -- 8. Insert Reviews
 INSERT IGNORE INTO reviews (id, created_at, updated_at, user_id, tour_id, rating, comment, image_url) VALUES 
-(1, NOW(), NOW(), 3, 1, 5, 'Chuyến đi Phượng Hoàng Cổ Trấn tuyệt vời ngoài mong đợi! Hướng dẫn viên rất chu đáo.', 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png'),
+(1, NOW(), NOW(), 3, 1, 5, 'Chuyến đi Phượng Hoàng Cổ Trấn tuyệt vời ngoài mong đợi! Hướng dẫn viên rất chu đáo.', '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg'),
 (2, NOW(), NOW(), 3, 2, 5, 'Thượng Hải và Ô Trấn rất đẹp, dịch vụ khách sạn 4 sao chất lượng cao.', '/images/tours/tour-2-thuong-hai-o-tran/image 1 thuong-hai-o-tran.jpg'),
 (3, NOW(), NOW(), 4, 1, 4, 'Hành trình tham quan phong phú, khách sạn 4 sao sạch sẽ. Tuy nhiên thời gian ngồi trên xe khá nhiều giữa các điểm, nên chuẩn bị gối cổ chữ U.', NULL),
 (4, NOW(), NOW(), 5, 1, 3, 'Cảnh Phượng Hoàng Cổ Trấn về đêm rất lung linh, nhưng khâu làm thủ tục xuất nhập cảnh ở cửa khẩu đông đúc nên đoàn phải chờ mất gần 1 tiếng.', NULL),

@@ -115,7 +115,7 @@ Câu hỏi của khách: ${message}`;
             price: 17990000,
             departureLocation: 'TP.Hồ Chí Minh',
             durationDays: 6,
-            thumbnailUrl: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png',
+            thumbnailUrl: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg',
           },
           2: {
             id: 2,

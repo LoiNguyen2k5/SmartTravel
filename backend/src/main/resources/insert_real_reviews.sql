@@ -2,7 +2,7 @@ SET NAMES utf8mb4;
 
 INSERT INTO reviews (user_id, tour_id, rating, comment, image_url, created_at, updated_at) VALUES 
 -- Tour 1: Phượng Hoàng Cổ Trấn - Trương Gia Giới
-(3, 1, 5, 'Trương Gia Giới đẹp hùng vĩ như phim Avatar! Đồ ăn Trung Quốc hơi nhiều dầu mỡ nhưng HDV đã linh hoạt nhờ nhà hàng nấu bớt cay cho đoàn Việt Nam, rất chu đáo.', 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png', NOW(), NOW()),
+(3, 1, 5, 'Trương Gia Giới đẹp hùng vĩ như phim Avatar! Đồ ăn Trung Quốc hơi nhiều dầu mỡ nhưng HDV đã linh hoạt nhờ nhà hàng nấu bớt cay cho đoàn Việt Nam, rất chu đáo.', '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg', NOW(), NOW()),
 (4, 1, 4, 'Hành trình tham quan phong phú, khách sạn 4 sao sạch sẽ. Tuy nhiên thời gian ngồi trên xe khá nhiều giữa các điểm, các bạn nên chuẩn bị gối cổ chữ U.', NULL, NOW(), NOW()),
 (5, 1, 3, 'Cảnh Phượng Hoàng Cổ Trấn về đêm rất lung linh, nhưng khâu làm thủ tục xuất nhập cảnh ở cửa khẩu đông đúc nên đoàn phải chờ mất gần 1 tiếng.', NULL, NOW(), NOW()),
 

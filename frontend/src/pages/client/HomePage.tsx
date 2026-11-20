@@ -120,7 +120,7 @@ export const HomePage: React.FC = () => {
               name: 'Phượng Hoàng Cổ Trấn', 
               visits: 855, 
               region: 'Quốc Tế (Trung Quốc)', 
-              img: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image5.png',
+              img: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg',
               target: 'Phượng Hoàng Cổ Trấn'
             },
             { 

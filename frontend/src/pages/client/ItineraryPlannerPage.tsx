@@ -53,7 +53,7 @@ export const ItineraryPlannerPage: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
 
-  // Initial Activities with real images from dulichnewtour.vn for Tour Ân Thi - Phượng Hoàng Cổ Trấn
+  // Initial Activities with local real images for Tour Ân Thi - Phượng Hoàng Cổ Trấn
   const [activities, setActivities] = useState<ActivityItem[]>([
     { 
       id: 1, 
@@ -64,7 +64,7 @@ export const ItineraryPlannerPage: React.FC = () => {
       cost: 350000, 
       lat: 30.2917, 
       lng: 109.4886,
-      imageUrl: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image1.png'
+      imageUrl: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/05.jpg'
     },
     { 
       id: 2, 
@@ -75,7 +75,7 @@ export const ItineraryPlannerPage: React.FC = () => {
       cost: 450000, 
       lat: 29.9867, 
       lng: 109.4839,
-      imageUrl: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image2.png'
+      imageUrl: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/02.webp'
     },
     { 
       id: 3, 
@@ -86,7 +86,7 @@ export const ItineraryPlannerPage: React.FC = () => {
       cost: 200000, 
       lat: 27.9485, 
       lng: 109.5986,
-      imageUrl: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image3.png'
+      imageUrl: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/01.jpg'
     },
     { 
       id: 4, 
@@ -97,7 +97,7 @@ export const ItineraryPlannerPage: React.FC = () => {
       cost: 1500000, 
       lat: 29.1170, 
       lng: 110.4783,
-      imageUrl: 'https://dulichnewtour.vn/ckfinder/images/Tours/tour-an-thi-tuyen-an-phch/image4.png'
+      imageUrl: '/images/tours/phuong-hoang-co-tran-truong-gia-gioi/04.jpg'
     },
   ]);
 
