@@ -1030,7 +1030,7 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-                      + "<tr><td style=\"padding: 3px 0; color: #94a3b8;\">Hạn tất toán 70% còn lại:</td><td style=\"padding: 3px 0; text-align: right; color: #38bdf8; font-weight: bold;\">Trước ngày khởi hành 03 - 15 ngày</td></tr>"
+                      + "<tr><td style=\"padding: 3px 0; color: #94a3b8;\">Hạn tất toán 70% còn lại:</td><td style=\"padding: 3px 0; text-align: right; color: #38bdf8; font-weight: bold;\">Trước ngày khởi hành 03 - 07 ngày (hoặc theo hạn Visa)</td></tr>"
 
 
 
@@ -1106,7 +1106,7 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-                    ? "• <strong>Điều kiện hiệu lực của vé:</strong> Vé điện tử này xác nhận Quý khách đã đặt cọc giữ chỗ 30% thành công. Chỗ của Quý khách đã được bảo lưu an toàn. Quý khách vui lòng hoàn tất thanh toán 70% số tiền còn lại (<strong>" + remainingAmountFormatted + "</strong>) trước ngày khởi hành tối thiểu 03 ngày (tour nội địa) hoặc 15 ngày (tour quốc tế) để được cấp thẻ lên đoàn chính thức.<br/>"
+                    ? "• <strong>Điều kiện hiệu lực của vé:</strong> Vé điện tử này xác nhận Quý khách đã đặt cọc giữ chỗ 30% thành công. Chỗ của Quý khách đã được bảo lưu an toàn. Quý khách vui lòng hoàn tất thanh toán 70% số tiền còn lại (<strong>" + remainingAmountFormatted + "</strong>) trước ngày khởi hành tối thiểu 03 ngày (tour nội địa), 07 ngày (tour quốc tế) hoặc theo hạn hồ sơ Visa để được cấp thẻ lên đoàn chính thức.<br/>"
 
 
 
@@ -1730,7 +1730,7 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-                      + "<tr><td style=\"padding: 6px 0; color: #64748b;\">Hạn tất toán 70% còn lại:</td><td style=\"padding: 6px 0; color: #0284c7; font-weight: 600;\">Trước ngày khởi hành 03 - 15 ngày</td></tr>"
+                      + "<tr><td style=\"padding: 6px 0; color: #64748b;\">Hạn tất toán 70% còn lại:</td><td style=\"padding: 6px 0; color: #0284c7; font-weight: 600;\">Trước ngày khởi hành 03 - 07 ngày (hoặc theo hạn Visa)</td></tr>"
 
 
 

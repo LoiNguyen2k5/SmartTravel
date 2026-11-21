@@ -628,7 +628,7 @@ export const BookingHistoryPage: React.FC = () => {
                             <h4 className="font-bold text-amber-400 text-xs uppercase">Đã đặt cọc giữ chỗ 30% (Chỗ ngồi & phòng đã được bảo đảm)</h4>
                             <p className="text-[11px] text-amber-200/90 leading-relaxed">
                               Đã thanh toán cọc: <strong className="text-white">{(b.depositAmount || Math.round(b.totalPrice * 0.3)).toLocaleString('vi-VN')} đ</strong> • Số tiền còn lại cần nộp: <strong className="text-rose-400 font-bold">{(b.remainingAmount || (b.totalPrice - Math.round(b.totalPrice * 0.3))).toLocaleString('vi-VN')} đ</strong>.
-                              Vui lòng hoàn tất trước ngày khởi hành tối thiểu 03 - 15 ngày!
+                              Vui lòng hoàn tất trước ngày khởi hành tối thiểu 03 - 07 ngày (hoặc theo hạn hồ sơ Visa)!
                             </p>
                           </div>
                         </div>

@@ -4,6 +4,7 @@ import { tourService } from '../../services/tourService';
 import { 
   tourScheduleService, 
   computeScheduleStatus,
+  getBookingCutoffDays,
   TourScheduleItem
 } from '../../services/tourScheduleService';
 import { Tour } from '../../types/tour';
@@ -88,10 +89,19 @@ export const VendorSchedulesPage: React.FC = () => {
   };
 
   const selectedTour = tours.find((t) => t.id === selectedTourId);
+  const selectedTourLeadDays = getBookingCutoffDays(selectedTour?.category, {
+    requiresVisa: selectedTour?.requiresVisa,
+    visaProcessingDays: selectedTour?.visaProcessingDays,
+    visaBufferDays: selectedTour?.visaBufferDays,
+  });
 
   // Compute status for all schedules
   const enrichedSchedules = schedules.map((s) => {
-    const lifecycle = computeScheduleStatus(s, selectedTour?.category);
+    const lifecycle = computeScheduleStatus(s, selectedTour?.category, {
+      requiresVisa: selectedTour?.requiresVisa,
+      visaProcessingDays: selectedTour?.visaProcessingDays,
+      visaBufferDays: selectedTour?.visaBufferDays,
+    });
     return {
       ...s,
       minParticipants: s.minParticipants || 10,
@@ -116,7 +126,7 @@ export const VendorSchedulesPage: React.FC = () => {
           <CalendarDays className="h-8 w-8 text-emerald-600" /> Lịch Khởi Hành & Quản Lý Vòng Đời Tour
         </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Cài đặt hạn đặt trước ({selectedTour?.category === 'NUOC_NGOAI' ? '15 ngày quốc tế' : '3 ngày trong nước'}), quy định tối thiểu 10 khách/đoàn và tự động hoàn tiền
+          Cài đặt hạn đặt trước ({selectedTourLeadDays} ngày{selectedTour?.requiresVisa ? ' theo mẫu Visa' : selectedTour?.category === 'NUOC_NGOAI' ? ' quốc tế' : ' trong nước'}), quy định tối thiểu 10 khách/đoàn và tự động hoàn tiền
         </p>
       </div>
 

@@ -1047,7 +1047,7 @@ public class InvoicePdfServiceImpl implements InvoicePdfService {
 
             if (isDeposit) {
 
-                paymentInfoCell.addElement(createFieldPhrase("Hạn tất toán 70% còn lại: ", "Trước ngày khởi hành 03 - 15 ngày", fontTableCellMuted, fontTableCellBold));
+                paymentInfoCell.addElement(createFieldPhrase("Hạn tất toán 70% còn lại: ", "Trước ngày khởi hành 03 - 07 ngày (hoặc theo hạn Visa)", fontTableCellMuted, fontTableCellBold));
 
             } else if (hasDepositHistory) {
 

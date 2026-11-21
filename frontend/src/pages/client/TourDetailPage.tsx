@@ -21,7 +21,8 @@ import {
   tourScheduleService, 
   formatScheduleDate, 
   computeScheduleStatus, 
-  TourScheduleStatus 
+  TourScheduleStatus,
+  ScheduleLeadTimeConfig
 } from '../../services/tourScheduleService';
 
 const MOCK_DETAIL_TOUR: Tour = MOCK_TOURS[0]; // Default fallback = first tour
@@ -144,10 +145,10 @@ export const TourDetailPage: React.FC = () => {
   }>>([]);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number>(1);
 
-  const loadSchedules = (tourId: number, category?: string) => {
-    const active = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
+  const loadSchedules = (tourId: number, category?: string, visaConfig?: ScheduleLeadTimeConfig) => {
+    const active = tourScheduleService.getUpcomingSchedulesForUser(tourId, category, visaConfig);
     const mapped = active.map((s) => {
-      const computed = computeScheduleStatus(s, category);
+      const computed = computeScheduleStatus(s, category, visaConfig);
       return {
         id: s.id,
         rawStartDate: s.startDate,
@@ -177,22 +178,30 @@ export const TourDetailPage: React.FC = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
     const targetId = tour?.id || (id ? Number(id) : null);
     if (targetId) {
-      loadSchedules(targetId, tour?.category);
+      loadSchedules(targetId, tour?.category, {
+        requiresVisa: tour?.requiresVisa,
+        visaProcessingDays: tour?.visaProcessingDays,
+        visaBufferDays: tour?.visaBufferDays,
+      });
       void tourScheduleService.fetchSchedulesForTour(targetId);
     }
-  }, [tour?.id, tour?.category, id]);
+  }, [tour?.id, tour?.category, tour?.requiresVisa, tour?.visaProcessingDays, tour?.visaBufferDays, id]);
 
   // Listen to schedule updates from Vendor or booking
   useEffect(() => {
     const handleUpdate = (e: any) => {
       const targetId = tour?.id || (id ? Number(id) : null);
       if (targetId && (!e.detail?.tourId || e.detail?.tourId === targetId)) {
-        loadSchedules(targetId, tour?.category);
+        loadSchedules(targetId, tour?.category, {
+          requiresVisa: tour?.requiresVisa,
+          visaProcessingDays: tour?.visaProcessingDays,
+          visaBufferDays: tour?.visaBufferDays,
+        });
       }
     };
     window.addEventListener('tour_schedules_updated', handleUpdate);
     return () => window.removeEventListener('tour_schedules_updated', handleUpdate);
-  }, [tour?.id, tour?.category, id]);
+  }, [tour?.id, tour?.category, tour?.requiresVisa, tour?.visaProcessingDays, tour?.visaBufferDays, id]);
 
   const selectedSchedule = schedulesWithDynamicSeats.find(s => s.id === selectedScheduleId) || schedulesWithDynamicSeats[0] || {
     id: 0,
@@ -1597,7 +1606,13 @@ export const TourDetailPage: React.FC = () => {
                               : selectedSchedule.reason}
                           </p>
                           <p className="text-[10px] italic opacity-80">
-                            Quy định lữ hành: Tour {tour.category === 'NUOC_NGOAI' ? 'quốc tế cần đặt trước tối thiểu 15 ngày (thủ tục visa & xuất vé quốc tế)' : 'trong nước cần đặt trước tối thiểu 3 ngày (chốt xe & danh sách lưu trú)'}.
+                            Quy định lữ hành: Tour{' '}
+                            {tour.requiresVisa
+                              ? `yêu cầu Visa cần đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày (xử lý Lãnh sự & sơ duyệt hồ sơ)`
+                              : tour.category === 'NUOC_NGOAI'
+                                ? `quốc tế cần đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày (xuất vé & chốt dịch vụ quốc tế)`
+                                : `trong nước cần đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày (chốt xe & danh sách lưu trú)`}
+                            .
                           </p>
                         </div>
                       ) : (
@@ -1858,7 +1873,13 @@ export const TourDetailPage: React.FC = () => {
                   • <strong>Đoàn tối thiểu:</strong> Mỗi đợt khởi hành yêu cầu tối thiểu {selectedSchedule.minParticipants || 10} khách. Nếu không đủ đoàn trước ngày đi {selectedSchedule.minLeadDays} ngày, SmartTravel hoàn tiền 100% hoặc đổi lịch mới tặng voucher giảm 10%.
                 </p>
                 <p className="leading-relaxed">
-                  • <strong>Hạn đặt chỗ:</strong> {tour.category === 'NUOC_NGOAI' ? 'Đặt trước tối thiểu 15 ngày để xử lý Visa' : 'Đặt trước tối thiểu 3 ngày để chốt dịch vụ'}.
+                  • <strong>Hạn đặt chỗ:</strong>{' '}
+                  {tour.requiresVisa
+                    ? `Đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày để xử lý hồ sơ Visa`
+                    : tour.category === 'NUOC_NGOAI'
+                      ? `Đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày cho tour quốc tế`
+                      : `Đặt trước tối thiểu ${selectedSchedule.minLeadDays} ngày để chốt dịch vụ`}
+                  .
                 </p>
               </div>
 

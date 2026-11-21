@@ -101,15 +101,30 @@ export const getDaysUntilDeparture = (dateStr: string): number => {
   }
 };
 
-// Quy định số ngày đặt trước tối thiểu (Tour nội địa: 3 ngày, Tour quốc tế: 15 ngày)
-export const getBookingCutoffDays = (category?: string): number => {
-  return category === 'NUOC_NGOAI' ? 15 : 3;
+export interface ScheduleLeadTimeConfig {
+  requiresVisa?: boolean;
+  visaProcessingDays?: number;
+  visaBufferDays?: number;
+}
+
+// Quy định số ngày đặt trước tối thiểu (theo mẫu Visa / 7 ngày quốc tế miễn Visa / 3 ngày nội địa)
+export const getBookingCutoffDays = (
+  category?: string,
+  visaConfig?: ScheduleLeadTimeConfig
+): number => {
+  if (visaConfig?.requiresVisa) {
+    const proc = visaConfig.visaProcessingDays ?? 10;
+    const buf = visaConfig.visaBufferDays ?? 3;
+    return proc + buf;
+  }
+  return category === 'NUOC_NGOAI' ? 7 : 3;
 };
 
 // Tính toán trạng thái vòng đời đợt khởi hành dựa trên Business Rules
 export const computeScheduleStatus = (
   schedule: TourScheduleItem,
-  category?: string
+  category?: string,
+  visaConfig?: ScheduleLeadTimeConfig
 ): {
   status: TourScheduleStatus;
   daysRemaining: number;
@@ -118,7 +133,7 @@ export const computeScheduleStatus = (
   isBookable: boolean;
 } => {
   const daysRemaining = getDaysUntilDeparture(schedule.startDate);
-  const minLeadDays = getBookingCutoffDays(category);
+  const minLeadDays = getBookingCutoffDays(category, visaConfig);
   const minParticipants = schedule.minParticipants || 10;
 
   if (daysRemaining < 0) {
@@ -156,9 +171,10 @@ export const computeScheduleStatus = (
       status: 'CLOSED_BOOKING',
       daysRemaining,
       minLeadDays,
-      reason:
-        category === 'NUOC_NGOAI'
-          ? `Đã hết hạn nhận hồ sơ Visa cho đợt này (Cần đặt trước tối thiểu ${minLeadDays} ngày)`
+      reason: visaConfig?.requiresVisa
+        ? `Đã hết hạn nhận hồ sơ Visa cho đợt này (Cần đặt trước tối thiểu ${minLeadDays} ngày)`
+        : category === 'NUOC_NGOAI'
+          ? `Đã đóng cổng nhận khách quốc tế (Cần đặt trước tối thiểu ${minLeadDays} ngày)`
           : `Đã đóng cổng nhận khách (Cần đặt trước tối thiểu ${minLeadDays} ngày để chốt dịch vụ)`,
       isBookable: false,
     };
@@ -221,13 +237,17 @@ export const tourScheduleService = {
     return schedulesCache[tourId] || [];
   },
 
-  getUpcomingSchedulesForUser: (tourId: number, category?: string): TourScheduleItem[] => {
+  getUpcomingSchedulesForUser: (
+    tourId: number,
+    category?: string,
+    visaConfig?: ScheduleLeadTimeConfig
+  ): TourScheduleItem[] => {
     const all = tourScheduleService.getSchedulesForTour(tourId);
     return all
       .filter((s) => isUpcomingSchedule(s.startDate))
       .sort((a, b) => a.startDate.localeCompare(b.startDate))
       .map((s) => {
-        const computed = computeScheduleStatus(s, category);
+        const computed = computeScheduleStatus(s, category, visaConfig);
         return {
           ...s,
           minParticipants: s.minParticipants || 10,
@@ -236,9 +256,13 @@ export const tourScheduleService = {
       });
   },
 
-  getSchedulesByLifecycle: (tourId: number, category?: string) => {
+  getSchedulesByLifecycle: (
+    tourId: number,
+    category?: string,
+    visaConfig?: ScheduleLeadTimeConfig
+  ) => {
     const all = tourScheduleService.getSchedulesForTour(tourId).map((s) => {
-      const computed = computeScheduleStatus(s, category);
+      const computed = computeScheduleStatus(s, category, visaConfig);
       return {
         ...s,
         minParticipants: s.minParticipants || 10,
@@ -256,8 +280,12 @@ export const tourScheduleService = {
     };
   },
 
-  getNearestUpcomingSchedule: (tourId: number, category?: string): TourScheduleItem | null => {
-    const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId, category);
+  getNearestUpcomingSchedule: (
+    tourId: number,
+    category?: string,
+    visaConfig?: ScheduleLeadTimeConfig
+  ): TourScheduleItem | null => {
+    const upcoming = tourScheduleService.getUpcomingSchedulesForUser(tourId, category, visaConfig);
     if (upcoming.length === 0) return null;
     const sorted = [...upcoming].sort((a, b) => {
       if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1;
