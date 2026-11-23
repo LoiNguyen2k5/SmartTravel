@@ -1,0 +1,206 @@
+name: SmartTravel CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  # Chặng 1: Kiểm tra tĩnh (TypeScript typecheck & Maven POM)
+  code-quality:
+    name: "1. Code Check & Typecheck"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend TypeScript check
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Validate backend Maven configuration
+        working-directory: backend
+        run: mvn -B validate
+
+  # Chặng 2: Build & chạy Unit Test Backend (Spring Boot + JUnit 5)
+  backend-test:
+    name: "2. Backend Test & Package"
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
+
+      - name: Run Maven tests & build JAR
+        working-directory: backend
+        run: mvn -B clean package
+
+      - name: Upload JUnit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: backend/target/surefire-reports/
+          retention-days: 14
+
+  # Chặng 3: Build Frontend Production Bundle (Vite)
+  frontend-build:
+    name: "3. Frontend Build"
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install & Build Frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload Frontend dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 7
+
+  # Chặng 4: Quét bảo mật file nhạy cảm & lỗ hổng thư viện
+  security-scan:
+    name: "4. Security & Secret Scan"
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Check tracked sensitive files (.env / local config / keys)
+        run: |
+          SENSITIVE=$(git ls-files | grep -E '(^|/)(\.env(\..*)?|application-local\.yml|.*\.(pem|key|p12))$' || true)
+          if [ -n "$SENSITIVE" ]; then
+            echo "::error::Phát hiện file nhạy cảm bị track trong Git:"
+            echo "$SENSITIVE"
+            exit 1
+          fi
+          echo "Không có file .env hoặc private key nào bị commit."
+
+      - name: Scan source for leaked key patterns
+        run: |
+          LEAKS=$(git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|AIza[0-9A-Za-z_-]{35}|ghp_[0-9A-Za-z]{36}|AKIA[0-9A-Z]{16}' -- ':!.github/workflows/' || true)
+          if [ -n "$LEAKS" ]; then
+            echo "::error::Phát hiện chuỗi API key / private key:"
+            echo "$LEAKS"
+            exit 1
+          fi
+          echo "Không phát hiện chuỗi token/private key nguy hiểm."
+
+      - name: Setup Node.js 20 for npm audit
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Audit frontend production dependencies
+        working-directory: frontend
+        run: |
+          echo "### Security Scan Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tracked sensitive files check: PASSED" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Key pattern scan: PASSED" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          npm audit --omit=dev --audit-level=high || echo "::warning::Phát hiện cảnh báo dependency mức high trong npm audit (xem log chi tiết)."
+          npm audit --omit=dev --summary >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # Chặng 5: Đóng gói & kiểm thử Docker Image Backend
+  docker-build:
+    name: "5. Docker Build Verify"
+    needs: [ backend-test, frontend-build, security-scan ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker image (verify only)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: smarttravel-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Chặng 6: Kiểm tra triển khai Production & Health Check (Render + Vercel)
+  deploy-health-check:
+    name: "6. Production Health Check"
+    needs: docker-build
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health check Backend (Render) & Frontend (Vercel)
+        run: |
+          BACKEND_URL="https://smarttravel-ls19.onrender.com/api/v1/tours"
+          FRONTEND_URL="https://smart-travel-tan.vercel.app"
+
+          # Chờ tối đa ~120s cho Render Free cold-start hoặc auto-deploy hoàn tất
+          BACKEND_STATUS="000"
+          BACKEND_TIME="0"
+          for i in 1 2 3 4 5 6; do
+            OUT=$(curl -sS -o /dev/null -m 25 -w "%{http_code} %{time_total}" "$BACKEND_URL" || echo "000 0")
+            BACKEND_STATUS=$(echo "$OUT" | awk '{print $1}')
+            BACKEND_TIME=$(echo "$OUT" | awk '{print $2}')
+            if [ "$BACKEND_STATUS" = "200" ]; then
+              break
+            fi
+            echo "Lần thử $i: Backend HTTP $BACKEND_STATUS — chờ 20s..."
+            sleep 20
+          done
+
+          FE_OUT=$(curl -sS -o /dev/null -m 20 -w "%{http_code} %{time_total}" "$FRONTEND_URL" || echo "000 0")
+          FE_STATUS=$(echo "$FE_OUT" | awk '{print $1}')
+          FE_TIME=$(echo "$FE_OUT" | awk '{print $2}')
+
+          echo "### SmartTravel Production Health Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Backend (\`$BACKEND_URL\`): HTTP **$BACKEND_STATUS** (${BACKEND_TIME}s)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Frontend (\`$FRONTEND_URL\`): HTTP **$FE_STATUS** (${FE_TIME}s)" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$BACKEND_STATUS" != "200" ] || [ "$FE_STATUS" != "200" ]; then
+            echo "::error::Health check failed (Backend=$BACKEND_STATUS, Frontend=$FE_STATUS)"
+            exit 1
+          fi
