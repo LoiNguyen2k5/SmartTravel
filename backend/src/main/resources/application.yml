@@ -38,8 +38,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${SPRING_MAIL_USERNAME:duyquang22042005@gmail.com} # Cấu hình email gửi hoặc set env SPRING_MAIL_USERNAME
-    password: ${SPRING_MAIL_PASSWORD:qznhncpnybsxsizk}             # App Password 16 ký tự hoặc set env SPRING_MAIL_PASSWORD
+    username: ${SPRING_MAIL_USERNAME:} # Cấu hình qua env SPRING_MAIL_USERNAME hoặc application-local.yml
+    password: ${SPRING_MAIL_PASSWORD:} # Cấu hình qua env SPRING_MAIL_PASSWORD hoặc application-local.yml
     properties:
       mail:
         smtp:
@@ -73,8 +73,8 @@ app:
     vnp_ReturnUrl: ${VNPAY_RETURN_URL:http://localhost:5173/payment-result}
 
   sepay:
-    # Điền API Token lấy từ trang my.sepay.vn -> Cấu hình công ty -> API Access để mọi máy trong nhóm tự nhận giao dịch không cần Ngrok
-    api-token: ${SEPAY_API_TOKEN:SCDUHPJ2BLSG0V6FXCAC4WI7GWTIXNAFY26QM5CVNP3UGWB1TRQHTYWMRE7LMPXA}
+    # Cấu hình qua env SEPAY_API_TOKEN (Render) hoặc application-local.yml (Local)
+    api-token: ${SEPAY_API_TOKEN:}
 
 # SpringDoc OpenAPI / Swagger UI
 springdoc:
