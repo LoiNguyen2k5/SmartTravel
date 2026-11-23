@@ -2,31 +2,41 @@ package com.smarttravel.services.impl;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.smarttravel.services.EmailService;
-
-
 
 import com.smarttravel.enums.BookingStatus;
 
-
-
 import java.math.BigDecimal;
-
-
 
 import java.math.RoundingMode;
 
+import java.net.URI;
 
+import java.net.http.HttpClient;
+
+import java.net.http.HttpRequest;
+
+import java.net.http.HttpResponse;
+
+import java.nio.charset.StandardCharsets;
 
 import java.text.NumberFormat;
 
-
+import java.time.Duration;
 
 import java.time.format.DateTimeFormatter;
 
+import java.util.Base64;
 
+import java.util.LinkedHashMap;
+
+import java.util.List;
 
 import java.util.Locale;
+
+import java.util.Map;
 
 
 
@@ -80,13 +90,87 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
 
-
+    private static final HttpClient BREVO_HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Value("${spring.mail.username:your-email@gmail.com}")
-
-
-
     private String fromEmail;
+
+    @Value("${app.brevo.api-key:}")
+    private String brevoApiKey;
+
+    @Value("${app.brevo.sender-email:}")
+    private String brevoSenderEmail;
+
+    /**
+     * Gửi email qua Brevo HTTPS API (cổng 443) khi có BREVO_API_KEY để vượt giới hạn chặn SMTP trên Render Free;
+     * giữ nguyên JavaMailSender SMTP khi chạy local không cấu hình Brevo.
+     */
+    private void dispatchEmail(
+            MimeMessage mimeMessage,
+            String senderName,
+            String toEmail,
+            String subject,
+            String htmlContent,
+            String replyToEmail,
+            String replyToName,
+            String attachmentName,
+            byte[] attachmentBytes
+    ) throws Exception {
+        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+            mailSender.send(mimeMessage);
+            return;
+        }
+
+        String resolvedSender = (brevoSenderEmail != null && !brevoSenderEmail.isBlank())
+                ? brevoSenderEmail.trim()
+                : (fromEmail != null ? fromEmail.trim() : "");
+        if (resolvedSender.isEmpty() || "your-email@gmail.com".equals(resolvedSender)) {
+            throw new IllegalStateException("Chưa cấu hình email người gửi hợp lệ (SPRING_MAIL_USERNAME hoặc BREVO_SENDER_EMAIL).");
+        }
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        Map<String, String> sender = new LinkedHashMap<>();
+        sender.put("name", senderName);
+        sender.put("email", resolvedSender);
+        payload.put("sender", sender);
+        payload.put("to", List.of(Map.of("email", toEmail.trim())));
+        payload.put("subject", subject);
+        payload.put("htmlContent", htmlContent);
+
+        if (replyToEmail != null && !replyToEmail.isBlank()) {
+            Map<String, String> replyTo = new LinkedHashMap<>();
+            replyTo.put("email", replyToEmail.trim());
+            if (replyToName != null && !replyToName.isBlank()) {
+                replyTo.put("name", replyToName.trim());
+            }
+            payload.put("replyTo", replyTo);
+        }
+
+        if (attachmentBytes != null && attachmentBytes.length > 0 && attachmentName != null && !attachmentName.isBlank()) {
+            payload.put("attachment", List.of(Map.of(
+                    "name", attachmentName,
+                    "content", Base64.getEncoder().encodeToString(attachmentBytes)
+            )));
+        }
+
+        String jsonBody = OBJECT_MAPPER.writeValueAsString(payload);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                .timeout(Duration.ofSeconds(15))
+                .header("accept", "application/json")
+                .header("content-type", "application/json")
+                .header("api-key", brevoApiKey.trim())
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody, StandardCharsets.UTF_8))
+                .build();
+
+        HttpResponse<String> response = BREVO_HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new IllegalStateException("Brevo API trả mã " + response.statusCode() + ": " + response.body());
+        }
+    }
 
 
 
@@ -200,9 +284,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(htmlContent, true);
 
-
-
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel Platform", toEmail, subject, htmlContent, null, null, null, null);
 
 
 
@@ -440,9 +522,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(htmlContent, true);
 
-
-
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel System", targetSupportEmail, emailSubject, htmlContent, clientEmail, fromName, null, null);
 
 
 
@@ -478,7 +558,8 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-                    clientHelper.setSubject("[Smart Travel] Đã tiếp nhận yêu cầu hỗ trợ của bạn - " + safeSubject);
+                    String clientSubject = "[Smart Travel] Đã tiếp nhận yêu cầu hỗ trợ của bạn - " + safeSubject;
+                    clientHelper.setSubject(clientSubject);
 
 
 
@@ -544,9 +625,7 @@ public class EmailServiceImpl implements EmailService {
 
                     clientHelper.setText(clientHtml, true);
 
-
-
-                    mailSender.send(clientConfirmMsg);
+                    dispatchEmail(clientConfirmMsg, "Smart Travel CSKH", clientEmail, clientSubject, clientHtml, null, null, null, null);
 
 
 
@@ -1384,9 +1463,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(htmlContent, true);
 
-
-
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel E-Ticket", toEmail, emailSubject, htmlContent, null, null, null, null);
 
 
 
@@ -1910,9 +1987,7 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-            mailSender.send(message);
-
-
+            dispatchEmail(message, "Smart Travel Billing", toEmail, emailSubject, htmlContent, null, null, attachmentFilename, pdfInvoice);
 
             log.info("Hóa đơn điện tử PDF đã gửi kèm email thành công tới: {}", toEmail);
 
@@ -1978,7 +2053,8 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-            helper.setSubject("🎉 [SmartTravel] Chúc mừng! Hồ sơ đối tác " + businessName + " đã được phê duyệt");
+            String emailSubject = "🎉 [SmartTravel] Chúc mừng! Hồ sơ đối tác " + businessName + " đã được phê duyệt";
+            helper.setSubject(emailSubject);
 
 
 
@@ -2092,9 +2168,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(htmlContent, true);
 
-
-
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel Partner Portal", toEmail, emailSubject, htmlContent, null, null, null, null);
 
 
 
@@ -2162,7 +2236,8 @@ public class EmailServiceImpl implements EmailService {
 
 
 
-            helper.setSubject("⚠️ [SmartTravel] Thông báo kết quả thẩm định hồ sơ đối tác " + businessName);
+            String emailSubject = "⚠️ [SmartTravel] Thông báo kết quả thẩm định hồ sơ đối tác " + businessName;
+            helper.setSubject(emailSubject);
 
 
 
@@ -2272,9 +2347,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(htmlContent, true);
 
-
-
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel Partner Portal", toEmail, emailSubject, htmlContent, null, null, null, null);
 
 
 
@@ -2303,7 +2376,8 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail, "Smart Travel Visa Support");
             helper.setTo(toEmail);
-            helper.setSubject("[Smart Travel] Cập nhật tiến độ hồ sơ Visa #" + bookingCode + " - " + statusLabel);
+            String emailSubject = "[Smart Travel] Cập nhật tiến độ hồ sơ Visa #" + bookingCode + " - " + statusLabel;
+            helper.setSubject(emailSubject);
 
             String safeName = customerName != null && !customerName.isBlank() ? customerName : "Quý khách";
             String safeTour = tourTitle != null ? tourTitle : "Tour du lịch quốc tế";
@@ -2322,7 +2396,7 @@ public class EmailServiceImpl implements EmailService {
                     + "</div>";
 
             helper.setText(htmlContent, true);
-            mailSender.send(message);
+            dispatchEmail(message, "Smart Travel Visa Support", toEmail, emailSubject, htmlContent, null, null, null, null);
             log.info("Đã gửi email cập nhật trạng thái Visa [{}] tới {}", statusLabel, toEmail);
         } catch (Exception e) {
             log.warn("Không thể gửi email cập nhật Visa tới {}: {}", toEmail, e.getMessage());

@@ -76,6 +76,11 @@ app:
     # Cấu hình qua env SEPAY_API_TOKEN (Render) hoặc application-local.yml (Local)
     api-token: ${SEPAY_API_TOKEN:}
 
+  brevo:
+    # Gửi email qua HTTPS 443 trên Render Free (vì Render Free chặn cổng SMTP 25/465/587)
+    api-key: ${BREVO_API_KEY:}
+    sender-email: ${BREVO_SENDER_EMAIL:}
+
 # SpringDoc OpenAPI / Swagger UI
 springdoc:
   api-docs:
