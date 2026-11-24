@@ -77,21 +77,11 @@ export const VendorTourListPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              setSentimentTour({ title: 'Tất Cả Tour Của Đại Lý Bạn' });
-              setShowSentimentModal(true);
-            }}
-            className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-3 text-xs font-bold text-white hover:opacity-95 transition shadow-lg shadow-cyan-900/20 cursor-pointer"
-          >
-            <Sparkles className="h-4 w-4 text-amber-800" /> Phân Tích Đánh Giá
-          </button>
           <Link
             to="/vendor/tours/create"
-            className="flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-lg shadow-emerald-900/20"
+            className="flex items-center gap-1.5 rounded-xl bg-[#0B3B49] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#0F5264] transition shadow-sm"
           >
-            <Plus className="h-4 w-4" /> Thêm Tour Mới
+            <Plus className="h-4 w-4 text-[#5EEAD4]" /> Thêm Tour Mới
           </Link>
         </div>
       </div>

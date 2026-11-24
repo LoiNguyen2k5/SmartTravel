@@ -141,7 +141,7 @@ export const BlogsPage: React.FC = () => {
           <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0F172A] leading-normal mb-5">
             Cẩm Nang
             <span 
-              className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-white to-sky-200"
+              className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-[#0B3B49] via-[#0D9488] to-[#D95D39]"
               style={{ paddingTop: '0.2em', paddingBottom: '0.25em' }}
             >
               Khám Phá Thế Giới

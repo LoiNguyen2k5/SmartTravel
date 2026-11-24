@@ -122,9 +122,9 @@ export const DashboardPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSentimentModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 via-indigo-600 to-fuchsia-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#0B3B49] hover:bg-[#0F5264] text-white text-sm font-bold rounded-xl shadow-sm border border-[#082E3A] transition active:scale-95 cursor-pointer"
           >
-            <Sparkles className="h-4 w-4 text-amber-800" />
+            <Sparkles className="h-4 w-4 text-[#5EEAD4]" />
             Phân Tích Đánh Giá
           </button>
           <button

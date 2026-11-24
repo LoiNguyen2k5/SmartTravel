@@ -224,7 +224,7 @@ export const BecomeVendorPage: React.FC = () => {
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0F172A] tracking-tight leading-tight">
             Hợp tác cùng SmartTravel <br />
-            <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#0B3B49] via-[#0D9488] to-[#D95D39] bg-clip-text text-transparent">
               Tiếp cận hàng triệu du khách mọi miền
             </span>
           </h1>

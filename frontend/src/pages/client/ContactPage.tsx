@@ -122,7 +122,7 @@ export const ContactPage: React.FC = () => {
           </div>
           <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0F172A] leading-snug mb-4">
             Liên Hệ
-            <span className="block mt-2.5 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-200">
+            <span className="block mt-2.5 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-[#0B3B49] via-[#0D9488] to-[#D95D39]">
               Smart Travel
             </span>
           </h1>

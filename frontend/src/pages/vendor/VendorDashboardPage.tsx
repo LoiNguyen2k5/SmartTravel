@@ -239,9 +239,9 @@ export const VendorDashboardPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSentimentModal(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition shadow-md shadow-cyan-900/20 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-[#0B3B49] hover:bg-[#0F5264] px-4 py-2.5 text-xs font-bold text-white border border-[#082E3A] transition shadow-sm cursor-pointer"
           >
-            <Sparkles className="h-4 w-4 text-amber-800" /> Phân Tích Đánh Giá
+            <Sparkles className="h-4 w-4 text-[#5EEAD4]" /> Phân Tích Đánh Giá
           </button>
           <button onClick={exportCSV} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
             <Download className="h-4 w-4" /> Xuất CSV

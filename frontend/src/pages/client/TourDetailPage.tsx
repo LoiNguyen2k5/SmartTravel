@@ -1995,12 +1995,12 @@ export const TourDetailPage: React.FC = () => {
                     : 'Đặt ngay'}
                 </button>
                 
-                <button
-                  onClick={() => alert('Đội ngũ tư vấn viên Smart Travel đang sẵn sàng! Hotline hỗ trợ 24/7: 1900 6868')}
-                  className="w-full rounded-xl border border-sky-400/40 text-[#0B3B49] hover:bg-sky-500/10 hover:border-sky-400 py-3 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                <a
+                  href="tel:0941899554"
+                  className="w-full rounded-xl border border-[#0B3B49]/30 text-[#0B3B49] hover:bg-[#E6F4F1] hover:border-[#0B3B49] py-3 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <PhoneCall className="h-4 w-4" /> Liên hệ tư vấn 1900 6868
-                </button>
+                  <PhoneCall className="h-4 w-4 text-[#0D9488]" /> Liên hệ tư vấn 0941 899 554
+                </a>
               </div>
 
               {/* Policy & Minimum Participants Guarantee Box */}

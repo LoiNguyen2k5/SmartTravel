@@ -113,14 +113,14 @@ export const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation Links (Merged Tour du lịch) */}
-          <div className="hidden lg:flex items-center gap-1 text-[13px] font-semibold text-slate-600 flex-1 justify-center">
+          <div className="hidden lg:flex items-center gap-0.5 text-[13px] font-semibold text-slate-600 flex-1 justify-center">
             {Object.entries(navLabels).map(([path, label]) => {
               const isActive = isNavActive(path);
               return (
                 <Link
                   key={path}
                   to={path}
-                  className={`px-3 py-2 rounded-xl transition-all duration-150 relative whitespace-nowrap ${
+                  className={`px-2.5 py-2 rounded-xl transition-all duration-150 relative whitespace-nowrap ${
                     isActive
                       ? 'text-[#0B3B49] font-extrabold'
                       : 'text-slate-600 hover:text-[#0B3B49] hover:bg-[#FAF8F5]'
@@ -128,7 +128,7 @@ export const Navbar: React.FC = () => {
                 >
                   {label}
                   {isActive && (
-                    <span className="absolute bottom-0.5 left-3 right-3 h-[2.5px] rounded-full bg-[#D95D39]" />
+                    <span className="absolute bottom-0.5 left-2.5 right-2.5 h-[2.5px] rounded-full bg-[#D95D39]" />
                   )}
                 </Link>
               );
@@ -136,28 +136,44 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Contact Info & User Auth Section */}
-          <div className="hidden sm:flex items-center gap-2.5">
-            {/* Hotline Warm Gold Pill */}
-            <a
-              href="tel:0941899554"
-              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] hover:bg-[#FEF3C7] transition group"
-            >
-              <Phone className="h-3.5 w-3.5 text-[#D97706] flex-shrink-0" />
-              <div className="flex flex-col leading-tight">
-                <span className="text-[9px] font-extrabold text-[#B45309] uppercase tracking-wider">Hotline</span>
-                <span className="text-xs font-extrabold text-[#D97706] tracking-wide">0941 899 554</span>
-              </div>
-            </a>
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+            {/* Hotline & Working Hours Group (Equal height, never wraps) */}
+            <div className="hidden md:flex items-center gap-2 shrink-0">
+              {/* Hotline Warm Gold Pill */}
+              <a
+                href="tel:0941899554"
+                className="hidden xl:flex items-center gap-2 h-10 px-3 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] hover:bg-[#FEF3C7] transition group whitespace-nowrap shrink-0"
+              >
+                <Phone className="h-3.5 w-3.5 text-[#D97706] flex-shrink-0" />
+                <div className="flex flex-col justify-center leading-none gap-0.5">
+                  <span className="text-[9px] font-extrabold text-[#B45309] uppercase tracking-wider whitespace-nowrap">
+                    Hotline
+                  </span>
+                  <span className="text-xs font-extrabold text-[#D97706] tracking-wide whitespace-nowrap">
+                    0941 899 554
+                  </span>
+                </div>
+              </a>
 
-            {/* Working Hours Soft Teal Pill */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E6F4F1] border border-[#99F6E4]">
-              <Clock className="h-3.5 w-3.5 text-[#0F5264] flex-shrink-0" />
-              <div className="flex flex-col leading-tight">
-                <span className="text-[9px] font-extrabold text-[#0F5264] uppercase tracking-wider">Giờ làm việc</span>
-                <span className="text-xs font-extrabold text-[#0B3B49] tracking-wide">8:00 – 17:30</span>
+              {/* Working Hours Soft Teal Pill */}
+              <div className="flex items-center gap-2 h-10 px-3 rounded-xl bg-[#E6F4F1] border border-[#99F6E4] whitespace-nowrap shrink-0">
+                <Clock className="h-3.5 w-3.5 text-[#0F5264] flex-shrink-0" />
+                <div className="flex flex-col justify-center leading-none gap-0.5">
+                  <span className="text-[9px] font-extrabold text-[#0F5264] uppercase tracking-wider whitespace-nowrap">
+                    Giờ làm việc
+                  </span>
+                  <span className="text-xs font-extrabold text-[#0B3B49] tracking-wide whitespace-nowrap">
+                    8:00 – 17:30
+                  </span>
+                </div>
               </div>
             </div>
 
+            {/* Visual Divider separating info pills from action buttons */}
+            <div className="hidden md:block h-7 w-px bg-[#E6E1DA] mx-1.5 shrink-0" />
+
+            {/* Action Buttons Group (Bell + Profile / Login-Register) */}
+            <div className="flex items-center gap-3 shrink-0">
             {/* Notification Bell (Always crisp Lucide Bell icon) */}
             {isAuthenticated && (
               <div className="relative" ref={notifDropdownRef}>
@@ -383,7 +399,7 @@ export const Navbar: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-xs font-bold">
+              <div className="flex items-center gap-2.5 text-xs font-bold">
                 <Link
                   to="/login"
                   className="px-4 py-2 rounded-xl border border-[#0B3B49] text-[#0B3B49] bg-white hover:bg-[#E6F4F1] transition whitespace-nowrap"
@@ -398,6 +414,7 @@ export const Navbar: React.FC = () => {
                 </Link>
               </div>
             )}
+            </div>
 
             {/* Mobile Hamburger */}
             <button

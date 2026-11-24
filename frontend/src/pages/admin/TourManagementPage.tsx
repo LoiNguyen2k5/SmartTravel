@@ -107,16 +107,6 @@ export const TourManagementPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => {
-              setSentimentModalTour({ title: 'Toàn Sàn SmartTravel (Tổng hợp đánh giá du khách)' });
-              setShowSentimentModal(true);
-            }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl shadow-md shadow-cyan-600/20 transition active:scale-95"
-          >
-            <Sparkles className="h-4 w-4 text-amber-800" />
-            Phân Tích Đánh Giá
-          </button>
-          <button
             onClick={fetchTours}
             disabled={loading}
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
