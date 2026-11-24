@@ -49,4 +49,10 @@ public class TourResponse {
     private Double averageRating;
     private Integer totalReviews;
     private Map<Integer, Long> ratingBreakdown;
+    private String transportMode;
+    private String fromTerminalCode;
+    private String toTerminalCode;
+    private String airlineCarrier;
+    private String baggageAllowance;
+    private String airportMeetingPoint;
 }

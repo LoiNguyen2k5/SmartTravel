@@ -60,6 +60,12 @@ export interface Tour {
   gallery?: string[];
   singleRoomSurcharge?: number;
   minParticipants?: number;
+  transportMode?: 'FLIGHT' | 'LAND_SEA';
+  fromTerminalCode?: string;
+  toTerminalCode?: string;
+  airlineCarrier?: string;
+  baggageAllowance?: string;
+  airportMeetingPoint?: string;
 }
 
 export interface TourSearchParams {

@@ -272,6 +272,7 @@ public class TourServiceImpl implements TourService {
 
         VisaTemplate tpl = tour.getVisaTemplate();
         boolean requiresVisa = tpl != null || hasCustomVisaReqs;
+        String[] transportMeta = resolveTransportMetadata(tour, requiresVisa);
 
         return TourResponse.builder()
                 .id(tour.getId())
@@ -307,6 +308,94 @@ public class TourServiceImpl implements TourService {
                 .averageRating(avgRating)
                 .totalReviews(tour.getReviews() != null ? tour.getReviews().size() : 0)
                 .ratingBreakdown(ratingBreakdown)
+                .transportMode(transportMeta[0])
+                .fromTerminalCode(transportMeta[1])
+                .toTerminalCode(transportMeta[2])
+                .airlineCarrier(transportMeta[3])
+                .baggageAllowance(transportMeta[4])
+                .airportMeetingPoint(transportMeta[5])
                 .build();
+    }
+
+    private String[] resolveTransportMetadata(Tour tour, boolean requiresVisa) {
+        String combined = ((tour.getTitle() != null ? tour.getTitle() : "") + " "
+                + (tour.getIncludedServices() != null ? tour.getIncludedServices() : "") + " "
+                + (tour.getDestination() != null && tour.getDestination().getName() != null ? tour.getDestination().getName() : ""))
+                .toLowerCase(Locale.ROOT);
+        boolean isInternational = tour.getCategory() == TourCategory.NUOC_NGOAI || requiresVisa;
+        boolean isFlight = isInternational || combined.contains("máy bay") || combined.contains("bay khứ hồi")
+                || combined.contains("hà nội") || combined.contains("sa pa") || combined.contains("hà giang")
+                || combined.contains("đà nẵng") || combined.contains("phú quốc") || combined.contains("phú yên");
+
+        String depLower = (tour.getDepartureLocation() != null ? tour.getDepartureLocation() : "TP.Hồ Chí Minh").toLowerCase(Locale.ROOT);
+        String fromCode = depLower.contains("hà nội") ? (isFlight ? "HAN" : "HNO")
+                : depLower.contains("đà nẵng") ? (isFlight ? "DAD" : "DNG")
+                : (isFlight ? "SGN" : "HCM");
+
+        String toCode = "DST";
+        String carrier = isFlight ? "Vietnam Airlines" : "Xe Limousine / Universe VIP";
+        String baggage = isFlight ? "07kg xách tay + 23kg hành lý ký gửi khứ hồi" : "Hành lý khoang xe tiêu chuẩn 25kg/khách";
+
+        if (combined.contains("hàn quốc") || combined.contains("seoul")) {
+            toCode = "ICN";
+        } else if (combined.contains("nhật bản") || combined.contains("tokyo")) {
+            toCode = "NRT";
+        } else if (combined.contains("thái lan") || combined.contains("bangkok")) {
+            toCode = "BKK";
+            carrier = "Vietjet Air";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("singapore") || combined.contains("malaysia")) {
+            toCode = "SIN";
+        } else if (combined.contains("bali") || combined.contains("indonesia")) {
+            toCode = "DPS";
+            carrier = "Vietjet Air";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("ân thi") || combined.contains("phượng hoàng")) {
+            toCode = "ENH";
+            carrier = "Vietjet Air Charter";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("thượng hải") || combined.contains("ô trấn")) {
+            toCode = "PVG";
+        } else if (combined.contains("đà nẵng") || combined.contains("hội an")) {
+            toCode = "DAD";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("phú quốc")) {
+            toCode = "PQC";
+            carrier = "Vietjet Air";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("phú yên") || combined.contains("quy nhơn")) {
+            toCode = "TBB";
+            baggage = "07kg xách tay + 20kg hành lý ký gửi khứ hồi";
+        } else if (combined.contains("hà nội") || combined.contains("sa pa") || combined.contains("hà giang")) {
+            toCode = "HAN";
+        } else if (combined.contains("đà lạt")) {
+            toCode = "DLI";
+        } else if (combined.contains("miền tây") || combined.contains("cần thơ")) {
+            toCode = "VCA";
+        } else if (combined.contains("nam du")) {
+            toCode = "NDU";
+            carrier = "Xe giường nằm + Tàu cao tốc Superdong";
+        } else if (combined.contains("châu đốc") || combined.contains("an giang")) {
+            toCode = "AGI";
+        } else if (combined.contains("vũng tàu")) {
+            toCode = "VTU";
+        } else if (combined.contains("chứa chan") || combined.contains("gia lào")) {
+            toCode = "DNB";
+        }
+
+        String meetingPoint = isFlight
+                ? (isInternational
+                    ? "Cột số 10 – Ga đi Quốc tế Sân bay Tân Sơn Nhất trước giờ bay 03 tiếng"
+                    : "Cột số 05 – Ga đi Quốc nội Sân bay Tân Sơn Nhất trước giờ bay 02 tiếng")
+                : "Văn phòng SmartTravel – 190 Pasteur, Quận 3, TP.HCM trước giờ khởi hành 45 phút";
+
+        return new String[]{
+                isFlight ? "FLIGHT" : "LAND_SEA",
+                fromCode,
+                toCode,
+                carrier,
+                baggage,
+                meetingPoint
+        };
     }
 }
