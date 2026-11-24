@@ -1130,11 +1130,11 @@ export const TourDetailPage: React.FC = () => {
 
             {/* Rating Breakdown Card */}
             <div className="bg-white p-6 rounded-2xl border border-[#E6E1DA] shadow-card flex flex-col md:flex-row items-center gap-8">
-              <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-[#E6E1DA] pb-4 md:pb-0">
-                <div className="text-5xl font-black text-[#0B3B49]">
+              <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-[#E6E1DA] pb-4 md:pb-0 shrink-0">
+                <div className="text-5xl font-black text-[#0B3B49] whitespace-nowrap">
                   {reviews.length > 0
-                    ? Number((reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1))
-                    : (tour.totalReviews ? (tour.averageRating || 5.0) : 0)}
+                    ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1)
+                    : (tour.totalReviews ? Number(tour.averageRating || 5.0).toFixed(1) : '0.0')}
                   <span className="text-xl text-slate-400 font-normal">/5</span>
                 </div>
                 <div className="text-xs font-extrabold text-[#0D9488] uppercase tracking-wider">
