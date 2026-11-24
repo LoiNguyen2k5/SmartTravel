@@ -131,7 +131,7 @@ export const VisaManagementBoard: React.FC = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[720px] text-left border-collapse">
           <thead>
             <tr className="bg-white/5 text-slate-300 text-sm border-b border-white/10">
               <th className="py-3 px-6 font-semibold">Khách hàng / Tour</th>

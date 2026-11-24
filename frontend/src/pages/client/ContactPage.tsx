@@ -142,15 +142,14 @@ export const ContactPage: React.FC = () => {
               href={c.href ?? undefined}
               target={c.href?.startsWith('http') ? '_blank' : undefined}
               rel="noreferrer"
-              className={`group relative rounded-2xl border border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] p-6 transition-all duration-300 hover:-translate-y-1 ${c.href ? 'cursor-pointer' : 'cursor-default'}`}
-              style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+              className={`group relative rounded-2xl border border-[#E6E1DA] bg-white hover:border-[#99F6E4] p-5 sm:p-6 shadow-card transition-all duration-300 hover:-translate-y-1 ${c.href ? 'cursor-pointer' : 'cursor-default'}`}
             >
               <div
                 className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                 style={{ background: `radial-gradient(350px circle at 50% 0%, ${c.glow}, transparent 70%)` }}
               />
               <div
-                className={`relative inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} text-[#0F172A] mb-4`}
+                className={`relative inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} text-white mb-4`}
                 style={{ boxShadow: `0 6px 20px ${c.glow}` }}
               >
                 {c.icon}
@@ -166,7 +165,7 @@ export const ContactPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
           {/* Contact Form */}
-          <div className="rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+          <div className="rounded-3xl border border-[#E6E1DA] bg-white p-5 sm:p-8 shadow-card">
             <div className="flex items-center gap-3 mb-7">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-[0_4px_16px_rgba(56,189,248,0.3)]">
                 <MessageSquare className="h-5 w-5" />
@@ -199,7 +198,7 @@ export const ContactPage: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Họ và tên *</label>
                     <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -254,11 +253,7 @@ export const ContactPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-[#0F172A] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  style={{
-                    background: '#D95D39',
-                    boxShadow: '0 0 12px rgba(60,190,235,.20), 0 4px 16px -2px rgba(90,220,255,.35)',
-                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white bg-[#D95D39] hover:bg-[#C24E2D] shadow-md transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -276,7 +271,7 @@ export const ContactPage: React.FC = () => {
 
           {/* FAQ + Social */}
           <div className="space-y-6">
-            <div className="rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+            <div className="rounded-3xl border border-[#E6E1DA] bg-white p-5 sm:p-8 shadow-card">
               <div className="flex items-center gap-2 mb-6">
                 <Sparkles className="h-4 w-4 text-amber-700" />
                 <h2 className="text-base font-bold text-[#0F172A]">Câu hỏi thường gặp</h2>

@@ -108,22 +108,22 @@ export const ItineraryPdfExporter: React.FC<ItineraryPdfExporterProps> = ({
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100">
         
         {/* Modal Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-sky-900 text-white shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/80">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2.5 rounded-2xl bg-sky-900 text-white shadow-md shrink-0">
               <FileText className="h-5 w-5" />
             </div>
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900">Xem Trước Bản In Lịch Trình PDF</h3>
-              <p className="text-xs text-slate-500 font-medium">Lịch trình tự động ghép bộ sưu tập ảnh riêng cho từng địa điểm theo đúng thứ tự chuyến đi</p>
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-900">Xem Trước Bản In Lịch Trình PDF</h3>
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium">Lịch trình chuẩn A4 tự động ghép bộ sưu tập ảnh theo đúng thứ tự chuyến đi</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
             <button
               onClick={handleExportPdf}
               disabled={isExporting}
-              className={`rounded-2xl px-5 py-2.5 text-xs font-extrabold text-white transition-all shadow-md flex items-center gap-2 ${
+              className={`rounded-2xl px-4 sm:px-5 py-2.5 text-xs font-extrabold text-white transition-all shadow-md flex items-center gap-2 whitespace-nowrap ${
                 isExporting 
                   ? 'bg-slate-400 cursor-not-allowed' 
                   : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95'
@@ -147,23 +147,24 @@ export const ItineraryPdfExporter: React.FC<ItineraryPdfExporterProps> = ({
             <button
               onClick={onClose}
               className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition"
+              aria-label="Đóng xem trước PDF"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Scrollable Printable Container */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
-          <div className="max-w-[794px] mx-auto bg-white shadow-lg rounded-2xl overflow-hidden" ref={printRef}>
+        {/* Scrollable Printable Container (keeps exact A4 794px canvas width for crisp PDF capture on all devices) */}
+        <div className="flex-1 overflow-auto p-3 sm:p-6 bg-slate-100">
+          <div className="w-[794px] min-w-[794px] mx-auto bg-white shadow-lg rounded-2xl overflow-hidden" ref={printRef}>
             
             {/* PDF Header Banner */}
             <div className="bg-gradient-to-r from-sky-950 via-slate-900 to-sky-900 text-white p-8 space-y-4 relative overflow-hidden">
-              <div className="absolute right-0 top-0 opacity-10 translate-x-8 -translate-y-4">
+              <div className="absolute right-0 top-0 opacity-10 translate-x-8 -translate-y-4 pointer-events-none">
                 <Compass className="h-64 w-64 text-white" />
               </div>
               
-              <div className="relative z-10 flex justify-between items-start">
+              <div className="relative z-10 flex justify-between items-start gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-sky-300 text-xs font-bold uppercase tracking-widest">
                     <Sparkles className="h-4 w-4" /> SMART TRAVEL - KẾ HOẠCH HÀNH TRÌNH
@@ -171,7 +172,7 @@ export const ItineraryPdfExporter: React.FC<ItineraryPdfExporterProps> = ({
                   <h1 className="text-2xl font-black mt-1 text-white tracking-tight">{title}</h1>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 text-right">
+                <div className="bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 text-right shrink-0">
                   <span className="text-[10px] text-sky-200 uppercase font-semibold block">Ngày Xuất Lịch Trình</span>
                   <span className="text-xs font-extrabold text-white">{new Date().toLocaleDateString('vi-VN')}</span>
                 </div>

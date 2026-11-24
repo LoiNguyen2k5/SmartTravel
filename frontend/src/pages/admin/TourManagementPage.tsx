@@ -185,7 +185,7 @@ export const TourManagementPage: React.FC = () => {
       {/* Tours List Table */}
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
               <tr>
                 <th className="py-3.5 px-4">Tour Du Lịch</th>
@@ -307,8 +307,8 @@ export const TourManagementPage: React.FC = () => {
 
       {/* Tour Inspection & Moderation Modal */}
       {inspectTour && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in">
-          <div className="w-full max-w-2xl bg-white border border-[#E6E1DA] rounded-3xl p-6 shadow-card space-y-5 my-8 max-h-[90vh] overflow-y-auto text-[#0F172A]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto animate-in fade-in">
+          <div className="w-full max-w-2xl bg-white border border-[#E6E1DA] rounded-3xl p-5 sm:p-6 shadow-card space-y-5 my-auto max-h-[90dvh] overflow-y-auto text-[#0F172A]">
             {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-[#E6E1DA] pb-4">
               <div>
@@ -413,7 +413,7 @@ export const TourManagementPage: React.FC = () => {
             )}
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E6E1DA]">
+            <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-3 border-t border-[#E6E1DA]">
               <button
                 onClick={() => setInspectTour(null)}
                 className="px-4 py-2 rounded-xl text-xs font-bold text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] transition"

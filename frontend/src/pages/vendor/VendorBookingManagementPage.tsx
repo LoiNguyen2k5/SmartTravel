@@ -439,8 +439,8 @@ export const VendorBookingManagementPage: React.FC = () => {
 
       {/* QR CODE CHECK-IN MODAL */}
       {showQrModal && (
-        <div className="fixed inset-0 bg-white backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 md:p-8 max-w-md w-full max-h-[90dvh] overflow-y-auto shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2 text-slate-900 font-black text-lg">
                 <QrCode className="h-6 w-6 text-emerald-600" /> Kiểm Tra Vé QR Check-in
@@ -509,8 +509,8 @@ export const VendorBookingManagementPage: React.FC = () => {
 
       {/* REFUND PROCESS MODAL */}
       {selectedRefundBooking && (
-        <div className="fixed inset-0 bg-white backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 font-black text-slate-900 text-lg">
                 <RefreshCw className="h-5 w-5 text-rose-600" /> Quy Trình Xử Lý Hoàn Tiền
@@ -543,7 +543,7 @@ export const VendorBookingManagementPage: React.FC = () => {
               <label className="block text-xs font-extrabold text-slate-700">
                 Chọn Chính Sách / Tỷ Lệ Hoàn Tiền:
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {[
                   { percent: 100, label: '100% (Trước >30d)', desc: 'Miễn phí hủy' },
                   { percent: 50, label: '50% (Trước 15-29d)', desc: 'Phạt 50%' },

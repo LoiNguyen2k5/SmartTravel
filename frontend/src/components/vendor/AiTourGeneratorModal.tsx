@@ -69,29 +69,30 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl max-h-[90dvh] flex flex-col rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
         {/* HEADER */}
-        <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 p-5 text-white">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/30">
+        <div className="flex items-center justify-between gap-3 border-b border-[#082E3A] bg-[#0B3B49] p-4 sm:p-5 text-white shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/30 shrink-0">
               <Sparkles className="h-5 w-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-extrabold text-[#0F172A]">AI Content Generator</h3>
-                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-700 border border-emerald-500/30">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base font-extrabold text-white">AI Content Generator</h3>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-300 border border-emerald-400/30">
                   Tự Động 24/7
                 </span>
               </div>
-              <p className="text-xs text-[#475569] mt-0.5">
+              <p className="text-xs text-slate-200 mt-0.5">
                 Tự động viết mô tả hấp dẫn & lên lịch trình từng ngày cho Vendor
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-[#526071] hover:bg-[#F4F1EC] hover:text-[#0F172A] transition"
+            className="rounded-xl p-2 text-slate-300 hover:bg-white/10 hover:text-white transition shrink-0"
+            aria-label="Đóng"
           >
             <X className="h-5 w-5" />
           </button>
@@ -210,7 +211,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 text-amber-800" />
+                    <Sparkles className="h-4 w-4 text-amber-300" />
                     Tạo Nội Dung Bằng AI
                   </>
                 )}

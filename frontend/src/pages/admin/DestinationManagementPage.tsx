@@ -252,8 +252,8 @@ export const DestinationManagementPage: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl space-y-4 my-8">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto animate-in fade-in">
+          <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 my-auto max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-sky-600" />
@@ -374,8 +374,8 @@ export const DestinationManagementPage: React.FC = () => {
 
       {/* Delete Modal */}
       {deleteModal.isOpen && deleteModal.destination && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto bg-white rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-2xl bg-red-100 text-red-600">
                 <AlertTriangle className="h-6 w-6" />

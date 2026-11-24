@@ -222,7 +222,7 @@ export const TransactionSettlementPage: React.FC = () => {
       {activeTab === 'SETTLEMENTS' && (
         <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
                 <tr>
                   <th className="py-3.5 px-4">Nhà Cung Cấp (Vendor)</th>
@@ -321,7 +321,7 @@ export const TransactionSettlementPage: React.FC = () => {
       {activeTab === 'PAYMENTS' && (
         <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[680px] text-left text-sm">
               <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
                 <tr>
                   <th className="py-3.5 px-4">Mã Giao Dịch</th>
@@ -392,8 +392,8 @@ export const TransactionSettlementPage: React.FC = () => {
 
       {/* Payout Confirmation Modal */}
       {payoutModal.isOpen && payoutModal.vendor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4 border border-[#CBD5E1] text-[#0F172A]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-3 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto bg-white rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 border border-[#CBD5E1] text-[#0F172A]">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-700 border border-emerald-500/30">
                 <FileCheck className="h-6 w-6" />

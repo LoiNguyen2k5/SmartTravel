@@ -153,12 +153,12 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-      <div className="bg-[#131d30] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col border border-slate-700/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-2.5 sm:p-4">
+      <div className="bg-[#131d30] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92dvh] overflow-hidden flex flex-col border border-slate-700/60">
         {/* Header */}
-        <div className="flex justify-between items-start gap-4 p-6 border-b border-slate-700/50">
-          <div>
-            <h2 className="text-xl font-bold text-white">
+        <div className="flex justify-between items-start gap-3 sm:gap-4 p-4 sm:p-6 border-b border-slate-700/50">
+          <div className="min-w-0">
+            <h2 className="text-base sm:text-xl font-bold text-white leading-snug">
               Sơ Duyệt & Theo Dõi Ủy Quyền Visa — {application.customerName || `Booking #${application.bookingId}`}
             </h2>
             <div className="flex flex-wrap items-center gap-2 mt-2">

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
-import { Filter, RefreshCw, ChevronRight } from 'lucide-react';
+import { Filter, RefreshCw, ChevronRight, ChevronDown } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { getTourTransportInfo, TourTransportMode } from '../../utils/tourTransport';
@@ -29,6 +29,7 @@ export const TourListPage: React.FC = () => {
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const PAGE_SIZE = 9;
 
   const getInitialPage = (): number => {
@@ -272,10 +273,30 @@ export const TourListPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+        {/* Mobile Collapsible Filter Toggle */}
+        <div className="lg:hidden mb-4">
+          <button
+            type="button"
+            onClick={() => setMobileFiltersOpen((prev) => !prev)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-white border border-[#E6E1DA] shadow-card text-sm font-extrabold text-[#0B3B49] cursor-pointer"
+          >
+            <span className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-[#0D9488]" />
+              <span>Bộ Lọc Tìm Kiếm</span>
+              {[departure !== 'Tất cả', destination !== 'Tất cả', transportFilter !== 'ALL', durationFilter !== 'ALL', categoryFilter !== 'ALL', budgetFilter !== 'ALL'].filter(Boolean).length > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-[#D95D39] text-white text-[10px] font-black">
+                  {[departure !== 'Tất cả', destination !== 'Tất cả', transportFilter !== 'ALL', durationFilter !== 'ALL', categoryFilter !== 'ALL', budgetFilter !== 'ALL'].filter(Boolean).length}
+                </span>
+              )}
+            </span>
+            <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-7">
-          {/* Left Sidebar Filter Section (Crisp White Editorial Card) */}
-          <aside className="lg:col-span-1 bg-white p-5 rounded-2xl border border-[#E6E1DA] shadow-card space-y-5 self-start lg:sticky lg:top-24">
+          {/* Left Sidebar Filter Section (Collapsible on mobile, sticky on lg+) */}
+          <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} lg:block lg:col-span-1 bg-white p-5 rounded-2xl border border-[#E6E1DA] shadow-card space-y-5 self-start lg:sticky lg:top-24`}>
             <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3.5">
               <div className="flex items-center gap-2 text-[#0F172A] font-extrabold text-base">
                 <Filter className="h-4 w-4 text-[#0D9488]" />

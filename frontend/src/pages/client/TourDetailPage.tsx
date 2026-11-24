@@ -886,20 +886,20 @@ export const TourDetailPage: React.FC = () => {
       {/* Breadcrumb Bar */}
       <div className="bg-white border-b border-[#E6E1DA] py-3 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-[#526071]">
+          <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 text-xs font-medium text-[#526071] min-w-0">
             <button
               type="button"
               onClick={handleBackToSelection}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E6F4F1] text-[#0B3B49] border border-[#E6E1DA] transition text-xs font-bold mr-1 cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E6F4F1] text-[#0B3B49] border border-[#E6E1DA] transition text-xs font-bold mr-1 cursor-pointer shrink-0"
               title={fromBlog ? 'Quay lại bài viết' : 'Quay lại danh sách tour'}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               <span>Quay lại</span>
             </button>
-            <span className="hover:text-[#0B3B49] cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
-            <ChevronRight className="h-3 w-3 text-slate-400" />
+            <span className="hover:text-[#0B3B49] cursor-pointer transition shrink-0" onClick={() => navigate('/')}>Trang Chủ</span>
+            <ChevronRight className="h-3 w-3 text-slate-400 shrink-0" />
             <span 
-              className="hover:text-[#0B3B49] cursor-pointer transition" 
+              className="hover:text-[#0B3B49] cursor-pointer transition shrink-0" 
               onClick={() => {
                 const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
                 const pageParam = savedPage && Number(savedPage) > 1 ? `&page=${savedPage}` : '';
@@ -908,8 +908,8 @@ export const TourDetailPage: React.FC = () => {
             >
               {tour.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
             </span>
-            <ChevronRight className="h-3 w-3 text-slate-400" />
-            <span className="text-[#0F172A] font-bold line-clamp-1">{tour.title}</span>
+            <ChevronRight className="h-3 w-3 text-slate-400 shrink-0 hidden sm:inline" />
+            <span className="text-[#0F172A] font-bold line-clamp-1 hidden sm:inline">{tour.title}</span>
           </div>
         </div>
       </div>
@@ -917,7 +917,7 @@ export const TourDetailPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8 relative z-10">
         
         {/* Top Hero Image Gallery (Click to open Lightbox & navigate) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[360px] sm:h-[400px] lg:h-[440px] rounded-2xl overflow-hidden relative z-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[240px] sm:h-[360px] lg:h-[440px] rounded-2xl overflow-hidden relative z-0">
           {/* Main Large Image */}
           <div 
             onClick={() => openLightbox(0)}
@@ -1129,8 +1129,8 @@ export const TourDetailPage: React.FC = () => {
             </div>
 
             {/* Rating Breakdown Card */}
-            <div className="bg-white p-6 rounded-2xl border border-[#E6E1DA] shadow-card flex flex-col md:flex-row items-center gap-8">
-              <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-[#E6E1DA] pb-4 md:pb-0 shrink-0">
+            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E6E1DA] shadow-card flex flex-col md:flex-row items-center gap-6 md:gap-8">
+              <div className="text-center md:text-left space-y-1 md:pr-6 border-b md:border-b-0 md:border-r border-[#E6E1DA] pb-4 md:pb-0 w-full md:w-auto shrink-0">
                 <div className="text-5xl font-black text-[#0B3B49] whitespace-nowrap">
                   {reviews.length > 0
                     ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1)
@@ -1192,15 +1192,15 @@ export const TourDetailPage: React.FC = () => {
 
               {/* TAB CONTENT: Lịch trình tour */}
               {activeTab === 'itinerary' && (
-                <div className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    {/* Left Day Selection Menu */}
-                    <div className="md:col-span-1 space-y-2 border-b md:border-b-0 md:border-r border-[#E6E1DA] pr-0 md:pr-4 pb-4 md:pb-0">
+                <div className="p-4 sm:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-5 sm:gap-6">
+                    {/* Left Day Selection Menu (Horizontal scroll pills on mobile, vertical sidebar on md+) */}
+                    <div className="md:col-span-1 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible border-b md:border-b-0 md:border-r border-[#E6E1DA] pr-0 md:pr-4 pb-3 md:pb-0">
                       {rawItinerary.map((item: any, idx: number) => (
                         <button
                           key={idx}
                           onClick={() => setSelectedDay(item.day)}
-                          className={`w-full text-left p-3 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                          className={`shrink-0 md:shrink md:w-full text-left px-3 py-2.5 sm:p-3 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                             selectedDay === item.day
                               ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-lg shadow-sky-500/25 border border-sky-400/40'
                               : 'bg-[#FAF8F5] text-[#475569] hover:bg-[#F4F1EC] hover:text-[#0F172A] border border-[#E6E1DA]'
@@ -1209,7 +1209,7 @@ export const TourDetailPage: React.FC = () => {
                           <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${selectedDay === item.day ? 'bg-white/20' : 'bg-[#F4F1EC]'}`}>
                             {item.day}
                           </span>
-                          <span className="line-clamp-2 leading-tight">{item.title?.replace(/^NGÀY \d+:\s*/i, '')}</span>
+                          <span className="whitespace-nowrap md:whitespace-normal md:line-clamp-2 leading-tight max-w-[160px] md:max-w-none truncate md:text-clip">{item.title?.replace(/^NGÀY \d+:\s*/i, '')}</span>
                         </button>
                       ))}
                     </div>
@@ -1358,7 +1358,7 @@ export const TourDetailPage: React.FC = () => {
                     </h3>
 
                     <div className="overflow-x-auto border border-[#CBD5E1] rounded-xl">
-                      <table className="w-full text-center border-collapse">
+                      <table className="w-full min-w-[460px] text-center border-collapse">
                         <thead>
                           <tr className="border-b border-[#CBD5E1] bg-[#FAF8F5] font-black text-xs text-[#0F172A]">
                             <th className="p-3 border-r border-[#CBD5E1] w-1/4">KHỞI HÀNH</th>
@@ -1665,7 +1665,7 @@ export const TourDetailPage: React.FC = () => {
 
           {/* Right Column: Summary Card (Matching Screenshot 2) */}
           <aside className="lg:col-span-1 space-y-6">
-            <div className="bg-white backdrop-blur-xl p-6 rounded-2xl border border-[#E6E1DA] shadow-2xl space-y-6 lg:sticky lg:top-24 z-10">
+            <div className="bg-white backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-[#E6E1DA] shadow-2xl space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto z-10">
               
               <div className="space-y-2 border-b border-[#E6E1DA] pb-4">
                 <h2 className="text-base font-extrabold text-[#0F172A] leading-snug uppercase">
@@ -1677,8 +1677,8 @@ export const TourDetailPage: React.FC = () => {
                   <div className="text-xs text-[#526071] font-medium">
                     Giá trọn gói ({transportInfo.mode === 'FLIGHT' ? 'Đã gồm vé máy bay khứ hồi' : 'Đã gồm phương tiện khứ hồi'}):
                   </div>
-                  <div className="text-3xl font-black text-[#D95D39] tracking-tight">
-                    {tour.price.toLocaleString('vi-VN')} đ <span className="text-xs font-normal text-[#526071]">/ Khách</span>
+                  <div className="text-2xl xl:text-3xl font-black text-[#D95D39] tracking-tight">
+                    {tour.price.toLocaleString('vi-VN')} đ <span className="text-xs font-normal text-[#526071] whitespace-nowrap">/ Khách</span>
                   </div>
                 </div>
 
@@ -1756,7 +1756,7 @@ export const TourDetailPage: React.FC = () => {
                         </div>
                       ) : (
                         <div className="space-y-1.5 mt-2">
-                          <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-[#0B3B49] gap-2 whitespace-nowrap">
+                          <div className="flex flex-wrap items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-[#0B3B49] gap-1.5">
                             {(() => {
                               const daysLeftToBook = Math.max(0, selectedSchedule.daysRemaining - selectedSchedule.minLeadDays);
                               return (
@@ -1850,12 +1850,14 @@ export const TourDetailPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setAdults(Math.max(1, adults - 1))}
-                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-9 w-9 rounded-lg bg-[#F4F1EC] hover:bg-[#E6E1DA] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-sm transition cursor-pointer"
+                      aria-label="Giảm số người lớn"
                     >-</button>
-                    <span className="font-bold text-sm w-4 text-center text-[#0F172A]">{adults}</span>
+                    <span className="font-bold text-sm w-5 text-center text-[#0F172A]">{adults}</span>
                     <button 
                       onClick={() => setAdults(adults + 1)}
-                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-9 w-9 rounded-lg bg-[#F4F1EC] hover:bg-[#E6E1DA] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-sm transition cursor-pointer"
+                      aria-label="Tăng số người lớn"
                     >+</button>
                   </div>
                 </div>
@@ -1868,12 +1870,14 @@ export const TourDetailPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setChildren(Math.max(0, children - 1))}
-                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-9 w-9 rounded-lg bg-[#F4F1EC] hover:bg-[#E6E1DA] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-sm transition cursor-pointer"
+                      aria-label="Giảm số trẻ em"
                     >-</button>
-                    <span className="font-bold text-sm w-4 text-center text-[#0F172A]">{children}</span>
+                    <span className="font-bold text-sm w-5 text-center text-[#0F172A]">{children}</span>
                     <button 
                       onClick={() => setChildren(children + 1)}
-                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-9 w-9 rounded-lg bg-[#F4F1EC] hover:bg-[#E6E1DA] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-sm transition cursor-pointer"
+                      aria-label="Tăng số trẻ em"
                     >+</button>
                   </div>
                 </div>
@@ -2029,19 +2033,20 @@ export const TourDetailPage: React.FC = () => {
         {/* SECTION: CÓ THỂ BẠN SẼ THÍCH (Khớp 100% Screenshot 4) */}
         <div className="pt-12 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight">Có thể bạn sẽ thích</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">Có thể bạn sẽ thích</h3>
             <button 
               onClick={() => {
                 const el = document.getElementById('recommended-carousel');
                 if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
               }}
-              className="h-10 w-10 rounded-full bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] flex items-center justify-center transition border border-[#E6E1DA] shadow-sm cursor-pointer"
+              className="md:hidden h-10 w-10 rounded-full bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] flex items-center justify-center transition border border-[#E6E1DA] shadow-sm cursor-pointer"
+              aria-label="Xem thêm tour gợi ý"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
 
-          <div id="recommended-carousel" className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-x-auto pb-4">
+          <div id="recommended-carousel" className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-none">
             {[
               {
                 id: 2,
@@ -2074,7 +2079,7 @@ export const TourDetailPage: React.FC = () => {
                 img: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
               },
             ].map((rec) => (
-              <div key={rec.id} className="bg-white backdrop-blur-md rounded-2xl border border-[#E6E1DA] hover:border-sky-500/40 overflow-hidden shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between group">
+              <div key={rec.id} className="min-w-[84vw] sm:min-w-[320px] md:min-w-0 snap-start bg-white backdrop-blur-md rounded-2xl border border-[#E6E1DA] hover:border-sky-500/40 overflow-hidden shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between group">
                 <div>
                   <div className="h-48 overflow-hidden relative bg-white">
                     <img src={rec.img} alt={rec.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
@@ -2207,26 +2212,28 @@ export const TourDetailPage: React.FC = () => {
           {/* Bottom Thumbnail Carousel Strip */}
           {galleryImages.length > 1 && (
             <div 
-              className="z-10 max-w-5xl mx-auto w-full overflow-x-auto pb-2 pt-1 flex items-center justify-center gap-2.5 px-4 scrollbar-thin"
+              className="z-10 max-w-5xl mx-auto w-full overflow-x-auto pb-2 pt-1 px-4 scrollbar-thin"
               onClick={(e) => e.stopPropagation()}
             >
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`h-14 w-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                    activeImageIndex === idx
-                      ? 'border-accent-400 scale-105 shadow-md shadow-accent-400/30 opacity-100'
-                      : 'border-transparent opacity-50 hover:opacity-85 hover:scale-100'
-                  }`}
-                >
-                  <img
-                    src={img}
-                    alt={`Thumbnail ${idx + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
+              <div className="flex items-center gap-2.5 mx-auto w-max">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`h-14 w-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                      activeImageIndex === idx
+                        ? 'border-accent-400 scale-105 shadow-md shadow-accent-400/30 opacity-100'
+                        : 'border-transparent opacity-50 hover:opacity-85 hover:scale-100'
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>

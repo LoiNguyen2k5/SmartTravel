@@ -106,8 +106,7 @@ export const ServicesPage: React.FC = () => {
           {services.map((svc, i) => (
             <div
               key={i}
-              className="group relative rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] p-7 transition-all duration-300 hover:-translate-y-1 cursor-default"
-              style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.3)` }}
+              className="group relative rounded-3xl border border-[#E6E1DA] bg-white p-6 sm:p-7 shadow-card transition-all duration-300 hover:-translate-y-1 cursor-default"
             >
               {/* Glow on hover */}
               <div
@@ -117,7 +116,7 @@ export const ServicesPage: React.FC = () => {
 
               {/* Icon */}
               <div
-                className={`relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${svc.color} text-[#0F172A] mb-5 shadow-lg`}
+                className={`relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${svc.color} text-white mb-5 shadow-lg`}
                 style={{ boxShadow: `0 8px 24px ${svc.glow}` }}
               >
                 {svc.icon}
@@ -150,11 +149,7 @@ export const ServicesPage: React.FC = () => {
           <p className="text-[#526071] text-sm mb-8">Hàng ngàn tour trong nước và quốc tế đang chờ bạn. Đặt ngay hôm nay!</p>
           <button
             onClick={() => navigate('/tours')}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-bold text-[#0F172A] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
-            style={{
-              background: '#D95D39',
-              boxShadow: '0 0 12px rgba(60,190,235,.25), 0 4px 16px -2px rgba(90,220,255,.4)',
-            }}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-bold text-white bg-[#D95D39] hover:bg-[#C24E2D] shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
           >
             Xem tất cả tour <ArrowRight className="h-4 w-4" />
           </button>

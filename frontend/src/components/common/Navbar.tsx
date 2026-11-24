@@ -34,6 +34,8 @@ export const Navbar: React.FC = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileNotifBtnRef = useRef<HTMLButtonElement>(null);
+  const mobileNotifPanelRef = useRef<HTMLDivElement>(null);
 
   const loadNotifications = () => {
     const list = notificationService.getNotifications(user?.email);
@@ -51,10 +53,14 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setDropdownOpen(false);
       }
-      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node)) {
+      const clickedDesktopNotif = notifDropdownRef.current?.contains(target) ?? false;
+      const clickedMobileBtn = mobileNotifBtnRef.current?.contains(target) ?? false;
+      const clickedMobilePanel = mobileNotifPanelRef.current?.contains(target) ?? false;
+      if (!clickedDesktopNotif && !clickedMobileBtn && !clickedMobilePanel) {
         setNotifDropdownOpen(false);
       }
     };
@@ -70,6 +76,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setNotifDropdownOpen(false);
   }, [location.pathname]);
 
   const isVendor = user?.roles?.includes('ROLE_VENDOR');
@@ -96,7 +103,7 @@ export const Navbar: React.FC = () => {
           scrolled ? 'border-[#E6E1DA] shadow-[0_6px_24px_-8px_rgba(11,59,73,0.12)]' : 'border-[#E6E1DA]'
         }`}
       >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+        <nav className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
             <div className="bg-[#0B3B49] text-[#5EEAD4] p-2 rounded-xl group-hover:scale-105 transition-transform duration-200 shadow-sm">
@@ -137,12 +144,12 @@ export const Navbar: React.FC = () => {
 
           {/* Contact Info & User Auth Section */}
           <div className="hidden sm:flex items-center gap-2.5 shrink-0">
-            {/* Hotline & Working Hours Group (Equal height, never wraps) */}
-            <div className="hidden md:flex items-center gap-2 shrink-0">
+            {/* Hotline & Working Hours Group (Shown cleanly at xl/2xl to prevent iPad landscape / 1024px crowding) */}
+            <div className="hidden xl:flex items-center gap-2 shrink-0">
               {/* Hotline Warm Gold Pill */}
               <a
                 href="tel:0941899554"
-                className="hidden xl:flex items-center gap-2 h-10 px-3 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] hover:bg-[#FEF3C7] transition group whitespace-nowrap shrink-0"
+                className="hidden 2xl:flex items-center gap-2 h-10 px-3 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] hover:bg-[#FEF3C7] transition group whitespace-nowrap shrink-0"
               >
                 <Phone className="h-3.5 w-3.5 text-[#D97706] flex-shrink-0" />
                 <div className="flex flex-col justify-center leading-none gap-0.5">
@@ -170,7 +177,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Visual Divider separating info pills from action buttons */}
-            <div className="hidden md:block h-7 w-px bg-[#E6E1DA] mx-1.5 shrink-0" />
+            <div className="hidden xl:block h-7 w-px bg-[#E6E1DA] mx-1.5 shrink-0" />
 
             {/* Action Buttons Group (Bell + Profile / Login-Register) */}
             <div className="flex items-center gap-3 shrink-0">
@@ -196,7 +203,7 @@ export const Navbar: React.FC = () => {
 
                 {/* NOTIFICATION DROPDOWN PANEL */}
                 {notifDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl shadow-float border border-[#E6E1DA] bg-white py-3 text-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="fixed top-[4.5rem] left-3 right-3 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl shadow-float border border-[#E6E1DA] bg-white py-3 text-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="px-4 pb-3 border-b border-[#E6E1DA] flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Bell className="h-4 w-4 text-[#0D9488]" />
@@ -426,19 +433,122 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Mobile Hamburger only (small screens) */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2 rounded-xl text-slate-600 hover:bg-[#FAF8F5] hover:text-[#0B3B49] transition"
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile Quick Actions (small screens < sm) */}
+          <div className="sm:hidden flex items-center gap-2">
+            {isAuthenticated && (
+              <button
+                ref={mobileNotifBtnRef}
+                onClick={() => {
+                  setNotifDropdownOpen(!notifDropdownOpen);
+                  setMobileMenuOpen(false);
+                }}
+                className="relative h-9 w-9 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] text-slate-700 hover:text-[#0B3B49] transition flex items-center justify-center"
+                aria-label="Thông báo"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-rose-600 text-[9px] font-black text-white ring-2 ring-white">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen);
+                setNotifDropdownOpen(false);
+              }}
+              className="p-2 rounded-xl text-slate-600 hover:bg-[#FAF8F5] hover:text-[#0B3B49] transition"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </nav>
+
+        {/* Mobile Notification Panel (< sm) */}
+        {isAuthenticated && notifDropdownOpen && (
+          <div
+            ref={mobileNotifPanelRef}
+            className="sm:hidden fixed top-[4.5rem] left-3 right-3 rounded-2xl shadow-float border border-[#E6E1DA] bg-white py-3 text-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+          >
+            <div className="px-4 pb-3 border-b border-[#E6E1DA] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4 text-[#0D9488]" />
+                <span className="text-xs font-extrabold text-[#0B3B49] uppercase tracking-wider">Thông báo</span>
+                {unreadCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#E6F4F1] text-[#0B3B49] border border-[#99F6E4]">
+                    {unreadCount} mới
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {notifications.length > 0 && (
+                  <button
+                    onClick={() => notificationService.markAllAsRead(user?.email)}
+                    className="text-[11px] text-slate-500 hover:text-[#0D9488] flex items-center gap-1 transition cursor-pointer font-semibold"
+                  >
+                    <CheckCheck className="h-3.5 w-3.5" /> Đọc tất cả
+                  </button>
+                )}
+                <button
+                  onClick={() => setNotifDropdownOpen(false)}
+                  className="p-1 text-slate-400 hover:text-slate-700"
+                  aria-label="Đóng thông báo"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 py-1">
+              {notifications.length === 0 ? (
+                <div className="py-8 text-center text-xs text-slate-400">
+                  Bạn chưa có thông báo nào
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    onClick={() => {
+                      notificationService.markAsRead(n.id, user?.email);
+                      setSelectedNotif(n);
+                      setNotifDropdownOpen(false);
+                    }}
+                    className={`px-4 py-3 hover:bg-[#FAF8F5] transition cursor-pointer flex items-start gap-3 relative ${
+                      !n.isRead ? 'bg-[#E6F4F1]/45' : ''
+                    }`}
+                  >
+                    <div
+                      className={`p-2 rounded-xl shrink-0 mt-0.5 ${
+                        n.type === 'CSKH_REPLY'
+                          ? 'bg-[#E6F4F1] text-[#0D9488] border border-[#99F6E4]'
+                          : 'bg-amber-50 text-amber-600 border border-amber-200'
+                      }`}
+                    >
+                      {n.type === 'CSKH_REPLY' ? (
+                        <Headphones className="h-4 w-4" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 pr-4">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <div className="text-xs font-bold text-[#0F172A] truncate">{n.title}</div>
+                        <span className="text-[10px] text-slate-400 shrink-0 ml-2">{n.createdAt}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">{n.message}</p>
+                    </div>
+                    {!n.isRead && <span className="absolute top-4 right-3 h-2 w-2 rounded-full bg-[#D95D39]" />}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#E6E1DA] bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg animate-in slide-in-from-top-3 duration-200">
+          <div className="lg:hidden border-t border-[#E6E1DA] bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg max-h-[calc(100dvh-4.25rem)] overflow-y-auto animate-in slide-in-from-top-3 duration-200">
             <div className="p-3 mb-2 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA]">
               {isAuthenticated ? (
                 <div className="space-y-2">
@@ -548,8 +658,8 @@ export const Navbar: React.FC = () => {
 
       {/* NOTIFICATION DETAIL MODAL */}
       {selectedNotif && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white border border-[#E6E1DA] rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-float text-slate-800 relative">
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
+          <div className="bg-white border border-[#E6E1DA] rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-float text-slate-800 relative">
             <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3">
               <div className="flex items-center gap-2.5 text-[#0B3B49] font-extrabold text-sm sm:text-base">
                 <div

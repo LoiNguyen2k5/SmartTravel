@@ -26,7 +26,7 @@ export const ResetPasswordPage: React.FC = () => {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-6 rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card text-[#0F172A]">
+      <div className="w-full max-w-md space-y-6 rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-5 sm:p-8 shadow-card text-[#0F172A]">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#0F172A]">Đặt lại mật khẩu</h2>
           <p className="mt-1 text-xs text-[#526071]">Nhập mật khẩu mới cho tài khoản của bạn</p>

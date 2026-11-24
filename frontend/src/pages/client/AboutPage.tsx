@@ -49,23 +49,23 @@ export const AboutPage: React.FC = () => {
           {/* ── Sidebar ── */}
           <aside className="lg:col-span-3">
             <div
-              className="rounded-2xl border border-[#E6E1DA] p-3 space-y-1 sticky top-24"
+              className="rounded-2xl border border-[#E6E1DA] bg-white p-2.5 sm:p-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-1.5 lg:sticky lg:top-24"
             >
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-2 ${
+                  className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between gap-2 cursor-pointer ${
                     activeTab === item.id
                       ? 'bg-sky-500/20 text-[#0B3B49] border border-sky-500/30'
                       : 'text-[#526071] hover:bg-[#FAF8F5] hover:text-[#0F172A] border border-transparent'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className={activeTab === item.id ? 'text-sky-400' : 'text-slate-600'}>{item.icon}</span>
-                    {item.label}
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span className={`shrink-0 ${activeTab === item.id ? 'text-sky-600' : 'text-slate-500'}`}>{item.icon}</span>
+                    <span className="truncate">{item.label}</span>
                   </span>
-                  {activeTab === item.id && <ChevronRight className="h-3.5 w-3.5 text-[#0D9488] flex-shrink-0" />}
+                  {activeTab === item.id && <ChevronRight className="h-3.5 w-3.5 text-[#0D9488] flex-shrink-0 hidden lg:block" />}
                 </button>
               ))}
             </div>
@@ -73,7 +73,7 @@ export const AboutPage: React.FC = () => {
 
           {/* ── Main Content ── */}
           <main
-            className="lg:col-span-9 rounded-2xl border border-[#E6E1DA] p-8 space-y-8"
+            className="lg:col-span-9 rounded-2xl border border-[#E6E1DA] bg-white p-5 sm:p-8 space-y-8"
           >
 
             {/* ── GIỚI THIỆU ── */}
@@ -146,7 +146,7 @@ export const AboutPage: React.FC = () => {
                     <div key={i} className="group relative rounded-2xl border border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] p-5 transition-all duration-300 hover:-translate-y-0.5">
                       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                         style={{ background: `radial-gradient(300px circle at 30% 0%, ${svc.glow}, transparent 70%)` }} />
-                      <div className={`relative inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br ${svc.color} text-[#0F172A] mb-3`}
+                      <div className={`relative inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br ${svc.color} text-white mb-3`}
                         style={{ boxShadow: `0 6px 20px ${svc.glow}` }}>
                         {svc.icon}
                       </div>
@@ -157,8 +157,7 @@ export const AboutPage: React.FC = () => {
                 </div>
                 <div className="pt-4 border-t border-[#E6E1DA] text-center">
                   <button onClick={() => navigate('/services')}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-[#0F172A] transition-all hover:-translate-y-0.5"
-                    style={{ background: '#D95D39', boxShadow: '0 0 12px rgba(60,190,235,.2)' }}>
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-[#D95D39] hover:bg-[#C24E2D] shadow-md transition-all hover:-translate-y-0.5 cursor-pointer">
                     Xem chi tiết dịch vụ <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>

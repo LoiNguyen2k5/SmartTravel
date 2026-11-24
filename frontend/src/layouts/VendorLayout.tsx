@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Compass, 
@@ -8,13 +8,29 @@ import {
   LogOut, 
   Globe, 
   QrCode,
-  Stamp
+  Stamp,
+  Menu,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const VendorLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -30,20 +46,48 @@ export const VendorLayout: React.FC = () => {
     { label: 'Hồ Sơ Đại Lý & Ngân Hàng', path: '/vendor/profile', icon: Building2 },
   ];
 
+  const currentNavLabel =
+    navItems.find((item) =>
+      item.end ? location.pathname === item.path : location.pathname.startsWith(item.path)
+    )?.label || 'Vendor Portal';
+
   return (
-    <div className="flex h-screen bg-[#FAF8F5] text-[#0F172A] overflow-hidden font-sans ocean-portal relative">
-      {/* Deep Ocean Sidebar */}
-      <aside className="w-64 bg-[#0B3B49] border-r border-[#082E3A] text-white flex flex-col justify-between p-4 shadow-xl flex-shrink-0 z-20">
+    <div className="flex h-screen supports-[height:100dvh]:h-dvh bg-[#FAF8F5] text-[#0F172A] overflow-hidden font-sans ocean-portal relative">
+      {/* Mobile Backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Deep Ocean Sidebar (Slide-over drawer on mobile/tablet, static on lg+) */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-[#0B3B49] border-r border-[#082E3A] text-white flex flex-col justify-between p-4 shadow-xl flex-shrink-0 overflow-y-auto transition-transform duration-200 ease-out lg:static lg:translate-x-0 lg:z-20 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div>
           {/* Logo & Portal Name */}
-          <div className="flex items-center gap-3 px-2 py-3 border-b border-white/15 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-[#0D9488] flex items-center justify-center font-black text-white text-xl shadow-md">
-              V
+          <div className="flex items-center justify-between gap-2 px-2 py-3 border-b border-white/15 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-[#0D9488] flex items-center justify-center font-black text-white text-xl shadow-md shrink-0">
+                V
+              </div>
+              <div>
+                <h2 className="font-extrabold text-sm text-white tracking-wide">SMARTTRAVEL</h2>
+                <span className="text-[10px] font-bold text-[#5EEAD4] uppercase tracking-widest">Vendor Portal</span>
+              </div>
             </div>
-            <div>
-              <h2 className="font-extrabold text-sm text-white tracking-wide">SMARTTRAVEL</h2>
-              <span className="text-[10px] font-bold text-[#5EEAD4] uppercase tracking-widest">Vendor Portal</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition"
+              aria-label="Đóng menu đại lý"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
           {/* Navigation Links */}
@@ -55,6 +99,7 @@ export const VendorLayout: React.FC = () => {
                   key={item.path}
                   to={item.path}
                   end={item.end}
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       isActive
@@ -63,7 +108,7 @@ export const VendorLayout: React.FC = () => {
                     }`
                   }
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4 shrink-0" />
                   <span>{item.label}</span>
                 </NavLink>
               );
@@ -72,14 +117,14 @@ export const VendorLayout: React.FC = () => {
         </div>
 
         {/* User Info & Footer Actions */}
-        <div className="border-t border-white/15 pt-4 space-y-3">
+        <div className="border-t border-white/15 pt-4 mt-4 space-y-3">
           <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 flex items-center gap-3">
             <img
               src={user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
               alt={user?.fullName}
-              className="h-9 w-9 rounded-full object-cover border-2 border-[#5EEAD4]"
+              className="h-9 w-9 rounded-full object-cover border-2 border-[#5EEAD4] shrink-0"
             />
-            <div className="overflow-hidden">
+            <div className="overflow-hidden min-w-0">
               <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Nhà Cung Cấp Tour'}</p>
               <p className="text-[10px] text-slate-300 truncate">{user?.email}</p>
             </div>
@@ -102,10 +147,37 @@ export const VendorLayout: React.FC = () => {
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative z-10 bg-[#FAF8F5]">
-        <Outlet />
-      </main>
+      {/* Right Column: Mobile Top Bar + Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="lg:hidden flex items-center justify-between gap-3 px-4 py-3 bg-[#0B3B49] text-white border-b border-[#082E3A] shadow-md shrink-0 z-30">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition"
+              aria-label="Mở menu đại lý"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="h-7 w-7 rounded-lg bg-[#0D9488] flex items-center justify-center font-black text-white text-xs shrink-0">
+                V
+              </div>
+              <div className="truncate">
+                <span className="font-extrabold text-sm text-white block leading-tight">Vendor Portal</span>
+                <span className="text-[10px] font-semibold text-[#5EEAD4] block truncate">{currentNavLabel}</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* MAIN CONTENT AREA */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10 bg-[#FAF8F5] min-w-0">
+          <div className="mx-auto w-full max-w-[1600px]">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

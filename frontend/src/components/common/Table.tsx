@@ -29,7 +29,7 @@ export function Table<T extends { id?: number | string }>({
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[600px] text-sm">
         <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500">
           <tr>
             {columns.map((col) => (

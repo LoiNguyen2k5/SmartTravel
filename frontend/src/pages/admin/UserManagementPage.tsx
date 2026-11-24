@@ -204,7 +204,7 @@ export const UserManagementPage: React.FC = () => {
       {/* Users Table */}
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
               <tr>
                 <th className="py-3.5 px-4">Người Dùng</th>
@@ -344,8 +344,8 @@ export const UserManagementPage: React.FC = () => {
 
       {/* Confirmation Modal */}
       {confirmModal.isOpen && confirmModal.user && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto bg-white rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-2xl ${confirmModal.nextState ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
                 {confirmModal.nextState ? <Unlock className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}

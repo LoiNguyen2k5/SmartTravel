@@ -103,7 +103,7 @@ export const BookingManagementPage: React.FC = () => {
       {/* Bookings Table */}
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
               <tr>
                 <th className="py-3.5 px-4">Mã Đơn</th>
@@ -185,8 +185,8 @@ export const BookingManagementPage: React.FC = () => {
 
       {/* Booking Detail Modal */}
       {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-white rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full">

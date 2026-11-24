@@ -454,8 +454,8 @@ export const ItineraryPlannerPage: React.FC = () => {
 
         {/* SHARE LINK MODAL */}
         {shareToken && (
-          <div className="fixed inset-0 z-50 bg-white backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 shadow-2xl animate-scale-up">
+          <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-white rounded-3xl max-w-md w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-6 shadow-2xl animate-scale-up">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-sky-900 font-bold text-base">
                   <Share2 className="h-5 w-5" /> Chia Sẻ Lịch Trình Du Lịch

@@ -170,8 +170,8 @@ export const AdminSentimentModal: React.FC<AdminSentimentModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FAF8F5] backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="w-full max-w-3xl bg-[#0b1322] border border-cyan-500/20 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.85)] p-6 sm:p-7 space-y-6 text-[#0F172A] max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+      <div className="w-full max-w-3xl bg-white border border-[#CBD5E1] rounded-3xl shadow-float p-5 sm:p-7 space-y-6 text-[#0F172A] max-h-[90dvh] overflow-y-auto my-auto">
         
         {/* Header */}
         <div className="flex items-start justify-between border-b border-[#E6E1DA] pb-4">
@@ -460,7 +460,7 @@ export const AdminSentimentModal: React.FC<AdminSentimentModalProps> = ({
                 <span className="truncate">{text}</span>
                 <button
                   onClick={() => handleRemoveReview(idx)}
-                  className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-[#D95D39] transition"
+                  className="touch-visible opacity-100 lg:opacity-0 lg:group-hover:opacity-100 p-1 text-slate-500 hover:text-[#D95D39] transition shrink-0"
                   title="Xóa đánh giá này"
                 >
                   <Trash2 className="h-3.5 w-3.5" />

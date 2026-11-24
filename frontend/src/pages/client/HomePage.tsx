@@ -331,7 +331,7 @@ export const HomePage: React.FC = () => {
 
         {/* 7. SECTION: PROMO SERVICE BANNER (Deep Ocean Editorial) */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#0B3B49] rounded-3xl overflow-hidden shadow-float p-8 sm:p-12 text-white relative border border-[#0F5264]">
+          <div className="bg-[#0B3B49] rounded-3xl overflow-hidden shadow-float p-6 sm:p-10 lg:p-12 text-white relative border border-[#0F5264]">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#0D9488]/20 blur-3xl pointer-events-none rounded-full" />
 
             <div className="max-w-3xl space-y-5 relative z-10">
@@ -349,7 +349,7 @@ export const HomePage: React.FC = () => {
                 Tổ chức tour đoàn, team building và hội nghị chuyên nghiệp với hơn 15 năm uy tín trong ngành du lịch &amp; sự kiện tại Việt Nam.
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-bold text-slate-100 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-bold text-slate-100 pt-1">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-[#5EEAD4]" /> Team Building gắn kết
                 </div>
@@ -390,13 +390,13 @@ export const HomePage: React.FC = () => {
 
         {/* 8. SECTION: LÊN KẾ HOẠCH CHUYẾN ĐI (Brand Story & Trust) */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl border border-[#E6E1DA] shadow-card p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div className="bg-white rounded-3xl border border-[#E6E1DA] shadow-card p-6 sm:p-10 lg:p-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div className="relative text-center">
-              <div className="relative inline-block">
+              <div className="relative inline-block w-full max-w-[288px] sm:max-w-[320px] md:max-w-[384px]">
                 <img
                   src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80"
                   alt="Travel Planning Inspiration"
-                  className="w-72 sm:w-80 md:w-96 h-72 sm:h-80 md:h-96 object-cover rounded-3xl shadow-card border border-[#E6E1DA] mx-auto"
+                  className="w-full aspect-square object-cover rounded-3xl shadow-card border border-[#E6E1DA] mx-auto"
                 />
                 <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#0B3B49] border-2 border-white shadow-xl px-5 py-3 rounded-2xl flex items-center gap-3 text-xs text-white whitespace-nowrap">
                   <div className="h-8 w-8 rounded-xl bg-[#0D9488] text-white flex items-center justify-center">

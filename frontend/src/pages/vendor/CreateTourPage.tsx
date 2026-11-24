@@ -153,7 +153,7 @@ export const CreateTourPage: React.FC = () => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Mã Tour</label>
             <input
@@ -197,7 +197,7 @@ export const CreateTourPage: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Giá người lớn (VNĐ) *</label>
             <input
@@ -223,7 +223,7 @@ export const CreateTourPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Số ngày</label>
             <input

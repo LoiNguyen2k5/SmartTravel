@@ -827,7 +827,7 @@ export const CheckoutPage: React.FC = () => {
 
           /* SUCCESS E-TICKET CONFIRMATION SCREEN */
 
-          <div className="bg-white backdrop-blur-2xl rounded-3xl border border-[#CBD5E1] shadow-float p-8 max-w-2xl mx-auto text-center space-y-6 animate-in fade-in text-[#0F172A]">
+          <div className="bg-white backdrop-blur-2xl rounded-3xl border border-[#CBD5E1] shadow-float p-5 sm:p-8 max-w-2xl mx-auto text-center space-y-6 animate-in fade-in text-[#0F172A]">
 
             <div className="h-16 w-16 bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(16,185,129,0.3)]">
 
@@ -875,23 +875,23 @@ export const CheckoutPage: React.FC = () => {
 
             {/* Booking Specs */}
 
-            <div className="bg-[#FAF8F5] p-5 rounded-2xl text-left text-xs space-y-2.5 border border-[#E6E1DA]">
+            <div className="bg-[#FAF8F5] p-4 sm:p-5 rounded-2xl text-left text-xs space-y-2.5 border border-[#E6E1DA]">
 
-              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
+              <div className="flex justify-between gap-4 border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-[#526071]">Tên Tour:</span>
+                <span className="text-[#526071] shrink-0">Tên Tour:</span>
 
-                <span className="font-bold text-[#0F172A]">{createdBooking.tourTitle || tourTitle}</span>
+                <span className="font-bold text-[#0F172A] text-right">{createdBooking.tourTitle || tourTitle}</span>
 
               </div>
 
-              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
+              <div className="flex justify-between gap-4 border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-[#526071]">Đơn vị tổ chức (Vendor):</span>
+                <span className="text-[#526071] shrink-0">Đơn vị tổ chức (Vendor):</span>
 
-                <span className="font-bold text-[#0D9488] flex items-center gap-1">
+                <span className="font-bold text-[#0D9488] flex items-center justify-end gap-1 text-right">
 
-                  <Building2 className="h-3.5 w-3.5" />
+                  <Building2 className="h-3.5 w-3.5 shrink-0" />
 
                   {createdBooking.vendorName || fetchedVendorName || 'NewTour Travel Company'}
 
@@ -899,35 +899,35 @@ export const CheckoutPage: React.FC = () => {
 
               </div>
 
-              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
+              <div className="flex justify-between gap-4 border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-[#526071]">Người liên hệ:</span>
+                <span className="text-[#526071] shrink-0">Người liên hệ:</span>
 
-                <span className="font-semibold text-[#0F172A]">{createdBooking.contactName} ({createdBooking.contactPhone})</span>
-
-              </div>
-
-              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
-
-                <span className="text-[#526071]">Số lượng khách:</span>
-
-                <span className="font-semibold text-[#0F172A]">{createdBooking.numberOfAdults} Người lớn {createdBooking.numberOfChildren ? `, ${createdBooking.numberOfChildren} Trẻ em` : ''}</span>
+                <span className="font-semibold text-[#0F172A] text-right">{createdBooking.contactName} ({createdBooking.contactPhone})</span>
 
               </div>
 
-              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
+              <div className="flex justify-between gap-4 border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-[#526071]">Tiêu chuẩn phòng:</span>
+                <span className="text-[#526071] shrink-0">Số lượng khách:</span>
 
-                <span className="font-bold text-emerald-700">{roomAllocation}</span>
+                <span className="font-semibold text-[#0F172A] text-right">{createdBooking.numberOfAdults} Người lớn {createdBooking.numberOfChildren ? `, ${createdBooking.numberOfChildren} Trẻ em` : ''}</span>
 
               </div>
 
-              <div className="flex justify-between pt-1 text-sm font-black text-[#0F172A]">
+              <div className="flex justify-between gap-4 border-b border-[#E6E1DA] pb-2">
+
+                <span className="text-[#526071] shrink-0">Tiêu chuẩn phòng:</span>
+
+                <span className="font-bold text-emerald-700 text-right">{roomAllocation}</span>
+
+              </div>
+
+              <div className="flex justify-between gap-4 pt-1 text-sm font-black text-[#0F172A]">
 
                 <span>Tổng giá trị tour đã thanh toán:</span>
 
-                <span className="text-[#D95D39]">{formatCurrency(createdBooking.totalPrice || finalPayAmount)}</span>
+                <span className="text-[#D95D39] text-right shrink-0">{formatCurrency(createdBooking.totalPrice || finalPayAmount)}</span>
 
               </div>
 
@@ -935,7 +935,7 @@ export const CheckoutPage: React.FC = () => {
 
 
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
 
               <button
 
@@ -1390,7 +1390,7 @@ export const CheckoutPage: React.FC = () => {
 
                           <div className="flex items-center gap-3.5">
 
-                            <div className={`h-10 w-12 rounded-xl ${m.color} text-[#0F172A] font-extrabold text-[10px] flex items-center justify-center gap-1 shadow-md`}>
+                            <div className={`h-10 w-12 rounded-xl ${m.color} text-white font-extrabold text-[10px] flex items-center justify-center gap-1 shadow-md shrink-0`}>
 
                               <IconComp className="h-5 w-5" />
 
@@ -1428,7 +1428,7 @@ export const CheckoutPage: React.FC = () => {
 
             <aside className="lg:col-span-1 space-y-6">
 
-              <div className="bg-white backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-4 sticky top-28">
+              <div className="bg-white backdrop-blur-xl p-5 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-4 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
 
                 <h3 className="font-black text-[#0F172A] text-base border-b border-[#E6E1DA] pb-3">Tóm tắt đơn đặt tour</h3>
 

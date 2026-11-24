@@ -40,14 +40,36 @@ function classifyStatus(status: string | undefined): keyof typeof STATUS_GROUPS 
   return 'confirmed';
 }
 
-const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
-  <span className="relative group inline-flex items-center">
-    {children}
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-52 rounded-xl bg-white text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
-      {text}
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [open]);
+
+  return (
+    <span
+      className="relative group inline-flex items-center"
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen((v) => !v);
+      }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {children}
+      <span
+        className={`absolute bottom-full right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 mb-2 z-50 ${
+          open ? 'block' : 'hidden group-hover:block'
+        } w-52 max-w-[75vw] rounded-xl bg-white border border-slate-200 text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none`}
+      >
+        {text}
+      </span>
     </span>
-  </span>
-);
+  );
+};
 
 export const VendorDashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -233,10 +255,10 @@ export const VendorDashboardPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Vendor Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Vendor Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">Báo cáo tài chính · Quản lý tour · Đối soát doanh thu</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowSentimentModal(true)}
             className="flex items-center gap-1.5 rounded-xl bg-[#0B3B49] hover:bg-[#0F5264] px-4 py-2.5 text-xs font-bold text-white border border-[#082E3A] transition shadow-sm cursor-pointer"
@@ -463,27 +485,35 @@ export const VendorDashboardPage: React.FC = () => {
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-4 rounded border-2 border-dashed border-teal-400 bg-teal-100" /> Chờ đối soát</span>
           </div>
 
-          <div className="h-52 flex items-end justify-between gap-2 px-1">
-            {chartDataFinal.map((item, i) => {
-              const totalH = Math.round((item.total / maxChartVal) * 100);
-              const settledH = item.total > 0 ? Math.round((item.settled / item.total) * totalH) : 0;
-              const pendH = totalH - settledH;
-              const isHov = hoveredBar === i;
-              return (
-                <div key={item.month} className="flex-1 flex flex-col items-center gap-2 cursor-pointer" onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)}>
-                  <div className={`transition-all duration-150 ${isHov ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} text-[10px] font-bold text-slate-700 bg-white border border-slate-200 shadow-xl rounded-xl px-2 py-1.5 whitespace-nowrap text-center`}>
-                    <div className="font-black text-slate-900">{fmtM(item.total)} đ</div>
-                    <div className="text-emerald-600">Ròng: {fmtM(item.netRev)} đ</div>
-                    <div className="text-slate-500">{item.bookingCount} đơn · {item.guestCount} khách</div>
+          <div className="overflow-x-auto pb-2">
+            <div className={`h-52 flex items-end justify-between gap-2 px-1 ${filterMonths >= 6 ? 'min-w-[460px]' : ''}`}>
+              {chartDataFinal.map((item, i) => {
+                const totalH = Math.round((item.total / maxChartVal) * 100);
+                const settledH = item.total > 0 ? Math.round((item.settled / item.total) * totalH) : 0;
+                const pendH = totalH - settledH;
+                const isHov = hoveredBar === i;
+                return (
+                  <div
+                    key={item.month}
+                    className="flex-1 flex flex-col items-center gap-2 cursor-pointer"
+                    onMouseEnter={() => setHoveredBar(i)}
+                    onMouseLeave={() => setHoveredBar(null)}
+                    onClick={() => setHoveredBar((prev) => (prev === i ? null : i))}
+                  >
+                    <div className={`transition-all duration-150 ${isHov ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'} text-[10px] font-bold text-slate-700 bg-white border border-slate-200 shadow-xl rounded-xl px-2 py-1.5 whitespace-nowrap text-center`}>
+                      <div className="font-black text-slate-900">{fmtM(item.total)} đ</div>
+                      <div className="text-emerald-600">Ròng: {fmtM(item.netRev)} đ</div>
+                      <div className="text-slate-500">{item.bookingCount} đơn · {item.guestCount} khách</div>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-2xl h-40 flex flex-col justify-end overflow-hidden p-0.5 gap-0.5">
+                      <div className="w-full rounded-t-xl border-2 border-dashed border-teal-400 bg-teal-100 transition-all duration-500" style={{ height: `${pendH}%`, minHeight: pendH > 0 ? 4 : 0 }} />
+                      <div className="w-full rounded-b-xl bg-gradient-to-t from-emerald-700 to-emerald-500 transition-all duration-500" style={{ height: `${settledH}%`, minHeight: settledH > 0 ? 4 : 0 }} />
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap">{item.month}</span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-2xl h-40 flex flex-col justify-end overflow-hidden p-0.5 gap-0.5">
-                    <div className="w-full rounded-t-xl border-2 border-dashed border-teal-400 bg-teal-100 transition-all duration-500" style={{ height: `${pendH}%`, minHeight: pendH > 0 ? 4 : 0 }} />
-                    <div className="w-full rounded-b-xl bg-gradient-to-t from-emerald-700 to-emerald-500 transition-all duration-500" style={{ height: `${settledH}%`, minHeight: settledH > 0 ? 4 : 0 }} />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-500">{item.month}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -562,7 +592,7 @@ export const VendorDashboardPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="text-right space-y-0.5">
+                <div className="text-left md:text-right space-y-0.5 shrink-0">
                   <div className="text-[11px] text-[#526071]">{b.numberOfAdults} người lớn{b.numberOfChildren ? ` · ${b.numberOfChildren} trẻ em` : ''}</div>
                   <div className="text-sm font-black text-rose-600">{fmt(b.totalPrice || 0)} đ</div>
                   <div className="text-[10px] text-emerald-600 font-bold">Ròng: {fmt(Math.round((b.totalPrice || 0) * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE)))} đ</div>
@@ -584,15 +614,15 @@ export const VendorDashboardPage: React.FC = () => {
         ) : (
           <div className="divide-y divide-slate-100">
             {tours.map((t) => (
-              <div key={t.id} className="py-3.5 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <img src={t.thumbnailUrl} alt={t.title} className="h-12 w-16 object-cover rounded-xl border border-slate-200" />
-                  <div>
+              <div key={t.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <img src={t.thumbnailUrl} alt={t.title} className="h-12 w-16 object-cover rounded-xl border border-slate-200 shrink-0" />
+                  <div className="min-w-0">
                     <div className="text-xs font-extrabold text-slate-900 line-clamp-1">{t.title}</div>
                     <div className="text-[11px] text-slate-500">Mã: {t.tourCode} · Giá: <strong className="text-rose-600">{fmt(t.price)} đ</strong></div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <button onClick={() => navigate(`/vendor/tours/${t.id}/edit`)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition"><Edit className="h-3.5 w-3.5" /> Chỉnh sửa</button>
                   <button onClick={() => navigate(`/tours/${t.id}`)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition"><Eye className="h-3.5 w-3.5" /> Xem</button>
                 </div>

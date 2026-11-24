@@ -215,7 +215,7 @@ export const BecomeVendorPage: React.FC = () => {
       
 
       {/* Hero Header */}
-      <div className="border-b border-[#E6E1DA] bg-gradient-to-b from-slate-900/60 to-transparent pt-12 pb-14 px-4 sm:px-6 relative z-10">
+      <div className="border-b border-[#E6E1DA] bg-gradient-to-b from-[#E6F4F1] to-transparent pt-10 sm:pt-12 pb-12 sm:pb-14 px-4 sm:px-6 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 text-[#0B3B49] text-xs font-bold mb-4 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
             <Sparkles className="w-3.5 h-3.5 text-[#0D9488]" />
@@ -272,7 +272,7 @@ export const BecomeVendorPage: React.FC = () => {
         
         {/* Case 1: Đã là Vendor */}
         {isAlreadyVendor && (
-          <div className="mb-8 p-6 rounded-3xl border border-emerald-500/30 bg-emerald-950/20 backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="mb-8 p-5 sm:p-6 rounded-3xl border border-emerald-200 bg-white shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                 <BadgeCheck className="w-8 h-8" />
@@ -302,7 +302,7 @@ export const BecomeVendorPage: React.FC = () => {
 
         {/* Case 2: Hồ sơ đang chờ duyệt (PENDING_REVIEW) */}
         {!isAlreadyVendor && currentApp && currentApp.status === 'PENDING_REVIEW' && (
-          <div className="mb-8 p-8 rounded-3xl border border-amber-500/30 bg-[#0d1627]/90 backdrop-blur-xl shadow-2xl space-y-6">
+          <div className="mb-8 p-5 sm:p-8 rounded-3xl border border-amber-200 bg-white shadow-card space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E6E1DA] pb-5">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-700 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
@@ -405,14 +405,14 @@ export const BecomeVendorPage: React.FC = () => {
 
         {/* Case 3: Hồ sơ bị từ chối (REJECTED) */}
         {!isAlreadyVendor && currentApp && currentApp.status === 'REJECTED' && (
-          <div className="mb-8 p-6 sm:p-8 rounded-3xl border border-rose-500/40 bg-rose-950/20 backdrop-blur-xl shadow-2xl space-y-4">
+          <div className="mb-8 p-5 sm:p-8 rounded-3xl border border-rose-200 bg-white shadow-card space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-[#D95D39] flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-[#D95D39] flex items-center justify-center flex-shrink-0">
                 <XCircle className="w-7 h-7" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-rose-500/20 text-rose-700 border border-rose-500/40">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
                     Hồ Sơ Chưa Đạt Yêu Cầu
                   </span>
                   <span className="text-xs text-[#526071]">
@@ -422,7 +422,7 @@ export const BecomeVendorPage: React.FC = () => {
                 <h2 className="text-base sm:text-lg font-bold text-[#0F172A] mt-1">
                   Đơn đăng ký đại lý cần chỉnh sửa hoặc bổ sung giấy tờ
                 </h2>
-                <div className="mt-3 p-3.5 rounded-xl bg-black/40 border border-rose-500/30 text-rose-200 text-xs leading-relaxed">
+                <div className="mt-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs leading-relaxed">
                   <strong className="text-[#D95D39] font-bold block mb-1">Lý do từ chối từ Ban Quản Trị:</strong>
                   {currentApp.rejectionReason || 'Thông tin giấy tờ chưa hợp lệ hoặc mờ không rõ nét.'}
                 </div>
@@ -436,14 +436,14 @@ export const BecomeVendorPage: React.FC = () => {
 
         {/* Case 4: Hồ sơ bị thu hồi quyền (REVOKED) */}
         {!isAlreadyVendor && currentApp && currentApp.status === 'REVOKED' && (
-          <div className="mb-8 p-6 sm:p-8 rounded-3xl border border-amber-500/40 bg-amber-950/25 backdrop-blur-xl shadow-2xl space-y-4">
+          <div className="mb-8 p-5 sm:p-8 rounded-3xl border border-amber-200 bg-white shadow-card space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center flex-shrink-0">
                 <ShieldAlert className="w-7 h-7" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-800 border border-amber-500/40">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
                     Đã Thu Hồi Quyền Đối Tác
                   </span>
                   <span className="text-xs text-[#526071]">
@@ -453,8 +453,8 @@ export const BecomeVendorPage: React.FC = () => {
                 <h2 className="text-base sm:text-lg font-bold text-[#0F172A] mt-1">
                   Quyền đối tác Vendor đã được chuyển về Khách hàng thường
                 </h2>
-                <div className="mt-3 p-3.5 rounded-xl bg-black/40 border border-amber-500/30 text-amber-200 text-xs leading-relaxed">
-                  <strong className="text-amber-700 font-bold block mb-1">Ghi chú từ Quản Trị Viên:</strong>
+                <div className="mt-3 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed">
+                  <strong className="text-amber-800 font-bold block mb-1">Ghi chú từ Quản Trị Viên:</strong>
                   {currentApp.rejectionReason || 'Quyền đối tác đã được thu hồi theo yêu cầu hoặc do kiểm toán định kỳ.'}
                 </div>
                 <p className="text-xs text-[#475569] mt-3">
@@ -467,7 +467,7 @@ export const BecomeVendorPage: React.FC = () => {
 
         {/* Form nộp hồ sơ (Hiển thị khi chưa là vendor & chưa có đơn pending) */}
         {(!isAlreadyVendor && (!currentApp || currentApp.status === 'REJECTED' || currentApp.status === 'REVOKED')) && (
-          <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-2xl p-6 sm:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.8)]">
+          <div className="rounded-3xl border border-[#E6E1DA] bg-white p-5 sm:p-10 shadow-card">
             <div className="border-b border-[#E6E1DA] pb-6 mb-8">
               <div className="flex items-center gap-2.5 text-[#0D9488] text-xs font-bold uppercase tracking-wider mb-1">
                 <Building2 className="w-4 h-4" />
@@ -802,7 +802,7 @@ export const BecomeVendorPage: React.FC = () => {
                   />
                   <span className="text-xs text-[#475569] leading-normal">
                     Tôi cam kết toàn bộ thông tin đăng ký và hồ sơ pháp lý đính kèm là hoàn toàn xác thực, tuân thủ Luật Du lịch Việt Nam và chịu trách nhiệm trước pháp luật. Tôi đồng ý với{' '}
-                    <a href="/terms" target="_blank" className="text-[#0D9488] underline hover:text-[#0B3B49]">
+                    <a href="/about" target="_blank" rel="noreferrer" className="text-[#0D9488] underline hover:text-[#0B3B49]">
                       Quy chế hoạt động sàn SmartTravel
                     </a>.
                   </span>

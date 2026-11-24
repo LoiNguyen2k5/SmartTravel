@@ -19,11 +19,18 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   body {
     background-color: #FAF8F5;
     color: #0F172A;
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
   }
 
   ::selection {
@@ -157,4 +164,195 @@
 
 .ocean-portal tbody tr:hover {
   background-color: #FAF8F5;
+}
+
+/* ==========================================================================
+   UNIVERSAL CROSS-DEVICE ADAPTATION
+   Supports: Foldable Cover (280px+), Smartphones, Landscape Mobile, Tablets
+   (iPad/Galaxy Tab/Surface), Laptops, 2K/4K/Ultrawide/Smart TV, Touch & Print
+   ========================================================================== */
+
+/* 1. Safe-area support for Notch, Dynamic Island & mobile gesture bars */
+@supports (padding: max(0px)) {
+  .floating-hub {
+    bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+    right: max(0.75rem, calc(env(safe-area-inset-right) + 0.5rem));
+  }
+
+  .floating-chat-window {
+    bottom: max(4.5rem, calc(env(safe-area-inset-bottom) + 4rem));
+  }
+
+  @media (min-width: 640px) {
+    .floating-hub {
+      bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 1rem));
+      right: max(1.5rem, calc(env(safe-area-inset-right) + 1rem));
+    }
+
+    .floating-chat-window {
+      bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 1rem));
+    }
+  }
+
+  footer {
+    padding-bottom: max(2rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+  }
+}
+
+/* 2. Ultra-narrow foldable cover screens (Galaxy Z Fold cover 280px–340px) */
+@media (max-width: 340px) {
+  html {
+    font-size: 14.5px;
+  }
+}
+
+/* 3. Short landscape viewports (rotated phones 640-932×360-440, Nest Hub, split-screen) */
+@media (max-height: 540px) {
+  .floating-social-links {
+    display: none !important;
+  }
+
+  .floating-chat-window {
+    top: 4.25rem;
+    bottom: 0.75rem;
+    height: auto !important;
+    max-height: calc(100dvh - 5rem) !important;
+  }
+}
+
+/* 4. Ultra-wide, 2K, 4K & Smart TV displays: comfortable reading scale */
+@media (min-width: 2200px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 3000px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+/* 5. Pure touchscreens (phones, iPads, tablets, kiosks): disable sticky hover jumps, expose hover-only actions & prevent iOS Safari input auto-zoom */
+@media (hover: none) and (pointer: coarse) {
+  .boarding-pass-card:hover {
+    transform: none;
+  }
+
+  .touch-visible {
+    opacity: 1 !important;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='url'],
+  input[type='search'],
+  input[type='date'],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* 6. Scrollbar utilities (Tailwind v3 without scrollbar plugin) */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+/* 7. Lightweight modal & dropdown entrance animations (without requiring tailwindcss-animate) */
+@keyframes stFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes stZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes stSlideFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in.fade-in,
+.animate-fade-in,
+.animate-fadeIn {
+  animation: stFadeIn 180ms ease-out both;
+}
+
+.animate-in.zoom-in,
+.animate-in.zoom-in-95,
+.animate-scale-up {
+  animation: stZoomIn 180ms ease-out both;
+}
+
+.animate-in.slide-in-from-top-2,
+.animate-in.slide-in-from-top-3,
+.animate-in.slide-in-from-top-4 {
+  animation: stSlideFromTop 180ms ease-out both;
+}
+
+/* 8. Accessibility: respect OS reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 9. Print / PDF mode (printing E-Tickets, invoices, dashboards & itineraries cleanly without clipping) */
+@media print {
+  .no-print,
+  header,
+  footer,
+  aside {
+    display: none !important;
+  }
+
+  html,
+  body,
+  #root,
+  main,
+  .ocean-portal {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
 }

@@ -122,8 +122,8 @@ export const VendorSchedulesPage: React.FC = () => {
     <div className="mx-auto max-w-6xl space-y-8">
       {/* Title */}
       <div>
-        <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-          <CalendarDays className="h-8 w-8 text-emerald-600" /> Lịch Khởi Hành & Quản Lý Vòng Đời Tour
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
+          <CalendarDays className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-600 shrink-0" /> Lịch Khởi Hành & Quản Lý Vòng Đời Tour
         </h1>
         <p className="mt-1 text-sm text-slate-600">
           Cài đặt hạn đặt trước ({selectedTourLeadDays} ngày{selectedTour?.requiresVisa ? ' theo mẫu Visa' : selectedTour?.category === 'NUOC_NGOAI' ? ' quốc tế' : ' trong nước'}), quy định tối thiểu 10 khách/đoàn và tự động hoàn tiền

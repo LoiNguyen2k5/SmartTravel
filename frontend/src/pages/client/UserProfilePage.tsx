@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { authService } from '../../services/authService';
 import { User as UserIcon, Mail, Phone, Camera, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -90,10 +91,10 @@ export const UserProfilePage: React.FC = () => {
           <p className="text-xs text-[#526071] mt-1">Quản lý thông tin tài khoản và bảo mật trải nghiệm Smart Travel</p>
         </div>
 
-        <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-6 text-[#0F172A]">
+        <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-5 sm:p-8 shadow-card space-y-6 text-[#0F172A]">
           {/* Avatar & User Header */}
-          <div className="flex items-center gap-6">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-4 sm:gap-6">
+            <div className="relative shrink-0">
               <div className="h-20 w-20 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-400 flex items-center justify-center text-white font-black text-2xl overflow-hidden shadow-[0_0_20px_rgba(14,165,233,0.3)] border-2 border-[#CBD5E1]">
                 {avatarUrl || user?.avatarUrl ? (
                   <img src={avatarUrl || user?.avatarUrl} alt="avatar" className="h-full w-full object-cover" />
@@ -110,9 +111,9 @@ export const UserProfilePage: React.FC = () => {
                 <Camera className="h-3.5 w-3.5" />
               </button>
             </div>
-            <div>
-              <div className="font-extrabold text-xl text-[#0F172A]">{fullName || user?.fullName || 'Khách Hàng SmartTravel'}</div>
-              <div className="text-xs text-[#0D9488]/80 font-mono mt-0.5">{user?.email}</div>
+            <div className="min-w-0">
+              <div className="font-extrabold text-lg sm:text-xl text-[#0F172A] break-words">{fullName || user?.fullName || 'Khách Hàng SmartTravel'}</div>
+              <div className="text-xs text-[#0D9488]/80 font-mono mt-0.5 break-all">{user?.email}</div>
             </div>
           </div>
 
@@ -216,7 +217,7 @@ export const UserProfilePage: React.FC = () => {
         {/* Change Password Card */}
         <form
           onSubmit={handleChangePassword}
-          className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-5 text-[#0F172A]"
+          className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-5 sm:p-8 shadow-card space-y-5 text-[#0F172A]"
         >
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-[#0D9488]">
@@ -305,12 +306,12 @@ export const UserProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <a
-            href={user?.roles?.includes('ROLE_VENDOR') ? '/vendor' : '/become-vendor'}
+          <Link
+            to={user?.roles?.includes('ROLE_VENDOR') ? '/vendor' : '/become-vendor'}
             className="flex-shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.3)] transition"
           >
             {user?.roles?.includes('ROLE_VENDOR') ? 'Truy cập Kênh Vendor' : 'Nộp hồ sơ Đối tác'}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -188,7 +188,7 @@ export const VendorTourListPage: React.FC = () => {
                       <span className="absolute top-3 left-3 bg-white backdrop-blur-md text-[#0F172A] text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg">
                         {t.tourCode}
                       </span>
-                      <span className={`absolute top-3 right-3 text-[#0F172A] text-[10px] font-bold px-2.5 py-1 rounded-lg ${
+                      <span className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg ${
                         hasUpcoming ? 'bg-emerald-600' : 'bg-slate-700'
                       }`}>
                         {hasUpcoming ? 'Đang Mở Bán' : 'Đã Kết Thúc'}

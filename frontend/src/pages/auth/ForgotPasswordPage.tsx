@@ -106,7 +106,7 @@ export const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-5 text-[#0F172A]">
+    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-5 sm:p-8 shadow-card space-y-5 text-[#0F172A]">
       {step === 'EMAIL' ? (
         /* Bước 1: Nhập Email */
         <>
@@ -189,7 +189,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="123456"
-                className="w-full text-center text-2xl font-bold tracking-[8px] rounded-xl border border-[#CBD5E1] bg-[#FAF8F5] px-4 py-2.5 text-[#D95D39] focus:border-rose-400 focus:outline-none transition"
+                className="w-full text-center text-2xl font-bold tracking-[6px] sm:tracking-[8px] rounded-xl border border-[#CBD5E1] bg-[#FAF8F5] px-4 py-2.5 text-[#D95D39] focus:border-rose-400 focus:outline-none transition"
               />
             </div>
 

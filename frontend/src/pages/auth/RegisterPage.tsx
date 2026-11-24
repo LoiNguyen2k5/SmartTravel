@@ -123,7 +123,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-5 text-[#0F172A]">
+    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-5 sm:p-8 shadow-card space-y-5 text-[#0F172A]">
       {/* Step 1: Form điền thông tin Đăng Ký */}
       {step === 'FORM' ? (
         <>

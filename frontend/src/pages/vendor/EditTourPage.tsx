@@ -274,7 +274,7 @@ export const EditTourPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">Số Ngày</label>
                 <input
@@ -338,7 +338,8 @@ export const EditTourPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveGalleryImage(idx)}
-                      className="absolute top-1.5 right-1.5 p-1 rounded-full bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition"
+                      className="touch-visible absolute top-1.5 right-1.5 p-1.5 sm:p-1 rounded-full bg-rose-600 text-white opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition shadow-sm"
+                      aria-label="Xóa ảnh khỏi thư viện"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>

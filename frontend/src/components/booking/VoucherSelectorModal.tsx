@@ -67,8 +67,8 @@ export const VoucherSelectorModal: React.FC<VoucherSelectorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-4 sm:p-6 flex items-center justify-center animate-in fade-in" style={{ zIndex: 9999 }}>
-      <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-float border border-[#CBD5E1] text-[#0F172A] relative space-y-4 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-3 sm:p-6 flex items-start justify-center animate-in fade-in" style={{ zIndex: 9999 }}>
+      <div className="w-full max-w-lg bg-white rounded-3xl p-4 sm:p-6 shadow-float border border-[#CBD5E1] text-[#0F172A] relative space-y-4 max-h-[90dvh] my-auto flex flex-col">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3 flex-shrink-0">
@@ -233,7 +233,7 @@ export const VoucherSelectorModal: React.FC<VoucherSelectorModalProps> = ({
                         className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1 ${
                           isSelected
                             ? 'bg-emerald-500 text-white shadow-lg'
-                            : 'bg-[#F4F1EC] hover:bg-emerald-500 hover:text-white text-emerald-300 border border-emerald-500/30'
+                            : 'bg-[#F4F1EC] hover:bg-emerald-500 hover:text-white text-emerald-700 border border-emerald-500/30'
                         }`}
                       >
                         {isSelected ? 'Đang Chọn' : 'Dùng Ngay'}

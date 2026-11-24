@@ -159,8 +159,8 @@ export const AiChatWidget: React.FC = () => {
 
   return (
     <>
-      {/* ─── FLOATING CONTACT & AI ACTION HUB (FIXED BOTTOM-6 RIGHT-6) ─── */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 items-center">
+      {/* ─── FLOATING CONTACT & AI ACTION HUB ─── */}
+      <div className="floating-hub no-print fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-2 sm:gap-2.5 items-center">
         {/* 1. ROBOT ICON BUTTON (1 icon robot, không text, nằm trên Zalo) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -170,6 +170,7 @@ export const AiChatWidget: React.FC = () => {
               : 'bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-emerald-900/30'
           }`}
           title="Trợ lý ảo AI - Tư Vấn Tour 24/7"
+          aria-label="Trợ lý ảo AI SmartTravel"
         >
           <Bot className="h-6 w-6 transition-transform group-hover:rotate-12" />
           {!isOpen && (
@@ -180,15 +181,17 @@ export const AiChatWidget: React.FC = () => {
           )}
         </button>
 
+        {/* Secondary contact links: compact on mobile & auto-hidden on short landscape viewports */}
+        <div className={`floating-social-links ${isOpen ? 'hidden sm:flex' : 'flex'} flex-col gap-2 sm:gap-2.5 items-center`}>
         {/* 2. ZALO ICON */}
         <a
           href="https://zalo.me/0941899554"
           target="_blank"
           rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl overflow-hidden shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center bg-white border border-white/30"
+          className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl overflow-hidden shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center bg-white border border-white/30"
           title="Tư vấn qua Zalo (0941 899 554)"
         >
-          <ZaloIcon className="h-11 w-11" />
+          <ZaloIcon className="h-10 w-10 sm:h-11 sm:w-11" />
         </a>
 
         {/* 3. FACEBOOK */}
@@ -196,10 +199,10 @@ export const AiChatWidget: React.FC = () => {
           href="https://www.facebook.com/loiii.nguyen.397715"
           target="_blank"
           rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
+          className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
           title="Trang Facebook"
         >
-          <Facebook className="h-5 w-5" />
+          <Facebook className="h-4 w-4 sm:h-5 sm:w-5" />
         </a>
 
         {/* 4. INSTAGRAM */}
@@ -207,19 +210,19 @@ export const AiChatWidget: React.FC = () => {
           href="https://www.instagram.com/loiiinguyen/"
           target="_blank"
           rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
+          className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
           title="Instagram"
         >
-          <Instagram className="h-5 w-5" />
+          <Instagram className="h-4 w-4 sm:h-5 sm:w-5" />
         </a>
 
         {/* 5. HOTLINE PHONE */}
         <a
           href="tel:0941899554"
-          className="h-11 w-11 rounded-2xl bg-accent-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
+          className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-accent-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
           title="Gọi Hotline: 0941 899 554"
         >
-          <Phone className="h-5 w-5 fill-white" />
+          <Phone className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />
         </a>
 
         {/* 6. GOOGLE MAPS */}
@@ -227,16 +230,17 @@ export const AiChatWidget: React.FC = () => {
           href="https://maps.google.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="h-11 w-11 rounded-2xl bg-slate-800 text-sky-400 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
+          className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-slate-800 text-sky-400 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all border border-white/20"
           title="Địa chỉ công ty"
         >
-          <MapPin className="h-5 w-5" />
+          <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
         </a>
+        </div>
       </div>
 
       {/* ─── CHAT WINDOW MODAL ─── */}
       {isOpen && (
-        <div className="fixed bottom-6 right-20 sm:right-24 z-50 flex h-[560px] max-h-[85vh] w-[calc(100vw-32px)] sm:w-[420px] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="floating-chat-window no-print fixed bottom-[4.5rem] left-3 right-3 sm:bottom-6 sm:left-auto sm:right-24 z-50 flex h-[74dvh] sm:h-[560px] max-h-[calc(100dvh-5.5rem)] sm:max-h-[calc(100dvh-3rem)] w-auto sm:w-[420px] sm:max-w-[calc(100vw-7rem)] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           {/* HEADER */}
           <div className="flex items-center justify-between border-b border-slate-100 bg-[#0B3B49] p-4 text-white">
             <div className="flex items-center gap-3">

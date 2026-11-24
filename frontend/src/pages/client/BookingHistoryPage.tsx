@@ -499,11 +499,11 @@ export const BookingHistoryPage: React.FC = () => {
   };
 
   const statusBadges: Record<string, { label: string; style: string }> = {
-    DEPOSITED: { label: 'Đã Cọc 30%', style: 'bg-amber-500/15 text-amber-300 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]' },
-    PAID: { label: 'Đã Thanh Toán Full', style: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]' },
-    COMPLETED: { label: 'Hoàn Thành Tour', style: 'bg-sky-500/15 text-sky-300 border-sky-500/30 shadow-[0_0_10px_rgba(14,165,233,0.15)]' },
-    CANCELLED: { label: 'Đã Hủy Đơn', style: 'bg-rose-500/15 text-rose-300 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]' },
-    PENDING: { label: 'Chờ Thanh Toán', style: 'bg-white/10 text-slate-300 border-white/20' },
+    DEPOSITED: { label: 'Đã Cọc 30%', style: 'bg-amber-50 text-amber-800 border-amber-300' },
+    PAID: { label: 'Đã Thanh Toán Full', style: 'bg-emerald-50 text-emerald-800 border-emerald-300' },
+    COMPLETED: { label: 'Hoàn Thành Tour', style: 'bg-sky-50 text-sky-800 border-sky-300' },
+    CANCELLED: { label: 'Đã Hủy Đơn', style: 'bg-rose-50 text-rose-800 border-rose-300' },
+    PENDING: { label: 'Chờ Thanh Toán', style: 'bg-slate-100 text-slate-700 border-slate-300' },
   };
 
   return (
@@ -516,9 +516,9 @@ export const BookingHistoryPage: React.FC = () => {
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-[#0F172A] flex items-center gap-3 tracking-tight">
-              <span className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-[#0D9488] shadow-[0_0_12px_rgba(34,211,238,0.2)]">
-                <History className="h-7 w-7" />
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] flex items-center gap-3 tracking-tight">
+              <span className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-[#0D9488] shadow-[0_0_12px_rgba(34,211,238,0.2)] shrink-0">
+                <History className="h-6 w-6 sm:h-7 sm:w-7" />
               </span>
               Quản Lý Đơn Đặt Tour & Vé Điện Tử
             </h1>
@@ -651,13 +651,13 @@ export const BookingHistoryPage: React.FC = () => {
 
                       {/* Visa Deadline Warning */}
                       {requiresVisa && b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && b.status !== 'REFUNDED' && (
-                        <div className="mt-3 bg-red-500/10 border border-red-500/40 rounded-xl p-3 flex items-start gap-3 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.15)]">
-                          <div className="h-7 w-7 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                            <Globe className="h-4 w-4 text-red-400" />
+                        <div className="mt-3 bg-rose-50 border border-rose-300 rounded-xl p-3 flex items-start gap-3">
+                          <div className="h-7 w-7 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+                            <Globe className="h-4 w-4 text-rose-600" />
                           </div>
                           <div className="space-y-0.5">
-                            <h4 className="font-bold text-red-400 text-xs uppercase">Cảnh báo: Hạn chót nộp hồ sơ Visa sắp tới</h4>
-                            <p className="text-[11px] text-red-200/80 leading-relaxed">
+                            <h4 className="font-bold text-rose-800 text-xs uppercase">Cảnh báo: Hạn chót nộp hồ sơ Visa sắp tới</h4>
+                            <p className="text-[11px] text-rose-700 leading-relaxed">
                               Tour của bạn có sử dụng dịch vụ ủy quyền làm Visa{dynamicVisaDeadlineText ? (<> — hạn chót gửi bản mềm cho Đại lý trước ngày <strong>{dynamicVisaDeadlineText}</strong></>) : ''}. Vui lòng bấm vào "Hồ sơ Visa" bên dưới để tải giấy tờ cho chuyên viên Đại lý sơ duyệt kịp tiến độ nộp Lãnh sự!
                             </p>
                           </div>
@@ -666,7 +666,7 @@ export const BookingHistoryPage: React.FC = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#E6E1DA]">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                           {b.status === 'PENDING' && (
                             <button
                               onClick={() => setPaymentBooking(b)}
@@ -760,7 +760,7 @@ export const BookingHistoryPage: React.FC = () => {
 
         {/* E-TICKET QR MODAL (Mounted via Portal to avoid being covered by navbar) */}
         {selectedTicket && createPortal(
-          <div className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in">
+          <div className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md flex items-start justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in">
             <div className="bg-white border border-[#CBD5E1] rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-card text-[#0F172A] max-h-[92vh] overflow-y-auto my-auto">
               <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3">
                 <div className="flex items-center gap-2 text-[#0D9488] font-bold text-base">
@@ -827,7 +827,7 @@ export const BookingHistoryPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => handleResendETicket(selectedTicket.bookingCode, selectedTicket)}
@@ -873,8 +873,8 @@ export const BookingHistoryPage: React.FC = () => {
 
         {/* VISA TRACKER MODAL */}
         {selectedVisaBooking && createPortal(
-          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
-            <div className="bg-white border border-[#CBD5E1] rounded-3xl max-w-3xl w-full p-6 shadow-card text-[#0F172A] overflow-y-auto max-h-[90vh]">
+          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 animate-in fade-in">
+            <div className="bg-white border border-[#CBD5E1] rounded-2xl sm:rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-card text-[#0F172A] overflow-y-auto max-h-[92dvh]">
               <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3 mb-4">
                 <div className="flex items-center gap-2 text-blue-400 font-bold text-base">
                   <Globe className="h-5 w-5" /> Quản lý Hồ sơ Visa

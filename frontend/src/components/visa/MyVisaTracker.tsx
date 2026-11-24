@@ -126,20 +126,20 @@ export const MyVisaTracker: React.FC<Props> = ({
   return (
     <div className="bg-[#0b1322] rounded-2xl border border-white/10 shadow-2xl overflow-hidden text-white">
       {/* Tracker Header */}
-      <div className="bg-gradient-to-r from-sky-950 via-[#0e1a2f] to-indigo-950 p-6 border-b border-white/10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-gradient-to-r from-sky-950 via-[#0e1a2f] to-indigo-950 p-4 sm:p-6 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-xs uppercase font-bold tracking-wider text-sky-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+              <span className="text-[11px] sm:text-xs uppercase font-bold tracking-wider text-sky-400">
                 Dịch Vụ Ủy Quyền Đại Lý Hỗ Trợ Hồ Sơ Visa
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+            <h2 className="text-lg sm:text-2xl font-black text-white mt-1">
               Hồ Sơ Visa #{application.bookingCode || application.bookingId}
             </h2>
           </div>
-          <div className="text-right space-y-1">
+          <div className="text-left sm:text-right space-y-1">
             {application.visaDeadline && (
               <div className="text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-1 inline-block">
                 Hạn nộp bản mềm: {new Date(application.visaDeadline).toLocaleDateString('vi-VN')}
@@ -154,44 +154,46 @@ export const MyVisaTracker: React.FC<Props> = ({
         </div>
 
         {/* Stepper 5 bước */}
-        <div className="mt-7 grid grid-cols-5 gap-1 relative">
-          {getStepItems().map((step, idx) => (
-            <div key={idx} className="flex flex-col items-center gap-1.5 text-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs transition-all shadow-lg ${
-                  step.isRejected
-                    ? 'bg-rose-500 text-white ring-4 ring-rose-500/30'
-                    : step.isWarning
-                    ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/30'
-                    : step.current
-                    ? 'bg-gradient-to-br from-sky-400 to-indigo-500 text-white ring-4 ring-sky-400/30 scale-105'
-                    : step.active
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-slate-800 text-slate-400 border border-white/10'
-                }`}
-              >
-                {step.isRejected || step.isWarning ? '!' : idx + 1}
+        <div className="mt-6 overflow-x-auto pb-1">
+          <div className="min-w-[420px] grid grid-cols-5 gap-2 relative">
+            {getStepItems().map((step, idx) => (
+              <div key={idx} className="flex flex-col items-center gap-1.5 text-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs transition-all shadow-lg ${
+                    step.isRejected
+                      ? 'bg-rose-500 text-white ring-4 ring-rose-500/30'
+                      : step.isWarning
+                      ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/30'
+                      : step.current
+                      ? 'bg-gradient-to-br from-sky-400 to-indigo-500 text-white ring-4 ring-sky-400/30 scale-105'
+                      : step.active
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-800 text-slate-400 border border-white/10'
+                  }`}
+                >
+                  {step.isRejected || step.isWarning ? '!' : idx + 1}
+                </div>
+                <span
+                  className={`text-[10px] sm:text-[11px] font-bold leading-tight ${
+                    step.current ? 'text-sky-300' : step.active ? 'text-white' : 'text-slate-400'
+                  }`}
+                >
+                  {step.name}
+                </span>
               </div>
-              <span
-                className={`text-[10px] sm:text-[11px] font-bold leading-tight ${
-                  step.current ? 'text-sky-300' : step.active ? 'text-white' : 'text-slate-400'
-                }`}
-              >
-                {step.name}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {application.notes && (
-        <div className="mx-6 mt-5 p-3.5 bg-sky-500/10 border border-sky-500/25 rounded-xl text-xs text-sky-200">
+        <div className="mx-4 sm:mx-6 mt-4 sm:mt-5 p-3.5 bg-sky-500/10 border border-sky-500/25 rounded-xl text-xs text-sky-200">
           <strong>Ghi chú tiến độ từ Đại lý:</strong> {application.notes}
         </div>
       )}
 
       {application.status === 'REJECTED' && (
-        <div className="mx-6 mt-4 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex gap-3 text-rose-200">
+        <div className="mx-4 sm:mx-6 mt-4 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex gap-3 text-rose-200">
           <AlertTriangle className="shrink-0 text-rose-400 mt-0.5" size={20} />
           <div>
             <h4 className="font-bold text-sm text-rose-300">Thông báo kết quả từ ĐSQ: Không đạt thị thực</h4>
@@ -203,14 +205,14 @@ export const MyVisaTracker: React.FC<Props> = ({
       )}
 
       {errorMsg && (
-        <div className="mx-6 mt-4 p-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs text-rose-300 font-semibold">
+        <div className="mx-4 sm:mx-6 mt-4 p-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs text-rose-300 font-semibold">
           {errorMsg}
         </div>
       )}
 
       {/* Document Upload Section */}
-      <div className="p-6 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
             <FileText size={16} className="text-sky-400" /> Danh mục bản mềm giấy tờ gửi Đại lý sơ duyệt
           </h3>

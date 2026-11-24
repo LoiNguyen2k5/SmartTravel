@@ -226,10 +226,10 @@ export const VoucherManagementPage: React.FC = () => {
     <div className="space-y-7">
       {/* Toast Notification */}
       {toastMsg && (
-        <div className={`fixed top-20 right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl border text-sm font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 ${
+        <div className={`fixed top-20 left-4 right-4 sm:left-auto sm:right-6 z-50 max-w-md px-4 py-3 rounded-2xl shadow-2xl border text-sm font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-4 ${
           toastMsg.type === 'success' 
-            ? 'bg-emerald-950/95 border-emerald-500/40 text-emerald-800' 
-            : 'bg-rose-950/95 border-rose-500/40 text-rose-800'
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-900' 
+            : 'bg-rose-50 border-rose-300 text-rose-900'
         }`}>
           {toastMsg.type === 'success' ? <CheckCircle2 className="h-4 w-4 text-emerald-700" /> : <AlertCircle className="h-4 w-4 text-[#D95D39]" />}
           {toastMsg.text}
@@ -363,7 +363,7 @@ export const VoucherManagementPage: React.FC = () => {
       {/* Table Container */}
       <div className="bg-white border border-[#E6E1DA] rounded-3xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#475569]">
+          <table className="w-full min-w-[780px] text-left text-xs text-[#475569]">
             <thead className="bg-[#FAF8F5] text-[#526071] font-bold uppercase tracking-wider border-b border-[#E6E1DA]">
               <tr>
                 <th className="py-4 px-5">Mã Voucher</th>
@@ -528,8 +528,8 @@ export const VoucherManagementPage: React.FC = () => {
 
       {/* CREATE / EDIT MODAL */}
       {showModal && (
-        <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-4 sm:p-6 flex items-center justify-center animate-in fade-in" style={{ zIndex: 9999 }}>
-          <div className="w-full max-w-xl bg-white rounded-3xl p-6 sm:p-7 shadow-float space-y-5 border border-[#CBD5E1] text-[#0F172A] relative">
+        <div className="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-md p-3 sm:p-6 flex items-start justify-center animate-in fade-in" style={{ zIndex: 9999 }}>
+          <div className="w-full max-w-xl bg-white rounded-3xl p-5 sm:p-7 shadow-float space-y-5 border border-[#CBD5E1] text-[#0F172A] relative my-auto max-h-[90dvh] overflow-y-auto">
             
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-4">
@@ -558,7 +558,7 @@ export const VoucherManagementPage: React.FC = () => {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {formError && (
-                <div className="p-3 rounded-2xl bg-rose-950/70 border border-rose-500/30 text-rose-800 text-xs flex items-center gap-2">
+                <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-[#D95D39] flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -639,7 +639,7 @@ export const VoucherManagementPage: React.FC = () => {
 
               {/* Discount Inputs based on type */}
               {discountType === 'PERCENT' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-emerald-950/20 border border-emerald-500/25 p-3.5 rounded-2xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-emerald-50/70 border border-emerald-200 p-3.5 rounded-2xl">
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-emerald-700">% Giảm Giá (1 - 100)</label>
                     <input
@@ -667,7 +667,7 @@ export const VoucherManagementPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-amber-950/20 border border-amber-500/25 p-3.5 rounded-2xl space-y-1">
+                <div className="bg-amber-50/70 border border-amber-200 p-3.5 rounded-2xl space-y-1">
                   <label className="text-[11px] font-bold text-amber-800">Số Tiền Giảm Cố Định (VNĐ)</label>
                   <input
                     type="number"

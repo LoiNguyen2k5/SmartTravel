@@ -329,7 +329,7 @@ export const VendorApprovalPage: React.FC = () => {
       {/* Table List */}
       <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[780px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-[#E6E1DA] bg-[#FAF8F5] text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
                 <th className="py-3.5 px-4">Mã đơn</th>
@@ -587,7 +587,7 @@ export const VendorApprovalPage: React.FC = () => {
             </div>
 
             {/* Modal Footer (Action Buttons) */}
-            <div className="px-6 py-4 border-t border-[#E6E1DA] bg-[#FAF8F5] flex items-center justify-between gap-3">
+            <div className="px-4 sm:px-6 py-4 border-t border-[#E6E1DA] bg-[#FAF8F5] flex flex-wrap items-center justify-between gap-2 sm:gap-3">
               <button
                 onClick={() => setSelectedApp(null)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-[#526071] hover:text-[#0F172A] transition cursor-pointer"
@@ -595,7 +595,7 @@ export const VendorApprovalPage: React.FC = () => {
                 Đóng cửa sổ
               </button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 {selectedApp.status === 'PENDING_REVIEW' && (
                   <>
                     <button
@@ -670,8 +670,8 @@ export const VendorApprovalPage: React.FC = () => {
       {/* MODAL: NHẬP LÝ DO TỪ CHỐI                                */}
       {/* ======================================================== */}
       {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white border border-rose-500/40 p-6 shadow-2xl space-y-4 text-[#0F172A]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-3xl bg-white border border-rose-500/40 p-5 sm:p-6 shadow-2xl space-y-4 text-[#0F172A]">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-rose-500/20 text-[#D95D39] border border-rose-500/30">
                 <AlertTriangle className="w-5 h-5" />

@@ -33,14 +33,36 @@ const PLATFORM_COMMISSION = 0.10; // 10% hoa hồng sàn
 const GATEWAY_FEE = 0.015;        // 1.5% phí cổng TT
 const SETTLED_VENDORS_KEY = 'smart_travel_settled_vendor_ids';
 
-const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
-  <span className="relative group inline-flex items-center">
-    {children}
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-56 rounded-xl bg-white text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
-      {text}
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [open]);
+
+  return (
+    <span
+      className="relative group inline-flex items-center"
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen((v) => !v);
+      }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {children}
+      <span
+        className={`absolute bottom-full right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 mb-2 z-50 ${
+          open ? 'block' : 'hidden group-hover:block'
+        } w-56 max-w-[75vw] rounded-xl bg-white border border-slate-200 text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none`}
+      >
+        {text}
+      </span>
     </span>
-  </span>
-);
+  );
+};
 
 export const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -119,7 +141,7 @@ export const DashboardPage: React.FC = () => {
             Giám sát thời gian thực toàn bộ hoạt động kinh doanh, người dùng và đối tác trên sàn SmartTravel
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowSentimentModal(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#0B3B49] hover:bg-[#0F5264] text-white text-sm font-bold rounded-xl shadow-sm border border-[#082E3A] transition active:scale-95 cursor-pointer"
@@ -425,7 +447,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-[#526071] bg-slate-50">
               <tr>
                 <th className="py-3 px-4">Mã Booking</th>

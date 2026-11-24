@@ -269,7 +269,7 @@ export const VendorVisaPage: React.FC = () => {
 
           <div className="bg-white border border-slate-700/50 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[780px]">
                 <thead>
                   <tr className="border-b border-slate-700/50">
                     {["Mã Booking", "Khách Hàng", "Tour", "Bản Mềm", "Hạn Nộp Hồ Sơ", "Trạng Thái", "Thao Tác"].map(h => (
@@ -563,10 +563,10 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
     });
   };
 
-  const inputCls = "w-full bg-slate-800 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500/60";
+  const inputCls = "w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-lg px-3 py-2 text-sm text-[#0F172A] placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0D9488]";
 
   return (
-    <div className="bg-white border border-sky-500/30 rounded-2xl p-6 space-y-5">
+    <div className="bg-white border border-sky-500/30 rounded-2xl p-4 sm:p-6 space-y-5 shadow-card">
       <div className="flex items-center justify-between">
         <h3 className="font-black text-[#0F172A] text-base">
           {initial ? "Chỉnh Sửa Mẫu Hồ Sơ Visa" : "Thêm Mẫu Hồ Sơ Visa Mới"}
@@ -584,10 +584,10 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
               key={opt.code}
               type="button"
               onClick={() => pickFlag(opt)}
-              className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border transition cursor-pointer ${
                 countryCode === opt.code
-                  ? "bg-sky-500/20 border-sky-500/50 text-sky-300"
-                  : "bg-slate-800 border-slate-700/50 text-slate-300 hover:border-slate-500"
+                  ? "bg-[#E6F4F1] border-[#0D9488] text-[#0B3B49]"
+                  : "bg-[#FAF8F5] border-[#E6E1DA] text-[#475569] hover:border-[#CBD5E1]"
               }`}
             >
               {opt.flag} {opt.name}
@@ -596,7 +596,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label className="block text-xs font-bold text-[#526071] mb-1">Tên quốc gia *</label>
           <input value={country} onChange={e => setCountry(e.target.value)} placeholder="VD: Nhật Bản" className={inputCls} />
@@ -621,7 +621,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
           <label className="block text-xs font-bold text-[#526071] mb-1">Phí dịch vụ Đại lý (VND)</label>
           <input type="number" min={0} value={visaFee} onChange={e => setVisaFee(Number(e.target.value))} className={inputCls} />
         </div>
-        <div className="col-span-2 lg:col-span-3">
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3">
           <label className="block text-xs font-bold text-amber-800 mb-1">
             Lệ phí Lãnh sự tham khảo (VND - Để riêng theo quy định ĐSQ, không cộng gộp vào giá thanh toán online)
           </label>
@@ -637,35 +637,35 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <label className="text-xs font-bold text-[#526071] uppercase tracking-wider">Danh mục giấy tờ ({docs.length})</label>
           <button
             type="button"
             onClick={addDoc}
-            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 rounded-lg text-xs font-bold hover:bg-emerald-500/20 transition"
+            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-100 transition cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" /> Thêm giấy tờ
           </button>
         </div>
         <div className="space-y-3">
           {docs.map((doc, i) => (
-            <div key={i} className="flex gap-3 items-start bg-slate-800/60 rounded-xl p-3 border border-slate-700/30">
+            <div key={i} className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-start bg-[#FAF8F5] rounded-xl p-3 border border-[#E6E1DA]">
               <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input
                   value={doc.documentName}
                   onChange={e => updateDoc(i, "documentName", e.target.value)}
                   placeholder="Tên loại giấy tờ"
-                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-sky-500/60"
+                  className="bg-white border border-[#CBD5E1] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-[#0D9488]"
                 />
                 <input
                   value={doc.description}
                   onChange={e => updateDoc(i, "description", e.target.value)}
                   placeholder="Hướng dẫn chi tiết cho khách"
-                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-sky-500/60"
+                  className="bg-white border border-[#CBD5E1] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-[#0D9488]"
                 />
               </div>
-              <div className="flex items-center gap-2 shrink-0 mt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer text-xs text-[#526071]">
+              <div className="flex items-center justify-between sm:justify-start gap-2 shrink-0 sm:mt-1">
+                <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-[#475569]">
                   <input
                     type="checkbox"
                     checked={doc.isMandatory}
@@ -674,7 +674,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
                   />
                   Bắt buộc
                 </label>
-                <button type="button" onClick={() => removeDoc(i)} className="p-1 text-slate-500 hover:text-red-400 transition">
+                <button type="button" onClick={() => removeDoc(i)} className="p-1 text-slate-500 hover:text-rose-600 transition cursor-pointer" aria-label="Xóa loại giấy tờ">
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -684,14 +684,14 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onCancel} className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-[#334155] rounded-xl text-sm font-bold transition">
+        <button type="button" onClick={onCancel} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition cursor-pointer">
           Hủy
         </button>
         <button
           type="button"
           onClick={handleSubmit}
           disabled={!country.trim() || docs.length === 0}
-          className="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-sky-500/25"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#0B3B49] hover:bg-[#0F5264] disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl text-sm font-bold transition shadow-sm cursor-pointer"
         >
           <Save className="h-4 w-4" /> Lưu Mẫu Visa
         </button>
