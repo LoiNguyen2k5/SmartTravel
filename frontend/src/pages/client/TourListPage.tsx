@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
-import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight, Plane, Bus } from 'lucide-react';
+import { Filter, RefreshCw, ChevronRight } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { getTourTransportInfo, TourTransportMode } from '../../utils/tourTransport';
+import { BoardingPassTourCard } from '../../components/tour/BoardingPassTourCard';
 
 export const TourListPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Helper to parse category from URL
   const parseCategoryFromParams = (params: URLSearchParams): string => {
     const raw = params.get('type') || params.get('category');
     if (!raw) return 'ALL';
@@ -29,10 +29,8 @@ export const TourListPage: React.FC = () => {
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  // Mỗi trang hiển thị tối đa 9 tour
   const PAGE_SIZE = 9;
 
-  // Helper to read initial page from URL or sessionStorage
   const getInitialPage = (): number => {
     const pageInUrl = searchParams.get('page');
     if (pageInUrl) {
@@ -49,7 +47,6 @@ export const TourListPage: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(getInitialPage);
 
-  // tours là danh sách đã được lọc và sắp xếp
   const totalPages = Math.max(1, Math.ceil(tours.length / PAGE_SIZE));
   const activePage = Math.min(Math.max(currentPage, 1), totalPages);
   const startIndex = (activePage - 1) * PAGE_SIZE;
@@ -57,6 +54,7 @@ export const TourListPage: React.FC = () => {
   const visibleTours = tours.slice(startIndex, startIndex + PAGE_SIZE);
   const firstItem = tours.length === 0 ? 0 : startIndex + 1;
   const lastItem = Math.min(startIndex + PAGE_SIZE, tours.length);
+
   // Filters state
   const [departure, setDeparture] = useState<string>(() => searchParams.get('departure') || 'Tất cả');
   const [destination, setDestination] = useState<string>(() => searchParams.get('destination') || 'Tất cả');
@@ -83,7 +81,7 @@ export const TourListPage: React.FC = () => {
   const changePage = (newPage: number) => {
     setCurrentPage(newPage);
     sessionStorage.setItem('smart_travel_tour_page', String(newPage));
-    setSearchParams(prev => {
+    setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       if (newPage > 1) {
         next.set('page', String(newPage));
@@ -92,10 +90,9 @@ export const TourListPage: React.FC = () => {
       }
       return next;
     });
-    window.scrollTo({ top: 350, behavior: 'smooth' });
+    window.scrollTo({ top: 260, behavior: 'smooth' });
   };
 
-  // Keep state synchronized with URL search params changes (e.g. Browser Back/Forward)
   useEffect(() => {
     const newCategory = parseCategoryFromParams(searchParams);
     if (newCategory !== categoryFilter) {
@@ -147,10 +144,9 @@ export const TourListPage: React.FC = () => {
         budgetFilter,
         sortBy,
       };
-      // Only reset to page 1 when user genuinely clicks a filter
       setCurrentPage(1);
       sessionStorage.setItem('smart_travel_tour_page', '1');
-      setSearchParams(prevParams => {
+      setSearchParams((prevParams) => {
         const next = new URLSearchParams(prevParams);
         next.delete('page');
         return next;
@@ -160,7 +156,6 @@ export const TourListPage: React.FC = () => {
     fetchTours();
   }, [departure, destination, transportFilter, durationFilter, categoryFilter, budgetFilter, sortBy]);
 
-  // Listen to schedule and custom tour changes
   useEffect(() => {
     const handleUpdate = () => {
       fetchTours();
@@ -180,53 +175,52 @@ export const TourListPage: React.FC = () => {
       const res = await tourService.getAllTours();
       let liveTours: Tour[] = res.success && Array.isArray(res.data) ? [...res.data] : [];
 
-      // Chuẩn hóa ảnh gallery phụ nếu tour chưa có gallery từ API
-      liveTours = liveTours.map(t => {
-        const assetMeta = MOCK_TOURS.find(m => m.id === t.id);
+      liveTours = liveTours.map((t) => {
+        const assetMeta = MOCK_TOURS.find((m) => m.id === t.id);
         if (assetMeta) {
           return {
             ...t,
-            thumbnailUrl: (t.thumbnailUrl && !t.thumbnailUrl.includes('unsplash')) ? t.thumbnailUrl : assetMeta.thumbnailUrl,
-            gallery: (t.gallery && t.gallery.length > 0) ? t.gallery : assetMeta.gallery,
+            thumbnailUrl:
+              t.thumbnailUrl && !t.thumbnailUrl.includes('unsplash') ? t.thumbnailUrl : assetMeta.thumbnailUrl,
+            gallery: t.gallery && t.gallery.length > 0 ? t.gallery : assetMeta.gallery,
           };
         }
         return t;
       });
 
-      // Tự động loại bỏ các tour có tất cả ngày khởi hành đã qua theo thời gian thực
-      liveTours = liveTours.filter(t => tourScheduleService.hasUpcomingSchedule(t.id));
+      liveTours = liveTours.filter((t) => tourScheduleService.hasUpcomingSchedule(t.id));
 
-      // Apply client-side filter combinations
       if (departure !== 'Tất cả') {
-        liveTours = liveTours.filter(t => t.departureLocation?.toLowerCase().includes(departure.toLowerCase()));
+        liveTours = liveTours.filter((t) =>
+          t.departureLocation?.toLowerCase().includes(departure.toLowerCase())
+        );
       }
       if (destination !== 'Tất cả') {
-        liveTours = liveTours.filter(t => t.title.toLowerCase().includes(destination.toLowerCase()));
+        liveTours = liveTours.filter((t) => t.title.toLowerCase().includes(destination.toLowerCase()));
       }
       if (transportFilter !== 'ALL') {
-        liveTours = liveTours.filter(t => getTourTransportInfo(t).mode === transportFilter);
+        liveTours = liveTours.filter((t) => getTourTransportInfo(t).mode === transportFilter);
       }
       if (durationFilter === '1_DAY') {
-        liveTours = liveTours.filter(t => t.durationDays === 1);
+        liveTours = liveTours.filter((t) => t.durationDays === 1);
       } else if (durationFilter === '1_TO_3') {
-        liveTours = liveTours.filter(t => t.durationDays >= 1 && t.durationDays <= 3);
+        liveTours = liveTours.filter((t) => t.durationDays >= 1 && t.durationDays <= 3);
       } else if (durationFilter === 'OVER_3') {
-        liveTours = liveTours.filter(t => t.durationDays > 3);
+        liveTours = liveTours.filter((t) => t.durationDays > 3);
       }
 
       if (categoryFilter !== 'ALL') {
-        liveTours = liveTours.filter(t => t.category === categoryFilter);
+        liveTours = liveTours.filter((t) => t.category === categoryFilter);
       }
 
       if (budgetFilter === 'UNDER_5M') {
-        liveTours = liveTours.filter(t => t.price < 5000000);
+        liveTours = liveTours.filter((t) => t.price < 5000000);
       } else if (budgetFilter === '5M_TO_10M') {
-        liveTours = liveTours.filter(t => t.price >= 5000000 && t.price <= 10000000);
+        liveTours = liveTours.filter((t) => t.price >= 5000000 && t.price <= 10000000);
       } else if (budgetFilter === 'OVER_10M') {
-        liveTours = liveTours.filter(t => t.price > 10000000);
+        liveTours = liveTours.filter((t) => t.price > 10000000);
       }
 
-      // Xử lý sắp xếp
       if (sortBy === 'PRICE_ASC') {
         liveTours.sort((a, b) => a.price - b.price);
       } else if (sortBy === 'PRICE_DESC') {
@@ -245,7 +239,7 @@ export const TourListPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-	setCurrentPage(1);
+    setCurrentPage(1);
     setDeparture('Tất cả');
     setDestination('Tất cả');
     setTransportFilter('ALL');
@@ -257,53 +251,53 @@ export const TourListPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#020204] min-h-screen pb-16 text-white">
-      {/* Top Banner Header */}
-      <div className="relative overflow-hidden py-10 px-4 sm:px-6 lg:px-8 border-b border-white/8">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[200px] bg-sky-600/10 rounded-full blur-[100px]" />
-        </div>
+    <div className="bg-[#FAF8F5] min-h-screen pb-16 text-[#0F172A]">
+      {/* Deep Ocean Top Banner Header (Matching Preview Image 2) */}
+      <div className="relative overflow-hidden py-9 px-4 sm:px-6 lg:px-8 bg-[#0B3B49] text-white">
+        <div className="absolute -top-20 right-1/4 w-[500px] h-[220px] bg-[#0D9488]/20 rounded-full blur-[90px] pointer-events-none" />
         <div className="relative max-w-7xl mx-auto space-y-2">
-          <nav className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="hover:text-sky-400 cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-slate-300 font-semibold">Danh sách Tour</span>
+          <nav className="flex items-center gap-2 text-xs text-[#5EEAD4] font-semibold">
+            <span className="hover:underline cursor-pointer transition" onClick={() => navigate('/')}>
+              Trang Chủ
+            </span>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-white/90">Danh sách Tour</span>
           </nav>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white">Danh sách Tour Du Lịch</h1>
-          <p className="text-sm text-slate-400 max-w-2xl">
-            Khám phá trải nghiệm tour du lịch và hơn thế nữa với thông tin hình ảnh thực tế chuẩn xác.
+          <h1 className="font-display text-3xl sm:text-4xl font-black tracking-tight text-white">
+            Danh sách Tour Du Lịch Trọn Gói
+          </h1>
+          <p className="text-sm text-slate-200 max-w-2xl">
+            Hiển thị minh bạch phương tiện (Máy bay khứ hồi / Xe Limousine), lịch khởi hành, thủ tục Visa và mức đặt cọc 30%.
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          {/* Left Sidebar Filter Section */}
-          <aside
-            className="lg:col-span-1 p-6 rounded-2xl border border-white/8 space-y-6 self-start sticky top-24"
-            style={{ background: 'rgba(10,17,29,0.85)', backdropFilter: 'blur(16px)' }}
-          >
-            <div className="flex items-center justify-between border-b border-white/8 pb-4">
-              <div className="flex items-center gap-2 text-white font-bold text-base">
-                <Filter className="h-5 w-5 text-sky-400" />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-7">
+          {/* Left Sidebar Filter Section (Crisp White Editorial Card) */}
+          <aside className="lg:col-span-1 bg-white p-5 rounded-2xl border border-[#E6E1DA] shadow-card space-y-5 self-start lg:sticky lg:top-24">
+            <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3.5">
+              <div className="flex items-center gap-2 text-[#0F172A] font-extrabold text-base">
+                <Filter className="h-4 w-4 text-[#0D9488]" />
                 <span>Bộ Lọc Tìm Kiếm</span>
               </div>
-              <button 
+              <button
                 onClick={handleResetFilters}
-                className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium transition"
+                className="text-xs text-[#D95D39] hover:text-[#C24E2D] flex items-center gap-1 font-bold transition cursor-pointer"
               >
                 <RefreshCw className="h-3.5 w-3.5" /> Xóa lọc
               </button>
             </div>
 
             {/* Điểm khởi hành */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Điểm Khởi Hành</label>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Điểm Khởi Hành
+              </label>
               <select
                 value={departure}
                 onChange={(e) => setDeparture(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm focus:border-sky-500 focus:outline-none text-white font-medium [&>option]:bg-slate-900"
+                className="w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-2.5 text-xs font-semibold text-[#0F172A] focus:border-[#0D9488] focus:bg-white focus:outline-none"
               >
                 <option value="Tất cả">Tất cả điểm khởi hành</option>
                 <option value="TP.Hồ Chí Minh">TP.Hồ Chí Minh</option>
@@ -314,8 +308,10 @@ export const TourListPage: React.FC = () => {
             </div>
 
             {/* Điểm đến */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Điểm Đến</label>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Điểm Đến
+              </label>
               <select
                 value={destination}
                 onChange={(e) => {
@@ -329,38 +325,66 @@ export const TourListPage: React.FC = () => {
                   }
                   setSearchParams(newParams, { replace: true });
                 }}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm focus:border-sky-500 focus:outline-none text-white font-medium [&>option]:bg-slate-900"
+                className="w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-2.5 text-xs font-semibold text-[#0F172A] focus:border-[#0D9488] focus:bg-white focus:outline-none"
               >
                 <option value="Tất cả">Tất cả điểm đến</option>
+                <option value="Hàn Quốc">Hàn Quốc (Seoul – Nami)</option>
+                <option value="Nhật Bản">Nhật Bản (Tokyo – Phú Sĩ)</option>
+                <option value="Thái Lan">Thái Lan (Bangkok – Pattaya)</option>
+                <option value="Singapore">Singapore – Malaysia</option>
+                <option value="Phượng Hoàng Cổ Trấn">Phượng Hoàng Cổ Trấn / Ân Thi</option>
+                <option value="Thượng Hải">Thượng Hải – Ô Trấn</option>
+                <option value="Đà Nẵng">Đà Nẵng – Hội An – Huế</option>
+                <option value="Phú Quốc">Phú Quốc – Nam Đảo</option>
+                <option value="Hà Nội">Hà Nội – Hạ Long – Sa Pa</option>
                 <option value="Đà Lạt">Đà Lạt (Lâm Đồng)</option>
                 <option value="Miền Tây">Miền Tây sông nước (6 tỉnh / Cà Mau)</option>
-                <option value="Phượng Hoàng Cổ Trấn">Phượng Hoàng Cổ Trấn / Ân Thi</option>
-                <option value="Thái Lan">Thái Lan / Bangkok - Pattaya</option>
-                <option value="Thượng Hải">Thượng Hải - Ô Trấn</option>
-                <option value="Châu Đốc">Châu Đốc - An Giang</option>
-                <option value="Núi Chứa Chan">Núi Chứa Chan - Đồng Nai</option>
+                <option value="Châu Đốc">Châu Đốc – An Giang</option>
                 <option value="Nam Du">Đảo Nam Du</option>
                 <option value="Vũng Tàu">Vũng Tàu</option>
-                <option value="Phú Yên">Phú Yên - Quy Nhơn</option>
-                {destination !== 'Tất cả' && ![
-                  'Đà Lạt', 'Miền Tây', 'Phượng Hoàng Cổ Trấn', 'Thái Lan', 
-                  'Thượng Hải', 'Châu Đốc', 'Núi Chứa Chan', 'Nam Du', 'Vũng Tàu', 'Phú Yên'
-                ].includes(destination) && (
-                  <option value={destination}>{destination}</option>
-                )}
+                <option value="Phú Yên">Phú Yên – Quy Nhơn</option>
+                <option value="Núi Chứa Chan">Núi Chứa Chan – Đồng Nai</option>
+                {destination !== 'Tất cả' &&
+                  ![
+                    'Hàn Quốc',
+                    'Nhật Bản',
+                    'Thái Lan',
+                    'Singapore',
+                    'Phượng Hoàng Cổ Trấn',
+                    'Thượng Hải',
+                    'Đà Nẵng',
+                    'Phú Quốc',
+                    'Hà Nội',
+                    'Đà Lạt',
+                    'Miền Tây',
+                    'Châu Đốc',
+                    'Nam Du',
+                    'Vũng Tàu',
+                    'Phú Yên',
+                    'Núi Chứa Chan',
+                  ].includes(destination) && <option value={destination}>{destination}</option>}
               </select>
             </div>
 
             {/* Phương Tiện Di Chuyển */}
-            <div className="space-y-2 pt-2 border-t border-white/8">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Phương Tiện Di Chuyển</label>
-              <div className="space-y-2 text-sm text-slate-400">
+            <div className="space-y-2 pt-3 border-t border-[#E6E1DA]">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Phương Tiện Di Chuyển
+              </label>
+              <div className="space-y-2">
                 {[
                   { id: 'ALL', label: 'Tất cả phương tiện' },
                   { id: 'FLIGHT', label: 'Máy bay khứ hồi + Ô tô' },
                   { id: 'LAND_SEA', label: 'Xe Limousine / Tàu cao tốc' },
                 ].map((opt) => (
-                  <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer text-xs font-medium hover:text-sky-400 text-slate-400">
+                  <label
+                    key={opt.id}
+                    className={`flex items-center gap-2.5 cursor-pointer text-xs transition ${
+                      transportFilter === opt.id
+                        ? 'font-extrabold text-[#0B3B49]'
+                        : 'font-medium text-slate-600 hover:text-[#0B3B49]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="transport"
@@ -376,7 +400,7 @@ export const TourListPage: React.FC = () => {
                         }
                         setSearchParams(newParams, { replace: true });
                       }}
-                      className="text-sky-600 focus:ring-sky-500 rounded-full"
+                      className="accent-[#0B3B49] h-3.5 w-3.5"
                     />
                     {opt.label}
                   </label>
@@ -385,22 +409,31 @@ export const TourListPage: React.FC = () => {
             </div>
 
             {/* Khoảng Thời Gian */}
-            <div className="space-y-2 pt-2 border-t border-white/8">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Khoảng Thời Gian</label>
-              <div className="space-y-2 text-sm text-slate-400">
+            <div className="space-y-2 pt-3 border-t border-[#E6E1DA]">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Khoảng Thời Gian
+              </label>
+              <div className="space-y-2">
                 {[
                   { id: 'ALL', label: 'Tất cả thời lượng' },
                   { id: '1_DAY', label: '1 ngày' },
                   { id: '1_TO_3', label: '1 đến 3 ngày' },
                   { id: 'OVER_3', label: 'Trên 3 ngày' },
                 ].map((opt) => (
-                  <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer text-xs font-medium hover:text-sky-400 text-slate-400">
+                  <label
+                    key={opt.id}
+                    className={`flex items-center gap-2.5 cursor-pointer text-xs transition ${
+                      durationFilter === opt.id
+                        ? 'font-extrabold text-[#0B3B49]'
+                        : 'font-medium text-slate-600 hover:text-[#0B3B49]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="duration"
                       checked={durationFilter === opt.id}
                       onChange={() => setDurationFilter(opt.id)}
-                      className="text-sky-600 focus:ring-sky-500 rounded-full"
+                      className="accent-[#0B3B49] h-3.5 w-3.5"
                     />
                     {opt.label}
                   </label>
@@ -409,9 +442,11 @@ export const TourListPage: React.FC = () => {
             </div>
 
             {/* Loại Tour */}
-            <div className="space-y-2 pt-2 border-t border-white/8">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Loại Tour</label>
-              <div className="space-y-2 text-sm text-slate-400 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-2 pt-3 border-t border-[#E6E1DA]">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Loại Tour
+              </label>
+              <div className="space-y-2">
                 {[
                   { id: 'ALL', label: 'Tất cả loại tour' },
                   { id: 'DOMESTIC', label: 'Domestic (Trong nước)' },
@@ -419,7 +454,14 @@ export const TourListPage: React.FC = () => {
                   { id: 'LE_2_9', label: 'Tour Lễ 2/9' },
                   { id: 'KHUYEN_MAI', label: 'Tour Khuyến Mãi' },
                 ].map((opt) => (
-                  <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer text-xs font-medium hover:text-sky-400 text-slate-400">
+                  <label
+                    key={opt.id}
+                    className={`flex items-center gap-2.5 cursor-pointer text-xs transition ${
+                      categoryFilter === opt.id
+                        ? 'font-extrabold text-[#0B3B49]'
+                        : 'font-medium text-slate-600 hover:text-[#0B3B49]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="category"
@@ -435,7 +477,7 @@ export const TourListPage: React.FC = () => {
                         }
                         setSearchParams(newParams, { replace: true });
                       }}
-                      className="text-sky-600 focus:ring-sky-500 rounded-full"
+                      className="accent-[#0B3B49] h-3.5 w-3.5"
                     />
                     {opt.label}
                   </label>
@@ -444,22 +486,31 @@ export const TourListPage: React.FC = () => {
             </div>
 
             {/* Ngân Sách */}
-            <div className="space-y-2 pt-2 border-t border-white/8">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ngân Sách</label>
-              <div className="space-y-2 text-sm text-slate-400">
+            <div className="space-y-2 pt-3 border-t border-[#E6E1DA]">
+              <label className="text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
+                Ngân Sách
+              </label>
+              <div className="space-y-2">
                 {[
                   { id: 'ALL', label: 'Tất cả mức giá' },
                   { id: 'UNDER_5M', label: 'Dưới 5 triệu' },
                   { id: '5M_TO_10M', label: 'Từ 5 đến 10 triệu' },
                   { id: 'OVER_10M', label: 'Trên 10 triệu' },
                 ].map((opt) => (
-                  <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer text-xs font-medium hover:text-sky-400 text-slate-400">
+                  <label
+                    key={opt.id}
+                    className={`flex items-center gap-2.5 cursor-pointer text-xs transition ${
+                      budgetFilter === opt.id
+                        ? 'font-extrabold text-[#0B3B49]'
+                        : 'font-medium text-slate-600 hover:text-[#0B3B49]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="budget"
                       checked={budgetFilter === opt.id}
                       onChange={() => setBudgetFilter(opt.id)}
-                      className="text-sky-600 focus:ring-sky-500 rounded-full"
+                      className="accent-[#0B3B49] h-3.5 w-3.5"
                     />
                     {opt.label}
                   </label>
@@ -470,27 +521,21 @@ export const TourListPage: React.FC = () => {
 
           {/* Right Main Content Listing */}
           <main className="lg:col-span-3 space-y-6">
-            <div
-              className="flex items-center justify-between p-4 rounded-2xl border border-white/8"
-              style={{ background: 'rgba(10,17,29,0.85)', backdropFilter: 'blur(16px)' }}
-            >
-			<span className="text-sm font-semibold text-slate-400">
-			  Hiển thị{' '}
-			  <span className="font-bold text-white">
-			    {tours.length > 0 ? `${firstItem}–${lastItem}` : '0'}
-			  </span>{' '}
-			  trên tổng số{' '}
-			  <span className="font-bold text-white">
-			    {tours.length}
-			  </span>{' '}
-			  tour
-			</span>
+            {/* Top Sort Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#E6E1DA] shadow-subtle">
+              <span className="text-sm font-semibold text-[#526071]">
+                Hiển thị{' '}
+                <span className="font-extrabold text-[#0F172A]">
+                  {tours.length > 0 ? `${firstItem}–${lastItem}` : '0'}
+                </span>{' '}
+                trên tổng số <span className="font-extrabold text-[#0F172A]">{tours.length}</span> tour trọn gói
+              </span>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-500">Sắp xếp:</span>
-                <select 
+                <span className="text-xs font-semibold text-[#526071]">Sắp xếp:</span>
+                <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs font-semibold text-white border-none bg-white/10 rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer [&>option]:bg-slate-900"
+                  className="text-xs font-bold text-[#0F172A] border border-[#CBD5E1] bg-[#F8FAFC] rounded-xl px-3 py-2 focus:border-[#0D9488] focus:outline-none cursor-pointer"
                 >
                   <option value="FEATURED">Nổi bật nhất</option>
                   <option value="PRICE_ASC">Giá tăng dần</option>
@@ -501,192 +546,76 @@ export const TourListPage: React.FC = () => {
             </div>
 
             {loading ? (
-              <div
-                className="flex h-64 items-center justify-center rounded-2xl border border-white/8"
-                style={{ background: 'rgba(10,17,29,0.85)' }}
-              >
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-400 border-t-transparent"></div>
+              <div className="flex h-64 items-center justify-center rounded-2xl border border-[#E6E1DA] bg-white">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0D9488] border-t-transparent" />
               </div>
             ) : tours.length === 0 ? (
-              <div
-                className="rounded-2xl border border-dashed border-white/15 p-16 text-center text-slate-500 space-y-3"
-                style={{ background: 'rgba(10,17,29,0.85)' }}
-              >
-                <p className="text-lg font-bold text-white">Không tìm thấy tour phù hợp</p>
+              <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white p-16 text-center text-[#526071] space-y-3">
+                <p className="text-lg font-extrabold text-[#0F172A]">Không tìm thấy tour phù hợp</p>
                 <p className="text-sm">Vui lòng thử điều chỉnh bộ lọc để xem các hành trình khác.</p>
                 <button
                   onClick={handleResetFilters}
-                  className="mt-2 rounded-xl bg-sky-500 hover:bg-sky-400 px-4 py-2 text-xs font-semibold text-white transition"
+                  className="mt-2 rounded-xl bg-[#D95D39] hover:bg-[#C24E2D] px-5 py-2.5 text-xs font-bold text-white transition cursor-pointer"
                 >
                   Xóa tất cả bộ lọc
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {visibleTours.map((tour) => {
-                  const transport = getTourTransportInfo(tour);
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {visibleTours.map((tour) => (
+                  <BoardingPassTourCard
+                    key={tour.id}
+                    tour={tour}
+                    onSelect={(id) => navigate(`/tours/${id}`, { state: { fromPage: activePage } })}
+                  />
+                ))}
+              </div>
+            )}
+
+            {!loading && tours.length > PAGE_SIZE && (
+              <nav
+                aria-label="Phân trang danh sách tour"
+                className="flex flex-wrap items-center justify-center gap-2 pt-4"
+              >
+                <button
+                  type="button"
+                  disabled={activePage === 1}
+                  onClick={() => changePage(activePage - 1)}
+                  className="rounded-xl border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-bold text-[#0F172A] transition hover:border-[#0B3B49] hover:bg-[#E6F4F1] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                >
+                  Trước
+                </button>
+
+                {Array.from({ length: totalPages }, (_, index) => {
+                  const page = index + 1;
                   return (
-                  <div 
-                    key={tour.id} 
-                    className="group overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col hover:-translate-y-1"
-                    style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.35)' }}
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative h-48 overflow-hidden">
-                      <img 
-                        src={tour.thumbnailUrl} 
-                        alt={tour.title} 
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute top-3 left-3 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full">
-                        KH từ {tour.departureLocation || 'TP.Hồ Chí Minh'}
-                      </div>
-                      <div className={`absolute top-3 right-3 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 border ${
-                        transport.mode === 'FLIGHT'
-                          ? 'bg-teal-600/90 border-teal-300/30'
-                          : 'bg-indigo-600/90 border-indigo-300/30'
-                      }`}>
-                        {transport.mode === 'FLIGHT' ? <Plane className="h-3 w-3" /> : <Bus className="h-3 w-3" />}
-                        <span>{transport.badgeLabel}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                      <div className="space-y-2">
-                        {/* Flight / Route Bar */}
-                        <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-500/10 border border-sky-500/20 px-3 py-1.5 text-[11px]">
-                          <div className="flex items-center gap-1.5 font-extrabold text-sky-300">
-                            <span>{transport.fromCode}</span>
-                            {transport.mode === 'FLIGHT' ? (
-                              <Plane className="h-3.5 w-3.5 text-cyan-400" />
-                            ) : (
-                              <Bus className="h-3.5 w-3.5 text-cyan-400" />
-                            )}
-                            <span>{transport.toCode}</span>
-                          </div>
-                          <span className="text-slate-300 font-semibold truncate">{transport.shortCarrierBadge}</span>
-                        </div>
-
-                        <h3 
-                          onClick={() => navigate(`/tours/${tour.id}`, { state: { fromPage: activePage } })}
-                          className="text-xs font-extrabold text-white hover:text-sky-300 cursor-pointer line-clamp-2 leading-snug uppercase transition-colors"
-                        >
-                          {tour.title}
-                        </h3>
-
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-b border-white/8 pb-2">
-                          <span className="flex items-center gap-1 font-medium">
-                            <Eye className="h-3.5 w-3.5" /> {tour.viewCount || 100} Lượt xem
-                          </span>
-                          <span className="flex items-center gap-1 font-semibold text-amber-400">
-                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                            {tour.totalReviews && tour.totalReviews > 0
-                              ? `${tour.averageRating || 5.0}/5 (${tour.totalReviews})`
-                              : 'Chưa có đánh giá'}
-                          </span>
-                          <span className="flex items-center gap-1 font-medium">
-                            📌 Đã chốt ({tour.totalReviews || 0})
-                          </span>
-                        </div>
-
-                        <div className="space-y-1.5 text-xs text-slate-400 pt-1">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
-                            <span>Khởi hành: <strong className="text-slate-200">{tourScheduleService.getTourDepartureDateDisplay(tour.id, tour.category)}</strong></span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
-                            <span>Thời gian: <strong className="text-slate-200">{tour.durationDays} ngày {tour.durationNights} đêm</strong></span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-white/8 space-y-3">
-                        <div className="flex items-baseline justify-between">
-                          <div>
-                            <span className="text-[11px] text-slate-500">Giá từ: </span>
-                            <span className="text-base font-black text-rose-400">
-                              {tour.price.toLocaleString('vi-VN')} đ
-                            </span>
-                            <span className="text-[10px] text-slate-500"> / Khách</span>
-                          </div>
-                          {(() => {
-                            const ratio = tourScheduleService.getTourSeatRatioDisplay(tour.id, tour.category);
-                            const avail = tourScheduleService.getTourAvailableSeats(tour.id, tour.remainingSeats ?? 40, tour.category);
-                            return (
-                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                                avail > 0 ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'
-                              }`}>
-                                {avail > 0 ? `${ratio.booked}/${ratio.max} chỗ` : 'Hết chỗ'}
-                              </span>
-                            );
-                          })()}
-                        </div>
-
-                        <button 
-                          onClick={() => navigate(`/tours/${tour.id}`, { state: { fromPage: activePage } })}
-                          className="w-full rounded-xl py-2.5 text-xs font-bold transition hover:-translate-y-0.5 text-white"
-                          style={{
-                            background: 'linear-gradient(to top, #9ad9ec 1px, #14a8c6 5px, #04465a 13px, #0a111d 32px)',
-                            boxShadow: '0 0 10px rgba(60,190,235,.18), 0 4px 12px -2px rgba(90,220,255,.28)',
-                          }}
-                        >
-                          Đặt ngay
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    <button
+                      key={page}
+                      type="button"
+                      aria-label={`Trang ${page}`}
+                      aria-current={activePage === page ? 'page' : undefined}
+                      onClick={() => changePage(page)}
+                      className={`h-10 min-w-10 rounded-xl border px-3 text-sm font-bold transition cursor-pointer ${
+                        activePage === page
+                          ? 'border-[#0B3B49] bg-[#0B3B49] text-white shadow-sm'
+                          : 'border-[#CBD5E1] bg-white text-slate-700 hover:border-[#0B3B49] hover:bg-[#E6F4F1]'
+                      }`}
+                    >
+                      {page}
+                    </button>
                   );
-				        })}
-				      </div>
-				    )}
+                })}
 
-				    {!loading && tours.length > PAGE_SIZE && (
-				      <nav
-				        aria-label="Phân trang danh sách tour"
-				        className="flex flex-wrap items-center justify-center gap-2 pt-4"
-				      >
-				        <button
-				          type="button"
-				          disabled={activePage === 1}
-				          onClick={() => changePage(activePage - 1)}
-				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-				        >
-				          Trước
-				        </button>
-
-				        {Array.from({ length: totalPages }, (_, index) => {
-				          const page = index + 1;
-
-				          return (
-				            <button
-				              key={page}
-				              type="button"
-				              aria-label={`Trang ${page}`}
-				              aria-current={activePage === page ? 'page' : undefined}
-				              onClick={() => changePage(page)}
-				              className={`h-10 min-w-10 rounded-lg border px-3 text-sm font-semibold transition ${
-				                activePage === page
-				                  ? 'border-sky-500 bg-sky-500 text-white'
-				                  : 'border-white/20 text-slate-300 hover:bg-white/10'
-				              }`}
-				            >
-				              {page}
-				            </button>
-				          );
-				        })}
-
-				        <button
-				          type="button"
-				          disabled={activePage === totalPages}
-				          onClick={() => changePage(activePage + 1)}
-				          className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-				        >
-				          Sau
-				        </button>
-				      </nav>
-				    )}
+                <button
+                  type="button"
+                  disabled={activePage === totalPages}
+                  onClick={() => changePage(activePage + 1)}
+                  className="rounded-xl border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-bold text-[#0F172A] transition hover:border-[#0B3B49] hover:bg-[#E6F4F1] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                >
+                  Sau
+                </button>
+              </nav>
+            )}
           </main>
         </div>
       </div>

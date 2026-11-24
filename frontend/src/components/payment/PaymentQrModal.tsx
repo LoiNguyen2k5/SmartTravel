@@ -326,28 +326,28 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
       style={{ zIndex: 99999 }}
     >
       <div className="min-h-full flex items-start sm:items-center justify-center py-4 sm:py-6">
-        <div className="w-full max-w-lg bg-[#0a111d] rounded-3xl p-5 sm:p-7 shadow-[0_25px_60px_rgba(0,0,0,0.8)] space-y-4 border border-white/15 text-white relative">
+        <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-7 shadow-float space-y-4 border border-[#CBD5E1] text-[#0F172A] relative">
           <div className="text-center space-y-1">
             {timeLeft > 0 ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                <Clock className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 text-xs font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                <Clock className="h-3.5 w-3.5 text-emerald-700" />
                 Thời gian thanh toán còn lại:{' '}
-                <span className="font-mono text-white font-black">{formatTime(timeLeft)}</span>
+                <span className="font-mono text-[#0F172A] font-black">{formatTime(timeLeft)}</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold shadow-[0_0_10px_rgba(244,63,94,0.3)] animate-pulse">
-                <Clock className="h-3.5 w-3.5 text-rose-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-700 text-xs font-bold shadow-[0_0_10px_rgba(244,63,94,0.3)] animate-pulse">
+                <Clock className="h-3.5 w-3.5 text-[#D95D39]" />
                 Phiên thanh toán đã hết hạn giữ chỗ (3 phút)
               </div>
             )}
-            <h3 className="text-lg sm:text-xl font-black text-white pt-0.5">
+            <h3 className="text-lg sm:text-xl font-black text-[#0F172A] pt-0.5">
               {isRemainingPayment
                 ? 'Thanh Toán 70% Còn Lại (Tất Toán Đơn Hàng)'
                 : qrGatewayTab === 'VISA'
                   ? 'Thanh Toán Thẻ Quốc Tế (Visa / MasterCard)'
                   : 'Quét Mã QR Thanh Toán Trực Tiếp'}
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#526071]">
               {timeLeft > 0
                 ? isRemainingPayment
                   ? 'Hoàn tất 70% số tiền còn lại để nhận Hóa Đơn VAT và Vé Điện Tử chính thức.'
@@ -359,7 +359,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
           </div>
 
           {/* 3-Tab Payment Gateway Switcher */}
-          <div className="grid grid-cols-3 gap-1.5 p-1 bg-white/[0.05] border border-white/10 rounded-2xl text-[11px] sm:text-xs font-bold">
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#FAF8F5] border border-[#E6E1DA] rounded-2xl text-[11px] sm:text-xs font-bold">
             <button
               type="button"
               onClick={() => {
@@ -368,11 +368,11 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
               }}
               className={`py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 qrGatewayTab === 'VIETQR'
-                  ? 'bg-white/15 text-white shadow-sm border border-white/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white/15 text-[#0F172A] shadow-sm border border-[#CBD5E1]'
+                  : 'text-[#526071] hover:text-[#0F172A]'
               }`}
             >
-              <Building2 className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+              <Building2 className="h-3.5 w-3.5 text-emerald-700 flex-shrink-0" />
               <span className="truncate">VietQR (MB)</span>
             </button>
             <button
@@ -383,8 +383,8 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
               }}
               className={`py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 qrGatewayTab === 'MOMO'
-                  ? 'bg-white/15 text-white shadow-sm border border-white/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white/15 text-[#0F172A] shadow-sm border border-[#CBD5E1]'
+                  : 'text-[#526071] hover:text-[#0F172A]'
               }`}
             >
               <Wallet className="h-3.5 w-3.5 text-pink-400 flex-shrink-0" />
@@ -398,11 +398,11 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
               }}
               className={`py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 qrGatewayTab === 'VISA'
-                  ? 'bg-white/15 text-white shadow-sm border border-white/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white/15 text-[#0F172A] shadow-sm border border-[#CBD5E1]'
+                  : 'text-[#526071] hover:text-[#0F172A]'
               }`}
             >
-              <CreditCard className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+              <CreditCard className="h-3.5 w-3.5 text-[#0D9488] flex-shrink-0" />
               <span className="truncate">Thẻ Visa/Master</span>
             </button>
           </div>
@@ -423,10 +423,10 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                     className="h-44 w-44 sm:h-48 sm:w-48 mx-auto object-contain"
                   />
                 </div>
-                <div className="flex items-center justify-center gap-2 text-xs text-slate-300 font-medium">
+                <div className="flex items-center justify-center gap-2 text-xs text-[#475569] font-medium">
                   {qrGatewayTab === 'VIETQR' ? (
                     <>
-                      <span className="font-bold text-emerald-400">NAPAS 24/7 • MBBANK</span>
+                      <span className="font-bold text-emerald-700">NAPAS 24/7 • MBBANK</span>
                       <span>•</span>
                       <span>Tích hợp SePay Webhook</span>
                     </>
@@ -440,38 +440,38 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                 </div>
               </div>
 
-              <div className="bg-white/[0.03] rounded-2xl p-4 space-y-2.5 text-xs border border-white/10">
+              <div className="bg-[#FAF8F5] rounded-2xl p-4 space-y-2.5 text-xs border border-[#E6E1DA]">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400 font-medium">Ngân hàng nhận:</span>
-                  <span className="font-bold text-white text-right">
+                  <span className="text-[#526071] font-medium">Ngân hàng nhận:</span>
+                  <span className="font-bold text-[#0F172A] text-right">
                     {qrGatewayTab === 'VIETQR' ? 'MBBank (Quân Đội)' : 'Ví MoMo / MBBank'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                  <span className="text-slate-400 font-medium">Số tài khoản nhận:</span>
+                <div className="flex justify-between items-center pt-2 border-t border-[#E6E1DA]">
+                  <span className="text-[#526071] font-medium">Số tài khoản nhận:</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-black text-cyan-300 text-sm">
+                    <span className="font-mono font-black text-[#0D9488] text-sm">
                       {BANK_CONFIG.accountNumber}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopy(BANK_CONFIG.accountNumber, 'stk')}
-                      className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                      className="p-1 rounded-lg bg-[#F4F1EC] hover:bg-[#E6F4F1] text-[#475569] hover:text-[#0F172A] transition"
                     >
                       {copiedStk ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                        <Check className="h-3.5 w-3.5 text-emerald-700" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                  <span className="text-slate-400 font-medium">Chủ tài khoản:</span>
-                  <span className="font-black text-white uppercase">{BANK_CONFIG.accountName}</span>
+                <div className="flex justify-between items-center pt-2 border-t border-[#E6E1DA]">
+                  <span className="text-[#526071] font-medium">Chủ tài khoản:</span>
+                  <span className="font-black text-[#0F172A] uppercase">{BANK_CONFIG.accountName}</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                  <span className="text-slate-400 font-medium">
+                <div className="flex justify-between items-center pt-2 border-t border-[#E6E1DA]">
+                  <span className="text-[#526071] font-medium">
                     {isRemainingPayment
                       ? 'Số tiền 70% còn lại:'
                       : booking.isDeposit || booking.status === 'DEPOSITED'
@@ -479,35 +479,35 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                         : 'Số tiền thanh toán:'}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-rose-400 text-base">
+                    <span className="font-black text-[#D95D39] text-base">
                       {formatCurrency(payableAmount)}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopy(payableAmount.toString(), 'amount')}
-                      className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                      className="p-1 rounded-lg bg-[#F4F1EC] hover:bg-[#E6F4F1] text-[#475569] hover:text-[#0F172A] transition"
                     >
                       {copiedAmount ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                        <Check className="h-3.5 w-3.5 text-emerald-700" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                  <span className="text-slate-400 font-medium">Nội dung chuyển khoản:</span>
+                <div className="flex justify-between items-center pt-2 border-t border-[#E6E1DA]">
+                  <span className="text-[#526071] font-medium">Nội dung chuyển khoản:</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sky-300 bg-sky-500/20 px-2.5 py-0.5 rounded-lg border border-sky-500/30">
+                    <span className="font-mono font-bold text-[#0B3B49] bg-sky-500/20 px-2.5 py-0.5 rounded-lg border border-sky-500/30">
                       {transferContent}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopy(transferContent, 'content')}
-                      className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                      className="p-1 rounded-lg bg-[#F4F1EC] hover:bg-[#E6F4F1] text-[#475569] hover:text-[#0F172A] transition"
                     >
                       {copiedContent ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                        <Check className="h-3.5 w-3.5 text-emerald-700" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
@@ -526,33 +526,33 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                     <div className="h-7 w-10 rounded-md bg-amber-300/80 border border-amber-200/60 flex items-center justify-center shadow-inner">
                       <div className="h-4 w-6 border border-amber-700/40 rounded-sm" />
                     </div>
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-sky-200/80">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-[#0B3B49]/80">
                       MBBank International Card
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-md bg-white/10 border border-white/15 font-black tracking-wider text-xs text-white">
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#F4F1EC] border border-[#CBD5E1] font-black tracking-wider text-xs text-[#0F172A]">
                     {cardBrand}
                   </span>
                 </div>
 
-                <div className="mt-4 font-mono text-base sm:text-lg font-black tracking-[0.18em] text-white">
+                <div className="mt-4 font-mono text-base sm:text-lg font-black tracking-[0.18em] text-[#0F172A]">
                   {cardNumber || '4720 •••• •••• ••••'}
                 </div>
 
                 <div className="mt-4 flex items-end justify-between text-xs">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-slate-400">
+                    <div className="text-[9px] uppercase tracking-wider text-[#526071]">
                       Card Holder
                     </div>
-                    <div className="font-bold tracking-wider text-slate-100 uppercase truncate max-w-[200px]">
+                    <div className="font-bold tracking-wider text-[#0F172A] uppercase truncate max-w-[200px]">
                       {cardHolder || 'NGUYEN BAO LOI'}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[9px] uppercase tracking-wider text-slate-400">
+                    <div className="text-[9px] uppercase tracking-wider text-[#526071]">
                       Expires
                     </div>
-                    <div className="font-mono font-bold text-cyan-300">
+                    <div className="font-mono font-bold text-[#0D9488]">
                       {cardExpiry || 'MM/YY'}
                     </div>
                   </div>
@@ -560,9 +560,9 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
               </div>
 
               {!otpStep ? (
-                <div className="bg-white/[0.03] rounded-2xl p-4 space-y-3 border border-white/10 text-xs">
+                <div className="bg-[#FAF8F5] rounded-2xl p-4 space-y-3 border border-[#E6E1DA] text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-[#475569] font-semibold mb-1">
                       Số thẻ quốc tế (16 số Visa / MasterCard / JCB) *
                     </label>
                     <div className="relative">
@@ -572,14 +572,14 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                         placeholder="4xxx xxxx xxxx xxxx"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                        className="w-full rounded-xl bg-[#070c18] border border-white/15 px-3.5 py-2.5 font-mono text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                        className="w-full rounded-xl bg-white border border-[#CBD5E1] px-3.5 py-2.5 font-mono text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                       />
-                      <CreditCard className="h-4 w-4 text-sky-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                      <CreditCard className="h-4 w-4 text-[#0D9488] absolute right-3.5 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-[#475569] font-semibold mb-1">
                       Họ và tên in trên thẻ (Không dấu) *
                     </label>
                     <input
@@ -587,13 +587,13 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                       placeholder="NGUYEN BAO LOI"
                       value={cardHolder}
                       onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
-                      className="w-full rounded-xl bg-[#070c18] border border-white/15 px-3.5 py-2.5 uppercase font-bold text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                      className="w-full rounded-xl bg-white border border-[#CBD5E1] px-3.5 py-2.5 uppercase font-bold text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">
+                      <label className="block text-[#475569] font-semibold mb-1">
                         Ngày hết hạn (MM/YY) *
                       </label>
                       <input
@@ -602,11 +602,11 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                         placeholder="08/29"
                         value={cardExpiry}
                         onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                        className="w-full rounded-xl bg-[#070c18] border border-white/15 px-3.5 py-2.5 font-mono text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                        className="w-full rounded-xl bg-white border border-[#CBD5E1] px-3.5 py-2.5 font-mono text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">
+                      <label className="block text-[#475569] font-semibold mb-1">
                         Mã bảo mật CVV/CVC *
                       </label>
                       <div className="relative">
@@ -619,22 +619,22 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                           onChange={(e) =>
                             setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))
                           }
-                          className="w-full rounded-xl bg-[#070c18] border border-white/15 px-3.5 py-2.5 font-mono text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                          className="w-full rounded-xl bg-white border border-[#CBD5E1] px-3.5 py-2.5 font-mono text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                         />
-                        <Lock className="h-3.5 w-3.5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                        <Lock className="h-3.5 w-3.5 text-[#526071] absolute right-3.5 top-1/2 -translate-y-1/2" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                    <span className="text-slate-400 font-medium">Số tiền khấu trừ thẻ:</span>
-                    <span className="font-black text-rose-400 text-base">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E6E1DA]">
+                    <span className="text-[#526071] font-medium">Số tiền khấu trừ thẻ:</span>
+                    <span className="font-black text-[#D95D39] text-base">
                       {formatCurrency(payableAmount)}
                     </span>
                   </div>
 
                   {cardError && (
-                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[11px] font-semibold">
+                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 text-[11px] font-semibold">
                       {cardError}
                     </div>
                   )}
@@ -651,9 +651,9 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                 </div>
               ) : (
                 /* 3D-SECURE OTP VERIFICATION STEP */
-                <div className="bg-white/[0.03] rounded-2xl p-4 space-y-3 border border-emerald-500/30 text-xs">
+                <div className="bg-[#FAF8F5] rounded-2xl p-4 space-y-3 border border-emerald-500/30 text-xs">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                    <div className="flex items-center gap-2 text-emerald-700 font-bold">
                       <KeyRound className="h-4 w-4" />
                       <span>Xác Thực Bảo Mật 3D-Secure (OTP)</span>
                     </div>
@@ -663,27 +663,27 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                         setOtpStep(false);
                         setCardError('');
                       }}
-                      className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] text-[#526071] hover:text-[#0F172A] flex items-center gap-1 cursor-pointer"
                     >
                       <ArrowLeft className="h-3 w-3" /> Sửa thẻ
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                  <p className="text-[11px] text-[#475569] leading-relaxed">
                     Cổng phát hành thẻ <strong>{cardBrand}</strong> yêu cầu xác nhận mã OTP cho giao
-                    dịch đơn hàng <strong className="text-sky-300">{booking.bookingCode}</strong> với
-                    số tiền <strong className="text-rose-400">{formatCurrency(payableAmount)}</strong>.
+                    dịch đơn hàng <strong className="text-[#0B3B49]">{booking.bookingCode}</strong> với
+                    số tiền <strong className="text-[#D95D39]">{formatCurrency(payableAmount)}</strong>.
                   </p>
 
                   <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between text-[11px]">
-                    <span className="text-emerald-200">Mã OTP 3D-Secure phiên giao dịch:</span>
-                    <span className="font-mono font-black text-sm text-emerald-300 tracking-widest">
+                    <span className="text-emerald-800">Mã OTP 3D-Secure phiên giao dịch:</span>
+                    <span className="font-mono font-black text-sm text-emerald-700 tracking-widest">
                       {generatedOtp}
                     </span>
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-[#475569] font-semibold mb-1">
                       Nhập mã OTP xác nhận (6 chữ số) *
                     </label>
                     <input
@@ -693,12 +693,12 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
                       placeholder="Nhập 6 số OTP"
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      className="w-full rounded-xl bg-[#070c18] border border-white/20 px-3.5 py-2.5 font-mono text-center text-base tracking-[0.35em] font-black text-white focus:outline-none focus:border-emerald-400 transition"
+                      className="w-full rounded-xl bg-white border border-[#CBD5E1] px-3.5 py-2.5 font-mono text-center text-base tracking-[0.35em] font-black text-[#0F172A] focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
 
                   {cardError && (
-                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[11px] font-semibold">
+                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 text-[11px] font-semibold">
                       {cardError}
                     </div>
                   )}
@@ -730,7 +730,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
             {paymentSuccessToast ? (
               <div className="p-4 rounded-2xl bg-emerald-600 text-white flex items-center gap-3 shadow-[0_0_25px_rgba(16,185,129,0.4)] animate-in fade-in zoom-in-95">
                 <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 animate-pulse">
-                  <CheckCircle className="h-6 w-6 text-white" />
+                  <CheckCircle className="h-6 w-6 text-[#0F172A]" />
                 </div>
                 <div>
                   <div className="font-black text-sm">Giao Dịch Thanh Toán Thành Công!</div>
@@ -741,35 +741,35 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
               </div>
             ) : (
               qrGatewayTab !== 'VISA' && (
-                <div className="p-4 rounded-2xl bg-[#070c18] text-white space-y-3 border border-white/10 shadow-xl">
+                <div className="p-4 rounded-2xl bg-white text-[#0F172A] space-y-3 border border-[#E6E1DA] shadow-xl">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                       </span>
-                      <span className="text-xs font-black text-emerald-400 tracking-wide uppercase">
+                      <span className="text-xs font-black text-emerald-700 tracking-wide uppercase">
                         Tự động lắng nghe giao dịch (SePay / MBBank)
                       </span>
                     </div>
-                    <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-slate-300 font-mono border border-white/10">
+                    <span className="text-[10px] bg-[#F4F1EC] px-2 py-0.5 rounded-full text-[#475569] font-mono border border-[#E6E1DA]">
                       Polling 2s
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                  <p className="text-[11px] text-[#475569] leading-relaxed">
                     Quý khách vui lòng quét mã QR trên. Khi chuyển khoản đúng nội dung{' '}
-                    <strong className="text-sky-300">{transferContent}</strong>, hệ thống sẽ{' '}
+                    <strong className="text-[#0B3B49]">{transferContent}</strong>, hệ thống sẽ{' '}
                     <strong>tự động nhận diện và chuyển sang màn hình thành công</strong> tức thì.
                   </p>
-                  <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[11px]">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-400" />
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E6E1DA] text-[11px]">
+                    <div className="flex items-center gap-1.5 text-[#526071]">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-700" />
                       <span>Đang chờ tín hiệu biến động số dư...</span>
                     </div>
                     <button
                       type="button"
                       onClick={handleSimulateBankWebhook}
-                      className="text-[11px] text-emerald-400 hover:text-emerald-300 underline font-semibold transition flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] text-emerald-700 hover:text-emerald-700 underline font-semibold transition flex items-center gap-1 cursor-pointer"
                     >
                       <Zap className="h-3 w-3" />
                       <span>Kích hoạt nhận diện ngay</span>
@@ -781,7 +781,7 @@ export const PaymentQrModal: React.FC<PaymentQrModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              className="w-full py-2.5 rounded-xl text-xs font-bold text-[#526071] hover:text-[#0F172A] hover:bg-[#F4F1EC] transition cursor-pointer"
             >
               Đóng
             </button>

@@ -15,23 +15,23 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-primary-950 text-slate-300 pt-16 pb-8 relative overflow-hidden border-t border-primary-900/60">
+    <footer className="bg-[#0B3B49] text-slate-200 pt-16 pb-8 relative overflow-hidden border-t border-[#082E3A]">
       
       {/* Subtle Background Ambience Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-primary-800/10 blur-3xl pointer-events-none rounded-full" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-teal-400/10 blur-3xl pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
 
         {/* 1. NEWSLETTER BANNER */}
-        <div className="glass-dark rounded-3xl p-8 md:p-10 border border-white/10 shadow-float text-center max-w-4xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-500/15 border border-accent-400/30 text-accent-300 text-xs font-bold uppercase tracking-wider">
-            <span>✨ Ưu đãi đặc quyền</span>
+        <div className="bg-[#0F5264]/80 rounded-3xl p-8 md:p-10 border border-white/15 shadow-float text-center max-w-4xl mx-auto space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-teal-300/30 text-[#5EEAD4] text-xs font-bold uppercase tracking-wider">
+            <span>Ưu đãi đặc quyền SmartTravel</span>
           </div>
           <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Tiết kiệm thời gian và chi phí cho kỳ nghỉ hoàn hảo
           </h3>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Đăng ký nhận bản tin sớm nhất để không bỏ lỡ các voucher giảm giá và lịch khởi hành tour độc quyền từ Smart Travel.
+          <p className="text-xs sm:text-sm text-slate-200 max-w-xl mx-auto leading-relaxed">
+            Đăng ký nhận bản tin sớm nhất để không bỏ lỡ các voucher giảm giá và lịch khởi hành tour đoàn độc quyền từ Smart Travel.
           </p>
 
           <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row items-center gap-2.5 pt-2">
@@ -40,12 +40,12 @@ export const Footer: React.FC = () => {
               value={newsletterEmail}
               onChange={(e) => setNewsletterEmail(e.target.value)}
               placeholder="Nhập địa chỉ email của bạn..."
-              className="w-full sm:flex-1 rounded-xl bg-white/95 px-4 py-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-accent-400 shadow-sm placeholder:text-slate-400 font-medium"
+              className="w-full sm:flex-1 rounded-xl bg-white px-4 py-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#5EEAD4] shadow-sm placeholder:text-slate-400 font-medium"
               required
             />
             <button
               type="submit"
-              className="w-full sm:w-auto rounded-xl bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white font-bold px-6 py-3 text-xs transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap"
+              className="w-full sm:w-auto rounded-xl bg-[#D95D39] hover:bg-[#C24E2D] active:scale-[0.98] text-white font-bold px-6 py-3 text-xs transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
             >
               <Send className="h-3.5 w-3.5" /> 
               <span>Nhận ưu đãi</span>

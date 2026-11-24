@@ -119,55 +119,55 @@ export const UserManagementPage: React.FC = () => {
           onClick={() => { setSelectedRole('ALL'); setSelectedStatus('ALL'); }}
           className={`cursor-pointer rounded-xl border p-4 transition ${
             selectedRole === 'ALL' && selectedStatus === 'ALL' 
-              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-white' 
-              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-[#0F172A]' 
+              : 'border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] hover:bg-[#F4F1EC]'
           }`}
         >
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tổng Tài Khoản</div>
-          <div className="text-2xl font-black text-white mt-1">{users.length}</div>
+          <div className="text-xs font-semibold text-[#526071] uppercase tracking-wider">Tổng Tài Khoản</div>
+          <div className="text-2xl font-black text-[#0F172A] mt-1">{users.length}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ROLE_USER'); setSelectedStatus('ALL'); }}
           className={`cursor-pointer rounded-xl border p-4 transition ${
             selectedRole === 'ROLE_USER' 
-              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-white' 
-              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+              ? 'border-sky-500/80 bg-sky-500/15 shadow-[0_0_15px_rgba(14,165,233,0.2)] text-[#0F172A]' 
+              : 'border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] hover:bg-[#F4F1EC]'
           }`}
         >
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Khách Hàng</div>
-          <div className="text-2xl font-black text-sky-400 mt-1">{countCustomers}</div>
+          <div className="text-xs font-semibold text-[#526071] uppercase tracking-wider">Khách Hàng</div>
+          <div className="text-2xl font-black text-[#0D9488] mt-1">{countCustomers}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ROLE_VENDOR'); setSelectedStatus('ALL'); }}
           className={`cursor-pointer rounded-xl border p-4 transition ${
             selectedRole === 'ROLE_VENDOR' 
-              ? 'border-emerald-500/80 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-white' 
-              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+              ? 'border-emerald-500/80 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-[#0F172A]' 
+              : 'border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] hover:bg-[#F4F1EC]'
           }`}
         >
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nhà Cung Cấp (Vendor)</div>
-          <div className="text-2xl font-black text-emerald-400 mt-1">{countVendors}</div>
+          <div className="text-xs font-semibold text-[#526071] uppercase tracking-wider">Nhà Cung Cấp (Vendor)</div>
+          <div className="text-2xl font-black text-emerald-700 mt-1">{countVendors}</div>
         </div>
 
         <div 
           onClick={() => { setSelectedRole('ALL'); setSelectedStatus('BANNED'); }}
           className={`cursor-pointer rounded-xl border p-4 transition ${
             selectedStatus === 'BANNED' 
-              ? 'border-rose-500/80 bg-rose-500/15 shadow-[0_0_15px_rgba(244,63,94,0.2)] text-white' 
-              : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]'
+              ? 'border-rose-500/80 bg-rose-500/15 shadow-[0_0_15px_rgba(244,63,94,0.2)] text-[#0F172A]' 
+              : 'border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] hover:bg-[#F4F1EC]'
           }`}
         >
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bị Khóa (Blacklist)</div>
-          <div className="text-2xl font-black text-rose-400 mt-1">{countBanned}</div>
+          <div className="text-xs font-semibold text-[#526071] uppercase tracking-wider">Bị Khóa (Blacklist)</div>
+          <div className="text-2xl font-black text-[#D95D39] mt-1">{countBanned}</div>
         </div>
       </div>
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
           <input
             type="text"
             placeholder="Tìm theo tên, email hoặc số điện thoại..."
@@ -205,7 +205,7 @@ export const UserManagementPage: React.FC = () => {
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
+            <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
               <tr>
                 <th className="py-3.5 px-4">Người Dùng</th>
                 <th className="py-3.5 px-4">Liên Hệ</th>
@@ -218,7 +218,7 @@ export const UserManagementPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-[#526071]">
                     <RefreshCw className="h-6 w-6 animate-spin mx-auto text-sky-600 mb-2" />
                     Đang tải danh sách người dùng...
                   </td>
@@ -246,19 +246,19 @@ export const UserManagementPage: React.FC = () => {
                               {isAdmin && <ShieldCheck className="h-4 w-4 text-sky-600" />}
                               {isVendor && <Building2 className="h-4 w-4 text-indigo-600" />}
                             </div>
-                            <div className="text-xs text-slate-400 font-mono">ID: #{user.id}</div>
+                            <div className="text-xs text-[#526071] font-mono">ID: #{user.id}</div>
                           </div>
                         </div>
                       </td>
 
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                          <Mail className="h-3.5 w-3.5 text-slate-400" />
+                          <Mail className="h-3.5 w-3.5 text-[#526071]" />
                           <span>{user.email}</span>
                         </div>
                         {user.phone && (
                           <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                            <Phone className="h-3.5 w-3.5 text-slate-400" />
+                            <Phone className="h-3.5 w-3.5 text-[#526071]" />
                             <span>{user.phone}</span>
                           </div>
                         )}
@@ -332,7 +332,7 @@ export const UserManagementPage: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 text-sm">
+                  <td colSpan={6} className="py-12 text-center text-[#526071] text-sm">
                     Không tìm thấy người dùng nào phù hợp với bộ lọc.
                   </td>
                 </tr>
@@ -344,7 +344,7 @@ export const UserManagementPage: React.FC = () => {
 
       {/* Confirmation Modal */}
       {confirmModal.isOpen && confirmModal.user && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 animate-in fade-in">
           <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-2xl ${confirmModal.nextState ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
@@ -376,7 +376,7 @@ export const UserManagementPage: React.FC = () => {
               <button
                 onClick={() => handleToggleStatus(confirmModal.user!, confirmModal.nextState)}
                 disabled={actionLoadingId !== null}
-                className={`px-5 py-2 rounded-xl text-sm font-bold text-white shadow-md transition active:scale-95 ${
+                className={`px-5 py-2 rounded-xl text-sm font-bold text-[#0F172A] shadow-md transition active:scale-95 ${
                   confirmModal.nextState ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'
                 }`}
               >

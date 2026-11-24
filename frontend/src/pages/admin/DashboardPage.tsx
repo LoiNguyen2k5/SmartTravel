@@ -36,7 +36,7 @@ const SETTLED_VENDORS_KEY = 'smart_travel_settled_vendor_ids';
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
   <span className="relative group inline-flex items-center">
     {children}
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-56 rounded-xl bg-slate-900 text-white text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-56 rounded-xl bg-white text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
       {text}
     </span>
   </span>
@@ -124,7 +124,7 @@ export const DashboardPage: React.FC = () => {
             onClick={() => setShowSentimentModal(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 via-indigo-600 to-fuchsia-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
           >
-            <Sparkles className="h-4 w-4 text-amber-300" />
+            <Sparkles className="h-4 w-4 text-amber-800" />
             Phân Tích Đánh Giá
           </button>
           <button
@@ -162,7 +162,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* ── PHÂN TÍCH DOANH THU (góc nhìn Admin — đồng bộ với VendorDashboard) ── */}
       <div>
-        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Phân Tích Doanh Thu Toàn Sàn</h2>
+        <h2 className="text-xs font-black uppercase tracking-widest text-[#526071] mb-3">Phân Tích Doanh Thu Toàn Sàn</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
           {/* 1. Doanh Thu Gộp (GMV) */}
@@ -170,11 +170,11 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-sky-100 p-2.5 text-sky-700"><DollarSign className="h-5 w-5" /></div>
               <Tooltip text="Gross Merchandise Value = Tổng tiền khách thanh toán cho tất cả đơn (kể cả đơn hủy). Đây là chỉ số quy mô toàn sàn.">
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp (GMV)</p>
-            <p className="text-[10px] text-slate-400 mb-1">Gross Merchandise Value</p>
+            <p className="text-[10px] text-[#526071] mb-1">Gross Merchandise Value</p>
             <h3 className="text-xl font-black text-slate-900">{formatCurrency(grossRevenue)}</h3>
             <div className="mt-1 flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
               <TrendingUp className="h-3 w-3" /> {successfulBookings} đơn hoàn tất
@@ -187,13 +187,13 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-amber-100 p-2.5 text-amber-600"><Percent className="h-5 w-5" /></div>
               <Tooltip text={`Doanh thu thực của nền tảng = ${PLATFORM_COMMISSION * 100}% hoa hồng + ${GATEWAY_FEE * 100}% phí cổng thanh toán (GW).`}>
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Hoa Hồng Sàn</p>
-            <p className="text-[10px] text-slate-400 mb-1">Platform Commission ({PLATFORM_COMMISSION * 100}%)</p>
+            <p className="text-[10px] text-[#526071] mb-1">Platform Commission ({PLATFORM_COMMISSION * 100}%)</p>
             <h3 className="text-xl font-black text-amber-600">{formatCurrency(platformCommission)}</h3>
-            <div className="mt-1 text-[11px] text-slate-400">Doanh thu phí dịch vụ nền tảng</div>
+            <div className="mt-1 text-[11px] text-[#526071]">Doanh thu phí dịch vụ nền tảng</div>
             <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-amber-50 opacity-60 pointer-events-none" />
           </div>
 
@@ -202,13 +202,13 @@ export const DashboardPage: React.FC = () => {
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-indigo-100 p-2.5 text-indigo-600"><ArrowDownRight className="h-5 w-5" /></div>
               <Tooltip text={`Số tiền platform cần chuyển cho vendor = GMV − ${PLATFORM_COMMISSION * 100}% hoa hồng − ${GATEWAY_FEE * 100}% phí GW.`}>
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Chi Trả Cho Vendor</p>
-            <p className="text-[10px] text-slate-400 mb-1">Total Net Payout</p>
+            <p className="text-[10px] text-[#526071] mb-1">Total Net Payout</p>
             <h3 className="text-xl font-black text-indigo-700">{formatCurrency(totalNetPayout)}</h3>
-            <div className="text-[11px] text-slate-400 mt-1 space-y-0.5">
+            <div className="text-[11px] text-[#526071] mt-1 space-y-0.5">
               <div>Hoa hồng {PLATFORM_COMMISSION * 100}%: <span className="text-amber-500">−{formatCurrency(platformCommission)}</span></div>
               <div>Phí GW {GATEWAY_FEE * 100}%: <span className="text-amber-500">−{formatCurrency(grossRevenue * GATEWAY_FEE)}</span></div>
             </div>
@@ -224,13 +224,13 @@ export const DashboardPage: React.FC = () => {
                 allSettled ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
               }`}><Wallet className="h-5 w-5" /></div>
               <Tooltip text="Số vendor chưa được chi trả doanh thu. Thực hiện quyết toán tại trang Giao Dịch & Đối Soát.">
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className={`text-[11px] font-bold uppercase tracking-wider ${allSettled ? 'text-slate-500' : 'text-amber-700'}`}>
               Đối Soát Vendor
             </p>
-            <p className={`text-[10px] mb-1 ${allSettled ? 'text-slate-400' : 'text-amber-600'}`}>(Settlement Status)</p>
+            <p className={`text-[10px] mb-1 ${allSettled ? 'text-[#526071]' : 'text-amber-600'}`}>(Settlement Status)</p>
             <h3 className={`text-xl font-black ${allSettled ? 'text-slate-900' : 'text-amber-800'}`}>
               {allSettled ? 'Hoàn tất' : `${pendingVendors} vendor`}
             </h3>
@@ -279,13 +279,13 @@ export const DashboardPage: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <div className="rounded-xl bg-purple-100 p-2 text-purple-700"><BarChart3 className="h-4 w-4" /></div>
             <Tooltip text="Average Order Value = Tổng doanh thu / Số đơn thành công. Giá trị trung bình mỗi booking toàn sàn.">
-              <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
             </Tooltip>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">AOV Toàn Sàn</p>
-          <p className="text-[10px] text-slate-400 mb-2">Avg Order Value</p>
+          <p className="text-[10px] text-[#526071] mb-2">Avg Order Value</p>
           <p className="text-2xl font-black text-slate-900">{aov > 0 ? `${(aov / 1_000_000).toFixed(1)}M` : '—'} đ</p>
-          <p className="text-[11px] text-slate-400 mt-1">/ đơn đặt thành công</p>
+          <p className="text-[11px] text-[#526071] mt-1">/ đơn đặt thành công</p>
         </div>
 
         {/* Người dùng */}
@@ -308,7 +308,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Tour Du Lịch</p>
           <p className="text-2xl font-black text-slate-900">
-            {stats?.totalActiveTours || 0} <span className="text-sm font-normal text-slate-400">đang chạy</span>
+            {stats?.totalActiveTours || 0} <span className="text-sm font-normal text-[#526071]">đang chạy</span>
           </p>
           <div className="mt-1">
             {Number(stats?.totalPendingTours) > 0 ? (
@@ -342,8 +342,8 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {monthlyEntries.length === 0 ? (
-            <div className="h-52 flex flex-col items-center justify-center text-slate-400 text-sm">
-              <ShoppingBag className="h-10 w-10 text-slate-300 mb-2" />
+            <div className="h-52 flex flex-col items-center justify-center text-[#526071] text-sm">
+              <ShoppingBag className="h-10 w-10 text-[#475569] mb-2" />
               Chưa có đủ dữ liệu giao dịch tháng để vẽ biểu đồ.
             </div>
           ) : (
@@ -358,7 +358,7 @@ export const DashboardPage: React.FC = () => {
                       <span className="text-slate-700">Tháng {month}</span>
                       <div className="text-right">
                         <span className="text-slate-900 font-bold">{formatCurrency(numAmount)}</span>
-                        <span className="text-slate-400 ml-2 text-[11px]">→ Vendor: {formatCurrency(netAmount)}</span>
+                        <span className="text-[#526071] ml-2 text-[11px]">→ Vendor: {formatCurrency(netAmount)}</span>
                       </div>
                     </div>
                     <div className="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden p-0.5">
@@ -407,7 +407,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-8 text-center">Chưa có dữ liệu điểm đến.</p>
+              <p className="text-xs text-[#526071] py-8 text-center">Chưa có dữ liệu điểm đến.</p>
             )}
           </div>
         </div>
@@ -426,7 +426,7 @@ export const DashboardPage: React.FC = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-50">
+            <thead className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-[#526071] bg-slate-50">
               <tr>
                 <th className="py-3 px-4">Mã Booking</th>
                 <th className="py-3 px-4">Tour</th>
@@ -483,7 +483,7 @@ export const DashboardPage: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400 text-xs">Chưa có đơn đặt tour nào.</td>
+                  <td colSpan={7} className="py-8 text-center text-[#526071] text-xs">Chưa có đơn đặt tour nào.</td>
                 </tr>
               )}
             </tbody>

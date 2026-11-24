@@ -16,8 +16,8 @@ const ArticleImage = ({ src, title }: ArticleImageProps) => {
 
   if (!src || failed) {
     return (
-      <div className="mb-8 flex min-h-48 items-center justify-center rounded-2xl border border-white/10 bg-slate-900 px-6 py-12">
-        <p className="text-center text-sm text-slate-400">
+      <div className="mb-8 flex min-h-48 items-center justify-center rounded-2xl border border-[#E6E1DA] bg-white px-6 py-12">
+        <p className="text-center text-sm text-[#526071]">
           Ảnh bài viết hiện chưa tải được.
         </p>
       </div>
@@ -25,7 +25,7 @@ const ArticleImage = ({ src, title }: ArticleImageProps) => {
   }
 
   return (
-    <div className="mb-8 overflow-hidden rounded-2xl bg-slate-900">
+    <div className="mb-8 overflow-hidden rounded-2xl bg-white">
       <img
         src={src}
         alt={title}
@@ -51,13 +51,13 @@ export const BlogDetailPage = () => {
 
   if (!post) {
     return (
-      <main className="min-h-screen bg-[#020204] px-6 py-20 text-white">
+      <main className="min-h-screen bg-[#FAF8F5] px-6 py-20 text-[#0F172A]">
         <div className="mx-auto max-w-3xl">
           <h1 className="mb-4 text-3xl font-bold">
             Không tìm thấy bài viết
           </h1>
 
-          <p className="mb-6 text-slate-400">
+          <p className="mb-6 text-[#526071]">
             Bài viết có thể đã được thay đổi hoặc đường dẫn chưa đúng.
           </p>
 
@@ -85,18 +85,18 @@ export const BlogDetailPage = () => {
     : undefined;
 
   return (
-    <main className="min-h-screen bg-[#020204] px-6 py-12 text-white">
+    <main className="min-h-screen bg-[#FAF8F5] px-6 py-12 text-[#0F172A]">
       <article className="mx-auto max-w-3xl">
         <Link
           to={backToBlogs}
-          className="mb-8 inline-block text-sm font-medium text-sky-400 hover:underline"
+          className="mb-8 inline-block text-sm font-medium text-[#0D9488] hover:underline"
         >
           ← Quay lại cẩm nang
         </Link>
 
         <div className="mb-4">
           <span
-            className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold text-white ${post.tagColor}`}
+            className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold text-[#0F172A] ${post.tagColor}`}
           >
             {post.tag}
           </span>
@@ -106,12 +106,12 @@ export const BlogDetailPage = () => {
           {post.title}
         </h1>
 
-        <p className="mb-8 text-sm text-slate-400">
+        <p className="mb-8 text-sm text-[#526071]">
           {post.date} · {post.readTime} đọc
         </p>
 
         {tourArticle?.isDemo && (
-          <div className="mb-8 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-200">
+          <div className="mb-8 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-800">
             Đây là bài giải thích mục thử nghiệm thanh toán,
             không phải chương trình du lịch.
           </div>
@@ -123,7 +123,7 @@ export const BlogDetailPage = () => {
           title={post.title}
         />
 
-        <p className="mb-10 text-lg leading-8 text-slate-300">
+        <p className="mb-10 text-lg leading-8 text-[#475569]">
           {post.desc}
         </p>
 
@@ -140,7 +140,7 @@ export const BlogDetailPage = () => {
               {section.paragraphs.map((paragraph, paragraphIndex) => (
                 <p
                   key={`${sectionIndex}-${paragraphIndex}`}
-                  className="mb-4 leading-8 text-slate-300"
+                  className="mb-4 leading-8 text-[#475569]"
                 >
                   {paragraph}
                 </p>
@@ -148,14 +148,14 @@ export const BlogDetailPage = () => {
             </section>
           ))
         ) : (
-          <p className="mb-10 text-slate-400">
+          <p className="mb-10 text-[#526071]">
             Nội dung bài viết đang được cập nhật.
           </p>
         )}
 
         {relatedTour && (
           <aside className="my-10 rounded-2xl border border-sky-400/20 bg-sky-500/5 p-6">
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-sky-400">
+            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
               {tourArticle?.isDemo ? 'Mục thử nghiệm liên quan' : 'Tour liên quan'}
             </p>
 
@@ -165,29 +165,29 @@ export const BlogDetailPage = () => {
 
             <dl className="mb-6 space-y-2 text-sm">
               <div>
-                <dt className="inline text-slate-400">
+                <dt className="inline text-[#526071]">
                   Khởi hành:
                 </dt>{' '}
-                <dd className="inline text-slate-200">
+                <dd className="inline text-[#334155]">
                   {relatedTour.departureLocation}
                 </dd>
               </div>
 
               <div>
-                <dt className="inline text-slate-400">
+                <dt className="inline text-[#526071]">
                   Thời gian:
                 </dt>{' '}
-                <dd className="inline text-slate-200">
+                <dd className="inline text-[#334155]">
                   {relatedTour.durationDays} ngày{' '}
                   {relatedTour.durationNights} đêm
                 </dd>
               </div>
 
               <div>
-                <dt className="inline text-slate-400">
+                <dt className="inline text-[#526071]">
                   Mã tour:
                 </dt>{' '}
-                <dd className="inline text-slate-200">
+                <dd className="inline text-[#334155]">
                   {relatedTour.tourCode}
                 </dd>
               </div>
@@ -208,10 +208,10 @@ export const BlogDetailPage = () => {
           </aside>
         )}
 
-        <div className="border-t border-white/10 pt-8">
+        <div className="border-t border-[#E6E1DA] pt-8">
           <Link
             to={backToBlogs}
-            className="inline-block rounded-xl border border-white/20 px-5 py-3 font-semibold text-slate-200 transition hover:bg-white/5"
+            className="inline-block rounded-xl border border-[#CBD5E1] px-5 py-3 font-semibold text-[#334155] transition hover:bg-[#FAF8F5]"
           >
             Xem các bài viết khác
           </Link>

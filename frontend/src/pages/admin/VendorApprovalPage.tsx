@@ -159,22 +159,22 @@ export const VendorApprovalPage: React.FC = () => {
     switch (status) {
       case 'PENDING_REVIEW':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-            <Clock className="w-3 h-3 animate-pulse text-amber-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-800 border border-amber-500/30">
+            <Clock className="w-3 h-3 animate-pulse text-amber-700" />
             <span>Chờ duyệt</span>
           </span>
         );
       case 'APPROVED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">
+            <CheckCircle2 className="w-3 h-3 text-emerald-700" />
             <span>Đã phê duyệt</span>
           </span>
         );
       case 'REJECTED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-            <XCircle className="w-3 h-3 text-rose-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-700 border border-rose-500/30">
+            <XCircle className="w-3 h-3 text-[#D95D39]" />
             <span>Từ chối</span>
           </span>
         );
@@ -197,14 +197,14 @@ export const VendorApprovalPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
+            <div className="p-2 rounded-xl bg-sky-500/20 text-[#0D9488] border border-sky-500/30">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
                 Phê Duyệt Hồ Sơ Đối Tác (Vendor Approvals)
               </h1>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#526071] mt-0.5">
                 Thẩm định giấy phép kinh doanh lữ hành, CCCD người đại diện và cấp quyền ROLE_VENDOR tự động
               </p>
             </div>
@@ -214,7 +214,7 @@ export const VendorApprovalPage: React.FC = () => {
         <button
           onClick={fetchApplications}
           disabled={loading}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-slate-300 border border-white/10 transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FAF8F5] hover:bg-[#F4F1EC] text-xs font-bold text-[#475569] border border-[#E6E1DA] transition cursor-pointer self-start sm:self-auto"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Làm mới danh sách</span>
@@ -222,12 +222,12 @@ export const VendorApprovalPage: React.FC = () => {
       </div>
 
       {actionSuccessMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between animate-in fade-in duration-200">
+        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 text-xs flex items-center justify-between animate-in fade-in duration-200">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
             <span className="font-semibold">{actionSuccessMsg}</span>
           </div>
-          <button onClick={() => setActionSuccessMsg(null)} className="text-slate-400 hover:text-white">
+          <button onClick={() => setActionSuccessMsg(null)} className="text-[#526071] hover:text-[#0F172A]">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -240,11 +240,11 @@ export const VendorApprovalPage: React.FC = () => {
           className={`p-4 rounded-2xl border transition cursor-pointer ${
             selectedStatus === 'ALL'
               ? 'bg-sky-500/10 border-sky-500/40 shadow-[0_0_20px_rgba(14,165,233,0.15)]'
-              : 'bg-white/[0.03] border-white/8 hover:bg-white/[0.05]'
+              : 'bg-[#FAF8F5] border-[#E6E1DA] hover:bg-[#FAF8F5]'
           }`}
         >
-          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng số hồ sơ</div>
-          <div className="text-2xl font-black text-white mt-1.5">{applications.length}</div>
+          <div className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Tổng số hồ sơ</div>
+          <div className="text-2xl font-black text-[#0F172A] mt-1.5">{applications.length}</div>
         </div>
 
         <div 
@@ -252,16 +252,16 @@ export const VendorApprovalPage: React.FC = () => {
           className={`p-4 rounded-2xl border transition cursor-pointer relative overflow-hidden ${
             selectedStatus === 'PENDING_REVIEW'
               ? 'bg-amber-500/15 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
-              : 'bg-white/[0.03] border-white/8 hover:bg-white/[0.05]'
+              : 'bg-[#FAF8F5] border-[#E6E1DA] hover:bg-[#FAF8F5]'
           }`}
         >
-          <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
             <span>Chờ thẩm định</span>
             {countPending > 0 && (
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
             )}
           </div>
-          <div className="text-2xl font-black text-amber-300 mt-1.5">{countPending}</div>
+          <div className="text-2xl font-black text-amber-800 mt-1.5">{countPending}</div>
         </div>
 
         <div 
@@ -269,11 +269,11 @@ export const VendorApprovalPage: React.FC = () => {
           className={`p-4 rounded-2xl border transition cursor-pointer ${
             selectedStatus === 'APPROVED'
               ? 'bg-emerald-500/15 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-              : 'bg-white/[0.03] border-white/8 hover:bg-white/[0.05]'
+              : 'bg-[#FAF8F5] border-[#E6E1DA] hover:bg-[#FAF8F5]'
           }`}
         >
-          <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Đã phê duyệt</div>
-          <div className="text-2xl font-black text-emerald-300 mt-1.5">{countApproved}</div>
+          <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Đã phê duyệt</div>
+          <div className="text-2xl font-black text-emerald-700 mt-1.5">{countApproved}</div>
         </div>
 
         <div 
@@ -281,24 +281,24 @@ export const VendorApprovalPage: React.FC = () => {
           className={`p-4 rounded-2xl border transition cursor-pointer ${
             selectedStatus === 'REJECTED'
               ? 'bg-rose-500/15 border-rose-500/50 shadow-[0_0_20px_rgba(244,63,94,0.2)]'
-              : 'bg-white/[0.03] border-white/8 hover:bg-white/[0.05]'
+              : 'bg-[#FAF8F5] border-[#E6E1DA] hover:bg-[#FAF8F5]'
           }`}
         >
-          <div className="text-[11px] font-bold text-rose-400 uppercase tracking-wider">Đã từ chối</div>
-          <div className="text-2xl font-black text-rose-300 mt-1.5">{countRejected}</div>
+          <div className="text-[11px] font-bold text-[#D95D39] uppercase tracking-wider">Đã từ chối</div>
+          <div className="text-2xl font-black text-rose-700 mt-1.5">{countRejected}</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA]">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#526071]" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm theo tên cty, MST, email, người đại diện..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#FAF8F5] border border-[#E6E1DA] text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-sky-400 transition"
           />
         </div>
 
@@ -316,8 +316,8 @@ export const VendorApprovalPage: React.FC = () => {
               onClick={() => setSelectedStatus(tab.val)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                 selectedStatus === tab.val
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-[0_0_12px_rgba(14,165,233,0.2)]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'
+                  ? 'bg-sky-500/20 text-[#0B3B49] border border-sky-500/40 shadow-[0_0_12px_rgba(14,165,233,0.2)]'
+                  : 'text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] border border-transparent'
               }`}
             >
               {tab.label}
@@ -327,11 +327,11 @@ export const VendorApprovalPage: React.FC = () => {
       </div>
 
       {/* Table List */}
-      <div className="rounded-2xl border border-white/10 bg-[#070c18] overflow-hidden shadow-2xl">
+      <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+              <tr className="border-b border-[#E6E1DA] bg-[#FAF8F5] text-[11px] font-extrabold text-[#526071] uppercase tracking-wider">
                 <th className="py-3.5 px-4">Mã đơn</th>
                 <th className="py-3.5 px-4">Doanh nghiệp & MST</th>
                 <th className="py-3.5 px-4">Đại diện & Hotline</th>
@@ -341,11 +341,11 @@ export const VendorApprovalPage: React.FC = () => {
                 <th className="py-3.5 px-4 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#E6E1DA]">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-400" />
+                  <td colSpan={7} className="py-12 text-center text-[#526071]">
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#0D9488]" />
                     <span>Đang tải danh sách hồ sơ đối tác...</span>
                   </td>
                 </tr>
@@ -357,31 +357,31 @@ export const VendorApprovalPage: React.FC = () => {
                 </tr>
               ) : (
                 filteredApps.map((app) => (
-                  <tr key={app.id} className="hover:bg-white/[0.03] transition group">
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-400">
+                  <tr key={app.id} className="hover:bg-[#FAF8F5] transition group">
+                    <td className="py-3.5 px-4 font-mono font-bold text-[#526071]">
                       #{app.id}
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <div className="font-bold text-white max-w-xs truncate">{app.businessName}</div>
-                      <div className="text-[11px] text-sky-400 font-mono mt-0.5">MST: {app.taxCode}</div>
+                      <div className="font-bold text-[#0F172A] max-w-xs truncate">{app.businessName}</div>
+                      <div className="text-[11px] text-[#0D9488] font-mono mt-0.5">MST: {app.taxCode}</div>
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-200">{app.representativeName}</div>
-                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">{app.hotline}</div>
+                      <div className="font-semibold text-[#334155]">{app.representativeName}</div>
+                      <div className="text-[11px] text-[#526071] font-mono mt-0.5">{app.hotline}</div>
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <div className="text-slate-300 truncate max-w-[160px]">{app.userFullName}</div>
-                      <div className="text-[11px] text-slate-400 font-mono truncate max-w-[160px]">{app.userEmail}</div>
+                      <div className="text-[#475569] truncate max-w-[160px]">{app.userFullName}</div>
+                      <div className="text-[11px] text-[#526071] font-mono truncate max-w-[160px]">{app.userEmail}</div>
                     </td>
 
                     <td className="py-3.5 px-4">
                       {getStatusBadge(app.status)}
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+                    <td className="py-3.5 px-4 text-[#526071] font-mono text-[11px]">
                       {formatDate(app.createdAt)}
                     </td>
 
@@ -391,7 +391,7 @@ export const VendorApprovalPage: React.FC = () => {
                           <button
                             onClick={() => handleApprove(app)}
                             disabled={actionLoading}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold transition cursor-pointer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700 border border-emerald-500/40 font-bold transition cursor-pointer"
                             title="Phê duyệt nhanh hồ sơ này"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -400,7 +400,7 @@ export const VendorApprovalPage: React.FC = () => {
                         )}
                         <button
                           onClick={() => setSelectedApp(app)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 font-bold transition cursor-pointer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-[#0B3B49] border border-sky-500/30 font-bold transition cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Thẩm định</span>
@@ -420,22 +420,22 @@ export const VendorApprovalPage: React.FC = () => {
       {/* ======================================================== */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl bg-[#0a111d] border border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.9)] overflow-hidden text-slate-100">
+          <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl bg-white border border-[#CBD5E1] shadow-float overflow-hidden text-[#0F172A]">
             
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+            <div className="px-6 py-4 border-b border-[#E6E1DA] flex items-center justify-between bg-[#FAF8F5]">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                <div className="p-2 rounded-xl bg-sky-500/20 text-[#0D9488] border border-sky-500/30">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-extrabold text-white">
+                    <h3 className="text-base font-extrabold text-[#0F172A]">
                       Hồ sơ đăng ký #{selectedApp.id}
                     </h3>
                     {getStatusBadge(selectedApp.status)}
                   </div>
-                  <p className="text-[11px] text-slate-400 font-mono">
+                  <p className="text-[11px] text-[#526071] font-mono">
                     Ngày nộp: {formatDate(selectedApp.createdAt)} • Người nộp: {selectedApp.userFullName} ({selectedApp.userEmail})
                   </p>
                 </div>
@@ -443,7 +443,7 @@ export const VendorApprovalPage: React.FC = () => {
 
               <button
                 onClick={() => setSelectedApp(null)}
-                className="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition cursor-pointer"
+                className="p-2 rounded-xl hover:bg-[#F4F1EC] text-[#526071] hover:text-[#0F172A] transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -454,39 +454,39 @@ export const VendorApprovalPage: React.FC = () => {
               
               {/* Thông tin pháp nhân */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-[#0D9488] uppercase tracking-wider flex items-center gap-1.5">
                   <FileText className="w-4 h-4" />
                   <span>1. Thông tin doanh nghiệp lữ hành</span>
                 </h4>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA]">
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Tên doanh nghiệp:</span>
-                    <strong className="text-white text-sm font-extrabold">{selectedApp.businessName}</strong>
+                    <span className="text-[#526071] block text-[11px]">Tên doanh nghiệp:</span>
+                    <strong className="text-[#0F172A] text-sm font-extrabold">{selectedApp.businessName}</strong>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Mã số thuế (MST):</span>
-                    <strong className="text-sky-300 font-mono text-xs">{selectedApp.taxCode}</strong>
+                    <span className="text-[#526071] block text-[11px]">Mã số thuế (MST):</span>
+                    <strong className="text-[#0B3B49] font-mono text-xs">{selectedApp.taxCode}</strong>
                   </div>
 
                   <div className="sm:col-span-2">
-                    <span className="text-slate-400 block text-[11px]">Trụ sở chính:</span>
-                    <span className="text-slate-200">{selectedApp.businessAddress}</span>
+                    <span className="text-[#526071] block text-[11px]">Trụ sở chính:</span>
+                    <span className="text-[#334155]">{selectedApp.businessAddress}</span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Hotline CSKH:</span>
-                    <span className="text-slate-200 font-mono font-bold">{selectedApp.hotline}</span>
+                    <span className="text-[#526071] block text-[11px]">Hotline CSKH:</span>
+                    <span className="text-[#334155] font-mono font-bold">{selectedApp.hotline}</span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Email liên hệ:</span>
-                    <span className="text-slate-200 font-mono">{selectedApp.contactEmail || 'Theo tài khoản user'}</span>
+                    <span className="text-[#526071] block text-[11px]">Email liên hệ:</span>
+                    <span className="text-[#334155] font-mono">{selectedApp.contactEmail || 'Theo tài khoản user'}</span>
                   </div>
 
                   {selectedApp.website && (
-                    <div className="sm:col-span-2 flex items-center gap-1.5 text-sky-400">
+                    <div className="sm:col-span-2 flex items-center gap-1.5 text-[#0D9488]">
                       <Globe className="w-3.5 h-3.5" />
                       <a href={selectedApp.website} target="_blank" rel="noreferrer" className="hover:underline truncate">
                         {selectedApp.website}
@@ -496,8 +496,8 @@ export const VendorApprovalPage: React.FC = () => {
 
                   {selectedApp.description && (
                     <div className="sm:col-span-2 pt-2 border-t border-white/6">
-                      <span className="text-slate-400 block text-[11px] mb-1">Mô tả doanh nghiệp & thế mạnh:</span>
-                      <p className="text-slate-300 italic leading-relaxed">{selectedApp.description}</p>
+                      <span className="text-[#526071] block text-[11px] mb-1">Mô tả doanh nghiệp & thế mạnh:</span>
+                      <p className="text-[#475569] italic leading-relaxed">{selectedApp.description}</p>
                     </div>
                   )}
                 </div>
@@ -505,20 +505,20 @@ export const VendorApprovalPage: React.FC = () => {
 
               {/* Thông tin người đại diện & Giấy tờ */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-[#0D9488] uppercase tracking-wider flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4" />
                   <span>2. Người đại diện pháp luật & Giấy tờ thẩm định</span>
                 </h4>
 
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/8 space-y-4">
+                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA] space-y-4">
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Người đại diện pháp luật:</span>
-                    <strong className="text-white text-sm font-bold">{selectedApp.representativeName}</strong>
+                    <span className="text-[#526071] block text-[11px]">Người đại diện pháp luật:</span>
+                    <strong className="text-[#0F172A] text-sm font-bold">{selectedApp.representativeName}</strong>
                   </div>
 
                   {/* Giấy phép & CCCD Thumbnails */}
                   <div className="space-y-2">
-                    <span className="text-slate-300 font-bold block text-[11px]">
+                    <span className="text-[#475569] font-bold block text-[11px]">
                       Hình ảnh hồ sơ pháp lý (Bấm vào ảnh để phóng to kiểm tra):
                     </span>
 
@@ -526,11 +526,11 @@ export const VendorApprovalPage: React.FC = () => {
                       {/* GPKD */}
                       <div 
                         onClick={() => setZoomedImage({ url: selectedApp.businessLicenseUrl, title: 'Giấy phép kinh doanh lữ hành' })}
-                        className="rounded-xl border border-white/10 overflow-hidden bg-slate-900 cursor-pointer group hover:border-sky-400 transition"
+                        className="rounded-xl border border-[#E6E1DA] overflow-hidden bg-white cursor-pointer group hover:border-sky-400 transition"
                       >
-                        <div className="p-2 text-[10px] font-bold text-slate-300 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                        <div className="p-2 text-[10px] font-bold text-[#475569] bg-[#FAF8F5] border-b border-[#E6E1DA] flex items-center justify-between">
                           <span>Giấy phép lữ hành</span>
-                          <ExternalLink className="w-3 h-3 text-sky-400 opacity-60 group-hover:opacity-100" />
+                          <ExternalLink className="w-3 h-3 text-[#0D9488] opacity-60 group-hover:opacity-100" />
                         </div>
                         <img src={selectedApp.businessLicenseUrl} alt="GPKD" className="w-full h-32 object-cover group-hover:scale-105 transition duration-300" />
                       </div>
@@ -538,11 +538,11 @@ export const VendorApprovalPage: React.FC = () => {
                       {/* CCCD Front */}
                       <div 
                         onClick={() => setZoomedImage({ url: selectedApp.idCardFrontUrl, title: 'CCCD Người đại diện (Mặt trước)' })}
-                        className="rounded-xl border border-white/10 overflow-hidden bg-slate-900 cursor-pointer group hover:border-sky-400 transition"
+                        className="rounded-xl border border-[#E6E1DA] overflow-hidden bg-white cursor-pointer group hover:border-sky-400 transition"
                       >
-                        <div className="p-2 text-[10px] font-bold text-slate-300 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                        <div className="p-2 text-[10px] font-bold text-[#475569] bg-[#FAF8F5] border-b border-[#E6E1DA] flex items-center justify-between">
                           <span>CCCD Mặt trước</span>
-                          <ExternalLink className="w-3 h-3 text-sky-400 opacity-60 group-hover:opacity-100" />
+                          <ExternalLink className="w-3 h-3 text-[#0D9488] opacity-60 group-hover:opacity-100" />
                         </div>
                         <img src={selectedApp.idCardFrontUrl} alt="CCCD Front" className="w-full h-32 object-cover group-hover:scale-105 transition duration-300" />
                       </div>
@@ -551,16 +551,16 @@ export const VendorApprovalPage: React.FC = () => {
                       {selectedApp.idCardBackUrl ? (
                         <div 
                           onClick={() => setZoomedImage({ url: selectedApp.idCardBackUrl!, title: 'CCCD Người đại diện (Mặt sau)' })}
-                          className="rounded-xl border border-white/10 overflow-hidden bg-slate-900 cursor-pointer group hover:border-sky-400 transition"
+                          className="rounded-xl border border-[#E6E1DA] overflow-hidden bg-white cursor-pointer group hover:border-sky-400 transition"
                         >
-                          <div className="p-2 text-[10px] font-bold text-slate-300 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                          <div className="p-2 text-[10px] font-bold text-[#475569] bg-[#FAF8F5] border-b border-[#E6E1DA] flex items-center justify-between">
                             <span>CCCD Mặt sau</span>
-                            <ExternalLink className="w-3 h-3 text-sky-400 opacity-60 group-hover:opacity-100" />
+                            <ExternalLink className="w-3 h-3 text-[#0D9488] opacity-60 group-hover:opacity-100" />
                           </div>
                           <img src={selectedApp.idCardBackUrl} alt="CCCD Back" className="w-full h-32 object-cover group-hover:scale-105 transition duration-300" />
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-dashed border-white/10 p-4 flex items-center justify-center text-slate-500 text-[11px] text-center">
+                        <div className="rounded-xl border border-dashed border-[#E6E1DA] p-4 flex items-center justify-center text-slate-500 text-[11px] text-center">
                           Chưa đính kèm CCCD mặt sau
                         </div>
                       )}
@@ -571,13 +571,13 @@ export const VendorApprovalPage: React.FC = () => {
 
               {/* Lịch sử thẩm định nếu đã review */}
               {selectedApp.status !== 'PENDING_REVIEW' && (
-                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/8 space-y-2">
-                  <div className="font-bold text-slate-300">Thông tin kết quả thẩm định:</div>
-                  <div className="text-slate-400">
-                    Người duyệt: <strong className="text-white">{selectedApp.reviewedBy || 'Admin'}</strong> • Thời gian: {selectedApp.reviewedAt ? formatDate(selectedApp.reviewedAt) : ''}
+                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA] space-y-2">
+                  <div className="font-bold text-[#475569]">Thông tin kết quả thẩm định:</div>
+                  <div className="text-[#526071]">
+                    Người duyệt: <strong className="text-[#0F172A]">{selectedApp.reviewedBy || 'Admin'}</strong> • Thời gian: {selectedApp.reviewedAt ? formatDate(selectedApp.reviewedAt) : ''}
                   </div>
                   {selectedApp.rejectionReason && (
-                    <div className="mt-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
+                    <div className="mt-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700">
                       <strong>Lý do từ chối:</strong> {selectedApp.rejectionReason}
                     </div>
                   )}
@@ -587,10 +587,10 @@ export const VendorApprovalPage: React.FC = () => {
             </div>
 
             {/* Modal Footer (Action Buttons) */}
-            <div className="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between gap-3">
+            <div className="px-6 py-4 border-t border-[#E6E1DA] bg-[#FAF8F5] flex items-center justify-between gap-3">
               <button
                 onClick={() => setSelectedApp(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#526071] hover:text-[#0F172A] transition cursor-pointer"
               >
                 Đóng cửa sổ
               </button>
@@ -601,7 +601,7 @@ export const VendorApprovalPage: React.FC = () => {
                     <button
                       onClick={() => setShowRejectModal(true)}
                       disabled={actionLoading}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-bold transition cursor-pointer"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/20 text-rose-700 border border-rose-500/40 hover:bg-rose-500/30 text-xs font-bold transition cursor-pointer"
                     >
                       <XCircle className="w-4 h-4" />
                       <span>Từ chối hồ sơ</span>
@@ -631,7 +631,7 @@ export const VendorApprovalPage: React.FC = () => {
                   <button
                     onClick={() => handleRevoke(selectedApp)}
                     disabled={actionLoading}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 text-xs font-bold transition cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/15 text-amber-800 border border-amber-500/40 hover:bg-amber-500/25 text-xs font-bold transition cursor-pointer"
                   >
                     <RotateCcw className="w-4 h-4" />
                     <span>Thu hồi quyền & Trả về Khách hàng</span>
@@ -642,7 +642,7 @@ export const VendorApprovalPage: React.FC = () => {
                   <button
                     onClick={() => handleApprove(selectedApp)}
                     disabled={actionLoading}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-bold transition cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-700 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-bold transition cursor-pointer"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span>Xem xét lại & Phê duyệt</span>
@@ -653,7 +653,7 @@ export const VendorApprovalPage: React.FC = () => {
                   <button
                     onClick={() => handleApprove(selectedApp)}
                     disabled={actionLoading}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-bold transition cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-700 border border-emerald-500/40 hover:bg-emerald-500/30 text-xs font-bold transition cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Khôi phục quyền Vendor</span>
@@ -671,19 +671,19 @@ export const VendorApprovalPage: React.FC = () => {
       {/* ======================================================== */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-[#0a111d] border border-rose-500/40 p-6 shadow-2xl space-y-4 text-white">
+          <div className="w-full max-w-md rounded-3xl bg-white border border-rose-500/40 p-6 shadow-2xl space-y-4 text-[#0F172A]">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30">
+              <div className="p-2.5 rounded-xl bg-rose-500/20 text-[#D95D39] border border-rose-500/30">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-base font-bold">Từ chối hồ sơ đối tác</h3>
-                <p className="text-[11px] text-slate-400">Vui lòng cung cấp lý do để đối tác hoàn thiện lại hồ sơ</p>
+                <p className="text-[11px] text-[#526071]">Vui lòng cung cấp lý do để đối tác hoàn thiện lại hồ sơ</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-[#475569] mb-1.5">
                 Lý do từ chối (Sẽ gửi qua email cho đối tác) *
               </label>
               <textarea
@@ -692,7 +692,7 @@ export const VendorApprovalPage: React.FC = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="VD: Ảnh Giấy phép kinh doanh bị mờ, không thấy rõ số MST. Vui lòng chụp lại bản gốc và nộp lại hồ sơ..."
-                className="w-full rounded-xl border border-white/10 bg-white/[0.05] p-3 text-xs text-white placeholder-slate-500 focus:border-rose-400 focus:outline-none resize-none"
+                className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] p-3 text-xs text-[#0F172A] placeholder-slate-400 focus:border-rose-400 focus:outline-none resize-none"
               />
             </div>
 
@@ -703,7 +703,7 @@ export const VendorApprovalPage: React.FC = () => {
                   setShowRejectModal(false);
                   setRejectionReason('');
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#526071] hover:text-[#0F172A]"
               >
                 Hủy bỏ
               </button>
@@ -730,11 +730,11 @@ export const VendorApprovalPage: React.FC = () => {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg cursor-zoom-out animate-in fade-in duration-200"
         >
           <div className="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-            <div className="w-full flex items-center justify-between text-white pb-3 px-2">
+            <div className="w-full flex items-center justify-between text-[#0F172A] pb-3 px-2">
               <span className="text-sm font-bold">{zoomedImage.title}</span>
               <button
                 onClick={() => setZoomedImage(null)}
-                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                className="p-1.5 rounded-xl bg-[#F4F1EC] hover:bg-[#E6F4F1] text-[#0F172A] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -742,7 +742,7 @@ export const VendorApprovalPage: React.FC = () => {
             <img 
               src={zoomedImage.url} 
               alt={zoomedImage.title} 
-              className="max-h-[80vh] max-w-full rounded-2xl border border-white/20 shadow-2xl object-contain bg-slate-950" 
+              className="max-h-[80vh] max-w-full rounded-2xl border border-[#CBD5E1] shadow-2xl object-contain bg-[#FAF8F5]" 
             />
           </div>
         </div>

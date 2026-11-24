@@ -48,27 +48,18 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-[#020204] text-slate-100 overflow-hidden font-sans portal-dark relative">
-      {/* Background Ambient Glow */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/3 w-[500px] h-[300px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
-
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#070c18] border-r border-white/10 text-white flex flex-col justify-between p-4 shadow-2xl flex-shrink-0 z-20">
+    <div className="flex h-screen bg-[#FAF8F5] text-[#0F172A] overflow-hidden font-sans ocean-portal relative">
+      {/* Deep Ocean Sidebar */}
+      <aside className="w-64 bg-[#0B3B49] border-r border-[#082E3A] text-white flex flex-col justify-between p-4 shadow-xl flex-shrink-0 z-20">
         <div>
           {/* Brand */}
-          <div className="flex items-center gap-2.5 mb-8 px-2">
-            <div 
-              className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white"
-              style={{
-                boxShadow: '0 0 20px rgba(14,165,233,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
-              }}
-            >
+          <div className="flex items-center gap-2.5 mb-8 px-2 pt-1">
+            <div className="p-2.5 rounded-xl bg-[#0D9488] text-white shadow-md">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
               <span className="font-extrabold text-lg text-white tracking-tight">SmartTravel</span>
-              <span className="block text-[11px] font-bold text-sky-400 uppercase tracking-widest">Admin Portal</span>
+              <span className="block text-[10px] font-bold text-[#5EEAD4] uppercase tracking-widest">Admin Portal</span>
             </div>
           </div>
 
@@ -84,16 +75,16 @@ export const AdminLayout: React.FC = () => {
                   to={item.path}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                     isActive
-                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.25)]'
-                      : 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                      ? 'bg-[#D95D39] text-white shadow-md'
+                      : 'text-slate-200/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-sky-300' : 'text-slate-400'}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#5EEAD4]'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950">
                       {item.badge}
                     </span>
                   )}
@@ -104,26 +95,26 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* User Info & Footer */}
-        <div className="space-y-3 pt-4 border-t border-white/10">
-          <div className="p-2.5 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center font-bold text-sky-300 text-xs shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+        <div className="space-y-2.5 pt-4 border-t border-white/15">
+          <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-[#0D9488] flex items-center justify-center font-bold text-white text-xs">
               AD
             </div>
             <div className="min-w-0 flex-1">
               <div className="font-bold text-xs text-white truncate">{user?.fullName || 'Administrator'}</div>
-              <div className="text-[11px] text-slate-400 truncate">{user?.email || 'admin@smarttravel.com'}</div>
+              <div className="text-[11px] text-slate-300 truncate">{user?.email || 'admin@smarttravel.com'}</div>
             </div>
           </div>
 
           <Link
             to="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/[0.06] transition"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition"
           >
             <ArrowLeft className="h-4 w-4" /> Quay lại Trang khách
           </Link>
           <button
             onClick={() => { logout(); navigate('/login'); }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
           >
             <LogOut className="h-4 w-4" /> Đăng xuất
           </button>
@@ -131,7 +122,7 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative z-10 bg-[#FAF8F5]">
         <Outlet />
       </main>
     </div>

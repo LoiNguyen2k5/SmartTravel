@@ -95,16 +95,16 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#0a111d]/90 backdrop-blur-xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.7)] space-y-6 text-white">
+    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-6 text-[#0F172A]">
       {/* Title */}
       <div className="text-center pt-2">
-        <h2 className="text-xl font-black text-white">Welcome Back, Log In</h2>
-        <p className="text-xs text-slate-400 mt-1">Đăng nhập tài khoản Smart Travel</p>
+        <h2 className="text-xl font-black text-[#0F172A]">Welcome Back, Log In</h2>
+        <p className="text-xs text-[#526071] mt-1">Đăng nhập tài khoản Smart Travel</p>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-rose-400 border border-rose-500/30 text-center">
+        <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-[#D95D39] border border-rose-500/30 text-center">
           {error}
         </div>
       )}
@@ -113,10 +113,10 @@ export const LoginPage: React.FC = () => {
       <form onSubmit={(e) => handleLoginSubmit(e)} className="space-y-4">
         {/* Textbox Email với Menu Gợi ý Tài khoản Đã Lưu */}
         <div className="relative" ref={dropdownRef}>
-          <label className="block text-xs font-bold text-slate-300 mb-1.5 flex justify-between">
+          <label className="block text-xs font-bold text-[#475569] mb-1.5 flex justify-between">
             <span>Email</span>
             {savedAccounts.length > 0 && (
-              <span className="text-[11px] font-normal text-sky-400 cursor-pointer hover:underline" onClick={() => setShowSavedDropdown(!showSavedDropdown)}>
+              <span className="text-[11px] font-normal text-[#0D9488] cursor-pointer hover:underline" onClick={() => setShowSavedDropdown(!showSavedDropdown)}>
                 💡 {showSavedDropdown ? 'Ẩn tài khoản đã lưu' : 'Hiện tài khoản đã lưu (' + savedAccounts.length + ')'}
               </span>
             )}
@@ -130,13 +130,13 @@ export const LoginPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setShowSavedDropdown(true)}
             placeholder="Enter Your email here"
-            className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none transition"
+            className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] px-4 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-sky-400 focus:outline-none transition"
           />
 
           {/* Dropdown gợi ý tài khoản & mật khẩu (hiện ẩn) */}
           {showSavedDropdown && savedAccounts.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-2xl border border-white/10 bg-[#0d1626] p-2 shadow-2xl space-y-1 max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between border-b border-white/8 mb-1">
+            <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-2xl border border-[#E6E1DA] bg-white p-2 shadow-2xl space-y-1 max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#526071] flex items-center justify-between border-b border-[#E6E1DA] mb-1">
                 <span>🔑 Tài khoản đã lưu (Click để điền)</span>
                 <span>Mật khẩu</span>
               </div>
@@ -145,27 +145,27 @@ export const LoginPage: React.FC = () => {
                 <div
                   key={idx}
                   onClick={() => handleSelectAccount(acc)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.08] text-xs cursor-pointer group transition border border-transparent hover:border-white/10"
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-[#F4F1EC] text-xs cursor-pointer group transition border border-transparent hover:border-[#E6E1DA]"
                 >
                   <div className="flex items-center gap-2 min-w-0 pr-2">
-                    <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-sky-500/20 text-slate-300 group-hover:text-sky-300 transition">
+                    <div className="p-1.5 rounded-lg bg-[#F4F1EC] group-hover:bg-sky-500/20 text-[#475569] group-hover:text-[#0B3B49] transition">
                       <User className="h-3.5 w-3.5" />
                     </div>
-                    <span className="font-semibold text-slate-200 truncate group-hover:text-sky-300">
+                    <span className="font-semibold text-[#334155] truncate group-hover:text-[#0B3B49]">
                       {acc.email}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {/* Mật khẩu hiển thị dạng ẩn •••••••• */}
-                    <span className="font-mono text-slate-400 group-hover:text-slate-300 bg-white/10 px-2 py-0.5 rounded text-[11px] tracking-widest">
+                    <span className="font-mono text-[#526071] group-hover:text-[#475569] bg-[#F4F1EC] px-2 py-0.5 rounded text-[11px] tracking-widest">
                       ••••••••
                     </span>
                     <button
                       type="button"
                       title="Xóa tài khoản đã lưu"
                       onClick={(e) => handleRemoveAccount(e, acc.email)}
-                      className="p-1 text-slate-400 hover:text-rose-400 rounded hover:bg-rose-500/10 transition"
+                      className="p-1 text-[#526071] hover:text-[#D95D39] rounded hover:bg-rose-500/10 transition"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -178,7 +178,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Textbox Password */}
         <div>
-          <label className="block text-xs font-bold text-slate-300 mb-1.5">Password</label>
+          <label className="block text-xs font-bold text-[#475569] mb-1.5">Password</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -187,12 +187,12 @@ export const LoginPage: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter Your password"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.05] pl-4 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none transition"
+              className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] pl-4 pr-10 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-sky-400 focus:outline-none transition"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-slate-400 hover:text-white transition cursor-pointer"
+              className="absolute right-3 top-3 text-[#526071] hover:text-[#0F172A] transition cursor-pointer"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -202,45 +202,45 @@ export const LoginPage: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-xl py-3 text-sm font-bold text-white shadow-[0_0_16px_rgba(56,189,248,0.3)] bg-gradient-to-r from-sky-500 via-cyan-500 to-sky-600 hover:from-sky-400 hover:to-cyan-400 active:scale-[0.99] transition disabled:opacity-50 mt-2 cursor-pointer"
+          className="w-full rounded-xl py-3 text-sm font-bold text-white shadow-[0_0_16px_rgba(56,189,248,0.3)] bg-[#D95D39] hover:bg-[#C24E2D] active:scale-[0.99] transition disabled:opacity-50 mt-2 cursor-pointer"
         >
           {isLoading ? 'Đang xác thực...' : 'Login'}
         </button>
 
         <div className="flex items-center justify-between text-xs pt-1">
-          <Link to="/forgot-password" className="text-slate-400 hover:text-rose-400 font-semibold hover:underline">
+          <Link to="/forgot-password" className="text-[#526071] hover:text-[#D95D39] font-semibold hover:underline">
             Quên mật khẩu?
           </Link>
-          <Link to="/register" className="text-slate-400 hover:text-sky-300 hover:underline">
+          <Link to="/register" className="text-[#526071] hover:text-[#0B3B49] hover:underline">
             Đăng ký tài khoản
           </Link>
         </div>
       </form>
 
       {/* Quick Role Login */}
-      <div className="pt-4 border-t border-white/10 space-y-2">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
+      <div className="pt-4 border-t border-[#E6E1DA] space-y-2">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-[#526071] text-center">
           Test nhanh theo vai trò
         </div>
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
             onClick={() => handleQuickFill('admin@smarttravel.com', '12345678')}
-            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 text-[11px] font-bold transition cursor-pointer"
+            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-700 text-[11px] font-bold transition cursor-pointer"
           >
             <ShieldCheck className="h-3.5 w-3.5" /> Admin
           </button>
           <button
             type="button"
             onClick={() => handleQuickFill('vendor@smarttravel.com', '12345678')}
-            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-[11px] font-bold transition cursor-pointer"
+            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 text-[11px] font-bold transition cursor-pointer"
           >
             <Store className="h-3.5 w-3.5" /> Vendor
           </button>
           <button
             type="button"
             onClick={() => handleQuickFill('user@smarttravel.com', '12345678')}
-            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-sky-500/30 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-[11px] font-bold transition cursor-pointer"
+            className="flex items-center justify-center gap-1 p-2 rounded-xl border border-sky-500/30 bg-sky-500/15 hover:bg-sky-500/25 text-[#0B3B49] text-[11px] font-bold transition cursor-pointer"
           >
             <UserCheck className="h-3.5 w-3.5" /> User
           </button>

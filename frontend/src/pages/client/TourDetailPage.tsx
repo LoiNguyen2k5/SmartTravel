@@ -526,15 +526,15 @@ export const TourDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-96 items-center justify-center bg-[#020204]">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-500 border-t-transparent"></div>
+      <div className="flex h-96 items-center justify-center bg-[#FAF8F5]">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#0D9488] border-t-transparent"></div>
       </div>
     );
   }
 
   if (!tour) {
     return (
-      <div className="min-h-screen bg-[#020204] flex items-center justify-center p-16 text-center text-slate-400 font-bold">
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-16 text-center text-[#526071] font-bold">
         Không tìm thấy thông tin tour.
       </div>
     );
@@ -871,37 +871,35 @@ export const TourDetailPage: React.FC = () => {
   const finalTotal = Math.max(0, subtotal - voucherDiscount);
 
   return (
-    <div className="bg-[#020204] text-white min-h-screen pb-20 relative overflow-hidden">
+    <div className="bg-[#FAF8F5] text-[#0F172A] min-h-screen pb-20 relative overflow-hidden">
       {fromBlog && (
         <div className="mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8">
           <button
             type="button"
             onClick={handleBackToSelection}
-            className="rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-sky-400 transition hover:bg-white/5"
+            className="rounded-xl border border-[#CBD5E1] bg-white px-4 py-2 text-sm font-semibold text-[#0B3B49] transition hover:bg-[#E6F4F1]"
           >
             ← Quay lại bài viết
           </button>
         </div>
       )}
-      {/* Background Ambient Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
       {/* Breadcrumb Bar */}
-      <div className="bg-white/[0.02] border-b border-white/10 py-3.5 px-4 sm:px-6 lg:px-8 relative z-10 backdrop-blur-md">
+      <div className="bg-white border-b border-[#E6E1DA] py-3 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#526071]">
             <button
               type="button"
               onClick={handleBackToSelection}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition text-xs font-semibold mr-1"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E6F4F1] text-[#0B3B49] border border-[#E6E1DA] transition text-xs font-bold mr-1 cursor-pointer"
               title={fromBlog ? 'Quay lại bài viết' : 'Quay lại danh sách tour'}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               <span>Quay lại</span>
             </button>
-            <span className="hover:text-sky-400 cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
-            <ChevronRight className="h-3 w-3 text-slate-600" />
+            <span className="hover:text-[#0B3B49] cursor-pointer transition" onClick={() => navigate('/')}>Trang Chủ</span>
+            <ChevronRight className="h-3 w-3 text-slate-400" />
             <span 
-              className="hover:text-sky-400 cursor-pointer transition" 
+              className="hover:text-[#0B3B49] cursor-pointer transition" 
               onClick={() => {
                 const savedPage = (location.state as any)?.fromPage || sessionStorage.getItem('smart_travel_tour_page');
                 const pageParam = savedPage && Number(savedPage) > 1 ? `&page=${savedPage}` : '';
@@ -910,8 +908,8 @@ export const TourDetailPage: React.FC = () => {
             >
               {tour.category === 'NUOC_NGOAI' ? 'Nước Ngoài' : 'Trong Nước'}
             </span>
-            <ChevronRight className="h-3 w-3 text-slate-600" />
-            <span className="text-white font-bold line-clamp-1">{tour.title}</span>
+            <ChevronRight className="h-3 w-3 text-slate-400" />
+            <span className="text-[#0F172A] font-bold line-clamp-1">{tour.title}</span>
           </div>
         </div>
       </div>
@@ -923,24 +921,24 @@ export const TourDetailPage: React.FC = () => {
           {/* Main Large Image */}
           <div 
             onClick={() => openLightbox(0)}
-            className="lg:col-span-2 rounded-2xl overflow-hidden bg-slate-900 border border-white/10 h-full relative group cursor-pointer shadow-2xl transition"
+            className="lg:col-span-2 rounded-2xl overflow-hidden bg-slate-200 border border-[#E6E1DA] h-full relative group cursor-pointer shadow-card transition"
           >
             <img 
               src={galleryImages[0]} 
               alt={tour.title} 
               className="h-full w-full object-cover group-hover:scale-105 transition duration-700 ease-out" 
             />
-            <div className="absolute inset-0 bg-slate-950/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-              <span className="bg-[#0a111d]/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 border border-sky-400/30 shadow-[0_0_15px_rgba(56,189,248,0.25)]">
-                <Maximize2 className="h-4 w-4 text-sky-400" />
-                <span>Nhấn để xem & chuyển ảnh</span>
+            <div className="absolute inset-0 bg-[#0B3B49]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span className="bg-[#0B3B49]/95 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 border border-white/20 shadow-lg">
+                <Maximize2 className="h-4 w-4 text-[#5EEAD4]" />
+                <span>Nhấn để xem &amp; chuyển ảnh</span>
               </span>
             </div>
-            <div className="absolute bottom-4 left-4 bg-[#0a111d]/85 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/10">
-              Mã tour: <span className="text-sky-400">{tour.tourCode || 'N/A'}</span>
+            <div className="absolute bottom-4 left-4 bg-[#0B3B49]/90 text-white text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/15">
+              Mã tour: <span className="text-[#5EEAD4]">{tour.tourCode || 'N/A'}</span>
             </div>
-            <div className="absolute bottom-4 right-4 bg-[#0a111d]/85 hover:bg-[#0a111d] text-white text-xs font-bold px-3.5 py-1.5 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 transition">
-              <ImageIcon className="h-3.5 w-3.5 text-sky-400" />
+            <div className="absolute bottom-4 right-4 bg-white/95 hover:bg-white text-[#0B3B49] text-xs font-extrabold px-3.5 py-1.5 rounded-lg backdrop-blur-md border border-[#E6E1DA] flex items-center gap-1.5 shadow-sm transition">
+              <ImageIcon className="h-3.5 w-3.5 text-[#0D9488]" />
               <span>{galleryImages.length} hình ảnh</span>
             </div>
           </div>
@@ -954,19 +952,19 @@ export const TourDetailPage: React.FC = () => {
                 <div 
                   key={idx}
                   onClick={() => openLightbox(idx < galleryImages.length ? idx : 0)}
-                  className="rounded-2xl overflow-hidden bg-slate-900 border border-white/10 relative cursor-pointer group shadow-lg transition min-h-0 h-full"
+                  className="rounded-2xl overflow-hidden bg-slate-200 border border-[#E6E1DA] relative cursor-pointer group shadow-subtle transition min-h-0 h-full"
                 >
                   <img 
                     src={imgUrl} 
                     alt={`Gallery ${idx}`} 
                     className="h-full w-full object-cover group-hover:scale-105 transition duration-500" 
                   />
-                  <div className="absolute inset-0 bg-slate-950/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <div className="absolute inset-0 bg-[#0B3B49]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <Maximize2 className="h-5 w-5 text-white drop-shadow-md" />
                   </div>
                   {isLast && (
-                    <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-[3px] flex flex-col items-center justify-center text-white font-bold text-xs group-hover:bg-slate-950/85 transition">
-                      <ImageIcon className="h-5 w-5 mb-1 text-sky-400" />
+                    <div className="absolute inset-0 bg-[#0B3B49]/75 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold text-xs group-hover:bg-[#0B3B49]/85 transition">
+                      <ImageIcon className="h-5 w-5 mb-1 text-[#5EEAD4]" />
                       <span>+ Xem tất cả ({galleryImages.length})</span>
                     </div>
                   )}
@@ -977,37 +975,37 @@ export const TourDetailPage: React.FC = () => {
         </div>
 
         {/* Tour Title & Vendor Info Header */}
-        <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
+        <div className="bg-white p-6 rounded-2xl border border-[#E6E1DA] shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30">
+              <span className="px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider bg-[#0B3B49] text-white">
                 {tour.category === 'NUOC_NGOAI' ? 'Tour Quốc Tế' : 'Tour Trong Nước'}
               </span>
-              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1.5">
-                {transportInfo.mode === 'FLIGHT' ? <Plane className="w-3.5 h-3.5" /> : <Bus className="w-3.5 h-3.5" />}
+              <span className="px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider bg-[#E6F4F1] text-[#0B3B49] border border-[#99F6E4] flex items-center gap-1.5">
+                {transportInfo.mode === 'FLIGHT' ? <Plane className="w-3.5 h-3.5 text-[#0D9488]" /> : <Bus className="w-3.5 h-3.5 text-[#0D9488]" />}
                 {transportInfo.badgeLabel}: {transportInfo.fromCode} → {transportInfo.toCode}
               </span>
-              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 flex items-center gap-1">
+              <span className="px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B]/50 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Bảo hiểm du lịch trọn gói
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">
+            <h1 className="font-display text-xl sm:text-2xl font-black text-[#0F172A] leading-tight">
               {tour.title}
             </h1>
           </div>
 
           {/* Vendor Showcase Card */}
-          <div className="flex items-center gap-3.5 p-3.5 bg-white/[0.04] border border-white/10 rounded-xl flex-shrink-0">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-500 flex items-center justify-center text-white shadow-md">
+          <div className="flex items-center gap-3.5 p-3.5 bg-[#FAF8F5] border border-[#E6E1DA] rounded-xl flex-shrink-0">
+            <div className="h-11 w-11 rounded-xl bg-[#0B3B49] flex items-center justify-center text-[#5EEAD4] shadow-sm">
               <Building2 className="h-6 w-6" />
             </div>
             <div className="text-left space-y-0.5">
-              <div className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Đơn Vị Tổ Chức (Vendor)</div>
-              <div className="text-sm font-bold text-white flex items-center gap-1.5">
+              <div className="text-[10px] font-extrabold uppercase text-[#526071] tracking-wider">Đơn Vị Tổ Chức (Vendor)</div>
+              <div className="text-sm font-extrabold text-[#0F172A] flex items-center gap-1.5">
                 <span>{tour.vendorName || 'NewTour Travel Company'}</span>
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <CheckCircle2 className="h-4 w-4 text-[#0D9488]" />
               </div>
-              <div className="text-[11px] text-sky-400 font-medium">Đối tác lữ hành chính thức SmartTravel</div>
+              <div className="text-[11px] text-[#0D9488] font-semibold">Đối tác lữ hành chính thức SmartTravel</div>
             </div>
           </div>
         </div>
@@ -1016,27 +1014,27 @@ export const TourDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 pt-2">
           
           {/* Left Column: Details & Tabs */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
 
-            {/* Group Flight & Airport Meeting Point Card (Luồng Chuyến Bay Đoàn & Vận Chuyển Trọn Gói) */}
-            <div className="bg-[#0a111d]/90 backdrop-blur-xl rounded-2xl border border-teal-500/30 shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-teal-900/80 via-sky-900/70 to-slate-900/80 px-6 py-4 border-b border-teal-500/25 flex flex-wrap items-center justify-between gap-3">
+            {/* Group Flight & Airport Meeting Point Card (Matching Preview Image 3) */}
+            <div className="bg-white rounded-2xl border-2 border-[#99F6E4] shadow-card overflow-hidden">
+              <div className="bg-[#0B3B49] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-9 w-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+                  <div className="h-9 w-9 rounded-xl bg-white/10 border border-[#5EEAD4]/30 flex items-center justify-center text-[#5EEAD4]">
                     {transportInfo.mode === 'FLIGHT' ? <Plane className="h-5 w-5" /> : <Bus className="h-5 w-5" />}
                   </div>
                   <div>
                     <h3 className="text-xs sm:text-sm font-black text-white uppercase tracking-wide">
                       {transportInfo.mode === 'FLIGHT'
-                        ? 'Thông Tin Vận Chuyển & Chuyến Bay Đoàn Khứ Hồi (Đã Gồm Trong Giá Tour)'
-                        : 'Thông Tin Phương Tiện Đoàn Khứ Hồi & Điểm Đón (Đã Gồm Trong Giá Tour)'}
+                        ? 'Thông Tin Vận Chuyển & Chuyến Bay Đoàn Khứ Hồi (Đã Bao Gồm Trong Giá Tour)'
+                        : 'Thông Tin Phương Tiện Đoàn Khứ Hồi & Điểm Đón (Đã Bao Gồm Trong Giá Tour)'}
                     </h3>
-                    <p className="text-[11px] text-teal-300 font-medium">
+                    <p className="text-[11px] text-[#5EEAD4] font-medium">
                       Đơn vị vận chuyển: {transportInfo.carrier} · {transportInfo.baggageSummary}
                     </p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-teal-500/20 text-teal-200 border border-teal-400/30">
+                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/15 text-white border border-white/20">
                   {transportInfo.shortCarrierBadge}
                 </span>
               </div>
@@ -1044,68 +1042,68 @@ export const TourDetailPage: React.FC = () => {
               <div className="p-6 space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Outbound Leg */}
-                  <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 space-y-3">
+                  <div className="rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] p-4 space-y-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-black uppercase">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase">
                         Chiều đi (Ngày 1)
                       </span>
-                      <span className="text-[11px] font-bold text-sky-300">
+                      <span className="text-[11px] font-bold text-[#0F5264]">
                         {transportInfo.carrier} · {transportInfo.outbound.code}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div>
-                        <div className="text-xl font-black text-white">{transportInfo.fromCode}</div>
-                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.outbound.departTime}</div>
+                        <div className="text-xl font-black text-[#0B3B49]">{transportInfo.fromCode}</div>
+                        <div className="text-sm font-extrabold text-[#D95D39]">{transportInfo.outbound.departTime}</div>
                       </div>
                       <div className="flex-1 px-2 text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-teal-400">
-                          <span className="h-[1px] flex-1 bg-teal-500/40" />
+                        <div className="flex items-center justify-center gap-1.5 text-[#0D9488]">
+                          <span className="h-[1.5px] flex-1 bg-[#0D9488]/40" />
                           {transportInfo.mode === 'FLIGHT' ? <Plane className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
-                          <span className="h-[1px] flex-1 bg-teal-500/40" />
+                          <span className="h-[1.5px] flex-1 bg-[#0D9488]/40" />
                         </div>
-                        <div className="text-[10px] font-bold text-teal-300 mt-1">{transportInfo.outbound.duration}</div>
+                        <div className="text-[10px] font-bold text-[#0D9488] mt-1">{transportInfo.outbound.duration}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-black text-white">{transportInfo.toCode}</div>
-                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.outbound.arriveTime}</div>
+                        <div className="text-xl font-black text-[#0B3B49]">{transportInfo.toCode}</div>
+                        <div className="text-sm font-extrabold text-[#D95D39]">{transportInfo.outbound.arriveTime}</div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/5">
+                    <div className="flex items-center justify-between text-[11px] text-[#526071] pt-1.5 border-t border-slate-200">
                       <span className="truncate max-w-[48%]">{transportInfo.fromName}</span>
                       <span className="truncate max-w-[48%] text-right">{transportInfo.toName}</span>
                     </div>
                   </div>
 
                   {/* Inbound Leg */}
-                  <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 space-y-3">
+                  <div className="rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] p-4 space-y-3">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[10px] font-black uppercase">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase">
                         Chiều về (Ngày {tour.durationDays})
                       </span>
-                      <span className="text-[11px] font-bold text-sky-300">
+                      <span className="text-[11px] font-bold text-[#0F5264]">
                         {transportInfo.carrier} · {transportInfo.inbound.code}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div>
-                        <div className="text-xl font-black text-white">{transportInfo.toCode}</div>
-                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.inbound.departTime}</div>
+                        <div className="text-xl font-black text-[#0B3B49]">{transportInfo.toCode}</div>
+                        <div className="text-sm font-extrabold text-[#D95D39]">{transportInfo.inbound.departTime}</div>
                       </div>
                       <div className="flex-1 px-2 text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-sky-400">
-                          <span className="h-[1px] flex-1 bg-sky-500/40" />
+                        <div className="flex items-center justify-center gap-1.5 text-[#0D9488]">
+                          <span className="h-[1.5px] flex-1 bg-[#0D9488]/40" />
                           {transportInfo.mode === 'FLIGHT' ? <Plane className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
-                          <span className="h-[1px] flex-1 bg-sky-500/40" />
+                          <span className="h-[1.5px] flex-1 bg-[#0D9488]/40" />
                         </div>
-                        <div className="text-[10px] font-bold text-sky-300 mt-1">{transportInfo.inbound.duration}</div>
+                        <div className="text-[10px] font-bold text-[#0D9488] mt-1">{transportInfo.inbound.duration}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-black text-white">{transportInfo.fromCode}</div>
-                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.inbound.arriveTime}</div>
+                        <div className="text-xl font-black text-[#0B3B49]">{transportInfo.fromCode}</div>
+                        <div className="text-sm font-extrabold text-[#D95D39]">{transportInfo.inbound.arriveTime}</div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/5">
+                    <div className="flex items-center justify-between text-[11px] text-[#526071] pt-1.5 border-t border-slate-200">
                       <span className="truncate max-w-[48%]">{transportInfo.toName}</span>
                       <span className="truncate max-w-[48%] text-right">{transportInfo.fromName}</span>
                     </div>
@@ -1113,36 +1111,36 @@ export const TourDetailPage: React.FC = () => {
                 </div>
 
                 {/* Perforated Divider & Airport Meeting Point / Baggage Instructions */}
-                <div className="border-t border-dashed border-white/15 pt-4 space-y-2 text-xs text-slate-300">
+                <div className="border-t border-dashed border-[#CBD5E1] pt-4 space-y-2 text-xs text-[#334155]">
                   <p>
-                    <strong className="text-white">• Tiêu chuẩn hành lý theo đoàn:</strong> {transportInfo.baggageSummary} (đã bao gồm thuế phí sân bay / phí cầu đường).
+                    <strong className="text-[#0F172A]">• Tiêu chuẩn hành lý theo đoàn:</strong> {transportInfo.baggageSummary} (đã bao gồm thuế phí sân bay / phí cầu đường).
                   </p>
                   <p>
-                    <strong className="text-teal-300">• Điểm tập trung làm thủ tục khởi hành:</strong> {transportInfo.meetingPoint}
+                    <strong className="text-[#0B3B49]">• Điểm tập trung làm thủ tục khởi hành:</strong> {transportInfo.meetingPoint}
                   </p>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-200">• Quy trình đón đoàn:</strong> {transportInfo.leaderInstruction}
+                  <p className="text-[#526071]">
+                    <strong className="text-[#0F172A]">• Quy trình đón đoàn:</strong> {transportInfo.leaderInstruction}
                   </p>
-                  <p className="text-slate-400">
-                    <strong className="text-slate-200">• Phương tiện tại điểm đến:</strong> {transportInfo.localTransport}
+                  <p className="text-[#526071]">
+                    <strong className="text-[#0F172A]">• Phương tiện tại điểm đến:</strong> {transportInfo.localTransport}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Rating Breakdown Card (Matching Screenshot 2) */}
-            <div className="bg-[#0a111d]/85 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col md:flex-row items-center gap-8">
-              <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0">
-                <div className="text-5xl font-black text-white">
+            {/* Rating Breakdown Card */}
+            <div className="bg-white p-6 rounded-2xl border border-[#E6E1DA] shadow-card flex flex-col md:flex-row items-center gap-8">
+              <div className="text-center md:text-left space-y-1 pr-6 border-b md:border-b-0 md:border-r border-[#E6E1DA] pb-4 md:pb-0">
+                <div className="text-5xl font-black text-[#0B3B49]">
                   {reviews.length > 0
                     ? Number((reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1))
                     : (tour.totalReviews ? (tour.averageRating || 5.0) : 0)}
                   <span className="text-xl text-slate-400 font-normal">/5</span>
                 </div>
-                <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+                <div className="text-xs font-extrabold text-[#0D9488] uppercase tracking-wider">
                   {(reviews.length > 0 || (tour.totalReviews && tour.totalReviews > 0)) ? 'Đánh Giá Du Khách' : 'Chưa Có Đánh Giá'}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-[#526071]">
                   {(reviews.length > 0 || (tour.totalReviews && tour.totalReviews > 0))
                     ? `Dựa trên ${reviews.length > 0 ? reviews.length : (tour.totalReviews || 0)} lượt đánh giá thực tế`
                     : 'Chưa có lượt đánh giá nào'}
@@ -1158,20 +1156,20 @@ export const TourDetailPage: React.FC = () => {
                   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
                   return (
                     <div key={star} className="flex items-center gap-3 text-xs">
-                      <span className="font-semibold text-slate-300 w-10">{star} Sao</span>
-                      <div className="flex-1 bg-white/10 h-2.5 rounded-full overflow-hidden">
+                      <span className="font-bold text-[#334155] w-10">{star} Sao</span>
+                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
                         <div className="bg-amber-400 h-full rounded-full" style={{ width: `${pct}%` }}></div>
                       </div>
-                      <span className="w-12 text-right text-slate-400 font-medium">{count} ({pct}%)</span>
+                      <span className="w-12 text-right text-[#526071] font-semibold">{count} ({pct}%)</span>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Navigation Tabs Header matching screenshot 2 style */}
-            <div className="bg-[#0a111d]/85 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl overflow-hidden">
-              <div className="flex items-center border-b border-white/10 overflow-x-auto text-xs font-bold scrollbar-none">
+            {/* Navigation Tabs Header */}
+            <div className="bg-white rounded-2xl border border-[#E6E1DA] shadow-card overflow-hidden">
+              <div className="flex items-center border-b border-[#E6E1DA] overflow-x-auto text-xs font-bold scrollbar-none bg-[#FAF8F5]">
                 {[
                   { id: 'itinerary', label: 'Lịch trình tour' },
                   { id: 'policy', label: 'Chính sách tour' },
@@ -1181,10 +1179,10 @@ export const TourDetailPage: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`px-6 py-4 border-b-2 transition whitespace-nowrap ${
+                    className={`px-6 py-4 border-b-2 transition whitespace-nowrap cursor-pointer ${
                       activeTab === tab.id
-                        ? 'border-sky-400 text-sky-400 bg-sky-500/10'
-                        : 'border-transparent text-slate-400 hover:text-white hover:bg-white/[0.02]'
+                        ? 'border-[#D95D39] text-[#0B3B49] bg-white font-extrabold'
+                        : 'border-transparent text-[#526071] hover:text-[#0B3B49] hover:bg-white/60'
                     }`}
                   >
                     {tab.label}
@@ -1197,7 +1195,7 @@ export const TourDetailPage: React.FC = () => {
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Left Day Selection Menu */}
-                    <div className="md:col-span-1 space-y-2 border-b md:border-b-0 md:border-r border-white/10 pr-0 md:pr-4 pb-4 md:pb-0">
+                    <div className="md:col-span-1 space-y-2 border-b md:border-b-0 md:border-r border-[#E6E1DA] pr-0 md:pr-4 pb-4 md:pb-0">
                       {rawItinerary.map((item: any, idx: number) => (
                         <button
                           key={idx}
@@ -1205,10 +1203,10 @@ export const TourDetailPage: React.FC = () => {
                           className={`w-full text-left p-3 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                             selectedDay === item.day
                               ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-lg shadow-sky-500/25 border border-sky-400/40'
-                              : 'bg-white/[0.03] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/5'
+                              : 'bg-[#FAF8F5] text-[#475569] hover:bg-[#F4F1EC] hover:text-[#0F172A] border border-[#E6E1DA]'
                           }`}
                         >
-                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${selectedDay === item.day ? 'bg-white/20' : 'bg-white/10'}`}>
+                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${selectedDay === item.day ? 'bg-white/20' : 'bg-[#F4F1EC]'}`}>
                             {item.day}
                           </span>
                           <span className="line-clamp-2 leading-tight">{item.title?.replace(/^NGÀY \d+:\s*/i, '')}</span>
@@ -1226,7 +1224,7 @@ export const TourDetailPage: React.FC = () => {
                             <div key={idx} className="space-y-5">
                               {/* Day Title */}
                               <div className="bg-gradient-to-r from-sky-500/15 to-cyan-500/10 p-4 rounded-xl border border-sky-500/25">
-                                <h4 className="text-sm font-black text-sky-300 uppercase tracking-wide">{item.title}</h4>
+                                <h4 className="text-sm font-black text-[#0B3B49] uppercase tracking-wide">{item.title}</h4>
                               </div>
 
                               {isRich ? (
@@ -1234,78 +1232,78 @@ export const TourDetailPage: React.FC = () => {
                                   {/* Hotel & Room Info */}
                                   {item.hotel && (
                                     <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                                      <span className="text-amber-400 text-lg flex-shrink-0">🏨</span>
+                                      <span className="text-amber-700 text-lg flex-shrink-0">🏨</span>
                                       <div>
-                                        <p className="text-xs font-black text-amber-300 uppercase tracking-wider mb-0.5">Lưu trú</p>
-                                        <p className="text-sm font-semibold text-white">{item.hotel}</p>
-                                        {item.hotelRooms && <p className="text-xs text-slate-400 mt-0.5">{item.hotelRooms}</p>}
+                                        <p className="text-xs font-black text-amber-800 uppercase tracking-wider mb-0.5">Lưu trú</p>
+                                        <p className="text-sm font-semibold text-[#0F172A]">{item.hotel}</p>
+                                        {item.hotelRooms && <p className="text-xs text-[#526071] mt-0.5">{item.hotelRooms}</p>}
                                       </div>
                                     </div>
                                   )}
 
                                   {/* Sessions List with Specific Times for Activities, Meals & Hotel Check-in/out */}
                                   <div className="space-y-4">
-                                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                                      <p className="text-xs font-black text-sky-400 uppercase tracking-widest flex items-center gap-2">
+                                    <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-2">
+                                      <p className="text-xs font-black text-[#0D9488] uppercase tracking-widest flex items-center gap-2">
                                         <span>📍</span> Lịch trình chi tiết theo buổi (Khung giờ, Ăn uống & Lưu trú)
                                       </p>
                                     </div>
 
                                     {buildDaySessions(item, rawItinerary.find((x: any) => x.day === item.day - 1)).map((session) => (
-                                      <div key={session.key} className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-sm">
+                                      <div key={session.key} className="bg-[#FAF8F5] border border-[#E6E1DA] rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-sm">
                                         {/* Session Title Header */}
-                                        <div className="flex items-center justify-between border-b border-white/8 pb-3">
+                                        <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3">
                                           <div className="flex items-center gap-2.5">
                                             <span className="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-base">
                                               {session.sessionIcon}
                                             </span>
-                                            <h5 className="text-sm font-extrabold text-white uppercase tracking-wide">
+                                            <h5 className="text-sm font-extrabold text-[#0F172A] uppercase tracking-wide">
                                               {session.sessionName}
                                             </h5>
                                           </div>
-                                          <span className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-                                            <Clock className="h-3 w-3 text-amber-400" />
+                                          <span className="text-[11px] font-bold text-amber-800 bg-amber-500/15 border border-amber-400/30 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                                            <Clock className="h-3 w-3 text-amber-700" />
                                             {session.timeRange}
                                           </span>
                                         </div>
 
                                         {/* Activities Timeline within the Session */}
-                                        <div className="space-y-3.5 pl-2 sm:pl-3 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-white/10">
+                                        <div className="space-y-3.5 pl-2 sm:pl-3 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#F4F1EC]">
                                           {session.activities.map((act, aIdx) => (
                                             <div key={aIdx} className="relative flex items-start gap-3.5">
                                               {/* Timeline node */}
                                               <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-sm z-10 border shadow-sm ${
                                                 act.badgeType === 'meal' 
-                                                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' 
+                                                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700' 
                                                   : act.badgeType === 'hotel' 
-                                                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-300' 
+                                                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-800' 
                                                     : act.badgeType === 'transit'
-                                                      ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300'
-                                                      : 'bg-sky-500/15 border-sky-500/30 text-sky-300'
+                                                      ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-700'
+                                                      : 'bg-sky-500/15 border-sky-500/30 text-[#0B3B49]'
                                               }`}>
                                                 {act.icon}
                                               </div>
 
                                               {/* Event detail */}
-                                              <div className="flex-1 bg-white/[0.02] border border-white/5 p-3 rounded-xl hover:bg-white/[0.04] transition space-y-1">
+                                              <div className="flex-1 bg-[#FAF8F5] border border-[#E6E1DA] p-3 rounded-xl hover:bg-[#FAF8F5] transition space-y-1">
                                                 <div className="flex items-center justify-between gap-2 flex-wrap">
                                                   <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                                                     act.badgeType === 'meal'
-                                                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                                      ? 'bg-emerald-500/20 text-emerald-700 border-emerald-500/40'
                                                       : act.badgeType === 'hotel'
-                                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                                        ? 'bg-amber-500/20 text-amber-800 border-amber-500/40'
                                                         : act.badgeType === 'transit'
-                                                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
-                                                          : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                                                          ? 'bg-indigo-500/20 text-indigo-700 border-indigo-500/40'
+                                                          : 'bg-sky-500/20 text-[#0B3B49] border-sky-500/40'
                                                   }`}>
                                                     {act.badge}
                                                   </span>
-                                                  <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
-                                                    <Clock className="h-3 w-3 text-slate-400" />
+                                                  <span className="text-[11px] font-bold text-[#475569] flex items-center gap-1">
+                                                    <Clock className="h-3 w-3 text-[#526071]" />
                                                     {act.time}
                                                   </span>
                                                 </div>
-                                                <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                                                <p className="text-xs text-[#334155] leading-relaxed font-medium">
                                                   {act.content}
                                                 </p>
                                               </div>
@@ -1319,10 +1317,10 @@ export const TourDetailPage: React.FC = () => {
                                   {/* Highlights */}
                                   {item.highlights && item.highlights.length > 0 && (
                                     <div>
-                                      <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">⭐ Điểm nổi bật trong ngày</p>
+                                      <p className="text-[11px] font-black text-[#526071] uppercase tracking-widest mb-2">⭐ Điểm nổi bật trong ngày</p>
                                       <div className="flex flex-wrap gap-2">
                                         {item.highlights.map((hl: string, hIdx: number) => (
-                                          <span key={hIdx} className="px-3 py-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-semibold rounded-full">
+                                          <span key={hIdx} className="px-3 py-1.5 bg-sky-500/10 border border-sky-500/20 text-[#0B3B49] text-xs font-semibold rounded-full">
                                             {hl}
                                           </span>
                                         ))}
@@ -1332,7 +1330,7 @@ export const TourDetailPage: React.FC = () => {
                                 </>
                               ) : (
                                 /* Legacy plain-text format fallback */
-                                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line font-normal">
+                                <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-line font-normal">
                                   {item.content}
                                 </p>
                               )}
@@ -1346,7 +1344,7 @@ export const TourDetailPage: React.FC = () => {
 
               {/* TAB CONTENT: Chính sách tour (Khớp 100% hình 1, 2, 3) */}
               {activeTab === 'policy' && (
-                <div className="p-6 space-y-6 text-xs text-slate-300 leading-relaxed font-sans">
+                <div className="p-6 space-y-6 text-xs text-[#475569] leading-relaxed font-sans">
                   
                   {/* VISA REQUIREMENTS */}
                   {visaReqs.length > 0 && (
@@ -1355,84 +1353,84 @@ export const TourDetailPage: React.FC = () => {
 
                   {/* BẢNG GIÁ TOUR GHÉP LẺ */}
                   <div className="space-y-3">
-                    <h3 className="font-black text-white text-base uppercase tracking-tight">
+                    <h3 className="font-black text-[#0F172A] text-base uppercase tracking-tight">
                       BẢNG GIÁ TOUR GHÉP LẺ
                     </h3>
 
-                    <div className="overflow-x-auto border border-white/15 rounded-xl">
+                    <div className="overflow-x-auto border border-[#CBD5E1] rounded-xl">
                       <table className="w-full text-center border-collapse">
                         <thead>
-                          <tr className="border-b border-white/15 bg-white/[0.06] font-black text-xs text-white">
-                            <th className="p-3 border-r border-white/15 w-1/4">KHỞI HÀNH</th>
+                          <tr className="border-b border-[#CBD5E1] bg-[#FAF8F5] font-black text-xs text-[#0F172A]">
+                            <th className="p-3 border-r border-[#CBD5E1] w-1/4">KHỞI HÀNH</th>
                             <th colSpan={3} className="p-3">GIÁ TRỌN GÓI: VND/KHÁCH</th>
                           </tr>
-                          <tr className="border-b border-white/15 bg-white/[0.03] font-bold text-[11px] text-slate-300">
-                            <th className="p-2 border-r border-white/15"></th>
-                            <th className="p-2 border-r border-white/15 w-1/4">
-                              NGƯỜI LỚN<br/><span className="font-normal italic text-slate-400">(Từ 10 tuổi trở lên)</span>
+                          <tr className="border-b border-[#CBD5E1] bg-[#FAF8F5] font-bold text-[11px] text-[#475569]">
+                            <th className="p-2 border-r border-[#CBD5E1]"></th>
+                            <th className="p-2 border-r border-[#CBD5E1] w-1/4">
+                              NGƯỜI LỚN<br/><span className="font-normal italic text-[#526071]">(Từ 10 tuổi trở lên)</span>
                             </th>
-                            <th className="p-2 border-r border-white/15 w-1/4">
-                              TRẺ EM<br/><span className="font-normal italic text-slate-400">(Từ 02 - dưới 10 tuổi)</span>
+                            <th className="p-2 border-r border-[#CBD5E1] w-1/4">
+                              TRẺ EM<br/><span className="font-normal italic text-[#526071]">(Từ 02 - dưới 10 tuổi)</span>
                             </th>
                             <th className="p-2 w-1/4">
-                              EM BÉ<br/><span className="font-normal italic text-slate-400">(Dưới 02 tuổi)</span>
+                              EM BÉ<br/><span className="font-normal italic text-[#526071]">(Dưới 02 tuổi)</span>
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/10 font-bold text-slate-200 text-xs">
+                        <tbody className="divide-y divide-[#E6E1DA] font-bold text-[#334155] text-xs">
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">10, 15, 24, 29/05</td>
-                            <td className="p-2.5 border-r border-white/15">16.490.000</td>
-                            <td className="p-2.5 border-r border-white/15">14.850.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">10, 15, 24, 29/05</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.490.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">14.850.000</td>
                             <td className="p-2.5">4.990.000</td>
                           </tr>
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">07, 12, 21, 26/06</td>
-                            <td className="p-2.5 border-r border-white/15">16.990.000</td>
-                            <td className="p-2.5 border-r border-white/15">15.390.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">07, 12, 21, 26/06</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.990.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">15.390.000</td>
                             <td className="p-2.5">5.190.000</td>
                           </tr>
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">05, 10, 19, 24/07</td>
-                            <td className="p-2.5 border-r border-white/15">16.990.000</td>
-                            <td className="p-2.5 border-r border-white/15">15.390.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">05, 10, 19, 24/07</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.990.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">15.390.000</td>
                             <td className="p-2.5">5.190.000</td>
                           </tr>
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">02, 07, 16, 21/08</td>
-                            <td className="p-2.5 border-r border-white/15">16.490.000</td>
-                            <td className="p-2.5 border-r border-white/15">14.850.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">02, 07, 16, 21/08</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.490.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">14.850.000</td>
                             <td className="p-2.5">4.990.000</td>
                           </tr>
-                          <tr className="bg-sky-500/10 font-black text-white">
-                            <td className="p-2.5 border-r border-white/15 text-sky-300">30/08</td>
-                            <td className="p-2.5 border-r border-white/15 text-rose-400">17.990.000</td>
-                            <td className="p-2.5 border-r border-white/15">16.190.000</td>
+                          <tr className="bg-sky-500/10 font-black text-[#0F172A]">
+                            <td className="p-2.5 border-r border-[#CBD5E1] text-[#0B3B49]">30/08</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1] text-[#D95D39]">17.990.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.190.000</td>
                             <td className="p-2.5">5.490.000</td>
                           </tr>
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">04, 13, 18, 27/09</td>
-                            <td className="p-2.5 border-r border-white/15">16.490.000</td>
-                            <td className="p-2.5 border-r border-white/15">14.850.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">04, 13, 18, 27/09</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.490.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">14.850.000</td>
                             <td className="p-2.5">4.990.000</td>
                           </tr>
                           <tr>
-                            <td className="p-2.5 border-r border-white/15">02, 11, 16, 25/10</td>
-                            <td className="p-2.5 border-r border-white/15">16.490.000</td>
-                            <td className="p-2.5 border-r border-white/15">14.850.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">02, 11, 16, 25/10</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">16.490.000</td>
+                            <td className="p-2.5 border-r border-[#CBD5E1]">14.850.000</td>
                             <td className="p-2.5">4.990.000</td>
                           </tr>
                         </tbody>
                         <tfoot>
-                          <tr className="border-t border-white/15 bg-white/[0.04] font-bold text-slate-300 text-xs">
-                            <td className="p-3 border-r border-white/15 uppercase">
+                          <tr className="border-t border-[#CBD5E1] bg-[#FAF8F5] font-bold text-[#475569] text-xs">
+                            <td className="p-3 border-r border-[#CBD5E1] uppercase">
                               {transportInfo.mode === 'FLIGHT' ? 'CHUYẾN BAY ĐOÀN DỰ KIẾN' : 'LỊCH XE ĐOÀN DỰ KIẾN'}
                             </td>
                             <td colSpan={3} className="p-3 text-left pl-8 space-y-1 font-mono text-[11px]">
-                              <div className="text-slate-300">
+                              <div className="text-[#475569]">
                                 {transportInfo.outbound.code} {transportInfo.fromCode} → {transportInfo.toCode} {transportInfo.outbound.departTime} – {transportInfo.outbound.arriveTime} ({transportInfo.carrier})
                               </div>
-                              <div className="text-slate-300">
+                              <div className="text-[#475569]">
                                 {transportInfo.inbound.code} {transportInfo.toCode} → {transportInfo.fromCode} {transportInfo.inbound.departTime} – {transportInfo.inbound.arriveTime} ({transportInfo.carrier})
                               </div>
                             </td>
@@ -1444,27 +1442,27 @@ export const TourDetailPage: React.FC = () => {
 
                   {/* GIÁ TOUR BAO GỒM */}
                   <div className="space-y-2 pt-2">
-                    <h3 className="font-black text-white text-sm uppercase">GIÁ TOUR BAO GỒM</h3>
-                    <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
+                    <h3 className="font-black text-[#0F172A] text-sm uppercase">GIÁ TOUR BAO GỒM</h3>
+                    <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
                       <li>Vé máy bay khứ hồi Hồ Chí Minh – Ân Thi – Hồ Chí Minh bao gồm 07kg hành lý xách tay + 20kg hành lý ký gửi.</li>
                       <li>Phí an ninh, phí xăng dầu, thuế sân bay 2 nước.</li>
                       <li>Xe du lịch và vé tham quan theo chương trình.</li>
-                      <li>Các bữa ăn chính theo chương trình. <i className="text-slate-400">(mức ăn 40 RMB/khách/bữa)</i></li>
-                      <li>Khách sạn tiêu chuẩn 4 sao địa phương. <i className="text-slate-400">(02 người/phòng)</i></li>
+                      <li>Các bữa ăn chính theo chương trình. <i className="text-[#526071]">(mức ăn 40 RMB/khách/bữa)</i></li>
+                      <li>Khách sạn tiêu chuẩn 4 sao địa phương. <i className="text-[#526071]">(02 người/phòng)</i></li>
                       <li>Trưởng đoàn và HDV địa phương phục vụ suốt tuyến theo chương trình.</li>
                     </ul>
                   </div>
 
                   {/* THÔNG TIN CHI TIẾT KHI BẤM XEM THÊM */}
                   {isPolicyExpanded && (
-                    <div className="space-y-6 pt-4 border-t border-white/10 animate-fade-in">
+                    <div className="space-y-6 pt-4 border-t border-[#E6E1DA] animate-fade-in">
                       
                       {/* GIÁ TOUR KHÔNG BAO GỒM */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-white text-sm uppercase">GIÁ TOUR KHÔNG BAO GỒM</h3>
-                        <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">GIÁ TOUR KHÔNG BAO GỒM</h3>
+                        <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
                           <li>Chi phí làm hộ chiếu.</li>
-                          <li>Phụ thu phòng đơn: 4.500.000 VND/khách/tour <i className="text-slate-400">(Không áp dụng Lễ, Tết)</i></li>
+                          <li>Phụ thu phòng đơn: 4.500.000 VND/khách/tour <i className="text-[#526071]">(Không áp dụng Lễ, Tết)</i></li>
                           <li>Chi phí làm visa tái nhập cảnh Việt Nam đối với khách Việt kiều, người nước ngoài.</li>
                           <li>Hành lý quá cước trên các chuyến bay.</li>
                           <li>Các dịch vụ sản phẩm không đề cập trong chương trình, show diễn.</li>
@@ -1476,25 +1474,25 @@ export const TourDetailPage: React.FC = () => {
 
                       {/* ĐIỀU KIỆN HỦY */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-white text-sm uppercase">ĐIỀU KIỆN HỦY (Không áp dụng cho Lễ, Tết)</h3>
-                        <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">ĐIỀU KIỆN HỦY (Không áp dụng cho Lễ, Tết)</h3>
+                        <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
                           <li>Ngay sau khi đăng ký tour, Quý khách vui lòng đóng cọc 60% tổng giá tour, phần còn lại vui lòng thanh toán trước 15 ngày tour khởi hành.</li>
                           <li>Hủy tour ngay sau khi Đại Sứ Quán, Lãnh Sự Quán đã cấp visa: Chi phí hủy tour là 100% trên tổng giá tour.</li>
                           <li>Hủy tour sau khi đăng ký: Phí hủy tour là 60% cọc và chi phí visa và vé máy bay nếu có.</li>
                           <li>Hủy tour trước 15 ngày khởi hành: Phí hủy tour là 90% trên tổng giá tour.</li>
                           <li>Hủy tour sau thời gian trên: Phí hủy tour là 100% trên tổng giá tour.</li>
                         </ul>
-                        <p className="text-[11px] italic text-slate-400 pt-1">
+                        <p className="text-[11px] italic text-[#526071] pt-1">
                           Thời gian hủy tour và thanh toán được tính theo ngày làm việc, không tính Thứ 7, Chủ Nhật và các ngày Lễ, Tết.
                         </p>
                       </div>
 
                       {/* CHÍNH SÁCH TRẺ EM, EM BÉ */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-white text-sm uppercase">CHÍNH SÁCH TRẺ EM, EM BÉ</h3>
-                        <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
-                          <li>Em bé: Dưới 02 tuổi <i className="text-slate-400">(ngủ chung giường với bố, mẹ)</i></li>
-                          <li>Trẻ em: Từ 02 đến dưới 10 tuổi <i className="text-slate-400">(ngủ chung giường với bố, mẹ)</i></li>
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">CHÍNH SÁCH TRẺ EM, EM BÉ</h3>
+                        <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
+                          <li>Em bé: Dưới 02 tuổi <i className="text-[#526071]">(ngủ chung giường với bố, mẹ)</i></li>
+                          <li>Trẻ em: Từ 02 đến dưới 10 tuổi <i className="text-[#526071]">(ngủ chung giường với bố, mẹ)</i></li>
                           <li>Trẻ em từ 10 tuổi trở lên được tính như người lớn.</li>
                           <li>Trẻ em ngủ giường riêng tính 100% giá tour.</li>
                         </ul>
@@ -1502,26 +1500,26 @@ export const TourDetailPage: React.FC = () => {
 
                       {/* QUY ĐỊNH MUA TOUR VÀ THANH TOÁN */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-white text-sm uppercase">QUY ĐỊNH MUA TOUR VÀ THANH TOÁN</h3>
-                        <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">QUY ĐỊNH MUA TOUR VÀ THANH TOÁN</h3>
+                        <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
                           <li>Khách hàng điền phiếu đăng ký và cung cấp hồ sơ xin visa trước ngày khởi hành ít nhất 15 ngày.</li>
-                          <li>Đóng tiền cọc tour 60% tổng giá tour <i className="text-slate-400">(gồm phí visa + vé máy bay)</i>.</li>
+                          <li>Đóng tiền cọc tour 60% tổng giá tour <i className="text-[#526071]">(gồm phí visa + vé máy bay)</i>.</li>
                           <li>Khách có quốc tịch được miễn visa hoặc đã có visa, chúng tôi sẽ trừ lại 500.000 VND/khách.</li>
                         </ul>
                       </div>
 
                       {/* LƯU Ý */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-white text-sm uppercase">LƯU Ý</h3>
-                        <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
-                          <li>Trẻ em dưới 16 tuổi phải có bố mẹ đi cùng. Trường hợp trẻ em đi với người nhà <i className="text-slate-400">(không phải Bố Mẹ)</i>, phải nộp kèm giấy đồng ý cho con đi du lịch được chính quyền địa phương xác nhận <i className="text-slate-400">(do Bố Mẹ ủy quyền cho người thân dẫn đi du lịch)</i>.</li>
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">LƯU Ý</h3>
+                        <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
+                          <li>Trẻ em dưới 16 tuổi phải có bố mẹ đi cùng. Trường hợp trẻ em đi với người nhà <i className="text-[#526071]">(không phải Bố Mẹ)</i>, phải nộp kèm giấy đồng ý cho con đi du lịch được chính quyền địa phương xác nhận <i className="text-[#526071]">(do Bố Mẹ ủy quyền cho người thân dẫn đi du lịch)</i>.</li>
                           <li>Quý khách có yêu cầu ở phòng đơn, vui lòng thanh toán thêm tiền phụ thu.</li>
-                          <li>Thứ tự các điểm tham quan và lộ trình chuyến đi có thể thay đổi tùy theo tình hình thực tế <i className="text-slate-400">(thời tiết, giao thông, ...)</i> nhưng vẫn đảm bảo đầy đủ các điểm tham quan như lúc đầu.</li>
+                          <li>Thứ tự các điểm tham quan và lộ trình chuyến đi có thể thay đổi tùy theo tình hình thực tế <i className="text-[#526071]">(thời tiết, giao thông, ...)</i> nhưng vẫn đảm bảo đầy đủ các điểm tham quan như lúc đầu.</li>
                           <li>Chương trình có các điểm shopping: Cửa hàng thuốc, đá quý, tơ lụa.</li>
                           <li>Nếu quý khách mang quốc tịch khác, hoặc nhiều quốc tịch. Xin vui lòng chủ động báo lại chúng tôi trước khi chốt tour.</li>
-                          <li>Trường hợp quý khách ngoại quốc <i className="text-slate-400">(không phải Việt Kiều)</i>, phía Trung Quốc sẽ phụ thu 100 USD/khách.</li>
+                          <li>Trường hợp quý khách ngoại quốc <i className="text-[#526071]">(không phải Việt Kiều)</i>, phía Trung Quốc sẽ phụ thu 100 USD/khách.</li>
                           <li>Khách từ 70 đến dưới 75 tuổi yêu cầu ký cam kết sức khỏe với Công ty.</li>
-                          <li>Quý khách từ 75 tuổi trở lên yêu cầu phải có giấy xác nhận đầy đủ sức khỏe đi du lịch nước ngoài của bác sĩ + giấy cam kết sức khỏe với Công ty và phải có người thân dưới 60 tuổi <i className="text-slate-400">(đầy đủ sức khỏe)</i> đi theo. Ngoài ra, khách trên 75 tuổi vui lòng đóng thêm phí bảo hiểm cao cấp.</li>
+                          <li>Quý khách từ 75 tuổi trở lên yêu cầu phải có giấy xác nhận đầy đủ sức khỏe đi du lịch nước ngoài của bác sĩ + giấy cam kết sức khỏe với Công ty và phải có người thân dưới 60 tuổi <i className="text-[#526071]">(đầy đủ sức khỏe)</i> đi theo. Ngoài ra, khách trên 75 tuổi vui lòng đóng thêm phí bảo hiểm cao cấp.</li>
                           <li>Không nhận khách từ 80 tuổi trở lên.</li>
                           <li>Quý khách mang thai xin vui lòng báo cho Công ty khi đăng ký tour để được tư vấn thêm thông tin. Không nhận khách mang thai từ 05 tháng trở lên vì lý do an toàn.</li>
                           <li>Giá tour không bao gồm visa tái nhập Việt Nam đối với khách Việt Kiều & Ngoại kiều.</li>
@@ -1533,10 +1531,10 @@ export const TourDetailPage: React.FC = () => {
                   )}
 
                   {/* NÚT XEM THÊM / THU GỌN */}
-                  <div className="text-center pt-4 border-t border-white/10">
+                  <div className="text-center pt-4 border-t border-[#E6E1DA]">
                     <button
                       onClick={() => setIsPolicyExpanded(!isPolicyExpanded)}
-                      className="px-6 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-sky-300 font-extrabold text-xs transition inline-flex items-center gap-1.5 shadow-sm border border-white/10 cursor-pointer"
+                      className="px-6 py-2.5 rounded-full bg-[#FAF8F5] hover:bg-[#F1ECE4] text-[#0B3B49] font-extrabold text-xs transition inline-flex items-center gap-1.5 shadow-sm border border-[#E6E1DA] cursor-pointer"
                     >
                       {isPolicyExpanded ? 'Thu gọn ^' : 'Xem thêm v'}
                     </button>
@@ -1547,17 +1545,17 @@ export const TourDetailPage: React.FC = () => {
 
               {/* TAB CONTENT: Câu hỏi thường gặp */}
               {activeTab === 'faq' && (
-                <div className="p-6 space-y-4 text-sm text-slate-300">
+                <div className="p-6 space-y-4 text-sm text-[#475569]">
                   {[
                     { q: 'Tour đã bao gồm visa chưa?', a: 'Đối với tour Trung Quốc Ân Thi - Phượng Hoàng Cổ Trấn, giá tour đã bao gồm phí Visa đoàn nhập cảnh.' },
                     { q: 'Trẻ em dưới 2 tuổi tính giá thế nào?', a: 'Trẻ em dưới 2 tuổi tính 30% giá tour người lớn và không có giường riêng.' },
                     { q: 'Có hỗ trợ tách đoàn tự do không?', a: 'Theo quy định du lịch theo đoàn của chính phủ Trung Quốc, khách hàng không được tự ý tách đoàn.' },
                   ].map((faq, i) => (
-                    <div key={i} className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5">
-                      <div className="font-bold text-white flex items-center gap-2">
-                        <HelpCircle className="h-4 w-4 text-sky-400" /> {faq.q}
+                    <div key={i} className="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6E1DA] space-y-1.5">
+                      <div className="font-bold text-[#0F172A] flex items-center gap-2">
+                        <HelpCircle className="h-4 w-4 text-[#0D9488]" /> {faq.q}
                       </div>
-                      <div className="text-xs text-slate-300 pl-6 leading-relaxed">{faq.a}</div>
+                      <div className="text-xs text-[#475569] pl-6 leading-relaxed">{faq.a}</div>
                     </div>
                   ))}
                 </div>
@@ -1568,9 +1566,9 @@ export const TourDetailPage: React.FC = () => {
                 <div className="p-6 space-y-6">
                   {/* Verified User Review Restriction Notice */}
                   {eligibleToReview ? (
-                    <form onSubmit={handleReviewSubmit} className="bg-white/[0.03] p-5 rounded-2xl border border-white/10 space-y-4">
+                    <form onSubmit={handleReviewSubmit} className="bg-[#FAF8F5] p-5 rounded-2xl border border-[#E6E1DA] space-y-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-300">Số sao:</span>
+                        <span className="text-xs font-semibold text-[#475569]">Số sao:</span>
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             type="button"
@@ -1578,7 +1576,7 @@ export const TourDetailPage: React.FC = () => {
                             onClick={() => setNewRating(star)}
                             className="p-1 focus:outline-none cursor-pointer"
                           >
-                            <Star className={`h-5 w-5 ${star <= newRating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`} />
+                            <Star className={`h-5 w-5 ${star <= newRating ? 'fill-amber-400 text-amber-700' : 'text-slate-600'}`} />
                           </button>
                         ))}
                       </div>
@@ -1589,33 +1587,33 @@ export const TourDetailPage: React.FC = () => {
                           value={newComment}
                           onChange={(e) => setNewComment(e.target.value)}
                           placeholder="Chia sẻ nhận xét chân thực về chuyến đi, chất lượng phục vụ và món ăn..."
-                          className="w-full rounded-xl border border-white/10 p-3 text-xs focus:border-sky-400 focus:outline-none bg-white/[0.05] text-white placeholder-slate-500"
+                          className="w-full rounded-xl border border-[#E6E1DA] p-3 text-xs focus:border-sky-400 focus:outline-none bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400"
                           required
                         />
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <ImageIcon className="h-4 w-4 text-slate-400" />
+                        <ImageIcon className="h-4 w-4 text-[#526071]" />
                         <input
                           type="url"
                           value={newImageUrl}
                           onChange={(e) => setNewImageUrl(e.target.value)}
                           placeholder="URL ảnh thực tế chuyến đi (tùy chọn)..."
-                          className="flex-1 rounded-xl border border-white/10 px-3 py-1.5 text-xs focus:border-sky-400 focus:outline-none bg-white/[0.05] text-white placeholder-slate-500"
+                          className="flex-1 rounded-xl border border-[#E6E1DA] px-3 py-1.5 text-xs focus:border-sky-400 focus:outline-none bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={submittingReview}
-                        className="rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white px-5 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20 cursor-pointer"
+                        className="rounded-xl bg-[#0B3B49] hover:bg-[#0F5264] text-white px-5 py-2.5 text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20 cursor-pointer"
                       >
                         <Send className="h-3.5 w-3.5" /> Gửi Đánh Giá
                       </button>
                     </form>
                   ) : (
-                    <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center gap-3 text-xs text-amber-300">
-                      <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-400" />
+                    <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center gap-3 text-xs text-amber-800">
+                      <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-700" />
                       <span>Chính sách minh bạch: Chỉ những tài khoản đã hoàn thành chuyến đi (trạng thái <strong>COMPLETED</strong>) mới được phép để lại bình luận và đính kèm ảnh thực tế.</span>
                     </div>
                   )}
@@ -1632,27 +1630,27 @@ export const TourDetailPage: React.FC = () => {
                         const initialLetter = displayName.charAt(0).toUpperCase();
 
                         return (
-                          <div key={rev.id} className="bg-white/[0.02] p-4 rounded-xl border border-white/8 space-y-2">
+                          <div key={rev.id} className="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6E1DA] space-y-2">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 font-bold flex items-center justify-center text-xs">
+                                <div className="h-8 w-8 rounded-full bg-sky-500/20 border border-sky-400/30 text-[#0B3B49] font-bold flex items-center justify-center text-xs">
                                   {initialLetter}
                                 </div>
                                 <div>
-                                  <div className="text-xs font-bold text-white">{displayName}</div>
-                                  <div className="text-[10px] text-slate-400">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</div>
+                                  <div className="text-xs font-bold text-[#0F172A]">{displayName}</div>
+                                  <div className="text-[10px] text-[#526071]">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</div>
                                 </div>
                               </div>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={`h-3.5 w-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-700'}`} />
+                                <Star key={i} className={`h-3.5 w-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-700' : 'text-slate-700'}`} />
                               ))}
                             </div>
                           </div>
-                          <p className="text-xs text-slate-300 pl-10 leading-relaxed">{rev.comment}</p>
+                          <p className="text-xs text-[#475569] pl-10 leading-relaxed">{rev.comment}</p>
                           {rev.imageUrl && (
                             <div className="pl-10 pt-2">
-                              <img src={rev.imageUrl} alt="Review attachment" className="h-20 w-20 object-cover rounded-lg border border-white/10" />
+                              <img src={rev.imageUrl} alt="Review attachment" className="h-20 w-20 object-cover rounded-lg border border-[#E6E1DA]" />
                             </div>
                           )}
                         </div>
@@ -1667,57 +1665,57 @@ export const TourDetailPage: React.FC = () => {
 
           {/* Right Column: Summary Card (Matching Screenshot 2) */}
           <aside className="lg:col-span-1 space-y-6">
-            <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-2xl space-y-6 lg:sticky lg:top-24 z-10">
+            <div className="bg-white backdrop-blur-xl p-6 rounded-2xl border border-[#E6E1DA] shadow-2xl space-y-6 lg:sticky lg:top-24 z-10">
               
-              <div className="space-y-2 border-b border-white/10 pb-4">
-                <h2 className="text-base font-extrabold text-white leading-snug uppercase">
+              <div className="space-y-2 border-b border-[#E6E1DA] pb-4">
+                <h2 className="text-base font-extrabold text-[#0F172A] leading-snug uppercase">
                   {tour.title}
                 </h2>
                 
                 {/* Price Display */}
                 <div className="pt-2">
-                  <div className="text-xs text-slate-400 font-medium">
+                  <div className="text-xs text-[#526071] font-medium">
                     Giá trọn gói ({transportInfo.mode === 'FLIGHT' ? 'Đã gồm vé máy bay khứ hồi' : 'Đã gồm phương tiện khứ hồi'}):
                   </div>
-                  <div className="text-3xl font-black text-rose-400 tracking-tight">
-                    {tour.price.toLocaleString('vi-VN')} đ <span className="text-xs font-normal text-slate-400">/ Khách</span>
+                  <div className="text-3xl font-black text-[#D95D39] tracking-tight">
+                    {tour.price.toLocaleString('vi-VN')} đ <span className="text-xs font-normal text-[#526071]">/ Khách</span>
                   </div>
                 </div>
 
                 {/* Group Flight / Transport & ID Document Match Notice */}
                 <div className="mt-3 rounded-xl bg-teal-500/10 border border-teal-500/25 p-3 space-y-1 text-[11px]">
-                  <div className="font-extrabold text-teal-300 flex items-center gap-1.5">
-                    {transportInfo.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-teal-400" /> : <Bus className="h-3.5 w-3.5 text-teal-400" />}
+                  <div className="font-extrabold text-[#0B3B49] flex items-center gap-1.5">
+                    {transportInfo.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-[#0D9488]" /> : <Bus className="h-3.5 w-3.5 text-[#0D9488]" />}
                     <span>
                       {transportInfo.mode === 'FLIGHT'
                         ? `Vé máy bay đoàn khứ hồi ${transportInfo.fromCode} ⇄ ${transportInfo.toCode} (${transportInfo.shortCarrierBadge})`
                         : `${transportInfo.badgeLabel}: ${transportInfo.fromCode} ⇄ ${transportInfo.toCode} (${transportInfo.shortCarrierBadge})`}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-300 leading-relaxed">
+                  <p className="text-[10px] text-[#475569] leading-relaxed">
                     {transportInfo.idDocumentNotice}
                   </p>
                 </div>
               </div>
 
               {/* Details Specs Table matching Reference Image 2 */}
-              <div className="space-y-3 text-xs text-slate-300">
-                <div className="space-y-1.5 pb-2 border-b border-white/10">
-                  <label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4 text-sky-400" /> Chọn Lịch Khởi Hành:
+              <div className="space-y-3 text-xs text-[#475569]">
+                <div className="space-y-1.5 pb-2 border-b border-[#E6E1DA]">
+                  <label className="text-[11px] font-bold text-[#475569] flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-[#0D9488]" /> Chọn Lịch Khởi Hành:
                   </label>
                   {schedulesWithDynamicSeats.length === 0 ? (
-                    <div className="rounded-xl bg-amber-500/10 p-3 border border-amber-500/30 text-xs font-semibold text-amber-300">
+                    <div className="rounded-xl bg-amber-500/10 p-3 border border-amber-500/30 text-xs font-semibold text-amber-800">
                       ⚠️ Các đợt khởi hành của tour này đã kết thúc hoặc quá hạn.
                     </div>
                   ) : (
                     <select
                       value={selectedScheduleId}
                       onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
-                      className="w-full rounded-xl border border-white/15 bg-slate-900/90 p-2.5 text-xs font-bold text-white focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 shadow-inner cursor-pointer"
+                      className="w-full rounded-xl border border-[#CBD5E1] bg-white p-2.5 text-xs font-bold text-[#0F172A] focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 shadow-inner cursor-pointer"
                     >
                       {schedulesWithDynamicSeats.map((sch) => (
-                        <option key={sch.id} value={sch.id} className="bg-slate-900 text-white">
+                        <option key={sch.id} value={sch.id} className="bg-white text-[#0F172A]">
                           {sch.startDate} - {sch.endDate} ({sch.bookedCount}/{sch.maxParticipants} chỗ){sch.note ? ` - ${sch.note}` : ''}
                         </option>
                       ))}
@@ -1730,11 +1728,11 @@ export const TourDetailPage: React.FC = () => {
                       {!selectedSchedule.isBookable ? (
                         <div className={`rounded-xl border p-3.5 text-xs space-y-1.5 mt-2 ${
                           selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
-                            ? 'bg-rose-500/15 border-rose-500/40 text-rose-200'
-                            : 'bg-amber-500/15 border-amber-500/40 text-amber-200'
+                            ? 'bg-rose-500/15 border-rose-500/40 text-rose-800'
+                            : 'bg-amber-500/15 border-amber-500/40 text-amber-800'
                         }`}>
                           <div className={`font-bold flex items-center gap-1.5 ${
-                            selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' ? 'text-rose-400' : 'text-amber-300'
+                            selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' ? 'text-[#D95D39]' : 'text-amber-800'
                           }`}>
                             <AlertCircle className="h-4 w-4" /> 
                             {selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
@@ -1758,38 +1756,38 @@ export const TourDetailPage: React.FC = () => {
                         </div>
                       ) : (
                         <div className="space-y-1.5 mt-2">
-                          <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-sky-300 gap-2 whitespace-nowrap">
+                          <div className="flex items-center justify-between text-[11px] bg-sky-500/10 border border-sky-500/20 px-3 py-2 rounded-xl text-[#0B3B49] gap-2 whitespace-nowrap">
                             {(() => {
                               const daysLeftToBook = Math.max(0, selectedSchedule.daysRemaining - selectedSchedule.minLeadDays);
                               return (
                                 <>
                                   <span className="flex items-center gap-1.5 flex-shrink-0">
-                                    <Clock className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+                                    <Clock className="h-3.5 w-3.5 text-[#0D9488] flex-shrink-0" />
                                     <span>
                                       {daysLeftToBook > 0 ? (
-                                        <>Còn <strong className="text-white font-bold">{daysLeftToBook} ngày</strong> đặt vé</>
+                                        <>Còn <strong className="text-[#0F172A] font-bold">{daysLeftToBook} ngày</strong> đặt vé</>
                                       ) : (
-                                        <strong className="text-amber-300 font-bold">Hôm nay hạn chót đặt vé</strong>
+                                        <strong className="text-amber-800 font-bold">Hôm nay hạn chót đặt vé</strong>
                                       )}
                                     </span>
                                   </span>
-                                  <span className="font-semibold text-white flex-shrink-0">
-                                    Đã đặt: <strong className="text-sky-300">{selectedSchedule.bookedCount}/{selectedSchedule.maxParticipants} chỗ</strong>
+                                  <span className="font-semibold text-[#0F172A] flex-shrink-0">
+                                    Đã đặt: <strong className="text-[#0B3B49]">{selectedSchedule.bookedCount}/{selectedSchedule.maxParticipants} chỗ</strong>
                                   </span>
                                 </>
                               );
                             })()}
                           </div>
                           {selectedSchedule.seats <= 4 ? (
-                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300">
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700">
                               Sắp hết chỗ — Chỉ còn <strong>{selectedSchedule.seats} chỗ trống</strong> cuối cùng
                             </div>
                           ) : selectedSchedule.bookedCount >= selectedSchedule.minParticipants ? (
-                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-700">
                               Đã đủ khách khởi hành ({selectedSchedule.bookedCount}/{selectedSchedule.minParticipants} khách tối thiểu)
                             </div>
                           ) : (
-                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300">
+                            <div className="text-[11px] font-semibold px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800">
                               Đang ghép đoàn — Cần thêm <strong>{selectedSchedule.minParticipants - selectedSchedule.bookedCount} khách</strong> nữa để đủ {selectedSchedule.minParticipants} khách khởi hành
                             </div>
                           )}
@@ -1799,34 +1797,34 @@ export const TourDetailPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                  <span className="text-slate-400 flex items-center gap-1.5"><Building2 className="h-4 w-4 text-sky-400" /> Đơn vị tổ chức:</span>
-                  <span className="font-bold text-sky-300 flex items-center gap-1">
+                <div className="flex items-center justify-between pb-2 border-b border-[#E6E1DA]">
+                  <span className="text-[#526071] flex items-center gap-1.5"><Building2 className="h-4 w-4 text-[#0D9488]" /> Đơn vị tổ chức:</span>
+                  <span className="font-bold text-[#0B3B49] flex items-center gap-1">
                     {tour.vendorName || 'NewTour Travel Company'}
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" />
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><Clock className="h-4 w-4 text-sky-400" /> Thời gian:</span>
-                  <span className="font-bold text-white">{tour.durationDays} ngày {tour.durationNights} đêm</span>
+                  <span className="text-[#526071] flex items-center gap-1.5"><Clock className="h-4 w-4 text-[#0D9488]" /> Thời gian:</span>
+                  <span className="font-bold text-[#0F172A]">{tour.durationDays} ngày {tour.durationNights} đêm</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><MapPin className="h-4 w-4 text-sky-400" /> Nơi khởi hành:</span>
-                  <span className="font-bold text-white">{tour.departureLocation}</span>
+                  <span className="text-[#526071] flex items-center gap-1.5"><MapPin className="h-4 w-4 text-[#0D9488]" /> Nơi khởi hành:</span>
+                  <span className="font-bold text-[#0F172A]">{tour.departureLocation}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><Users className="h-4 w-4 text-sky-400" /> Số chỗ:</span>
+                  <span className="text-[#526071] flex items-center gap-1.5"><Users className="h-4 w-4 text-[#0D9488]" /> Số chỗ:</span>
                   <div className="text-right">
-                    <span className="font-extrabold text-white text-xs">
+                    <span className="font-extrabold text-[#0F172A] text-xs">
                       {selectedSchedule.bookedCount} / {selectedSchedule.maxParticipants} chỗ
                     </span>
                     <span className={`ml-2 font-bold px-2 py-0.5 rounded text-[11px] ${
                       selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
-                        ? 'text-rose-400 bg-rose-500/15 border border-rose-500/30'
+                        ? 'text-[#D95D39] bg-rose-500/15 border border-rose-500/30'
                         : selectedSchedule.seats > 0 
-                          ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' 
-                          : 'text-rose-400 bg-rose-500/10 border border-rose-500/30'
+                          ? 'text-emerald-700 bg-emerald-500/10 border border-emerald-500/30' 
+                          : 'text-[#D95D39] bg-rose-500/10 border border-rose-500/30'
                     }`}>
                       {selectedSchedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
                         ? '(Đã hủy đoàn)'
@@ -1837,82 +1835,82 @@ export const TourDetailPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-sky-400" /> Mã tour:</span>
-                  <span className="font-bold text-sky-400">{tour.tourCode || 'DAHT14VQDZ'}</span>
+                  <span className="text-[#526071] flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[#0D9488]" /> Mã tour:</span>
+                  <span className="font-bold text-[#0D9488]">{tour.tourCode || 'DAHT14VQDZ'}</span>
                 </div>
               </div>
 
               {/* Guest Selector Counter */}
-              <div className="space-y-3 pt-4 border-t border-white/10">
+              <div className="space-y-3 pt-4 border-t border-[#E6E1DA]">
                 <div className="flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-bold text-white">Người lớn (từ 12 tuổi)</div>
-                    <div className="text-[10px] text-slate-400">{tour.price.toLocaleString('vi-VN')} đ / khách</div>
+                    <div className="font-bold text-[#0F172A]">Người lớn (từ 12 tuổi)</div>
+                    <div className="text-[10px] text-[#526071]">{tour.price.toLocaleString('vi-VN')} đ / khách</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setAdults(Math.max(1, adults - 1))}
-                      className="h-7 w-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-white font-bold border border-white/10 flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
                     >-</button>
-                    <span className="font-bold text-sm w-4 text-center text-white">{adults}</span>
+                    <span className="font-bold text-sm w-4 text-center text-[#0F172A]">{adults}</span>
                     <button 
                       onClick={() => setAdults(adults + 1)}
-                      className="h-7 w-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-white font-bold border border-white/10 flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
                     >+</button>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-bold text-white">Trẻ em (2 - 11 tuổi)</div>
-                    <div className="text-[10px] text-slate-400">{childPriceVal.toLocaleString('vi-VN')} đ / khách</div>
+                    <div className="font-bold text-[#0F172A]">Trẻ em (2 - 11 tuổi)</div>
+                    <div className="text-[10px] text-[#526071]">{childPriceVal.toLocaleString('vi-VN')} đ / khách</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setChildren(Math.max(0, children - 1))}
-                      className="h-7 w-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-white font-bold border border-white/10 flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
                     >-</button>
-                    <span className="font-bold text-sm w-4 text-center text-white">{children}</span>
+                    <span className="font-bold text-sm w-4 text-center text-[#0F172A]">{children}</span>
                     <button 
                       onClick={() => setChildren(children + 1)}
-                      className="h-7 w-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-white font-bold border border-white/10 flex items-center justify-center text-xs transition cursor-pointer"
+                      className="h-7 w-7 rounded-lg bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] font-bold border border-[#E6E1DA] flex items-center justify-center text-xs transition cursor-pointer"
                     >+</button>
                   </div>
                 </div>
               </div>
 
               {/* SINGLE ROOM SURCHARGE & ROOM ALLOCATION DETAILS */}
-              <div className="space-y-3 pt-3 border-t border-white/10">
+              <div className="space-y-3 pt-3 border-t border-[#E6E1DA]">
                 <div className="flex items-start justify-between gap-2 text-xs">
-                  <label className="font-bold text-slate-200 flex items-start gap-2 cursor-pointer select-none">
+                  <label className="font-bold text-[#334155] flex items-start gap-2 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={singleRoomRequired}
                       onChange={(e) => setSingleRoomRequired(e.target.checked)}
-                      className="h-4 w-4 mt-0.5 rounded border-white/20 bg-slate-900 text-sky-500 focus:ring-sky-400 cursor-pointer"
+                      className="h-4 w-4 mt-0.5 rounded border-[#CBD5E1] bg-white text-sky-500 focus:ring-sky-400 cursor-pointer"
                     />
                     <div>
-                      <span className="block text-slate-100">Yêu cầu phòng đơn riêng biệt</span>
-                      <span className="block text-[10px] text-slate-400 font-normal">Không ghép phòng với khách lẻ khác</span>
+                      <span className="block text-[#0F172A]">Yêu cầu phòng đơn riêng biệt</span>
+                      <span className="block text-[10px] text-[#526071] font-normal">Không ghép phòng với khách lẻ khác</span>
                     </div>
                   </label>
-                  <span className="text-[11px] font-extrabold text-amber-400 whitespace-nowrap">
+                  <span className="text-[11px] font-extrabold text-amber-700 whitespace-nowrap">
                     +{singleRoomSurchargeUnit.toLocaleString('vi-VN')} đ/khách
                   </span>
                 </div>
 
                 {/* Clear Room Allocation Display */}
-                <div className="rounded-xl bg-white/[0.04] border border-white/10 p-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between text-slate-300 font-semibold">
-                    <span className="flex items-center gap-1.5 text-sky-300">
+                <div className="rounded-xl bg-[#FAF8F5] border border-[#E6E1DA] p-3 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-[#475569] font-semibold">
+                    <span className="flex items-center gap-1.5 text-[#0B3B49]">
                       🏨 Tiêu chuẩn xếp phòng:
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">02 khách/phòng</span>
+                    <span className="text-[11px] text-[#526071] font-medium">02 khách/phòng</span>
                   </div>
-                  <div className="text-[11px] text-emerald-300 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 rounded-lg leading-relaxed">
+                  <div className="text-[11px] text-emerald-700 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 rounded-lg leading-relaxed">
                     Phân bổ: {getRoomAllocationText()}
                   </div>
-                  <p className="text-[10px] text-slate-400 italic leading-snug">
+                  <p className="text-[10px] text-[#526071] italic leading-snug">
                     {singleRoomRequired 
                       ? '✓ Đã kích hoạt phụ thu phòng riêng. Quý khách được bố trí phòng đơn 1 giường tiêu chuẩn 3-4 sao.' 
                       : 'ℹ️ Khách đi 1 mình mặc định ghép phòng Twin (2 giường đơn) với khách cùng giới tính. Quý khách có thể tick ô trên nếu muốn ở phòng riêng.'}
@@ -1921,15 +1919,15 @@ export const TourDetailPage: React.FC = () => {
               </div>
 
               {/* Voucher Application Form */}
-              <div className="space-y-2 pt-3 border-t border-white/10">
+              <div className="space-y-2 pt-3 border-t border-[#E6E1DA]">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-slate-300">Mã giảm giá (Voucher):</label>
+                  <label className="text-[11px] font-bold text-[#475569]">Mã giảm giá (Voucher):</label>
                   <button
                     type="button"
                     onClick={() => setShowVoucherModal(true)}
-                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] text-[#0D9488] hover:text-[#0D9488] font-bold transition flex items-center gap-1 cursor-pointer"
                   >
-                    <Sparkles className="h-3 w-3 text-cyan-400" />
+                    <Sparkles className="h-3 w-3 text-[#0D9488]" />
                     <span>Xem ưu đãi có sẵn</span>
                   </button>
                 </div>
@@ -1939,43 +1937,43 @@ export const TourDetailPage: React.FC = () => {
                     value={voucherCode}
                     onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                     placeholder="Nhập mã (Ví dụ: SUMMER2026)"
-                    className="flex-1 rounded-xl border border-white/10 px-3 py-2 text-xs focus:border-sky-400 focus:outline-none uppercase font-semibold bg-white/[0.05] text-white placeholder-slate-500"
+                    className="flex-1 rounded-xl border border-[#E6E1DA] px-3 py-2 text-xs focus:border-sky-400 focus:outline-none uppercase font-semibold bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400"
                   />
                   <button
                     onClick={() => handleApplyVoucher()}
-                    className="rounded-xl bg-white/[0.1] hover:bg-white/[0.18] text-white border border-white/15 px-3.5 py-2 text-xs font-bold transition cursor-pointer"
+                    className="rounded-xl bg-[#F1ECE4] hover:bg-[#F1ECE4] text-[#0F172A] border border-[#CBD5E1] px-3.5 py-2 text-xs font-bold transition cursor-pointer"
                   >
                     Áp dụng
                   </button>
                 </div>
                 {voucherMsg && (
-                  <p className={`text-[11px] font-semibold ${voucherMsg.type === 'success' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  <p className={`text-[11px] font-semibold ${voucherMsg.type === 'success' ? 'text-emerald-700' : 'text-[#D95D39]'}`}>
                     {voucherMsg.text}
                   </p>
                 )}
               </div>
 
               {/* Total Calculation Breakdown */}
-              <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-400">
+              <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#E6E1DA] space-y-1.5 text-xs">
+                <div className="flex justify-between text-[#526071]">
                   <span>Tiền vé ({adults} NL{children > 0 ? `, ${children} TE` : ''}):</span>
-                  <span className="text-slate-200 font-semibold">{(adultTotal + childTotal).toLocaleString('vi-VN')} đ</span>
+                  <span className="text-[#334155] font-semibold">{(adultTotal + childTotal).toLocaleString('vi-VN')} đ</span>
                 </div>
                 {singleRoomRequired && (
-                  <div className="flex justify-between text-amber-300 font-medium">
+                  <div className="flex justify-between text-amber-800 font-medium">
                     <span>Phụ thu phòng đơn ({adults} phòng):</span>
                     <span>+{singleRoomSurchargeTotal.toLocaleString('vi-VN')} đ</span>
                   </div>
                 )}
                 {voucherDiscount > 0 && (
-                  <div className="flex justify-between text-emerald-400 font-medium">
+                  <div className="flex justify-between text-emerald-700 font-medium">
                     <span>Giảm giá Voucher:</span>
                     <span>-{voucherDiscount.toLocaleString('vi-VN')} đ</span>
                   </div>
                 )}
-                <div className="flex justify-between text-base font-black text-white pt-2 border-t border-white/10">
+                <div className="flex justify-between text-base font-black text-[#0F172A] pt-2 border-t border-[#E6E1DA]">
                   <span>Tổng tiền:</span>
-                  <span className="text-rose-400">{finalTotal.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-[#D95D39]">{finalTotal.toLocaleString('vi-VN')} đ</span>
                 </div>
               </div>
 
@@ -1986,8 +1984,8 @@ export const TourDetailPage: React.FC = () => {
                   disabled={!selectedSchedule.isBookable}
                   className={`w-full rounded-xl py-3.5 text-sm font-black transition flex items-center justify-center gap-2 cursor-pointer ${
                     !selectedSchedule.isBookable 
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5' 
-                      : 'bg-gradient-to-r from-sky-500 via-cyan-500 to-sky-600 hover:from-sky-400 hover:to-cyan-400 text-white shadow-[0_0_20px_rgba(56,189,248,0.35)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] active:scale-[0.99]'
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-[#E6E1DA]' 
+                      : 'bg-[#D95D39] hover:bg-[#C24E2D] text-white shadow-md active:scale-[0.99]'
                   }`}
                 >
                   {!selectedSchedule.isBookable
@@ -1999,16 +1997,16 @@ export const TourDetailPage: React.FC = () => {
                 
                 <button
                   onClick={() => alert('Đội ngũ tư vấn viên Smart Travel đang sẵn sàng! Hotline hỗ trợ 24/7: 1900 6868')}
-                  className="w-full rounded-xl border border-sky-400/40 text-sky-300 hover:bg-sky-500/10 hover:border-sky-400 py-3 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full rounded-xl border border-sky-400/40 text-[#0B3B49] hover:bg-sky-500/10 hover:border-sky-400 py-3 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <PhoneCall className="h-4 w-4" /> Liên hệ tư vấn 1900 6868
                 </button>
               </div>
 
               {/* Policy & Minimum Participants Guarantee Box */}
-              <div className="rounded-xl bg-white/[0.02] border border-white/10 p-3 space-y-1.5 text-[11px] text-slate-400">
-                <div className="flex items-center gap-1.5 font-bold text-slate-300">
-                  <ShieldCheck className="h-4 w-4 text-emerald-400" /> Cam kết quyền lợi khách hàng:
+              <div className="rounded-xl bg-[#FAF8F5] border border-[#E6E1DA] p-3 space-y-1.5 text-[11px] text-[#526071]">
+                <div className="flex items-center gap-1.5 font-bold text-[#475569]">
+                  <ShieldCheck className="h-4 w-4 text-emerald-700" /> Cam kết quyền lợi khách hàng:
                 </div>
                 <p className="leading-relaxed">
                   • <strong>Đoàn tối thiểu:</strong> Mỗi đợt khởi hành yêu cầu tối thiểu {selectedSchedule.minParticipants || 10} khách. Nếu không đủ đoàn trước ngày đi {selectedSchedule.minLeadDays} ngày, SmartTravel hoàn tiền 100% hoặc đổi lịch mới tặng voucher giảm 10%.
@@ -2031,13 +2029,13 @@ export const TourDetailPage: React.FC = () => {
         {/* SECTION: CÓ THỂ BẠN SẼ THÍCH (Khớp 100% Screenshot 4) */}
         <div className="pt-12 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-black text-white tracking-tight">Có thể bạn sẽ thích</h3>
+            <h3 className="text-2xl font-black text-[#0F172A] tracking-tight">Có thể bạn sẽ thích</h3>
             <button 
               onClick={() => {
                 const el = document.getElementById('recommended-carousel');
                 if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
               }}
-              className="h-10 w-10 rounded-full bg-white/[0.08] hover:bg-white/[0.16] text-white flex items-center justify-center transition border border-white/10 shadow-sm cursor-pointer"
+              className="h-10 w-10 rounded-full bg-[#F4F1EC] hover:bg-[#F1ECE4] text-[#0F172A] flex items-center justify-center transition border border-[#E6E1DA] shadow-sm cursor-pointer"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -2076,41 +2074,41 @@ export const TourDetailPage: React.FC = () => {
                 img: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
               },
             ].map((rec) => (
-              <div key={rec.id} className="bg-[#0a111d]/80 backdrop-blur-md rounded-2xl border border-white/10 hover:border-sky-500/40 overflow-hidden shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between group">
+              <div key={rec.id} className="bg-white backdrop-blur-md rounded-2xl border border-[#E6E1DA] hover:border-sky-500/40 overflow-hidden shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between group">
                 <div>
-                  <div className="h-48 overflow-hidden relative bg-slate-900">
+                  <div className="h-48 overflow-hidden relative bg-white">
                     <img src={rec.img} alt={rec.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                   </div>
 
                   <div className="p-4 space-y-3">
-                    <h4 className="font-black text-xs text-white uppercase line-clamp-2 leading-snug group-hover:text-sky-300 transition">
+                    <h4 className="font-black text-xs text-[#0F172A] uppercase line-clamp-2 leading-snug group-hover:text-[#0B3B49] transition">
                       {rec.title}
                     </h4>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                    <div className="flex items-center justify-between text-[11px] text-[#526071] font-medium">
                       <span>👁 Lượt xem: {rec.views}</span>
                       <span>★ Đánh giá: 0/5</span>
                       <span>📌 Đặt chỗ: 0</span>
                     </div>
 
-                    <div className="space-y-1 text-xs text-slate-300 pt-1">
+                    <div className="space-y-1 text-xs text-[#475569] pt-1">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-sky-400" />
-                        <span>Khởi hành: <strong className="text-white">{rec.departure}</strong></span>
+                        <Calendar className="h-3.5 w-3.5 text-[#0D9488]" />
+                        <span>Khởi hành: <strong className="text-[#0F172A]">{rec.departure}</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-sky-400" />
-                        <span>Thời gian: <strong className="text-white">{rec.duration}</strong></span>
+                        <Clock className="h-3.5 w-3.5 text-[#0D9488]" />
+                        <span>Thời gian: <strong className="text-[#0F172A]">{rec.duration}</strong></span>
                       </div>
                     </div>
 
                     <div className="pt-2">
-                      <div className="text-[11px] text-slate-400">Giá từ</div>
-                      <div className="text-lg font-black text-rose-400">
-                        {rec.price.toLocaleString('vi-VN')} đ <span className="text-[11px] font-normal text-slate-400">/ Khách</span>
+                      <div className="text-[11px] text-[#526071]">Giá từ</div>
+                      <div className="text-lg font-black text-[#D95D39]">
+                        {rec.price.toLocaleString('vi-VN')} đ <span className="text-[11px] font-normal text-[#526071]">/ Khách</span>
                       </div>
-                      <div className="text-[11px] text-slate-400 font-medium mt-1">
-                        Còn lại <strong className="text-white">{rec.remaining}</strong> chỗ
+                      <div className="text-[11px] text-[#526071] font-medium mt-1">
+                        Còn lại <strong className="text-[#0F172A]">{rec.remaining}</strong> chỗ
                       </div>
                     </div>
                   </div>

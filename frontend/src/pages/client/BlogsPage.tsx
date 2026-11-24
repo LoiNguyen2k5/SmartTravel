@@ -126,7 +126,7 @@ export const BlogsPage: React.FC = () => {
 	  });
 	};
   return (
-    <div className="min-h-screen bg-[#020204] text-white">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#0F172A]">
 
       {/* Hero */}
       <div className="relative overflow-hidden pt-20 pb-14 text-center">
@@ -134,11 +134,11 @@ export const BlogsPage: React.FC = () => {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] bg-violet-600/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-violet-300 bg-violet-500/10 border border-violet-500/20 px-4 py-1.5 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-violet-700 bg-violet-500/10 border border-violet-500/20 px-4 py-1.5 rounded-full mb-6">
             <BookOpen className="h-3.5 w-3.5" />
             Cẩm nang du lịch
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white leading-normal mb-5">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0F172A] leading-normal mb-5">
             Cẩm Nang
             <span 
               className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-white to-sky-200"
@@ -147,26 +147,26 @@ export const BlogsPage: React.FC = () => {
               Khám Phá Thế Giới
             </span>
           </h1>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed mb-8">
+          <p className="text-sm text-[#526071] max-w-xl mx-auto leading-relaxed mb-8">
             Kinh nghiệm du lịch, địa điểm nổi bật, ẩm thực đặc sản — tất cả được biên soạn bởi các chuyên gia và khách hàng của Smart Travel.
           </p>
 
           {/* Search */}
-          <div className="flex items-center gap-2 max-w-md mx-auto bg-white/5 border border-white/10 focus-within:border-sky-500/40 focus-within:ring-1 focus-within:ring-sky-500/20 px-4 py-3 rounded-2xl transition-all">
+          <div className="flex items-center gap-2 max-w-md mx-auto bg-[#FAF8F5] border border-[#E6E1DA] focus-within:border-sky-500/40 focus-within:ring-1 focus-within:ring-sky-500/20 px-4 py-3 rounded-2xl transition-all">
             <Search className="h-4 w-4 text-slate-500 flex-shrink-0" />
             <input
               type="text"
               placeholder="Tìm bài viết..."
               value={searchQ}
               onChange={e => changeSearch(e.target.value)}
-              className="bg-transparent focus:outline-none w-full text-sm text-slate-200 placeholder:text-slate-500"
+              className="bg-transparent focus:outline-none w-full text-sm text-[#334155] placeholder:text-slate-500"
             />
           </div>
         </div>
       </div>
 
       {/* Category Filter */}
-      <div className="border-y border-white/8 bg-white/[0.02] py-4">
+      <div className="border-y border-[#E6E1DA] bg-[#FAF8F5] py-4">
         <div className="max-w-6xl mx-auto px-6 flex items-center gap-2 flex-wrap justify-center">
           {categories.map(cat => (
             <button
@@ -175,7 +175,7 @@ export const BlogsPage: React.FC = () => {
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 activeCat === cat.id
                   ? 'bg-sky-500 text-white shadow-[0_0_12px_rgba(56,189,248,0.3)]'
-                  : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/8'
+                  : 'bg-[#FAF8F5] text-[#526071] hover:text-[#0F172A] hover:bg-[#F4F1EC] border border-[#E6E1DA]'
               }`}
             >
               {cat.icon}{cat.label}
@@ -188,7 +188,7 @@ export const BlogsPage: React.FC = () => {
 	    id="blog-results"
 	    className="max-w-7xl mx-auto px-6 py-14 space-y-14 scroll-mt-28"
 	  >
-	    <p className="text-sm text-slate-400" aria-live="polite">
+	    <p className="text-sm text-[#526071]" aria-live="polite">
 	      Hiển thị {firstItem}–{lastItem} trong {orderedPosts.length} bài viết
 	    </p>
 
@@ -196,8 +196,8 @@ export const BlogsPage: React.FC = () => {
         {featured.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-7">
-              <Sparkles className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Nổi bật</span>
+              <Sparkles className="h-4 w-4 text-amber-700" />
+              <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Nổi bật</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {featured.map(post => (
@@ -205,17 +205,17 @@ export const BlogsPage: React.FC = () => {
 				  key={post.id}
 				  to={`/blogs/${post.id}`}
 				  state={{ from: listUrl }}
-				  className="group relative rounded-3xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-1"
+				  className="group relative rounded-3xl overflow-hidden border border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] transition-all duration-300 cursor-pointer hover:-translate-y-1"
 				  style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}
 				>
                   <div className="relative h-56 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#020204] via-black/20 to-transparent" />
-                    <span className={`absolute top-4 left-4 text-[10px] font-bold px-2.5 py-1 rounded-lg text-white ${post.tagColor}`}>{post.tag}</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B3B49]/75 via-[#0B3B49]/15 to-transparent" />
+                    <span className={`absolute top-4 left-4 text-[10px] font-bold px-2.5 py-1 rounded-lg text-[#0F172A] ${post.tagColor}`}>{post.tag}</span>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-base font-bold text-white leading-snug mb-2 group-hover:text-sky-300 transition-colors">{post.title}</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2">{post.desc}</p>
+                    <h3 className="text-base font-bold text-[#0F172A] leading-snug mb-2 group-hover:text-[#0B3B49] transition-colors">{post.title}</h3>
+                    <p className="text-xs text-[#526071] leading-relaxed mb-4 line-clamp-2">{post.desc}</p>
                     <div className="flex items-center justify-between text-[11px] text-slate-500">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {post.readTime}</span>
@@ -234,8 +234,8 @@ export const BlogsPage: React.FC = () => {
         {regular.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-7">
-              <Camera className="h-4 w-4 text-slate-400" />
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bài viết mới nhất</span>
+              <Camera className="h-4 w-4 text-[#526071]" />
+              <span className="text-xs font-bold text-[#526071] uppercase tracking-wider">Bài viết mới nhất</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {regular.map(post => (
@@ -243,16 +243,16 @@ export const BlogsPage: React.FC = () => {
 				  key={post.id}
 				  to={`/blogs/${post.id}`}
 				  state={{ from: listUrl }}
-				  className="group rounded-2xl overflow-hidden border border-white/8 bg-white/[0.03] hover:border-white/15 transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
+				  className="group rounded-2xl overflow-hidden border border-[#E6E1DA] bg-[#FAF8F5] hover:border-[#CBD5E1] transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
 				>
                   <div className="relative h-44 overflow-hidden">
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <span className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md text-white ${post.tagColor}`}>{post.tag}</span>
+                    <span className={`absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md text-[#0F172A] ${post.tagColor}`}>{post.tag}</span>
                   </div>
                   <div className="p-5">
-                    <h3 className="text-sm font-bold text-white leading-snug mb-2 line-clamp-2 group-hover:text-sky-300 transition-colors">{post.title}</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 mb-3">{post.desc}</p>
+                    <h3 className="text-sm font-bold text-[#0F172A] leading-snug mb-2 line-clamp-2 group-hover:text-[#0B3B49] transition-colors">{post.title}</h3>
+                    <p className="text-xs text-[#526071] leading-relaxed line-clamp-2 mb-3">{post.desc}</p>
                     <div className="flex items-center gap-3 text-[10px] text-slate-500">
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {post.readTime}</span>
                       <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views}</span>
@@ -279,7 +279,7 @@ export const BlogsPage: React.FC = () => {
 		      type="button"
 		      onClick={() => changePage(currentPage - 1)}
 		      disabled={currentPage === 1}
-		      className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+		      className="rounded-xl border border-[#CBD5E1] px-4 py-2 text-sm text-[#0F172A] hover:bg-[#F4F1EC] disabled:cursor-not-allowed disabled:opacity-40"
 		    >
 		      ← Trang trước
 		    </button>
@@ -295,7 +295,7 @@ export const BlogsPage: React.FC = () => {
 		          className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
 		            page === currentPage
 		              ? 'border-sky-500 bg-sky-600 text-white'
-		              : 'border-white/15 text-slate-300 hover:bg-white/10'
+		              : 'border-[#CBD5E1] text-[#475569] hover:bg-[#F4F1EC]'
 		          }`}
 		        >
 		          {page}
@@ -307,7 +307,7 @@ export const BlogsPage: React.FC = () => {
 		      type="button"
 		      onClick={() => changePage(currentPage + 1)}
 		      disabled={currentPage === totalPages}
-		      className="rounded-xl border border-white/15 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+		      className="rounded-xl border border-[#CBD5E1] px-4 py-2 text-sm text-[#0F172A] hover:bg-[#F4F1EC] disabled:cursor-not-allowed disabled:opacity-40"
 		    >
 		      Trang sau →
 		    </button>
@@ -316,15 +316,15 @@ export const BlogsPage: React.FC = () => {
       </div>
 
       {/* CTA */}
-      <div className="border-t border-white/8 py-16 text-center">
+      <div className="border-t border-[#E6E1DA] py-16 text-center">
         <div className="max-w-xl mx-auto px-6">
-          <h2 className="text-2xl font-black text-white mb-3">Lên kế hoạch ngay hôm nay!</h2>
-          <p className="text-sm text-slate-400 mb-7">Đã tìm được điểm đến ưng ý? Đặt tour ngay để không lỡ chỗ.</p>
+          <h2 className="text-2xl font-black text-[#0F172A] mb-3">Lên kế hoạch ngay hôm nay!</h2>
+          <p className="text-sm text-[#526071] mb-7">Đã tìm được điểm đến ưng ý? Đặt tour ngay để không lỡ chỗ.</p>
           <button
             onClick={() => navigate('/tours')}
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl text-sm font-bold text-[#0F172A] transition-all duration-300 hover:-translate-y-0.5"
             style={{
-              background: 'linear-gradient(to top, #9ad9ec 1px, #79e0f1 2px, #14a8c6 5px, #038aa8 7px, #006180 9px, #04465a 13px, #0a2a37 18px, #0a111d 32px)',
+              background: '#D95D39',
               boxShadow: '0 0 12px rgba(60,190,235,.25), 0 4px 16px -2px rgba(90,220,255,.4)',
             }}
           >

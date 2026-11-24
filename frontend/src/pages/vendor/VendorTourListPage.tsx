@@ -85,7 +85,7 @@ export const VendorTourListPage: React.FC = () => {
             }}
             className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-3 text-xs font-bold text-white hover:opacity-95 transition shadow-lg shadow-cyan-900/20 cursor-pointer"
           >
-            <Sparkles className="h-4 w-4 text-amber-300" /> Phân Tích Đánh Giá
+            <Sparkles className="h-4 w-4 text-amber-800" /> Phân Tích Đánh Giá
           </button>
           <Link
             to="/vendor/tours/create"
@@ -110,7 +110,7 @@ export const VendorTourListPage: React.FC = () => {
               onClick={() => setLifecycleFilter(tab.id as any)}
               className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 ${
                 lifecycleFilter === tab.id
-                  ? 'bg-slate-900 text-white shadow-md'
+                  ? 'bg-white text-[#0F172A] shadow-md'
                   : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
               }`}
             >
@@ -144,7 +144,7 @@ export const VendorTourListPage: React.FC = () => {
         </div>
 
         <div className="relative w-full md:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
           <input
             type="text"
             value={searchQuery}
@@ -176,8 +176,8 @@ export const VendorTourListPage: React.FC = () => {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
           </div>
         ) : filteredTours.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 space-y-2">
-            <Compass className="h-10 w-10 text-slate-300 mx-auto" />
+          <div className="text-center py-12 text-[#526071] space-y-2">
+            <Compass className="h-10 w-10 text-[#475569] mx-auto" />
             <p className="text-xs font-medium">Chưa có tour nào phù hợp với bộ lọc hiện tại.</p>
           </div>
         ) : (
@@ -195,10 +195,10 @@ export const VendorTourListPage: React.FC = () => {
                   <div>
                     <div className="relative h-44 overflow-hidden bg-slate-100">
                       <img src={t.thumbnailUrl} alt={t.title} className="w-full h-full object-cover" />
-                      <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg">
+                      <span className="absolute top-3 left-3 bg-white backdrop-blur-md text-[#0F172A] text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg">
                         {t.tourCode}
                       </span>
-                      <span className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg ${
+                      <span className={`absolute top-3 right-3 text-[#0F172A] text-[10px] font-bold px-2.5 py-1 rounded-lg ${
                         hasUpcoming ? 'bg-emerald-600' : 'bg-slate-700'
                       }`}>
                         {hasUpcoming ? 'Đang Mở Bán' : 'Đã Kết Thúc'}
@@ -224,7 +224,7 @@ export const VendorTourListPage: React.FC = () => {
                       </div>
 
                       <div className="pt-2 flex items-baseline justify-between border-t border-slate-100">
-                        <span className="text-[11px] text-slate-400 font-medium">Giá người lớn:</span>
+                        <span className="text-[11px] text-[#526071] font-medium">Giá người lớn:</span>
                         <span className="text-base font-black text-rose-600">{t.price.toLocaleString('vi-VN')} đ</span>
                       </div>
                     </div>

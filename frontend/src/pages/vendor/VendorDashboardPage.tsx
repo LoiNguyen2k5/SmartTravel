@@ -43,7 +43,7 @@ function classifyStatus(status: string | undefined): keyof typeof STATUS_GROUPS 
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
   <span className="relative group inline-flex items-center">
     {children}
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-52 rounded-xl bg-slate-900 text-white text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 hidden group-hover:block w-52 rounded-xl bg-white text-[#0F172A] text-[11px] px-3 py-2 shadow-xl leading-relaxed pointer-events-none">
       {text}
     </span>
   </span>
@@ -241,7 +241,7 @@ export const VendorDashboardPage: React.FC = () => {
             onClick={() => setShowSentimentModal(true)}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition shadow-md shadow-cyan-900/20 cursor-pointer"
           >
-            <Sparkles className="h-4 w-4 text-amber-300" /> Phân Tích Đánh Giá
+            <Sparkles className="h-4 w-4 text-amber-800" /> Phân Tích Đánh Giá
           </button>
           <button onClick={exportCSV} className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
             <Download className="h-4 w-4" /> Xuất CSV
@@ -299,23 +299,23 @@ export const VendorDashboardPage: React.FC = () => {
 
       {/* Revenue 4 cards */}
       <div>
-        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Phân Tích Doanh Thu</h2>
+        <h2 className="text-xs font-black uppercase tracking-widest text-[#526071] mb-3">Phân Tích Doanh Thu</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Gross */}
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-sky-100 p-2.5 text-sky-700"><DollarSign className="h-5 w-5" /></div>
               <Tooltip text="Tổng tiền khách thanh toán cho mọi đơn, kể cả đơn đã hủy. Chưa trừ hoàn tiền hay phí.">
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Gộp</p>
-            <p className="text-[10px] text-slate-400 mb-1">(Gross Revenue)</p>
+            <p className="text-[10px] text-[#526071] mb-1">(Gross Revenue)</p>
             <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.grossRevenue)}</h3>
             {analytics.grossRevenue > 0 ? (
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 mt-1"><ArrowUpRight className="h-3 w-3" /> +18.4% tháng trước</span>
             ) : (
-              <span className="text-[11px] text-slate-400 mt-1">Chưa có doanh thu</span>
+              <span className="text-[11px] text-[#526071] mt-1">Chưa có doanh thu</span>
             )}
           </div>
 
@@ -324,13 +324,13 @@ export const VendorDashboardPage: React.FC = () => {
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-emerald-100 p-2.5 text-emerald-700"><TrendingUp className="h-5 w-5" /></div>
               <Tooltip text="Doanh thu sau khi trừ các đơn hủy và đơn hoàn tiền. = Gross - Cancelled.">
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Doanh Thu Ròng</p>
-            <p className="text-[10px] text-slate-400 mb-1">(Net Revenue)</p>
+            <p className="text-[10px] text-[#526071] mb-1">(Net Revenue)</p>
             <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.netRevenue)}</h3>
-            <span className="text-[11px] text-slate-400">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
+            <span className="text-[11px] text-[#526071]">Sau trừ {analytics.counts.cancelled} đơn hủy</span>
           </div>
 
           {/* Net Payout */}
@@ -338,11 +338,11 @@ export const VendorDashboardPage: React.FC = () => {
             <div className="flex items-start justify-between mb-3">
               <div className="rounded-2xl bg-emerald-100 p-2.5 text-emerald-700"><Wallet className="h-5 w-5" /></div>
               <Tooltip text={`Số tiền vendor thực nhận = Net Revenue − hoa hồng platform (${COMMISSION_RATE * 100}%) − phí cổng thanh toán (${PAYMENT_FEE_RATE * 100}%).`}>
-                <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+                <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
               </Tooltip>
             </div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Thực Nhận</p>
-            <p className="text-[10px] text-slate-400 mb-1">(Net Payout)</p>
+            <p className="text-[10px] text-[#526071] mb-1">(Net Payout)</p>
             <h3 className="text-xl font-black text-slate-900">{formatCurrency(analytics.netPayout)}</h3>
             <div className="text-[11px] text-slate-500 space-y-0.5 mt-1">
               <div>Hoa hồng {COMMISSION_RATE * 100}%: <span className="text-rose-500">−{formatCurrency(analytics.commission)}</span></div>
@@ -361,13 +361,13 @@ export const VendorDashboardPage: React.FC = () => {
                 analytics.pendingSettlement > 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
               }`}><Clock className="h-5 w-5" /></div>
               <Tooltip text="Đơn đã hoàn thành tour nhưng platform chưa chuyển tiền về tài khoản vendor. Sẽ đối soát định kỳ.">
-                <Info className={`h-3.5 w-3.5 cursor-help ${analytics.pendingSettlement > 0 ? 'text-amber-400' : 'text-slate-300'}`} />
+                <Info className={`h-3.5 w-3.5 cursor-help ${analytics.pendingSettlement > 0 ? 'text-amber-700' : 'text-[#475569]'}`} />
               </Tooltip>
             </div>
             <p className={`text-[11px] font-bold uppercase tracking-wider ${
               analytics.pendingSettlement > 0 ? 'text-amber-700' : 'text-slate-500'
             }`}>Chờ Đối Soát</p>
-            <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-slate-400'}`}>(Pending Settlement)</p>
+            <p className={`text-[10px] mb-1 ${analytics.pendingSettlement > 0 ? 'text-amber-600' : 'text-[#526071]'}`}>(Pending Settlement)</p>
             <h3 className={`text-xl font-black ${
               analytics.pendingSettlement > 0 ? 'text-amber-800' : 'text-slate-900'
             }`}>{formatCurrency(analytics.pendingSettlement)}</h3>
@@ -404,13 +404,13 @@ export const VendorDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <div className="rounded-xl bg-purple-100 p-2 text-purple-700"><BarChart3 className="h-4 w-4" /></div>
             <Tooltip text="Average Order Value = Doanh thu ròng / Số đơn thanh toán thành công. Giá trị trung bình mỗi booking.">
-              <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
             </Tooltip>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">AOV</p>
-          <p className="text-[10px] text-slate-400 mb-2">Avg Order Value</p>
+          <p className="text-[10px] text-[#526071] mb-2">Avg Order Value</p>
           <p className="text-2xl font-black text-slate-900">{analytics.aov > 0 ? `${fmtM(analytics.aov)} đ` : '0 đ'}</p>
-          <p className="text-[11px] text-slate-400 mt-1">/ đơn đặt</p>
+          <p className="text-[11px] text-[#526071] mt-1">/ đơn đặt</p>
         </div>
 
         {/* Cancellation */}
@@ -418,11 +418,11 @@ export const VendorDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <div className="rounded-xl bg-rose-100 p-2 text-rose-600"><AlertTriangle className="h-4 w-4" /></div>
             <Tooltip text="Tỷ lệ hủy = Số đơn hủy / Tổng đơn. Ngành tour tỷ lệ lý tưởng < 5%.">
-              <Info className="h-3.5 w-3.5 text-slate-300 cursor-help" />
+              <Info className="h-3.5 w-3.5 text-[#475569] cursor-help" />
             </Tooltip>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Tỷ Lệ Hủy</p>
-          <p className="text-[10px] text-slate-400 mb-2">Cancellation Rate</p>
+          <p className="text-[10px] text-[#526071] mb-2">Cancellation Rate</p>
           <p className={`text-2xl font-black ${analytics.cancellationRate > 10 ? 'text-rose-600' : 'text-slate-900'}`}>{analytics.cancellationRate > 0 ? analytics.cancellationRate.toFixed(1) : '0'}%</p>
           <p className={`text-[11px] mt-1 font-bold ${analytics.cancellationRate > 10 ? 'text-rose-500' : 'text-emerald-500'}`}>
             {analytics.counts.total > 0 ? (analytics.cancellationRate > 10 ? '⚠ Cần theo dõi' : '✓ Trong ngưỡng tốt') : 'Chưa có đơn hàng'}
@@ -436,7 +436,7 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Tổng Khách</p>
           <p className="text-2xl font-black text-slate-900">{analytics.totalGuests}</p>
-          <p className="text-[11px] text-slate-400 mt-1">du khách đã trải nghiệm</p>
+          <p className="text-[11px] text-[#526071] mt-1">du khách đã trải nghiệm</p>
           <div className="mt-2 h-1.5 rounded-full bg-teal-100 overflow-hidden">
             <div className="h-full rounded-full bg-teal-500" style={{ width: `${Math.min(100, (analytics.totalGuests / 200) * 100)}%` }} />
           </div>
@@ -494,7 +494,7 @@ export const VendorDashboardPage: React.FC = () => {
             <Link to="/vendor/tours" className="text-xs font-bold text-emerald-600 hover:underline">Xem tất cả</Link>
           </div>
           {tours.length === 0 ? (
-            <p className="text-xs text-slate-400 text-center py-8">Chưa có tour nào</p>
+            <p className="text-xs text-[#526071] text-center py-8">Chưa có tour nào</p>
           ) : (
             <div className="space-y-4">
               {tours.slice(0, 4).map((t, idx) => (
@@ -504,7 +504,7 @@ export const VendorDashboardPage: React.FC = () => {
                     <img src={t.thumbnailUrl} alt={t.title} className="h-9 w-12 object-cover rounded-lg border flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-xs font-black text-slate-900 line-clamp-1">{t.title}</p>
-                      <p className="text-[10px] text-slate-400">{fmt(t.price)} đ</p>
+                      <p className="text-[10px] text-[#526071]">{fmt(t.price)} đ</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md flex-shrink-0">HOT</span>
@@ -529,11 +529,11 @@ export const VendorDashboardPage: React.FC = () => {
             <p className="text-xs text-slate-500">Lọc theo trạng thái để phân tích từng nhóm</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="h-3.5 w-3.5 text-slate-400" />
+            <Filter className="h-3.5 w-3.5 text-[#526071]" />
             {(['ALL', 'confirmed', 'pending', 'completed', 'cancelled'] as const).map((s) => {
               const labels: Record<string, string> = { ALL: 'Tất cả', confirmed: 'Xác nhận', pending: 'Chờ TT', completed: 'Hoàn thành', cancelled: 'Đã hủy' };
               return (
-                <button key={s} onClick={() => setFilterStatus(s)} className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition ${filterStatus === s ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{labels[s]}</button>
+                <button key={s} onClick={() => setFilterStatus(s)} className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition ${filterStatus === s ? 'bg-white text-[#0F172A]' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{labels[s]}</button>
               );
             })}
             <Link to="/vendor/bookings" className="flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900 ml-1">Tất cả <ChevronRight className="h-4 w-4" /></Link>
@@ -543,7 +543,7 @@ export const VendorDashboardPage: React.FC = () => {
         {loading ? (
           <div className="flex h-24 items-center justify-center"><div className="h-6 w-6 animate-spin rounded-full border-4 border-sky-600 border-t-transparent" /></div>
         ) : filteredBookings.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-xs">Không có đơn nào trong nhóm này.</div>
+          <div className="text-center py-8 text-[#526071] text-xs">Không có đơn nào trong nhóm này.</div>
         ) : (
           <div className="divide-y divide-slate-100">
             {filteredBookings.slice(0, 6).map((b) => (
@@ -552,7 +552,7 @@ export const VendorDashboardPage: React.FC = () => {
                   <img src={b.tourThumbnailUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=200&q=80'} alt={b.tourTitle} className="h-14 w-20 object-cover rounded-xl border border-slate-200 flex-shrink-0" />
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="bg-slate-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">{b.bookingCode}</span>
+                      <span className="bg-white text-[#0F172A] text-[10px] font-extrabold px-2 py-0.5 rounded-md">{b.bookingCode}</span>
                       {statusBadge(b.status)}
                     </div>
                     <h4 className="text-xs font-black text-slate-900 line-clamp-1">{b.tourTitle}</h4>
@@ -563,7 +563,7 @@ export const VendorDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right space-y-0.5">
-                  <div className="text-[11px] text-slate-400">{b.numberOfAdults} người lớn{b.numberOfChildren ? ` · ${b.numberOfChildren} trẻ em` : ''}</div>
+                  <div className="text-[11px] text-[#526071]">{b.numberOfAdults} người lớn{b.numberOfChildren ? ` · ${b.numberOfChildren} trẻ em` : ''}</div>
                   <div className="text-sm font-black text-rose-600">{fmt(b.totalPrice || 0)} đ</div>
                   <div className="text-[10px] text-emerald-600 font-bold">Ròng: {fmt(Math.round((b.totalPrice || 0) * (1 - COMMISSION_RATE - PAYMENT_FEE_RATE)))} đ</div>
                 </div>
@@ -580,7 +580,7 @@ export const VendorDashboardPage: React.FC = () => {
           <span className="text-xs font-semibold text-slate-500">Tổng: {tours.length} tour</span>
         </div>
         {tours.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">Chưa có tour nào.</p>
+          <p className="text-sm text-[#526071] text-center py-8">Chưa có tour nào.</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {tours.map((t) => (
@@ -612,11 +612,11 @@ export const VendorDashboardPage: React.FC = () => {
             <span className="text-2xl">🌐</span>
           </span>
           <div>
-            <p className="font-black text-white text-base">Quản Lý Thủ Tục Visa</p>
-            <p className="text-sm text-slate-400 mt-0.5">Thẩm định hồ sơ, duyệt giấy tờ và quản lý mẫu visa theo quốc gia</p>
+            <p className="font-black text-[#0F172A] text-base">Quản Lý Thủ Tục Visa</p>
+            <p className="text-sm text-[#526071] mt-0.5">Thẩm định hồ sơ, duyệt giấy tờ và quản lý mẫu visa theo quốc gia</p>
           </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-sky-400 group-hover:translate-x-1 transition-transform" />
+        <ChevronRight className="h-5 w-5 text-[#0D9488] group-hover:translate-x-1 transition-transform" />
       </Link>
 
       {/* AI Customer Sentiment Analysis Modal for Vendor */}

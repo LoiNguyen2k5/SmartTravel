@@ -6,7 +6,7 @@ import { AiChatWidget } from '../components/chat/AiChatWidget';
 
 export const MainLayout: React.FC = () => {
   return (
-    <div className="flex min-h-screen flex-col bg-[#020204]">
+    <div className="flex min-h-screen flex-col bg-[#FAF8F5] text-[#0F172A]">
       {/* Header Navigation Component */}
       <Navbar />
 
@@ -18,9 +18,8 @@ export const MainLayout: React.FC = () => {
       {/* Footer Component */}
       <Footer />
 
-      {/* Floating AI Chatbot Assistant 24/7 */}
+      {/* Floating Contact & AI Chatbot Action Hub (6 icons) */}
       <AiChatWidget />
     </div>
   );
 };
-

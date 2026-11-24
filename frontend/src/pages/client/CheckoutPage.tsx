@@ -777,15 +777,15 @@ export const CheckoutPage: React.FC = () => {
 
   return (
 
-    <div className="bg-[#020204] text-white min-h-screen pt-8 sm:pt-10 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+    <div className="bg-[#FAF8F5] text-[#0F172A] min-h-screen pt-8 sm:pt-10 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
 
       {/* Ambient Deep Space Radial Glows */}
 
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
+      
 
-      <div className="absolute top-1/3 -right-40 w-[600px] h-[500px] bg-indigo-600/10 rounded-full blur-[160px] pointer-events-none" />
+      
 
-      <div className="absolute bottom-10 -left-40 w-[600px] h-[500px] bg-cyan-600/10 rounded-full blur-[160px] pointer-events-none" />
+      
 
 
 
@@ -801,7 +801,7 @@ export const CheckoutPage: React.FC = () => {
 
             onClick={() => navigate(-1)} 
 
-            className="p-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition shadow-sm cursor-pointer"
+            className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#E6E1DA] text-[#475569] hover:text-[#0F172A] hover:bg-[#F4F1EC] transition shadow-sm cursor-pointer"
 
             title="Quay lại"
 
@@ -813,9 +813,9 @@ export const CheckoutPage: React.FC = () => {
 
           <div>
 
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Xác Nhận & Thanh Toán Đặt Tour</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">Xác Nhận & Thanh Toán Đặt Tour</h1>
 
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">Tích hợp thanh toán trực tuyến quét mã VietQR & Ví MoMo chuyển khoản tức thời</p>
+            <p className="text-xs sm:text-sm text-[#526071] mt-1">Tích hợp thanh toán trực tuyến quét mã VietQR & Ví MoMo chuyển khoản tức thời</p>
 
           </div>
 
@@ -827,9 +827,9 @@ export const CheckoutPage: React.FC = () => {
 
           /* SUCCESS E-TICKET CONFIRMATION SCREEN */
 
-          <div className="bg-[#0a111d]/95 backdrop-blur-2xl rounded-3xl border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.8)] p-8 max-w-2xl mx-auto text-center space-y-6 animate-in fade-in text-white">
+          <div className="bg-white backdrop-blur-2xl rounded-3xl border border-[#CBD5E1] shadow-float p-8 max-w-2xl mx-auto text-center space-y-6 animate-in fade-in text-[#0F172A]">
 
-            <div className="h-16 w-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+            <div className="h-16 w-16 bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(16,185,129,0.3)]">
 
               <CheckCircle className="h-10 w-10" />
 
@@ -839,11 +839,11 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="space-y-1">
 
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Thanh toán & Đặt tour thành công</span>
+              <span className="text-xs font-bold text-emerald-700 uppercase tracking-widest">Thanh toán & Đặt tour thành công</span>
 
-              <h2 className="text-2xl font-black text-white">Vé Điện Tử (E-Ticket) SmartTravel</h2>
+              <h2 className="text-2xl font-black text-[#0F172A]">Vé Điện Tử (E-Ticket) SmartTravel</h2>
 
-              <p className="text-xs text-slate-400">Mã đơn hàng: <strong className="text-cyan-300 font-mono">{createdBooking.bookingCode}</strong></p>
+              <p className="text-xs text-[#526071]">Mã đơn hàng: <strong className="text-[#0D9488] font-mono">{createdBooking.bookingCode}</strong></p>
 
             </div>
 
@@ -851,7 +851,7 @@ export const CheckoutPage: React.FC = () => {
 
             {/* QR Code Container */}
 
-            <div className="bg-white/[0.03] p-6 rounded-2xl border border-white/10 inline-block mx-auto space-y-3">
+            <div className="bg-[#FAF8F5] p-6 rounded-2xl border border-[#E6E1DA] inline-block mx-auto space-y-3">
 
               <img 
 
@@ -859,13 +859,13 @@ export const CheckoutPage: React.FC = () => {
 
                 alt="E-Ticket QR Code" 
 
-                className="h-48 w-48 mx-auto rounded-xl border border-white/20 shadow-md bg-white p-2"
+                className="h-48 w-48 mx-auto rounded-xl border border-[#CBD5E1] shadow-md bg-white p-2"
 
               />
 
-              <div className="text-[11px] text-slate-400 font-semibold flex items-center justify-center gap-1">
+              <div className="text-[11px] text-[#526071] font-semibold flex items-center justify-center gap-1">
 
-                <QrCode className="h-4 w-4 text-sky-400" /> Quét mã QR tại quầy làm thủ tục tour
+                <QrCode className="h-4 w-4 text-[#0D9488]" /> Quét mã QR tại quầy làm thủ tục tour
 
               </div>
 
@@ -875,21 +875,21 @@ export const CheckoutPage: React.FC = () => {
 
             {/* Booking Specs */}
 
-            <div className="bg-white/[0.03] p-5 rounded-2xl text-left text-xs space-y-2.5 border border-white/10">
+            <div className="bg-[#FAF8F5] p-5 rounded-2xl text-left text-xs space-y-2.5 border border-[#E6E1DA]">
 
-              <div className="flex justify-between border-b border-white/10 pb-2">
+              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-slate-400">Tên Tour:</span>
+                <span className="text-[#526071]">Tên Tour:</span>
 
-                <span className="font-bold text-white">{createdBooking.tourTitle || tourTitle}</span>
+                <span className="font-bold text-[#0F172A]">{createdBooking.tourTitle || tourTitle}</span>
 
               </div>
 
-              <div className="flex justify-between border-b border-white/10 pb-2">
+              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-slate-400">Đơn vị tổ chức (Vendor):</span>
+                <span className="text-[#526071]">Đơn vị tổ chức (Vendor):</span>
 
-                <span className="font-bold text-sky-400 flex items-center gap-1">
+                <span className="font-bold text-[#0D9488] flex items-center gap-1">
 
                   <Building2 className="h-3.5 w-3.5" />
 
@@ -899,35 +899,35 @@ export const CheckoutPage: React.FC = () => {
 
               </div>
 
-              <div className="flex justify-between border-b border-white/10 pb-2">
+              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-slate-400">Người liên hệ:</span>
+                <span className="text-[#526071]">Người liên hệ:</span>
 
-                <span className="font-semibold text-white">{createdBooking.contactName} ({createdBooking.contactPhone})</span>
-
-              </div>
-
-              <div className="flex justify-between border-b border-white/10 pb-2">
-
-                <span className="text-slate-400">Số lượng khách:</span>
-
-                <span className="font-semibold text-white">{createdBooking.numberOfAdults} Người lớn {createdBooking.numberOfChildren ? `, ${createdBooking.numberOfChildren} Trẻ em` : ''}</span>
+                <span className="font-semibold text-[#0F172A]">{createdBooking.contactName} ({createdBooking.contactPhone})</span>
 
               </div>
 
-              <div className="flex justify-between border-b border-white/10 pb-2">
+              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
 
-                <span className="text-slate-400">Tiêu chuẩn phòng:</span>
+                <span className="text-[#526071]">Số lượng khách:</span>
 
-                <span className="font-bold text-emerald-400">{roomAllocation}</span>
+                <span className="font-semibold text-[#0F172A]">{createdBooking.numberOfAdults} Người lớn {createdBooking.numberOfChildren ? `, ${createdBooking.numberOfChildren} Trẻ em` : ''}</span>
 
               </div>
 
-              <div className="flex justify-between pt-1 text-sm font-black text-white">
+              <div className="flex justify-between border-b border-[#E6E1DA] pb-2">
+
+                <span className="text-[#526071]">Tiêu chuẩn phòng:</span>
+
+                <span className="font-bold text-emerald-700">{roomAllocation}</span>
+
+              </div>
+
+              <div className="flex justify-between pt-1 text-sm font-black text-[#0F172A]">
 
                 <span>Tổng giá trị tour đã thanh toán:</span>
 
-                <span className="text-rose-400">{formatCurrency(createdBooking.totalPrice || finalPayAmount)}</span>
+                <span className="text-[#D95D39]">{formatCurrency(createdBooking.totalPrice || finalPayAmount)}</span>
 
               </div>
 
@@ -953,7 +953,7 @@ export const CheckoutPage: React.FC = () => {
 
                 onClick={() => navigate('/tours')}
 
-                className="flex-1 rounded-xl border border-white/20 text-slate-300 py-3 text-xs font-bold hover:bg-white/10 hover:text-white transition"
+                className="flex-1 rounded-xl border border-[#CBD5E1] text-[#475569] py-3 text-xs font-bold hover:bg-[#F4F1EC] hover:text-[#0F172A] transition"
 
               >
 
@@ -981,11 +981,11 @@ export const CheckoutPage: React.FC = () => {
 
               {/* Contact Information Box */}
 
-              <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-4">
+              <div className="bg-white backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-4">
 
-                <h3 className="font-black text-white text-base border-b border-white/10 pb-3 flex items-center gap-2">
+                <h3 className="font-black text-[#0F172A] text-base border-b border-[#E6E1DA] pb-3 flex items-center gap-2">
 
-                  <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-black border border-sky-500/30">1</span>
+                  <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-[#0D9488] flex items-center justify-center text-xs font-black border border-sky-500/30">1</span>
 
                   Thông tin người đặt tour
 
@@ -997,7 +997,7 @@ export const CheckoutPage: React.FC = () => {
 
                   <div className="space-y-1.5">
 
-                    <label className="font-bold text-slate-300">Họ và tên người đại diện *</label>
+                    <label className="font-bold text-[#475569]">Họ và tên người đại diện *</label>
 
                     <input
 
@@ -1011,7 +1011,7 @@ export const CheckoutPage: React.FC = () => {
 
                       placeholder="Nguyễn Bảo Lợi"
 
-                      className="w-full rounded-xl border border-white/10 px-3.5 py-2.5 bg-white/[0.04] text-white placeholder-slate-500 focus:border-cyan-400 focus:bg-white/[0.08] focus:outline-none font-medium transition"
+                      className="w-full rounded-xl border border-[#E6E1DA] px-3.5 py-2.5 bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400 focus:border-cyan-400 focus:bg-[#F4F1EC] focus:outline-none font-medium transition"
 
                     />
 
@@ -1021,7 +1021,7 @@ export const CheckoutPage: React.FC = () => {
 
                   <div className="space-y-1.5">
 
-                    <label className="font-bold text-slate-300">Số điện thoại liên hệ *</label>
+                    <label className="font-bold text-[#475569]">Số điện thoại liên hệ *</label>
 
                     <input
 
@@ -1035,7 +1035,7 @@ export const CheckoutPage: React.FC = () => {
 
                       placeholder="0988 776 655"
 
-                      className="w-full rounded-xl border border-white/10 px-3.5 py-2.5 bg-white/[0.04] text-white placeholder-slate-500 focus:border-cyan-400 focus:bg-white/[0.08] focus:outline-none font-medium transition"
+                      className="w-full rounded-xl border border-[#E6E1DA] px-3.5 py-2.5 bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400 focus:border-cyan-400 focus:bg-[#F4F1EC] focus:outline-none font-medium transition"
 
                     />
 
@@ -1045,7 +1045,7 @@ export const CheckoutPage: React.FC = () => {
 
                   <div className="space-y-1.5 md:col-span-2">
 
-                    <label className="font-bold text-slate-300">Email nhận vé điện tử (E-Ticket) *</label>
+                    <label className="font-bold text-[#475569]">Email nhận vé điện tử (E-Ticket) *</label>
 
                     <input
 
@@ -1059,7 +1059,7 @@ export const CheckoutPage: React.FC = () => {
 
                       placeholder={activeUser?.email || "nguyenbaoloicv@gmail.com"}
 
-                      className="w-full rounded-xl border border-white/10 px-3.5 py-2.5 bg-white/[0.04] text-white placeholder-slate-500 focus:border-cyan-400 focus:bg-white/[0.08] focus:outline-none font-medium transition"
+                      className="w-full rounded-xl border border-[#E6E1DA] px-3.5 py-2.5 bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400 focus:border-cyan-400 focus:bg-[#F4F1EC] focus:outline-none font-medium transition"
 
                     />
 
@@ -1069,7 +1069,7 @@ export const CheckoutPage: React.FC = () => {
 
                   <div className="space-y-1.5 md:col-span-2">
 
-                    <label className="font-bold text-slate-300">Ghi chú đặc biệt (Tùy chọn)</label>
+                    <label className="font-bold text-[#475569]">Ghi chú đặc biệt (Tùy chọn)</label>
 
                     <textarea
 
@@ -1081,7 +1081,7 @@ export const CheckoutPage: React.FC = () => {
 
                       placeholder="Ví dụ: Đặt chỗ cho chuyến trải nghiệm gia đình..."
 
-                      className="w-full rounded-xl border border-white/10 px-3.5 py-2.5 bg-white/[0.04] text-white placeholder-slate-500 focus:border-cyan-400 focus:bg-white/[0.08] focus:outline-none font-medium transition"
+                      className="w-full rounded-xl border border-[#E6E1DA] px-3.5 py-2.5 bg-[#FAF8F5] text-[#0F172A] placeholder-slate-400 focus:border-cyan-400 focus:bg-[#F4F1EC] focus:outline-none font-medium transition"
 
                     />
 
@@ -1095,19 +1095,19 @@ export const CheckoutPage: React.FC = () => {
 
               {/* Room Allocation & Accommodation Box */}
 
-              <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-4">
+              <div className="bg-white backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-4">
 
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3">
 
-                  <h3 className="font-black text-white text-base flex items-center gap-2">
+                  <h3 className="font-black text-[#0F172A] text-base flex items-center gap-2">
 
-                    <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-black border border-sky-500/30">2</span>
+                    <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-[#0D9488] flex items-center justify-center text-xs font-black border border-sky-500/30">2</span>
 
                     Tiêu chuẩn lưu trú & Phân bổ phòng
 
                   </h3>
 
-                  <span className="text-[11px] font-bold text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/30">
+                  <span className="text-[11px] font-bold text-[#0D9488] bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/30">
 
                     Tiêu chuẩn 02 khách/phòng
 
@@ -1119,15 +1119,15 @@ export const CheckoutPage: React.FC = () => {
 
                 <div className="space-y-3 text-xs">
 
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6E1DA] space-y-2">
 
                     <div className="flex items-center justify-between">
 
-                      <span className="font-bold text-slate-400 text-[11px] uppercase tracking-wider">Phân bổ phòng dự kiến:</span>
+                      <span className="font-bold text-[#526071] text-[11px] uppercase tracking-wider">Phân bổ phòng dự kiến:</span>
 
                       {singleRoomRequired && (
 
-                        <span className="text-[10px] font-black text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
+                        <span className="text-[10px] font-black text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30">
 
                           Phòng đơn riêng biệt
 
@@ -1137,13 +1137,13 @@ export const CheckoutPage: React.FC = () => {
 
                     </div>
 
-                    <div className="text-sm font-extrabold text-white flex items-center gap-2">
+                    <div className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
 
                       🏨 {roomAllocation}
 
                     </div>
 
-                    <p className="text-[11px] text-slate-400 leading-relaxed pt-1.5 border-t border-white/10">
+                    <p className="text-[11px] text-[#526071] leading-relaxed pt-1.5 border-t border-[#E6E1DA]">
 
                       {singleRoomRequired
 
@@ -1157,9 +1157,9 @@ export const CheckoutPage: React.FC = () => {
 
 
 
-                  <div className="flex items-center gap-2 text-[11px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl">
+                  <div className="flex items-center gap-2 text-[11px] text-emerald-700 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl">
 
-                    <ShieldCheck className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                    <ShieldCheck className="h-4 w-4 text-emerald-700 flex-shrink-0" />
 
                     <span>Đoàn cam kết tối thiểu <strong>{minParticipants} khách</strong>. Nếu không đủ đoàn trước ngày đi, hoàn tiền 100%.</span>
 
@@ -1200,7 +1200,7 @@ export const CheckoutPage: React.FC = () => {
 
                     <h4 className="font-bold text-blue-400 text-sm">Hành trình yêu cầu Visa</h4>
 
-                    <p className="text-xs text-blue-200/70 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
 
                       Để thuận tiện cho bạn, thủ tục nộp giấy tờ Visa sẽ được thực hiện <strong>sau khi đặt tour</strong>. Bạn có thể upload hồ sơ bất cứ lúc nào trong mục <strong>Lịch sử đặt tour</strong>.
 
@@ -1216,7 +1216,7 @@ export const CheckoutPage: React.FC = () => {
 
               {/* Payment Option & Method Box */}
 
-              <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-6">
+              <div className="bg-white backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-6">
 
                 
 
@@ -1224,9 +1224,9 @@ export const CheckoutPage: React.FC = () => {
 
                 <div className="space-y-3">
 
-                  <h3 className="font-black text-white text-base border-b border-white/10 pb-3 flex items-center gap-2">
+                  <h3 className="font-black text-[#0F172A] text-base border-b border-[#E6E1DA] pb-3 flex items-center gap-2">
 
-                    <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-black border border-sky-500/30">3</span>
+                    <span className="h-6 w-6 rounded-lg bg-sky-500/20 text-[#0D9488] flex items-center justify-center text-xs font-black border border-sky-500/30">3</span>
 
                     Tùy chọn thanh toán
 
@@ -1246,13 +1246,13 @@ export const CheckoutPage: React.FC = () => {
 
                           ? 'border-cyan-500 bg-cyan-500/15 shadow-[0_0_20px_rgba(34,211,238,0.15)]'
 
-                          : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20'
+                          : 'border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] hover:border-[#CBD5E1]'
 
                       }`}
 
                     >
 
-                      <div className="flex items-center justify-between font-bold text-xs text-white">
+                      <div className="flex items-center justify-between font-bold text-xs text-[#0F172A]">
 
                         <span>Thanh toán 100% trọn gói</span>
 
@@ -1260,9 +1260,9 @@ export const CheckoutPage: React.FC = () => {
 
                       </div>
 
-                      <p className="text-[11px] text-slate-400 mt-1">Thanh toán trọn gói và nhận ngay vé điện tử.</p>
+                      <p className="text-[11px] text-[#526071] mt-1">Thanh toán trọn gói và nhận ngay vé điện tử.</p>
 
-                      <div className="text-sm font-black text-rose-400 mt-2">{formatCurrency(totalAfterDiscount)}</div>
+                      <div className="text-sm font-black text-[#D95D39] mt-2">{formatCurrency(totalAfterDiscount)}</div>
 
                     </div>
 
@@ -1278,13 +1278,13 @@ export const CheckoutPage: React.FC = () => {
 
                           ? 'border-cyan-500 bg-cyan-500/15 shadow-[0_0_20px_rgba(34,211,238,0.15)]'
 
-                          : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20'
+                          : 'border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] hover:border-[#CBD5E1]'
 
                       }`}
 
                     >
 
-                      <div className="flex items-center justify-between font-bold text-xs text-white">
+                      <div className="flex items-center justify-between font-bold text-xs text-[#0F172A]">
 
                         <span>Đặt cọc 30% giữ chỗ</span>
 
@@ -1292,9 +1292,9 @@ export const CheckoutPage: React.FC = () => {
 
                       </div>
 
-                      <p className="text-[11px] text-slate-400 mt-1">Đặt cọc giữ chỗ trước chuyến đi.</p>
+                      <p className="text-[11px] text-[#526071] mt-1">Đặt cọc giữ chỗ trước chuyến đi.</p>
 
-                      <div className="text-sm font-black text-cyan-400 mt-2">{formatCurrency(Math.round(totalAfterDiscount * 0.3))}</div>
+                      <div className="text-sm font-black text-[#0D9488] mt-2">{formatCurrency(Math.round(totalAfterDiscount * 0.3))}</div>
 
                     </div>
 
@@ -1306,9 +1306,9 @@ export const CheckoutPage: React.FC = () => {
 
                 {/* Gateway Methods Choice */}
 
-                <div className="space-y-3 pt-4 border-t border-white/10">
+                <div className="space-y-3 pt-4 border-t border-[#E6E1DA]">
 
-                  <h4 className="font-bold text-xs text-slate-300 uppercase tracking-wider">Phương thức thanh toán</h4>
+                  <h4 className="font-bold text-xs text-[#475569] uppercase tracking-wider">Phương thức thanh toán</h4>
 
 
 
@@ -1382,7 +1382,7 @@ export const CheckoutPage: React.FC = () => {
 
                               ? 'border-emerald-500 bg-emerald-500/15 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
 
-                              : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20'
+                              : 'border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] hover:border-[#CBD5E1]'
 
                           }`}
 
@@ -1390,7 +1390,7 @@ export const CheckoutPage: React.FC = () => {
 
                           <div className="flex items-center gap-3.5">
 
-                            <div className={`h-10 w-12 rounded-xl ${m.color} text-white font-extrabold text-[10px] flex items-center justify-center gap-1 shadow-md`}>
+                            <div className={`h-10 w-12 rounded-xl ${m.color} text-[#0F172A] font-extrabold text-[10px] flex items-center justify-center gap-1 shadow-md`}>
 
                               <IconComp className="h-5 w-5" />
 
@@ -1398,9 +1398,9 @@ export const CheckoutPage: React.FC = () => {
 
                             <div>
 
-                              <div className="font-bold text-xs text-white">{m.name}</div>
+                              <div className="font-bold text-xs text-[#0F172A]">{m.name}</div>
 
-                              <div className="text-[11px] text-slate-400 leading-tight mt-0.5">{m.sub}</div>
+                              <div className="text-[11px] text-[#526071] leading-tight mt-0.5">{m.sub}</div>
 
                             </div>
 
@@ -1428,52 +1428,52 @@ export const CheckoutPage: React.FC = () => {
 
             <aside className="lg:col-span-1 space-y-6">
 
-              <div className="bg-[#0a111d]/90 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-4 sticky top-28">
+              <div className="bg-white backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-[#E6E1DA] shadow-card space-y-4 sticky top-28">
 
-                <h3 className="font-black text-white text-base border-b border-white/10 pb-3">Tóm tắt đơn đặt tour</h3>
+                <h3 className="font-black text-[#0F172A] text-base border-b border-[#E6E1DA] pb-3">Tóm tắt đơn đặt tour</h3>
 
 
 
                 <div className="space-y-2 text-xs">
 
-                  <div className="font-extrabold text-white text-sm line-clamp-2 leading-snug">
+                  <div className="font-extrabold text-[#0F172A] text-sm line-clamp-2 leading-snug">
 
                     {tourTitle}
 
                   </div>
 
-                  <div className="text-slate-400 font-medium flex items-center gap-1">
+                  <div className="text-[#526071] font-medium flex items-center gap-1">
 
-                    <span>📅 Khởi hành: <strong className="text-cyan-300">{stateData.departureDate || '15-09-2026'}</strong></span>
+                    <span>📅 Khởi hành: <strong className="text-[#0D9488]">{stateData.departureDate || '15-09-2026'}</strong></span>
 
                   </div>
 
-                  <div className="text-slate-400 font-medium flex items-center gap-1.5 pt-0.5">
+                  <div className="text-[#526071] font-medium flex items-center gap-1.5 pt-0.5">
 
-                    <Building2 className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+                    <Building2 className="h-3.5 w-3.5 text-[#0D9488] flex-shrink-0" />
 
-                    <span>Đơn vị tổ chức: <strong className="text-sky-300 font-bold">{fetchedVendorName || 'NewTour Travel Company'}</strong></span>
+                    <span>Đơn vị tổ chức: <strong className="text-[#0B3B49] font-bold">{fetchedVendorName || 'NewTour Travel Company'}</strong></span>
 
                   </div>
 
                   {/* Group Flight / Transport Summary in Checkout Sidebar */}
                   <div className="mt-2 rounded-xl bg-teal-500/10 border border-teal-500/25 p-3 space-y-1.5 text-[11px]">
-                    <div className="font-extrabold text-teal-300 flex items-center justify-between gap-2">
+                    <div className="font-extrabold text-[#0B3B49] flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5">
-                        {checkoutTransport.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-teal-400" /> : <Bus className="h-3.5 w-3.5 text-teal-400" />}
+                        {checkoutTransport.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-[#0D9488]" /> : <Bus className="h-3.5 w-3.5 text-[#0D9488]" />}
                         {checkoutTransport.badgeLabel} ({checkoutTransport.fromCode} ⇄ {checkoutTransport.toCode})
                       </span>
-                      <span className="text-[10px] font-bold text-sky-300">
+                      <span className="text-[10px] font-bold text-[#0B3B49]">
                         {checkoutTransport.outbound.code}/{checkoutTransport.inbound.code}
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-300">
+                    <div className="text-[10px] text-[#475569]">
                       • <strong>Hãng & Hành lý:</strong> {checkoutTransport.carrier} ({checkoutTransport.baggageSummary})
                     </div>
-                    <div className="text-[10px] text-teal-200/90">
+                    <div className="text-[10px] text-[#0B3B49]">
                       • <strong>Điểm tập trung:</strong> {checkoutTransport.meetingPoint}
                     </div>
-                    <div className="text-[10px] text-amber-300/90">
+                    <div className="text-[10px] text-amber-800">
                       • {checkoutTransport.idDocumentNotice}
                     </div>
                   </div>
@@ -1482,13 +1482,13 @@ export const CheckoutPage: React.FC = () => {
 
 
 
-                <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-white/10">
+                <div className="space-y-2 text-xs text-[#526071] pt-3 border-t border-[#E6E1DA]">
 
                   <div className="flex justify-between">
 
                     <span>Người lớn ({adults} x {formatCurrency(adultPrice)}):</span>
 
-                    <span className="font-semibold text-white">{formatCurrency(adultPrice * adults)}</span>
+                    <span className="font-semibold text-[#0F172A]">{formatCurrency(adultPrice * adults)}</span>
 
                   </div>
 
@@ -1498,7 +1498,7 @@ export const CheckoutPage: React.FC = () => {
 
                       <span>Trẻ em ({children} x {formatCurrency(childPrice)}):</span>
 
-                      <span className="font-semibold text-white">{formatCurrency(childPrice * children)}</span>
+                      <span className="font-semibold text-[#0F172A]">{formatCurrency(childPrice * children)}</span>
 
                     </div>
 
@@ -1506,7 +1506,7 @@ export const CheckoutPage: React.FC = () => {
 
                   {singleRoomRequired && singleRoomSurchargeAmount > 0 && (
 
-                    <div className="flex justify-between text-amber-400 font-semibold">
+                    <div className="flex justify-between text-amber-700 font-semibold">
 
                       <span>Phụ thu phòng đơn ({adults} phòng):</span>
 
@@ -1518,13 +1518,13 @@ export const CheckoutPage: React.FC = () => {
 
                   {/* Voucher display & selection */}
 
-                  <div className="pt-2 border-t border-white/10 space-y-1">
+                  <div className="pt-2 border-t border-[#E6E1DA] space-y-1">
 
                     <div className="flex items-center justify-between">
 
-                      <span className="text-slate-300 font-medium flex items-center gap-1">
+                      <span className="text-[#475569] font-medium flex items-center gap-1">
 
-                        <Ticket className="h-3.5 w-3.5 text-cyan-400" /> Mã khuyến mãi:
+                        <Ticket className="h-3.5 w-3.5 text-[#0D9488]" /> Mã khuyến mãi:
 
                       </span>
 
@@ -1534,7 +1534,7 @@ export const CheckoutPage: React.FC = () => {
 
                         onClick={() => setShowVoucherModal(true)}
 
-                        className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] text-[#0D9488] hover:text-[#0D9488] font-bold transition flex items-center gap-1 cursor-pointer"
 
                       >
 
@@ -1548,7 +1548,7 @@ export const CheckoutPage: React.FC = () => {
 
                     {currentDiscountAmount > 0 && (
 
-                      <div className="flex justify-between text-emerald-400 font-bold">
+                      <div className="flex justify-between text-emerald-700 font-bold">
 
                         <span>Đã giảm ({currentVoucherCode}):</span>
 
@@ -1561,16 +1561,16 @@ export const CheckoutPage: React.FC = () => {
                   </div>
 
                   {visaServiceFeeTotal > 0 && (
-                    <div className="flex justify-between pt-2 text-xs font-bold text-sky-300">
+                    <div className="flex justify-between pt-2 text-xs font-bold text-[#0B3B49]">
                       <span>Phí dịch vụ ủy quyền Visa ({totalGuestsCount} khách):</span>
                       <span>+{formatCurrency(visaServiceFeeTotal)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between pt-2 border-t border-white/10 text-sm font-black text-white">
+                  <div className="flex justify-between pt-2 border-t border-[#E6E1DA] text-sm font-black text-[#0F172A]">
 
                     <span>Tổng đơn hàng:</span>
 
-                    <span className="text-rose-400">{formatCurrency(totalAfterDiscount)}</span>
+                    <span className="text-[#D95D39]">{formatCurrency(totalAfterDiscount)}</span>
 
                   </div>
 
@@ -1582,13 +1582,13 @@ export const CheckoutPage: React.FC = () => {
 
                 <div className="bg-emerald-500/10 border border-emerald-500/25 p-4 rounded-2xl text-xs space-y-1">
 
-                  <div className="text-slate-300 font-medium">Tổng số tiền thanh toán hiển thị:</div>
+                  <div className="text-[#475569] font-medium">Tổng số tiền thanh toán hiển thị:</div>
 
-                  <div className="text-2xl font-black text-emerald-400">{formatCurrency(finalPayAmount)}</div>
+                  <div className="text-2xl font-black text-emerald-700">{formatCurrency(finalPayAmount)}</div>
 
                   {paymentOption === 'DEPOSIT' && (
 
-                    <div className="text-[10px] text-emerald-300 font-semibold">
+                    <div className="text-[10px] text-emerald-700 font-semibold">
 
                       (Đã áp dụng mức đặt cọc 30% giữ chỗ)
 
@@ -1608,7 +1608,7 @@ export const CheckoutPage: React.FC = () => {
 
                     onClick={handleSavePendingBooking}
 
-                    className="w-full rounded-2xl bg-[#0a111d] border border-white/20 hover:bg-white/10 text-slate-300 py-3.5 text-xs font-bold transition flex items-center justify-center gap-2"
+                    className="w-full rounded-2xl bg-white border border-[#CBD5E1] hover:bg-[#F4F1EC] text-[#475569] py-3.5 text-xs font-bold transition flex items-center justify-center gap-2"
 
                   >
 
@@ -1638,9 +1638,9 @@ export const CheckoutPage: React.FC = () => {
 
 
 
-                <div className="flex items-center gap-2 text-[10px] text-slate-400 justify-center">
+                <div className="flex items-center gap-2 text-[10px] text-[#526071] justify-center">
 
-                  <ShieldCheck className="h-4 w-4 text-emerald-400" /> Cổng thanh toán VietQR chuẩn Napas 24/7
+                  <ShieldCheck className="h-4 w-4 text-emerald-700" /> Cổng thanh toán VietQR chuẩn Napas 24/7
 
                 </div>
 

@@ -108,7 +108,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020204] text-white">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#0F172A]">
 
       {/* Hero */}
       <div className="relative overflow-hidden pt-20 pb-14 text-center">
@@ -116,17 +116,17 @@ export const ContactPage: React.FC = () => {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] bg-emerald-600/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full mb-6">
             <HeadphonesIcon className="h-3.5 w-3.5" />
             Luôn sẵn sàng hỗ trợ bạn
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white leading-snug mb-4">
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0F172A] leading-snug mb-4">
             Liên Hệ
             <span className="block mt-2.5 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-200">
               Smart Travel
             </span>
           </h1>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm text-[#526071] max-w-xl mx-auto leading-relaxed">
             Đội ngũ tư vấn viên chuyên nghiệp luôn sẵn sàng hỗ trợ bạn — từ lựa chọn tour đến thủ tục visa và mọi vấn đề phát sinh trong hành trình.
           </p>
         </div>
@@ -142,7 +142,7 @@ export const ContactPage: React.FC = () => {
               href={c.href ?? undefined}
               target={c.href?.startsWith('http') ? '_blank' : undefined}
               rel="noreferrer"
-              className={`group relative rounded-2xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] p-6 transition-all duration-300 hover:-translate-y-1 ${c.href ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`group relative rounded-2xl border border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] p-6 transition-all duration-300 hover:-translate-y-1 ${c.href ? 'cursor-pointer' : 'cursor-default'}`}
               style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
             >
               <div
@@ -150,13 +150,13 @@ export const ContactPage: React.FC = () => {
                 style={{ background: `radial-gradient(350px circle at 50% 0%, ${c.glow}, transparent 70%)` }}
               />
               <div
-                className={`relative inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} text-white mb-4`}
+                className={`relative inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${c.color} text-[#0F172A] mb-4`}
                 style={{ boxShadow: `0 6px 20px ${c.glow}` }}
               >
                 {c.icon}
               </div>
               <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-1">{c.label}</div>
-              <div className="text-sm font-bold text-white mb-1 group-hover:text-sky-300 transition-colors">{c.value}</div>
+              <div className="text-sm font-bold text-[#0F172A] mb-1 group-hover:text-[#0B3B49] transition-colors">{c.value}</div>
               <div className="text-[11px] text-slate-500">{c.sub}</div>
             </a>
           ))}
@@ -166,33 +166,33 @@ export const ContactPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
           {/* Contact Form */}
-          <div className="rounded-3xl border border-white/8 bg-white/[0.03] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+          <div className="rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
             <div className="flex items-center gap-3 mb-7">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-[0_4px_16px_rgba(56,189,248,0.3)]">
                 <MessageSquare className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Gửi tin nhắn</h2>
+                <h2 className="text-base font-bold text-[#0F172A]">Gửi tin nhắn</h2>
                 <p className="text-[11px] text-slate-500">Chúng tôi phản hồi trong vòng 2 giờ</p>
               </div>
             </div>
 
             {sent ? (
               <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-700 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
                   <CheckCircle2 className="h-9 w-9" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Gửi tin nhắn thành công!</h3>
-                <p className="text-sm text-slate-300 max-w-md leading-relaxed">
+                <h3 className="text-xl font-bold text-[#0F172A]">Gửi tin nhắn thành công!</h3>
+                <p className="text-sm text-[#475569] max-w-md leading-relaxed">
                   Tin nhắn của bạn đã được chuyển tiếp trực tiếp đến hộp thư hỗ trợ:{' '}
-                  <strong className="text-sky-300">tiemnet.coaching.y3@gmail.com</strong>
+                  <strong className="text-[#0B3B49]">tiemnet.coaching.y3@gmail.com</strong>
                 </p>
-                <p className="text-xs text-slate-400 max-w-sm">
-                  Đội ngũ chăm sóc khách hàng Smart Travel sẽ kiểm tra nội dung và phản hồi qua email <span className="text-white font-medium">{form.email}</span> trong thời gian sớm nhất.
+                <p className="text-xs text-[#526071] max-w-sm">
+                  Đội ngũ chăm sóc khách hàng Smart Travel sẽ kiểm tra nội dung và phản hồi qua email <span className="text-[#0F172A] font-medium">{form.email}</span> trong thời gian sớm nhất.
                 </p>
                 <button 
                   onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }); }}
-                  className="mt-3 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-cyan-300 border border-white/10 transition cursor-pointer"
+                  className="mt-3 px-6 py-2.5 rounded-xl bg-[#F4F1EC] hover:bg-[#E6F4F1] text-xs font-bold text-[#0D9488] border border-[#E6E1DA] transition cursor-pointer"
                 >
                   Gửi tin nhắn khác →
                 </button>
@@ -201,33 +201,33 @@ export const ContactPage: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên *</label>
+                    <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Họ và tên *</label>
                     <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="Nguyễn Văn A"
-                      className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none transition"
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1DA] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-[#0F172A] placeholder:text-slate-600 focus:outline-none transition"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</label>
+                    <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Số điện thoại</label>
                     <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                       placeholder="0901 234 567"
-                      className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none transition"
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1DA] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-[#0F172A] placeholder:text-slate-600 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email *</label>
+                  <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Email *</label>
                   <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="you@email.com"
-                    className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none transition"
+                    className="w-full bg-[#FAF8F5] border border-[#E6E1DA] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-[#0F172A] placeholder:text-slate-600 focus:outline-none transition"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chủ đề</label>
+                  <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Chủ đề</label>
                   <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition [&>option]:bg-slate-900">
+                    className="w-full bg-[#FAF8F5] border border-[#E6E1DA] focus:border-sky-500/50 rounded-xl px-4 py-2.5 text-sm text-[#0F172A] focus:outline-none transition [&>option]:bg-white">
                     <option value="">Chọn chủ đề...</option>
                     <option value="Tư vấn tour du lịch">Tư vấn tour du lịch</option>
                     <option value="Hỗ trợ đặt tour / thanh toán">Hỗ trợ đặt tour / thanh toán</option>
@@ -238,15 +238,15 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tin nhắn *</label>
+                  <label className="text-[11px] font-bold text-[#526071] uppercase tracking-wider">Tin nhắn *</label>
                   <textarea required rows={4} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
                     placeholder="Cho chúng tôi biết bạn cần hỗ trợ gì..."
-                    className="w-full bg-white/5 border border-white/10 focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none transition resize-none"
+                    className="w-full bg-[#FAF8F5] border border-[#E6E1DA] focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/20 rounded-xl px-4 py-2.5 text-sm text-[#0F172A] placeholder:text-slate-600 focus:outline-none transition resize-none"
                   />
                 </div>
 
                 {errorMsg && (
-                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs">
+                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 text-xs">
                     {errorMsg}
                   </div>
                 )}
@@ -254,9 +254,9 @@ export const ContactPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-[#0F172A] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   style={{
-                    background: 'linear-gradient(to top, #9ad9ec 1px, #79e0f1 2px, #14a8c6 5px, #038aa8 7px, #006180 9px, #04465a 13px, #0a2a37 18px, #0a111d 32px)',
+                    background: '#D95D39',
                     boxShadow: '0 0 12px rgba(60,190,235,.20), 0 4px 16px -2px rgba(90,220,255,.35)',
                   }}
                 >
@@ -276,23 +276,23 @@ export const ContactPage: React.FC = () => {
 
           {/* FAQ + Social */}
           <div className="space-y-6">
-            <div className="rounded-3xl border border-white/8 bg-white/[0.03] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+            <div className="rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] p-8" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
               <div className="flex items-center gap-2 mb-6">
-                <Sparkles className="h-4 w-4 text-amber-400" />
-                <h2 className="text-base font-bold text-white">Câu hỏi thường gặp</h2>
+                <Sparkles className="h-4 w-4 text-amber-700" />
+                <h2 className="text-base font-bold text-[#0F172A]">Câu hỏi thường gặp</h2>
               </div>
               <div className="space-y-3">
                 {faqs.map((faq, i) => (
-                  <div key={i} className="border border-white/8 rounded-2xl overflow-hidden">
+                  <div key={i} className="border border-[#E6E1DA] rounded-2xl overflow-hidden">
                     <button
                       onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-white hover:text-sky-300 transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-[#0F172A] hover:text-[#0B3B49] transition-colors"
                     >
                       {faq.q}
                       <span className={`text-slate-500 transition-transform duration-200 ml-3 flex-shrink-0 ${openFaq === i ? 'rotate-180' : ''}`}>▾</span>
                     </button>
                     {openFaq === i && (
-                      <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-white/8 pt-3">
+                      <div className="px-5 pb-4 text-xs text-[#526071] leading-relaxed border-t border-[#E6E1DA] pt-3">
                         {faq.a}
                       </div>
                     )}
@@ -302,8 +302,8 @@ export const ContactPage: React.FC = () => {
             </div>
 
             {/* Social links */}
-            <div className="rounded-3xl border border-white/8 bg-white/[0.03] p-6" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
-              <h3 className="text-sm font-bold text-white mb-4">Kết nối với chúng tôi</h3>
+            <div className="rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] p-6" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-4">Kết nối với chúng tôi</h3>
               <div className="flex flex-wrap items-center gap-3">
                 {[
                   { 
@@ -330,7 +330,7 @@ export const ContactPage: React.FC = () => {
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-br ${s.color} text-white text-xs font-semibold hover:-translate-y-0.5 hover:brightness-110 transition-all shadow-md`}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-br ${s.color} text-[#0F172A] text-xs font-semibold hover:-translate-y-0.5 hover:brightness-110 transition-all shadow-md`}
                   >
                     {s.icon} {s.label}
                   </a>
@@ -341,10 +341,10 @@ export const ContactPage: React.FC = () => {
         </div>
 
         {/* Map embed */}
-        <div className="rounded-3xl border border-white/8 overflow-hidden" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
-          <div className="flex items-center gap-3 px-7 py-4 border-b border-white/8 bg-white/[0.03]">
-            <MapPin className="h-4 w-4 text-rose-400" />
-            <span className="text-sm font-bold text-white">Thủ Đức, Hồ Chí Minh</span>
+        <div className="rounded-3xl border border-[#E6E1DA] overflow-hidden" style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.3)' }}>
+          <div className="flex items-center gap-3 px-7 py-4 border-b border-[#E6E1DA] bg-[#FAF8F5]">
+            <MapPin className="h-4 w-4 text-[#D95D39]" />
+            <span className="text-sm font-bold text-[#0F172A]">Thủ Đức, Hồ Chí Minh</span>
           </div>
           <iframe
             title="Smart Travel Office Location"

@@ -166,7 +166,7 @@ export const DestinationManagementPage: React.FC = () => {
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
         <input
           type="text"
           placeholder="Tìm kiếm theo tên địa danh, thành phố, quốc gia..."
@@ -178,7 +178,7 @@ export const DestinationManagementPage: React.FC = () => {
 
       {/* Destinations Grid Cards */}
       {loading ? (
-        <div className="py-16 text-center text-slate-400">
+        <div className="py-16 text-center text-[#526071]">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto text-sky-600 mb-2" />
           Đang tải danh sách điểm đến...
         </div>
@@ -214,7 +214,7 @@ export const DestinationManagementPage: React.FC = () => {
                     {dest.description || 'Chưa có mô tả chi tiết cho địa danh này.'}
                   </p>
                   {(dest.latitude || dest.longitude) && (
-                    <div className="text-[11px] font-mono text-slate-400 pt-1">
+                    <div className="text-[11px] font-mono text-[#526071] pt-1">
                       Tọa độ: {dest.latitude?.toFixed(4)}, {dest.longitude?.toFixed(4)}
                     </div>
                   )}
@@ -222,12 +222,12 @@ export const DestinationManagementPage: React.FC = () => {
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between px-5 py-3.5 bg-white/[0.03] border-t border-white/8">
-                <span className="text-xs text-slate-400 font-mono">ID: #{dest.id}</span>
+              <div className="flex items-center justify-between px-5 py-3.5 bg-[#FAF8F5] border-t border-[#E6E1DA]">
+                <span className="text-xs text-[#526071] font-mono">ID: #{dest.id}</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleOpenEditModal(dest)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-white/[0.06] transition"
+                    className="p-1.5 rounded-lg text-[#526071] hover:text-[#0D9488] hover:bg-[#FAF8F5] transition"
                     title="Chỉnh sửa"
                   >
                     <Edit3 className="h-4 w-4" />
@@ -245,14 +245,14 @@ export const DestinationManagementPage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="py-16 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">
+        <div className="py-16 text-center text-[#526071] bg-white rounded-2xl border border-slate-200">
           Không tìm thấy điểm đến nào phù hợp.
         </div>
       )}
 
       {/* Add / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in">
           <div className="w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl space-y-4 my-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -261,7 +261,7 @@ export const DestinationManagementPage: React.FC = () => {
               </h3>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1 rounded-full text-[#526071] hover:text-slate-600 hover:bg-slate-100"
               >
                 <XCircle className="h-5 w-5" />
               </button>
@@ -374,7 +374,7 @@ export const DestinationManagementPage: React.FC = () => {
 
       {/* Delete Modal */}
       {deleteModal.isOpen && deleteModal.destination && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4 animate-in fade-in">
           <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-2xl bg-red-100 text-red-600">

@@ -60,7 +60,7 @@ export const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#020204] text-white">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#0F172A]">
 
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-20 pb-16 text-center">
@@ -68,11 +68,11 @@ export const ServicesPage: React.FC = () => {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-sky-600/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-sky-300 bg-sky-500/10 border border-sky-500/20 px-4 py-1.5 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-[#0B3B49] bg-sky-500/10 border border-sky-500/20 px-4 py-1.5 rounded-full mb-6">
             <Sparkles className="h-3.5 w-3.5" />
             Dịch vụ du lịch Smart Travel
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-normal mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#0F172A] leading-normal mb-6">
             Dịch Vụ
             <span 
               className="block mt-2 sm:mt-3 text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-white to-cyan-200"
@@ -81,14 +81,14 @@ export const ServicesPage: React.FC = () => {
               Trọn Vẹn & Hiện Đại
             </span>
           </h1>
-          <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#526071] max-w-2xl mx-auto leading-relaxed">
             Từ tour trọn gói đến lịch trình cá nhân hoá, thanh toán VietQR tức thì đến tư vấn AI — Smart Travel mang đến trải nghiệm du lịch hoàn hảo từ A đến Z.
           </p>
         </div>
       </div>
 
       {/* Stats Bar */}
-      <div className="border-y border-white/8 bg-white/[0.02] py-8">
+      <div className="border-y border-[#E6E1DA] bg-[#FAF8F5] py-8">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((s, i) => (
             <div key={i} className="flex flex-col items-center text-center gap-1.5">
@@ -106,7 +106,7 @@ export const ServicesPage: React.FC = () => {
           {services.map((svc, i) => (
             <div
               key={i}
-              className="group relative rounded-3xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] p-7 transition-all duration-300 hover:-translate-y-1 cursor-default"
+              className="group relative rounded-3xl border border-[#E6E1DA] bg-[#FAF8F5] hover:bg-[#FAF8F5] p-7 transition-all duration-300 hover:-translate-y-1 cursor-default"
               style={{ boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.3)` }}
             >
               {/* Glow on hover */}
@@ -117,20 +117,20 @@ export const ServicesPage: React.FC = () => {
 
               {/* Icon */}
               <div
-                className={`relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${svc.color} text-white mb-5 shadow-lg`}
+                className={`relative inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${svc.color} text-[#0F172A] mb-5 shadow-lg`}
                 style={{ boxShadow: `0 8px 24px ${svc.glow}` }}
               >
                 {svc.icon}
               </div>
 
-              <h3 className="text-lg font-bold text-white mb-2">{svc.title}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed mb-5">{svc.desc}</p>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-2">{svc.title}</h3>
+              <p className="text-sm text-[#526071] leading-relaxed mb-5">{svc.desc}</p>
 
               {/* Feature list */}
               <ul className="space-y-2">
                 {svc.features.map((f, j) => (
-                  <li key={j} className="flex items-center gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                  <li key={j} className="flex items-center gap-2 text-xs text-[#475569]">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 flex-shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -141,18 +141,18 @@ export const ServicesPage: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="relative border-t border-white/8 py-20 text-center overflow-hidden">
+      <div className="relative border-t border-[#E6E1DA] py-20 text-center overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-cyan-600/8 rounded-full blur-[100px]" />
         </div>
         <div className="relative z-10 max-w-2xl mx-auto px-6">
-          <h2 className="text-3xl font-black text-white mb-4">Sẵn sàng khám phá?</h2>
-          <p className="text-slate-400 text-sm mb-8">Hàng ngàn tour trong nước và quốc tế đang chờ bạn. Đặt ngay hôm nay!</p>
+          <h2 className="text-3xl font-black text-[#0F172A] mb-4">Sẵn sàng khám phá?</h2>
+          <p className="text-[#526071] text-sm mb-8">Hàng ngàn tour trong nước và quốc tế đang chờ bạn. Đặt ngay hôm nay!</p>
           <button
             onClick={() => navigate('/tours')}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-bold text-[#0F172A] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
             style={{
-              background: 'linear-gradient(to top, #9ad9ec 1px, #79e0f1 2px, #14a8c6 5px, #038aa8 7px, #006180 9px, #04465a 13px, #0a2a37 18px, #0a111d 32px)',
+              background: '#D95D39',
               boxShadow: '0 0 12px rgba(60,190,235,.25), 0 4px 16px -2px rgba(90,220,255,.4)',
             }}
           >

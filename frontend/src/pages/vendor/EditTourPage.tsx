@@ -183,7 +183,7 @@ export const EditTourPage: React.FC = () => {
           onClick={() => setShowAiModal(true)}
           className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-black text-white hover:from-emerald-500 hover:to-teal-500 transition shadow-md shadow-emerald-900/20 whitespace-nowrap cursor-pointer"
         >
-          <Sparkles className="h-4 w-4 text-amber-300" /> Tối ưu bằng AI
+          <Sparkles className="h-4 w-4 text-amber-800" /> Tối ưu bằng AI
         </button>
       </div>
 
@@ -358,7 +358,7 @@ export const EditTourPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleAddGalleryImage}
-                  className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+                  className="flex items-center gap-1.5 rounded-xl bg-[#0B3B49] px-4 py-2 text-xs font-bold text-white hover:bg-[#0F5264] transition"
                 >
                   <Plus className="h-3.5 w-3.5" /> Thêm Ảnh
                 </button>

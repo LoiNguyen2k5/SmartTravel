@@ -184,13 +184,13 @@ export const VendorVisaPage: React.FC = () => {
     <div className="space-y-6 pb-10">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white flex items-center gap-3">
+        <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-3">
           <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg">
-            <Globe className="h-5 w-5 text-white" />
+            <Globe className="h-5 w-5 text-[#0F172A]" />
           </span>
           Quản Lý Dịch Vụ Ủy Quyền Hồ Sơ Visa
         </h1>
-        <p className="text-slate-400 text-sm mt-2">
+        <p className="text-[#526071] text-sm mt-2">
           Chuyên viên Đại lý sơ duyệt bản mềm trực tuyến, đại diện đoàn nộp trực tiếp tại ĐSQ/LSQ và ghi nhận kết quả trả về
         </p>
       </div>
@@ -208,14 +208,14 @@ export const VendorVisaPage: React.FC = () => {
             <s.Icon className={`h-8 w-8 ${s.txt} shrink-0`} />
             <div>
               <p className={`text-2xl font-black ${s.txt}`}>{s.value}</p>
-              <p className="text-[11px] text-slate-400 leading-tight">{s.label}</p>
+              <p className="text-[11px] text-[#526071] leading-tight">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-900/60 border border-slate-700/50 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-white border border-slate-700/50 rounded-xl p-1 w-fit">
         {([
           { key: "applications" as Tab, label: "Sơ Duyệt & Theo Dõi Hồ Sơ", Icon: FileText },
           { key: "templates" as Tab, label: "Thư Viện Mẫu Visa Quốc Gia", Icon: BookOpen },
@@ -240,20 +240,20 @@ export const VendorVisaPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Tìm theo mã booking, tên khách, tên tour..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-900/60 border border-slate-700/50 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/60"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-700/50 rounded-xl text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-sky-500/60"
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-slate-400 shrink-0" />
+              <Filter className="h-4 w-4 text-[#526071] shrink-0" />
               <select
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value)}
-                className="bg-slate-900/60 border border-slate-700/50 rounded-xl text-sm text-white py-2.5 px-3 focus:outline-none focus:border-sky-500/60"
+                className="bg-white border border-slate-700/50 rounded-xl text-sm text-[#0F172A] py-2.5 px-3 focus:outline-none focus:border-sky-500/60"
               >
                 <option value="ALL">Tất cả trạng thái</option>
                 <option value="PENDING_DOCS">Chờ tải bản mềm</option>
@@ -267,13 +267,13 @@ export const VendorVisaPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-700/50 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-slate-700/50 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-700/50">
                     {["Mã Booking", "Khách Hàng", "Tour", "Bản Mềm", "Hạn Nộp Hồ Sơ", "Trạng Thái", "Thao Tác"].map(h => (
-                      <th key={h} className="px-4 py-3.5 text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                      <th key={h} className="px-4 py-3.5 text-left text-[11px] font-bold text-[#526071] uppercase tracking-wider whitespace-nowrap">
                         {h}
                       </th>
                     ))}
@@ -281,12 +281,12 @@ export const VendorVisaPage: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-700/30">
                   {loadingApps ? (
-                    <tr><td colSpan={7} className="text-center py-12 text-slate-400">Đang tải dữ liệu từ máy chủ...</td></tr>
+                    <tr><td colSpan={7} className="text-center py-12 text-[#526071]">Đang tải dữ liệu từ máy chủ...</td></tr>
                   ) : filteredApps.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center py-16">
                         <Globe className="mx-auto h-10 w-10 text-slate-600 mb-3" />
-                        <p className="text-slate-400 font-medium">Chưa có hồ sơ ủy quyền Visa nào</p>
+                        <p className="text-[#526071] font-medium">Chưa có hồ sơ ủy quyền Visa nào</p>
                         <p className="text-slate-500 text-sm mt-1">Hồ sơ của khách đặt các tour quốc tế thuộc quản lý của Đại lý bạn sẽ hiển thị tại đây</p>
                       </td>
                     </tr>
@@ -297,18 +297,18 @@ export const VendorVisaPage: React.FC = () => {
                     const docsApproved = app.documents.filter(d => d.status === "APPROVED").length;
                     const docsTotal = app.documents.length;
                     return (
-                      <tr key={app.id} className="hover:bg-white/[0.02] transition-colors">
+                      <tr key={app.id} className="hover:bg-[#FAF8F5] transition-colors">
                         <td className="px-4 py-4">
-                          <span className="font-mono text-sky-400 font-bold text-sm">
+                          <span className="font-mono text-[#0D9488] font-bold text-sm">
                             #{app.bookingCode || app.bookingId}
                           </span>
                         </td>
                         <td className="px-4 py-4">
-                          <p className="font-semibold text-white text-sm">{app.customerName || "Khách hàng"}</p>
-                          {app.contactEmail && <p className="text-xs text-slate-400 mt-0.5">{app.contactEmail}</p>}
+                          <p className="font-semibold text-[#0F172A] text-sm">{app.customerName || "Khách hàng"}</p>
+                          {app.contactEmail && <p className="text-xs text-[#526071] mt-0.5">{app.contactEmail}</p>}
                         </td>
                         <td className="px-4 py-4 max-w-[180px]">
-                          <p className="text-sm text-slate-200 line-clamp-2 leading-snug">{app.tourTitle || "—"}</p>
+                          <p className="text-sm text-[#334155] line-clamp-2 leading-snug">{app.tourTitle || "—"}</p>
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
@@ -318,7 +318,7 @@ export const VendorVisaPage: React.FC = () => {
                                 style={{ width: docsTotal > 0 ? `${(docsApproved / docsTotal) * 100}%` : "0%" }}
                               />
                             </div>
-                            <span className="text-xs text-slate-400 whitespace-nowrap">{docsApproved}/{docsTotal}</span>
+                            <span className="text-xs text-[#526071] whitespace-nowrap">{docsApproved}/{docsTotal}</span>
                           </div>
                           {app.documents.some(d => d.status === "REJECTED") && (
                             <span className="text-[11px] text-red-400 mt-1 block">Cần khách bổ sung lại</span>
@@ -327,7 +327,7 @@ export const VendorVisaPage: React.FC = () => {
                         <td className="px-4 py-4 whitespace-nowrap">
                           {dl ? (
                             <div>
-                              <p className="text-sm text-slate-300">
+                              <p className="text-sm text-[#475569]">
                                 {dl.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })}
                               </p>
                               {dlBadge && (
@@ -347,14 +347,14 @@ export const VendorVisaPage: React.FC = () => {
                           {app.status === "APPROVED" || app.status === "REJECTED" ? (
                             <button
                               onClick={() => setSelectedApp(app)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-600/50 rounded-lg text-xs font-bold transition-all"
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 text-[#475569] border border-slate-600/50 rounded-lg text-xs font-bold transition-all"
                             >
                               <Lock className="h-3.5 w-3.5" /> Xem hồ sơ (Đã chốt)
                             </button>
                           ) : (
                             <button
                               onClick={() => setSelectedApp(app)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 rounded-lg text-xs font-bold transition-all"
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-[#0B3B49] border border-sky-500/20 rounded-lg text-xs font-bold transition-all"
                             >
                               <Eye className="h-3.5 w-3.5" /> Kiểm tra & Cập nhật
                             </button>
@@ -367,7 +367,7 @@ export const VendorVisaPage: React.FC = () => {
               </table>
             </div>
             {filteredApps.length > 0 && (
-              <div className="px-4 py-3 border-t border-slate-700/30 text-xs text-slate-400">
+              <div className="px-4 py-3 border-t border-slate-700/30 text-xs text-[#526071]">
                 Hiển thị {filteredApps.length}/{applications.length} hồ sơ thuộc tour của Đại lý
               </div>
             )}
@@ -379,7 +379,7 @@ export const VendorVisaPage: React.FC = () => {
       {activeTab === "templates" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-slate-400 text-sm">
+            <p className="text-[#526071] text-sm">
               Quản lý mẫu hồ sơ Visa theo quốc gia trên Database (tách bạch Phí dịch vụ Đại lý và Lệ phí Lãnh sự).
             </p>
             <button
@@ -399,26 +399,26 @@ export const VendorVisaPage: React.FC = () => {
           )}
 
           {loadingTemplates ? (
-            <div className="text-center py-12 text-slate-400 text-sm">Đang tải thư viện mẫu Visa...</div>
+            <div className="text-center py-12 text-[#526071] text-sm">Đang tải thư viện mẫu Visa...</div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {templates.map(t => (
-                <div key={t.id} className="bg-slate-900/60 border border-slate-700/50 rounded-2xl overflow-hidden">
+                <div key={t.id} className="bg-white border border-slate-700/50 rounded-2xl overflow-hidden">
                   <div className="flex items-center justify-between p-5 border-b border-slate-700/30">
                     <div className="flex items-center gap-3">
                       <span className="text-4xl">{t.flagEmoji}</span>
                       <div>
-                        <h3 className="font-black text-white text-base">{t.country}</h3>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-400">
+                        <h3 className="font-black text-[#0F172A] text-base">{t.country}</h3>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#526071]">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" /> {t.processingDays} ngày ĐSQ + {t.bufferDays ?? 3} ngày sơ duyệt
                           </span>
                           <span className="flex items-center gap-1">
-                            <TrendingUp className="h-3 w-3 text-emerald-400" />
-                            <span className="text-emerald-400 font-bold">DV: {fmtCurrency(t.visaFee)}</span>
+                            <TrendingUp className="h-3 w-3 text-emerald-700" />
+                            <span className="text-emerald-700 font-bold">DV: {fmtCurrency(t.visaFee)}</span>
                           </span>
                           {(t.consularFee ?? 0) > 0 && (
-                            <span className="text-amber-300">Lãnh sự: {fmtCurrency(t.consularFee ?? 0)}</span>
+                            <span className="text-amber-800">Lãnh sự: {fmtCurrency(t.consularFee ?? 0)}</span>
                           )}
                           {t.tourCount !== undefined && (
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {t.tourCount} tour</span>
@@ -429,19 +429,19 @@ export const VendorVisaPage: React.FC = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => { setEditingTemplate(t); setShowTemplateForm(true); }}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition"
+                        className="p-2 text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] rounded-lg transition"
                       >
                         <Edit3 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteTemplate(t.id)}
-                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition"
+                        className="p-2 text-[#526071] hover:text-red-400 hover:bg-red-500/5 rounded-lg transition"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => setExpandedTemplate(expandedTemplate === t.id ? null : t.id)}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition"
+                        className="p-2 text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] rounded-lg transition"
                       >
                         {expandedTemplate === t.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </button>
@@ -450,11 +450,11 @@ export const VendorVisaPage: React.FC = () => {
                   {expandedTemplate === t.id && (
                     <div className="p-5 space-y-2.5">
                       {t.notes && (
-                        <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 text-xs text-sky-300">
+                        <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 text-xs text-[#0B3B49]">
                           <strong>Hướng dẫn nộp tại ĐSQ/Trung tâm thị thực:</strong> {t.notes}
                         </div>
                       )}
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <p className="text-xs font-bold text-[#526071] uppercase tracking-wider">
                         Danh mục giấy tờ ({t.documents.length})
                       </p>
                       {t.documents.map((doc, i) => (
@@ -467,7 +467,7 @@ export const VendorVisaPage: React.FC = () => {
                             {doc.isMandatory ? "!" : "o"}
                           </span>
                           <div>
-                            <p className="text-sm font-semibold text-white">
+                            <p className="text-sm font-semibold text-[#0F172A]">
                               {doc.documentName}
                               {doc.isMandatory && (
                                 <span className="ml-2 text-[10px] font-black text-red-400 border border-red-500/30 rounded px-1">
@@ -475,7 +475,7 @@ export const VendorVisaPage: React.FC = () => {
                                 </span>
                               )}
                             </p>
-                            <p className="text-xs text-slate-400 mt-0.5">{doc.description}</p>
+                            <p className="text-xs text-[#526071] mt-0.5">{doc.description}</p>
                           </div>
                         </div>
                       ))}
@@ -566,18 +566,18 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
   const inputCls = "w-full bg-slate-800 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500/60";
 
   return (
-    <div className="bg-slate-900/80 border border-sky-500/30 rounded-2xl p-6 space-y-5">
+    <div className="bg-white border border-sky-500/30 rounded-2xl p-6 space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-black text-white text-base">
+        <h3 className="font-black text-[#0F172A] text-base">
           {initial ? "Chỉnh Sửa Mẫu Hồ Sơ Visa" : "Thêm Mẫu Hồ Sơ Visa Mới"}
         </h3>
-        <button onClick={onCancel} className="p-2 text-slate-400 hover:text-white rounded-lg transition">
+        <button onClick={onCancel} className="p-2 text-[#526071] hover:text-[#0F172A] rounded-lg transition">
           <X className="h-4 w-4" />
         </button>
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Chọn quốc gia nhanh</label>
+        <label className="block text-xs font-bold text-[#526071] uppercase tracking-wider mb-2">Chọn quốc gia nhanh</label>
         <div className="flex flex-wrap gap-2">
           {FLAG_OPTIONS.map(opt => (
             <button
@@ -598,31 +598,31 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Tên quốc gia *</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Tên quốc gia *</label>
           <input value={country} onChange={e => setCountry(e.target.value)} placeholder="VD: Nhật Bản" className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Mã quốc gia (ISO)</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Mã quốc gia (ISO)</label>
           <input value={countryCode} onChange={e => setCountryCode(e.target.value.toUpperCase())} placeholder="JP" className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Emoji cờ</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Emoji cờ</label>
           <input value={flagEmoji} onChange={e => setFlagEmoji(e.target.value)} placeholder="🇯🇵" className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Số ngày ĐSQ xử lý</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Số ngày ĐSQ xử lý</label>
           <input type="number" min={1} max={60} value={processingDays} onChange={e => setProcessingDays(Number(e.target.value))} className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Số ngày Đại lý sơ duyệt (Buffer)</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Số ngày Đại lý sơ duyệt (Buffer)</label>
           <input type="number" min={0} max={30} value={bufferDays} onChange={e => setBufferDays(Number(e.target.value))} className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs font-bold text-slate-400 mb-1">Phí dịch vụ Đại lý (VND)</label>
+          <label className="block text-xs font-bold text-[#526071] mb-1">Phí dịch vụ Đại lý (VND)</label>
           <input type="number" min={0} value={visaFee} onChange={e => setVisaFee(Number(e.target.value))} className={inputCls} />
         </div>
         <div className="col-span-2 lg:col-span-3">
-          <label className="block text-xs font-bold text-amber-300 mb-1">
+          <label className="block text-xs font-bold text-amber-800 mb-1">
             Lệ phí Lãnh sự tham khảo (VND - Để riêng theo quy định ĐSQ, không cộng gộp vào giá thanh toán online)
           </label>
           <input type="number" min={0} value={consularFee} onChange={e => setConsularFee(Number(e.target.value))} className={inputCls} />
@@ -630,7 +630,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-slate-400 mb-1">
+        <label className="block text-xs font-bold text-[#526071] mb-1">
           Ghi chú địa điểm Đại lý nộp hồ sơ (VFS Global / KVAC / Lãnh sự quán)
         </label>
         <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="VD: Đại lý nộp hồ sơ đoàn tại KVAC Quận 1..." className={inputCls} />
@@ -638,11 +638,11 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Danh mục giấy tờ ({docs.length})</label>
+          <label className="text-xs font-bold text-[#526071] uppercase tracking-wider">Danh mục giấy tờ ({docs.length})</label>
           <button
             type="button"
             onClick={addDoc}
-            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-bold hover:bg-emerald-500/20 transition"
+            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 rounded-lg text-xs font-bold hover:bg-emerald-500/20 transition"
           >
             <Plus className="h-3.5 w-3.5" /> Thêm giấy tờ
           </button>
@@ -655,17 +655,17 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
                   value={doc.documentName}
                   onChange={e => updateDoc(i, "documentName", e.target.value)}
                   placeholder="Tên loại giấy tờ"
-                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500/60"
+                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-sky-500/60"
                 />
                 <input
                   value={doc.description}
                   onChange={e => updateDoc(i, "description", e.target.value)}
                   placeholder="Hướng dẫn chi tiết cho khách"
-                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500/60"
+                  className="bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-sky-500/60"
                 />
               </div>
               <div className="flex items-center gap-2 shrink-0 mt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer text-xs text-slate-400">
+                <label className="flex items-center gap-1.5 cursor-pointer text-xs text-[#526071]">
                   <input
                     type="checkbox"
                     checked={doc.isMandatory}
@@ -684,7 +684,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initial, onSave, onCancel }
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onCancel} className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-sm font-bold transition">
+        <button type="button" onClick={onCancel} className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-[#334155] rounded-xl text-sm font-bold transition">
           Hủy
         </button>
         <button

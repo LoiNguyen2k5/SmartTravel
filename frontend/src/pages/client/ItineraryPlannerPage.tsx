@@ -233,7 +233,7 @@ export const ItineraryPlannerPage: React.FC = () => {
               <div className="text-xs font-bold text-slate-500">DỰ TOÁN NGÂN SÁCH CHUYẾN ĐI</div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-black text-slate-900">{totalCost.toLocaleString('vi-VN')} đ</span>
-                <span className="text-xs text-slate-400">/ Ngân sách {estimatedBudget.toLocaleString('vi-VN')} đ</span>
+                <span className="text-xs text-[#526071]">/ Ngân sách {estimatedBudget.toLocaleString('vi-VN')} đ</span>
               </div>
             </div>
 
@@ -301,7 +301,7 @@ export const ItineraryPlannerPage: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center gap-3.5">
-                        <GripVertical className="h-5 w-5 text-slate-400 flex-shrink-0 cursor-grab" />
+                        <GripVertical className="h-5 w-5 text-[#526071] flex-shrink-0 cursor-grab" />
                         
                         <img
                           src={act.imageUrl}
@@ -311,7 +311,7 @@ export const ItineraryPlannerPage: React.FC = () => {
 
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="rounded-lg bg-slate-900 text-white px-2 py-0.5 text-[11px] font-black font-mono">
+                            <span className="rounded-lg bg-white text-[#0F172A] px-2 py-0.5 text-[11px] font-black font-mono">
                               #{index + 1} | {act.time}
                             </span>
                             <h4 className="font-extrabold text-xs text-slate-900">{act.name}</h4>
@@ -332,7 +332,7 @@ export const ItineraryPlannerPage: React.FC = () => {
                         </span>
                         <button 
                           onClick={() => handleDelete(act.id)} 
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                          className="p-1.5 rounded-lg text-[#526071] hover:text-rose-600 hover:bg-rose-50 transition"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -394,7 +394,7 @@ export const ItineraryPlannerPage: React.FC = () => {
                   />
 
                   <div className="sm:col-span-3 flex items-center gap-2">
-                    <ImageIcon className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                    <ImageIcon className="h-4 w-4 text-[#526071] flex-shrink-0" />
                     <input
                       type="text"
                       placeholder="Link ảnh minh họa riêng cho địa điểm này (tùy chọn)"
@@ -423,7 +423,7 @@ export const ItineraryPlannerPage: React.FC = () => {
                 <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                   <MapPin className="h-4 w-4 text-sky-600" /> Bản Đồ Tọa Độ Hành Trình
                 </span>
-                <span className="text-[10px] text-slate-400 font-semibold">Tự động gắn ghim</span>
+                <span className="text-[10px] text-[#526071] font-semibold">Tự động gắn ghim</span>
               </div>
 
               <div className="h-[480px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
@@ -454,13 +454,13 @@ export const ItineraryPlannerPage: React.FC = () => {
 
         {/* SHARE LINK MODAL */}
         {shareToken && (
-          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-white backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 shadow-2xl animate-scale-up">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-sky-900 font-bold text-base">
                   <Share2 className="h-5 w-5" /> Chia Sẻ Lịch Trình Du Lịch
                 </div>
-                <button onClick={() => setShareToken(null)} className="text-slate-400 hover:text-slate-700 font-bold">✕</button>
+                <button onClick={() => setShareToken(null)} className="text-[#526071] hover:text-slate-700 font-bold">✕</button>
               </div>
 
               <div className="space-y-3 text-xs">
@@ -476,7 +476,7 @@ export const ItineraryPlannerPage: React.FC = () => {
                     onClick={handleCopyLink}
                     className="p-2 rounded-lg bg-sky-900 text-white font-bold hover:bg-sky-950 transition flex items-center gap-1"
                   >
-                    {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-white font-bold" />}
+                    {copied ? <Check className="h-4 w-4 text-emerald-700" /> : <Copy className="h-4 w-4 text-[#0F172A] font-bold" />}
                   </button>
                 </div>
                 {copied && <p className="text-[11px] font-bold text-emerald-600">Đã sao chép liên kết vào bộ nhớ tạm!</p>}
@@ -484,7 +484,7 @@ export const ItineraryPlannerPage: React.FC = () => {
 
               <button
                 onClick={() => setShareToken(null)}
-                className="w-full rounded-xl bg-slate-900 text-white py-2.5 text-xs font-bold hover:bg-slate-800 transition"
+                className="w-full rounded-xl bg-[#0B3B49] text-white py-2.5 text-xs font-bold hover:bg-[#0F5264] transition"
               >
                 Đóng
               </button>

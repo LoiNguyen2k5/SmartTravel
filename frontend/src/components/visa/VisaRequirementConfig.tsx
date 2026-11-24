@@ -94,7 +94,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({
         <button
           type="button"
           onClick={handleAdd}
-          className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+          className="flex items-center gap-1.5 rounded-xl bg-[#0B3B49] px-4 py-2 text-xs font-bold text-white hover:bg-[#0F5264] transition"
         >
           <Plus size={16} />
           Thêm giấy tờ riêng
@@ -139,7 +139,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({
       </div>
 
       {requirements.length === 0 ? (
-        <div className="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-xs">
+        <div className="text-center py-8 text-[#526071] bg-slate-50 rounded-xl border border-dashed border-slate-300 text-xs">
           Tour này hiện không yêu cầu nộp hồ sơ Visa (Miễn thị thực). Chọn một Mẫu Visa phía trên nếu hành trình yêu cầu xin Visa.
         </div>
       ) : (
@@ -198,7 +198,7 @@ export const VisaRequirementConfig: React.FC<Props> = ({
         <button
           type="button"
           onClick={() => onSave(requirements)}
-          className="flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition"
+          className="flex items-center gap-2 rounded-2xl bg-[#0B3B49] px-6 py-2.5 text-xs font-bold text-white hover:bg-[#0F5264] transition"
         >
           <Save size={16} />
           Lưu danh mục giấy tờ riêng cho Tour

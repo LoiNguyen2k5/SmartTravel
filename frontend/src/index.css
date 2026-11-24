@@ -4,7 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base layer & Quality Floor */
+/* ==========================================================================
+   BASE LAYER — WARM OCEAN & BOARDING PASS EDITORIAL DESIGN SYSTEM
+   Canvas: #FAF8F5 | Deep Ocean: #0B3B49 | Teal: #0D9488 | Coral CTA: #D95D39
+   ========================================================================== */
 @layer base {
   * {
     box-sizing: border-box;
@@ -19,24 +22,22 @@
   }
 
   body {
-    background-color: #FAF9F6;
+    background-color: #FAF8F5;
     color: #0F172A;
   }
 
-  /* Themed text selection */
   ::selection {
-    background-color: rgba(3, 105, 161, 0.2);
-    color: #082f49;
+    background-color: rgba(13, 148, 136, 0.18);
+    color: #0B3B49;
   }
 
-  /* Refined, modern custom scrollbar */
   ::-webkit-scrollbar {
     width: 7px;
     height: 7px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #F4F2EC;
+    background: #F4F1EC;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -48,27 +49,76 @@
     background: #94A3B8;
   }
 
-  /* Sharp, accessible keyboard focus rings */
   :focus-visible {
-    outline: 2px solid #0284c7;
+    outline: 2px solid #0D9488;
     outline-offset: 2px;
   }
 }
 
-/* Glassmorphism & Surface Utilities */
+/* ==========================================================================
+   BOARDING PASS & EDITORIAL SURFACE UTILITIES
+   ========================================================================== */
 @layer utilities {
   .glass-surface {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid #E6E1DA;
   }
 
   .glass-dark {
-    background: rgba(8, 47, 73, 0.88);
+    background: rgba(11, 59, 73, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .boarding-pass-card {
+    background: #FFFFFF;
+    border: 1px solid #E6E1DA;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px -6px rgba(11, 59, 73, 0.08), 0 2px 6px -2px rgba(11, 59, 73, 0.04);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms cubic-bezier(0.16, 1, 0.3, 1), border-color 240ms ease;
+  }
+
+  .boarding-pass-card:hover {
+    transform: translateY(-4px);
+    border-color: #99F6E4;
+    box-shadow: 0 18px 36px -10px rgba(11, 59, 73, 0.15), 0 4px 12px -4px rgba(13, 148, 136, 0.1);
+  }
+
+  .boarding-pass-tear {
+    position: relative;
+    border-top: 1.5px dashed #CBD5E1;
+  }
+
+  .boarding-pass-tear::before,
+  .boarding-pass-tear::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background-color: #FAF8F5;
+    border: 1px solid #E6E1DA;
+    z-index: 2;
+  }
+
+  .boarding-pass-tear::before {
+    left: -10px;
+    clip-path: inset(0 0 0 50%);
+  }
+
+  .boarding-pass-tear::after {
+    right: -10px;
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .passport-stamp {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #F59E0B;
   }
 
   .text-balance {
@@ -84,174 +134,27 @@
 }
 
 /* ==========================================================================
-   PORTAL DARK THEME (Admin & Vendor Portals)
+   OCEAN EDITORIAL PORTAL (Admin & Vendor Portals — Crisp Warm Ivory Light UI)
    ========================================================================== */
-.portal-dark {
-  background-color: #020204 !important;
-  color: #f1f5f9 !important;
+.ocean-portal {
+  background-color: #FAF8F5;
+  color: #0F172A;
 }
 
-.portal-dark ::-webkit-scrollbar-track {
-  background: #060b14;
+.ocean-portal table {
+  border-color: #E6E1DA;
 }
 
-.portal-dark ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+.ocean-portal thead th {
+  background-color: #F4F1EC;
+  color: #334155;
+  border-bottom: 1px solid #E6E1DA;
 }
 
-.portal-dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+.ocean-portal tbody tr {
+  border-bottom: 1px solid #F1ECE4;
 }
 
-/* Cards & Surfaces */
-.portal-dark .bg-white {
-  background-color: rgba(10, 17, 29, 0.88) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #f1f5f9 !important;
-}
-
-.portal-dark [class*="bg-slate-50"],
-.portal-dark [class*="bg-slate-100"],
-.portal-dark [class*="bg-slate-200"],
-.portal-dark .bg-slate-50,
-.portal-dark .bg-slate-100 {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.portal-dark [class*="bg-sky-50"] {
-  background-color: rgba(14, 165, 233, 0.15) !important;
-  border-color: rgba(14, 165, 233, 0.4) !important;
-}
-
-.portal-dark [class*="bg-red-50"] {
-  background-color: rgba(244, 63, 94, 0.15) !important;
-  border-color: rgba(244, 63, 94, 0.4) !important;
-}
-
-/* Typography Overrides */
-.portal-dark .text-slate-900,
-.portal-dark .text-slate-800,
-.portal-dark .text-slate-700 {
-  color: #f8fafc !important;
-}
-
-.portal-dark .text-slate-600 {
-  color: #cbd5e1 !important;
-}
-
-.portal-dark .text-slate-500 {
-  color: #94a3b8 !important;
-}
-
-.portal-dark .text-slate-400 {
-  color: #64748b !important;
-}
-
-/* Borders */
-.portal-dark .border-slate-100,
-.portal-dark .border-slate-200,
-.portal-dark .border-slate-300 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Form Inputs, Selects, and Textareas */
-.portal-dark input:not([type="checkbox"]):not([type="radio"]),
-.portal-dark select,
-.portal-dark textarea {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: #ffffff !important;
-}
-
-.portal-dark input:focus,
-.portal-dark select:focus,
-.portal-dark textarea:focus {
-  border-color: rgba(56, 189, 248, 0.6) !important;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2) !important;
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.portal-dark select option {
-  background-color: #0b1322 !important;
-  color: #ffffff !important;
-}
-
-/* Tables & Thead */
-.portal-dark table {
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-.portal-dark thead,
-.portal-dark thead tr,
-.portal-dark thead th,
-.portal-dark table thead th,
-.portal-dark [class*="thead"],
-.portal-dark thead[class*="bg-slate-50"] {
-  background-color: #0d1527 !important;
-  color: #94a3b8 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.portal-dark tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-}
-
-.portal-dark tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.035) !important;
-}
-
-.portal-dark td {
-  border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* Modals & Overlays */
-.portal-dark .fixed.inset-0.bg-black\/50,
-.portal-dark .fixed.inset-0.bg-slate-900\/50,
-.portal-dark .fixed.inset-0.bg-slate-900\/60 {
-  background-color: rgba(0, 0, 0, 0.75) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-/* Status Badges */
-.portal-dark .bg-emerald-50,
-.portal-dark .bg-emerald-100 {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
-  color: #6ee7b7 !important;
-}
-
-.portal-dark .bg-amber-50,
-.portal-dark .bg-amber-100 {
-  background-color: rgba(245, 158, 11, 0.15) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
-  color: #fcd34d !important;
-}
-
-.portal-dark .bg-red-50,
-.portal-dark .bg-red-100,
-.portal-dark .bg-rose-50,
-.portal-dark .bg-rose-100 {
-  background-color: rgba(244, 63, 94, 0.15) !important;
-  border: 1px solid rgba(244, 63, 94, 0.3) !important;
-  color: #fda4af !important;
-}
-
-.portal-dark .bg-sky-50,
-.portal-dark .bg-sky-100,
-.portal-dark .bg-blue-50,
-.portal-dark .bg-blue-100 {
-  background-color: rgba(14, 165, 233, 0.15) !important;
-  border: 1px solid rgba(14, 165, 233, 0.3) !important;
-  color: #7dd3fc !important;
-}
-
-.portal-dark .bg-indigo-50,
-.portal-dark .bg-indigo-100,
-.portal-dark .bg-purple-50,
-.portal-dark .bg-purple-100 {
-  background-color: rgba(129, 140, 248, 0.15) !important;
-  border: 1px solid rgba(129, 140, 248, 0.3) !important;
-  color: #c7d2fe !important;
+.ocean-portal tbody tr:hover {
+  background-color: #FAF8F5;
 }

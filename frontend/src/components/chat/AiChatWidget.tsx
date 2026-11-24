@@ -238,11 +238,11 @@ export const AiChatWidget: React.FC = () => {
       {isOpen && (
         <div className="fixed bottom-6 right-20 sm:right-24 z-50 flex h-[560px] max-h-[85vh] w-[calc(100vw-32px)] sm:w-[420px] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           {/* HEADER */}
-          <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 p-4 text-white">
+          <div className="flex items-center justify-between border-b border-slate-100 bg-[#0B3B49] p-4 text-white">
             <div className="flex items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-md shadow-emerald-500/20">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0D9488] text-white shadow-md">
                 <Bot className="h-5 w-5" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-400"></span>
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0B3B49] bg-emerald-400"></span>
               </div>
               <div>
                 <div className="flex items-center gap-1.5">

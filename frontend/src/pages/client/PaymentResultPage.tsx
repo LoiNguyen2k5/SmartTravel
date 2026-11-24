@@ -61,7 +61,7 @@ export const PaymentResultPage: React.FC = () => {
 
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-xs font-bold text-white hover:bg-slate-800 transition"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#0B3B49] px-6 py-3 text-xs font-bold text-white hover:bg-[#0F5264] transition"
         >
           <ArrowLeft className="h-4 w-4" /> Quay về Trang chủ
         </Link>

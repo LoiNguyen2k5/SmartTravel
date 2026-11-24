@@ -119,55 +119,55 @@ export const TransactionSettlementPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <CreditCard className="h-8 w-8 text-sky-400" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] tracking-tight flex items-center gap-2.5">
+            <CreditCard className="h-8 w-8 text-[#0D9488]" />
             Quản Lý Giao Dịch & Đối Soát Hoa Hồng
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-[#526071]">
             Theo dõi dòng tiền thanh toán toàn sàn, thiết lập tỷ lệ chiết khấu hoa hồng và đối soát chi trả doanh thu cho Vendor
           </p>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#F4F1EC] border border-[#E6E1DA] hover:bg-[#E6F4F1] text-[#0F172A] text-sm font-semibold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-[#0D9488]' : ''}`} />
           Làm mới
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="rounded-2xl border border-white/10 bg-[#070c18] p-6 shadow-xl">
+        <div className="rounded-2xl border border-[#E6E1DA] bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Tổng Doanh Số Toàn Sàn</span>
-            <div className="rounded-xl bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-emerald-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">Tổng Doanh Số Toàn Sàn</span>
+            <div className="rounded-xl bg-emerald-500/20 border border-emerald-500/30 p-2.5 text-emerald-700">
               <DollarSign className="h-6 w-6" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-white">
+          <div className="mt-3 text-2xl font-black text-[#0F172A]">
             {formatCurrency(totalGrossRevenue)}
           </div>
-          <div className="mt-1 text-xs text-slate-400">Gross Merchandise Value (GMV)</div>
+          <div className="mt-1 text-xs text-[#526071]">Gross Merchandise Value (GMV)</div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-[#070c18] p-6 shadow-xl">
+        <div className="rounded-2xl border border-[#E6E1DA] bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Hoa Hồng Sàn Giữ Lại (10%)</span>
-            <div className="rounded-xl bg-amber-500/20 border border-amber-500/30 p-2.5 text-amber-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">Hoa Hồng Sàn Giữ Lại (10%)</span>
+            <div className="rounded-xl bg-amber-500/20 border border-amber-500/30 p-2.5 text-amber-700">
               <Percent className="h-6 w-6" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-amber-400">
+          <div className="mt-3 text-2xl font-black text-amber-700">
             {formatCurrency(totalPlatformFees)}
           </div>
-          <div className="mt-1 text-xs text-slate-400">Doanh thu phí dịch vụ nền tảng</div>
+          <div className="mt-1 text-xs text-[#526071]">Doanh thu phí dịch vụ nền tảng</div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-[#070c18] p-6 shadow-xl">
+        <div className="rounded-2xl border border-[#E6E1DA] bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Tổng Chi Trả Cho Vendor (90%)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">Tổng Chi Trả Cho Vendor (90%)</span>
             <div className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 p-2.5 text-indigo-400">
               <ArrowDownRight className="h-6 w-6" />
             </div>
@@ -175,18 +175,18 @@ export const TransactionSettlementPage: React.FC = () => {
           <div className="mt-3 text-2xl font-black text-indigo-400">
             {formatCurrency(totalNetPayouts)}
           </div>
-          <div className="mt-1 text-xs text-slate-400">Thực nhận của các nhà cung cấp</div>
+          <div className="mt-1 text-xs text-[#526071]">Thực nhận của các nhà cung cấp</div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+      <div className="flex items-center gap-2 border-b border-[#E6E1DA] pb-3">
         <button
           onClick={() => { setActiveTab('SETTLEMENTS'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'SETTLEMENTS'
-              ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]'
-              : 'bg-white/[0.04] text-slate-400 border border-white/10 hover:bg-white/[0.08] hover:text-white'
+              ? 'bg-sky-500/20 text-[#0B3B49] border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]'
+              : 'bg-[#FAF8F5] text-[#526071] border border-[#E6E1DA] hover:bg-[#F4F1EC] hover:text-[#0F172A]'
           }`}
         >
           <Building2 className="h-4 w-4" />
@@ -197,8 +197,8 @@ export const TransactionSettlementPage: React.FC = () => {
           onClick={() => { setActiveTab('PAYMENTS'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'PAYMENTS'
-              ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]'
-              : 'bg-white/[0.04] text-slate-400 border border-white/10 hover:bg-white/[0.08] hover:text-white'
+              ? 'bg-sky-500/20 text-[#0B3B49] border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]'
+              : 'bg-[#FAF8F5] text-[#526071] border border-[#E6E1DA] hover:bg-[#F4F1EC] hover:text-[#0F172A]'
           }`}
         >
           <CreditCard className="h-4 w-4" />
@@ -208,22 +208,22 @@ export const TransactionSettlementPage: React.FC = () => {
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
         <input
           type="text"
           placeholder={activeTab === 'SETTLEMENTS' ? 'Tìm theo tên vendor, email hoặc số điện thoại...' : 'Tìm theo mã giao dịch, mã booking, phương thức...'}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 text-sm bg-[#070c18] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-400 shadow-sm transition"
+          className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-[#E6E1DA] rounded-xl text-[#0F172A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-400 shadow-sm transition"
         />
       </div>
 
       {/* Content for Tab 1: Settlements */}
       {activeTab === 'SETTLEMENTS' && (
-        <div className="rounded-2xl border border-white/10 bg-[#070c18] overflow-hidden shadow-xl">
+        <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
+              <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
                 <tr>
                   <th className="py-3.5 px-4">Nhà Cung Cấp (Vendor)</th>
                   <th className="py-3.5 px-4">Tổng Tour & Đơn</th>
@@ -234,11 +234,11 @@ export const TransactionSettlementPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Quyết Toán</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-[#E6E1DA]">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400">
-                      <RefreshCw className="h-6 w-6 animate-spin mx-auto text-sky-400 mb-2" />
+                    <td colSpan={7} className="py-12 text-center text-[#526071]">
+                      <RefreshCw className="h-6 w-6 animate-spin mx-auto text-[#0D9488] mb-2" />
                       Đang tính toán đối soát...
                     </td>
                   </tr>
@@ -247,42 +247,42 @@ export const TransactionSettlementPage: React.FC = () => {
                     const isSettled = s.settlementStatus === 'SETTLED';
 
                     return (
-                      <tr key={s.vendorId} className="hover:bg-white/[0.03] transition">
+                      <tr key={s.vendorId} className="hover:bg-[#FAF8F5] transition">
                         <td className="py-3.5 px-4">
-                          <div className="font-bold text-white flex items-center gap-1.5">
+                          <div className="font-bold text-[#0F172A] flex items-center gap-1.5">
                             <Building2 className="h-4 w-4 text-indigo-400" />
                             {s.vendorName}
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                          <div className="flex items-center gap-2 text-xs text-[#526071] mt-0.5">
                             <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {s.vendorEmail}</span>
                             {s.vendorPhone && <span className="flex items-center gap-1">• <Phone className="h-3 w-3" /> {s.vendorPhone}</span>}
                           </div>
                         </td>
 
                         <td className="py-3.5 px-4">
-                          <div className="text-xs font-bold text-slate-200">{s.totalTours} tour hoạt động</div>
-                          <div className="text-xs text-slate-400">{s.totalBookings} đơn đặt chỗ</div>
+                          <div className="text-xs font-bold text-[#334155]">{s.totalTours} tour hoạt động</div>
+                          <div className="text-xs text-[#526071]">{s.totalBookings} đơn đặt chỗ</div>
                         </td>
 
-                        <td className="py-3.5 px-4 font-bold text-white">
+                        <td className="py-3.5 px-4 font-bold text-[#0F172A]">
                           {formatCurrency(s.totalGrossRevenue)}
                         </td>
 
-                        <td className="py-3.5 px-4 font-semibold text-amber-400 text-xs">
+                        <td className="py-3.5 px-4 font-semibold text-amber-700 text-xs">
                           {formatCurrency(s.platformFee)}
                         </td>
 
-                        <td className="py-3.5 px-4 font-black text-emerald-400 text-sm">
+                        <td className="py-3.5 px-4 font-black text-emerald-700 text-sm">
                           {formatCurrency(s.netPayout)}
                         </td>
 
                         <td className="py-3.5 px-4">
                           {isSettled ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                               <CheckCircle2 className="h-3 w-3" /> Đã quyết toán
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-500/30">
                               <Clock className="h-3 w-3" /> Chờ đối soát
                             </span>
                           )}
@@ -292,13 +292,13 @@ export const TransactionSettlementPage: React.FC = () => {
                           {!isSettled ? (
                             <button
                               onClick={() => setPayoutModal({ isOpen: true, vendor: s })}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 border border-sky-500/40 transition active:scale-95 shadow-sm"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 text-[#0B3B49] hover:bg-sky-500/30 border border-sky-500/40 transition active:scale-95 shadow-sm"
                             >
                               <FileCheck className="h-3.5 w-3.5" />
                               Chi trả
                             </button>
                           ) : (
-                            <span className="text-xs text-slate-400 font-medium">Hoàn tất</span>
+                            <span className="text-xs text-[#526071] font-medium">Hoàn tất</span>
                           )}
                         </td>
                       </tr>
@@ -306,7 +306,7 @@ export const TransactionSettlementPage: React.FC = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400 text-sm">
+                    <td colSpan={7} className="py-12 text-center text-[#526071] text-sm">
                       Chưa có dữ liệu đối soát cho nhà cung cấp nào.
                     </td>
                   </tr>
@@ -319,10 +319,10 @@ export const TransactionSettlementPage: React.FC = () => {
 
       {/* Content for Tab 2: Payments Log */}
       {activeTab === 'PAYMENTS' && (
-        <div className="rounded-2xl border border-white/10 bg-[#070c18] overflow-hidden shadow-xl">
+        <div className="rounded-2xl border border-[#E6E1DA] bg-white overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-white/10 text-xs font-bold uppercase tracking-wider text-slate-400 bg-[#0d1527]">
+              <thead className="border-b border-[#E6E1DA] text-xs font-bold uppercase tracking-wider text-[#526071] bg-[#F4F1EC]">
                 <tr>
                   <th className="py-3.5 px-4">Mã Giao Dịch</th>
                   <th className="py-3.5 px-4">Mã Đơn Booking</th>
@@ -332,11 +332,11 @@ export const TransactionSettlementPage: React.FC = () => {
                   <th className="py-3.5 px-4">Thời Gian</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-[#E6E1DA]">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-400">
-                      <RefreshCw className="h-6 w-6 animate-spin mx-auto text-sky-400 mb-2" />
+                    <td colSpan={6} className="py-12 text-center text-[#526071]">
+                      <RefreshCw className="h-6 w-6 animate-spin mx-auto text-[#0D9488] mb-2" />
                       Đang tải danh sách giao dịch...
                     </td>
                   </tr>
@@ -345,33 +345,33 @@ export const TransactionSettlementPage: React.FC = () => {
                     const isPaid = p.paymentStatus === 'PAID' || p.paymentStatus === 'SUCCESS';
 
                     return (
-                      <tr key={p.id} className="hover:bg-white/[0.03] transition">
-                        <td className="py-3.5 px-4 font-mono font-bold text-xs text-slate-300">
+                      <tr key={p.id} className="hover:bg-[#FAF8F5] transition">
+                        <td className="py-3.5 px-4 font-mono font-bold text-xs text-[#475569]">
                           {p.transactionId || `TX-${p.id}`}
                         </td>
-                        <td className="py-3.5 px-4 font-mono font-bold text-xs text-sky-400">
+                        <td className="py-3.5 px-4 font-mono font-bold text-xs text-[#0D9488]">
                           {p.bookingCode || `#BK-${p.bookingId}`}
                         </td>
-                        <td className="py-3.5 px-4 font-bold text-white">
+                        <td className="py-3.5 px-4 font-bold text-[#0F172A]">
                           {formatCurrency(p.amount)}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/10 text-slate-200 border border-white/10">
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F4F1EC] text-[#334155] border border-[#E6E1DA]">
                             {p.paymentMethod || 'VNPAY'}
                           </span>
                         </td>
                         <td className="py-3.5 px-4">
                           {isPaid ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 border border-emerald-500/30">
                               <CheckCircle2 className="h-3 w-3" /> Thành công
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-500/30">
                               <Clock className="h-3 w-3" /> {p.paymentStatus}
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-xs text-slate-400">
+                        <td className="py-3.5 px-4 text-xs text-[#526071]">
                           {p.paymentTime ? formatDate(p.paymentTime) : 'Vừa xong'}
                         </td>
                       </tr>
@@ -379,7 +379,7 @@ export const TransactionSettlementPage: React.FC = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-400 text-sm">
+                    <td colSpan={6} className="py-12 text-center text-[#526071] text-sm">
                       Chưa có giao dịch thanh toán nào.
                     </td>
                   </tr>
@@ -393,38 +393,38 @@ export const TransactionSettlementPage: React.FC = () => {
       {/* Payout Confirmation Modal */}
       {payoutModal.isOpen && payoutModal.vendor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-[#0a111d] rounded-3xl p-6 shadow-2xl space-y-4 border border-white/15 text-white">
+          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl space-y-4 border border-[#CBD5E1] text-[#0F172A]">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-700 border border-emerald-500/30">
                 <FileCheck className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Xác Nhận Quyết Toán Doanh Thu</h3>
-                <p className="text-xs text-slate-400">
-                  Đối tác: <strong className="text-white">{payoutModal.vendor.vendorName}</strong>
+                <h3 className="text-lg font-bold text-[#0F172A]">Xác Nhận Quyết Toán Doanh Thu</h3>
+                <p className="text-xs text-[#526071]">
+                  Đối tác: <strong className="text-[#0F172A]">{payoutModal.vendor.vendorName}</strong>
                 </p>
               </div>
             </div>
 
-            <div className="p-4 bg-white/[0.04] border border-white/10 rounded-2xl space-y-2 text-xs">
+            <div className="p-4 bg-[#FAF8F5] border border-[#E6E1DA] rounded-2xl space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Tổng doanh thu bán tour:</span>
-                <span className="font-bold text-white">{formatCurrency(payoutModal.vendor.totalGrossRevenue)}</span>
+                <span className="text-[#526071]">Tổng doanh thu bán tour:</span>
+                <span className="font-bold text-[#0F172A]">{formatCurrency(payoutModal.vendor.totalGrossRevenue)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Phí sàn khấu trừ (10%):</span>
-                <span className="font-bold text-amber-400">-{formatCurrency(payoutModal.vendor.platformFee)}</span>
+                <span className="text-[#526071]">Phí sàn khấu trừ (10%):</span>
+                <span className="font-bold text-amber-700">-{formatCurrency(payoutModal.vendor.platformFee)}</span>
               </div>
-              <div className="border-t border-white/10 pt-2 flex justify-between text-sm">
-                <span className="font-extrabold text-white">Số tiền chi trả Vendor:</span>
-                <span className="font-black text-emerald-400">{formatCurrency(payoutModal.vendor.netPayout)}</span>
+              <div className="border-t border-[#E6E1DA] pt-2 flex justify-between text-sm">
+                <span className="font-extrabold text-[#0F172A]">Số tiền chi trả Vendor:</span>
+                <span className="font-black text-emerald-700">{formatCurrency(payoutModal.vendor.netPayout)}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setPayoutModal({ isOpen: false, vendor: null })}
-                className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/10 transition"
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-[#526071] hover:text-[#0F172A] hover:bg-[#F4F1EC] transition"
               >
                 Hủy bỏ
               </button>

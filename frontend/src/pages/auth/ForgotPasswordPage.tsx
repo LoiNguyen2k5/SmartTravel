@@ -106,34 +106,34 @@ export const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#0a111d]/90 backdrop-blur-xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.7)] space-y-5 text-white">
+    <div className="rounded-3xl border border-[#E6E1DA] bg-white backdrop-blur-xl p-8 shadow-card space-y-5 text-[#0F172A]">
       {step === 'EMAIL' ? (
         /* Bước 1: Nhập Email */
         <>
           <div className="text-center pt-2">
-            <div className="mx-auto w-12 h-12 bg-sky-500/15 border border-sky-500/30 rounded-full flex items-center justify-center text-sky-400 mb-2 shadow-[0_0_16px_rgba(14,165,233,0.2)]">
+            <div className="mx-auto w-12 h-12 bg-sky-500/15 border border-sky-500/30 rounded-full flex items-center justify-center text-[#0D9488] mb-2 shadow-[0_0_16px_rgba(14,165,233,0.2)]">
               <KeyRound className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-bold text-white">Quên mật khẩu</h2>
-            <p className="text-xs text-slate-400 mt-1">Nhập Email để nhận mã OTP 60s xác thực</p>
+            <h2 className="text-xl font-bold text-[#0F172A]">Quên mật khẩu</h2>
+            <p className="text-xs text-[#526071] mt-1">Nhập Email để nhận mã OTP 60s xác thực</p>
           </div>
 
           {error && (
-            <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-rose-400 border border-rose-500/20 text-center">
+            <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-[#D95D39] border border-rose-500/20 text-center">
               {error}
             </div>
           )}
 
           <form onSubmit={handleRequestOtp} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Email đăng ký</label>
+              <label className="block text-xs font-bold text-[#475569] mb-1.5">Email đăng ký</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-rose-400 focus:bg-white/[0.08] focus:outline-none transition"
+                className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] px-4 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-rose-400 focus:bg-[#F4F1EC] focus:outline-none transition"
               />
             </div>
 
@@ -146,7 +146,7 @@ export const ForgotPasswordPage: React.FC = () => {
             </button>
 
             <div className="text-center pt-1">
-              <Link to="/login" className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white transition">
+              <Link to="/login" className="inline-flex items-center gap-1 text-xs text-[#526071] hover:text-[#0F172A] transition">
                 <ArrowLeft className="w-3.5 h-3.5" /> Quay lại Đăng nhập
               </Link>
             </div>
@@ -156,30 +156,30 @@ export const ForgotPasswordPage: React.FC = () => {
         /* Bước 2: Nhập OTP & Mật khẩu mới */
         <>
           <div className="text-center pt-2">
-            <div className="mx-auto w-12 h-12 bg-rose-500/15 border border-rose-500/30 rounded-full flex items-center justify-center text-rose-400 mb-2 shadow-[0_0_16px_rgba(244,63,94,0.2)]">
+            <div className="mx-auto w-12 h-12 bg-rose-500/15 border border-rose-500/30 rounded-full flex items-center justify-center text-[#D95D39] mb-2 shadow-[0_0_16px_rgba(244,63,94,0.2)]">
               <MailCheck className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-bold text-white">Đặt lại mật khẩu</h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Mã xác thực đã được gửi tới: <span className="font-bold text-rose-300">{email}</span>
+            <h2 className="text-xl font-bold text-[#0F172A]">Đặt lại mật khẩu</h2>
+            <p className="text-xs text-[#526071] mt-1">
+              Mã xác thực đã được gửi tới: <span className="font-bold text-rose-700">{email}</span>
             </p>
           </div>
 
           {successMsg && (
-            <div className="rounded-xl bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-400 border border-emerald-500/20 text-center">
+            <div className="rounded-xl bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-700 border border-emerald-500/20 text-center">
               {successMsg}
             </div>
           )}
 
           {error && (
-            <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-rose-400 border border-rose-500/20 text-center">
+            <div className="rounded-xl bg-rose-500/10 p-3 text-xs font-semibold text-[#D95D39] border border-rose-500/20 text-center">
               {error}
             </div>
           )}
 
           <form onSubmit={handleResetPassword} className="space-y-3.5">
             <div>
-              <label className="block text-center text-xs font-bold text-slate-300 mb-1.5">
+              <label className="block text-center text-xs font-bold text-[#475569] mb-1.5">
                 Mã OTP 6 chữ số
               </label>
               <input
@@ -189,23 +189,23 @@ export const ForgotPasswordPage: React.FC = () => {
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="123456"
-                className="w-full text-center text-2xl font-bold tracking-[8px] rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-rose-400 focus:border-rose-400 focus:outline-none transition"
+                className="w-full text-center text-2xl font-bold tracking-[8px] rounded-xl border border-[#CBD5E1] bg-[#FAF8F5] px-4 py-2.5 text-[#D95D39] focus:border-rose-400 focus:outline-none transition"
               />
             </div>
 
             {/* Countdown 60s */}
             <div className="text-center text-xs font-semibold">
               {timer > 0 ? (
-                <span className="text-slate-400">
-                  Mã hết hạn sau: <span className="text-rose-400 font-bold text-sm">{timer}s</span>
+                <span className="text-[#526071]">
+                  Mã hết hạn sau: <span className="text-[#D95D39] font-bold text-sm">{timer}s</span>
                 </span>
               ) : (
-                <span className="text-rose-400">Mã OTP đã hết hạn! Vui lòng bấm gửi lại.</span>
+                <span className="text-[#D95D39]">Mã OTP đã hết hạn! Vui lòng bấm gửi lại.</span>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Mật khẩu mới</label>
+              <label className="block text-xs font-bold text-[#475569] mb-1.5">Mật khẩu mới</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -213,12 +213,12 @@ export const ForgotPasswordPage: React.FC = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Mật khẩu mới ít nhất 6 ký tự"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.05] pl-4 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:border-rose-400 focus:bg-white/[0.08] focus:outline-none transition"
+                  className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] pl-4 pr-10 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-rose-400 focus:bg-[#F4F1EC] focus:outline-none transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-slate-400 hover:text-white transition"
+                  className="absolute right-3 top-3 text-[#526071] hover:text-[#0F172A] transition"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -226,14 +226,14 @@ export const ForgotPasswordPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Xác nhận mật khẩu mới</label>
+              <label className="block text-xs font-bold text-[#475569] mb-1.5">Xác nhận mật khẩu mới</label>
               <input
                 type="password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-rose-400 focus:bg-white/[0.08] focus:outline-none transition"
+                className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] px-4 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-rose-400 focus:bg-[#F4F1EC] focus:outline-none transition"
               />
             </div>
 
@@ -249,7 +249,7 @@ export const ForgotPasswordPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setStep('EMAIL')}
-                className="text-slate-400 hover:text-white transition"
+                className="text-[#526071] hover:text-[#0F172A] transition"
               >
                 ← Nhập email khác
               </button>
@@ -259,7 +259,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 onClick={handleResendOtp}
                 disabled={timer > 0 || isResending}
                 className={`flex items-center gap-1 font-bold transition ${
-                  timer > 0 ? 'text-slate-600 cursor-not-allowed' : 'text-rose-400 hover:underline'
+                  timer > 0 ? 'text-slate-600 cursor-not-allowed' : 'text-[#D95D39] hover:underline'
                 }`}
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />

@@ -69,7 +69,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm animate-in fade-in duration-200">
       <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
         {/* HEADER */}
         <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 p-5 text-white">
@@ -79,19 +79,19 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-extrabold text-white">AI Content Generator</h3>
-                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-300 border border-emerald-500/30">
+                <h3 className="text-base font-extrabold text-[#0F172A]">AI Content Generator</h3>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-700 border border-emerald-500/30">
                   Tự Động 24/7
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs text-[#475569] mt-0.5">
                 Tự động viết mô tả hấp dẫn & lên lịch trình từng ngày cho Vendor
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
+            className="rounded-xl p-2 text-[#526071] hover:bg-[#F4F1EC] hover:text-[#0F172A] transition"
           >
             <X className="h-5 w-5" />
           </button>
@@ -113,7 +113,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
                   Điểm đến hoặc Địa danh chính *
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
                   <input
                     type="text"
                     required
@@ -210,7 +210,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 text-amber-300" />
+                    <Sparkles className="h-4 w-4 text-amber-800" />
                     Tạo Nội Dung Bằng AI
                   </>
                 )}
@@ -235,7 +235,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
 
               <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-left">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiêu đề đề xuất</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#526071]">Tiêu đề đề xuất</span>
                   <h4 className="text-sm font-black text-slate-900">{result.title}</h4>
                   <span className="text-[11px] font-mono text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-md mt-1 inline-block">
                     Mã: {result.tourCode}
@@ -244,17 +244,17 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Giá người lớn đề xuất</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#526071]">Giá người lớn đề xuất</span>
                     <p className="font-black text-rose-600">{(result.suggestedPrice || 0).toLocaleString('vi-VN')} đ</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Giá trẻ em</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#526071]">Giá trẻ em</span>
                     <p className="font-bold text-slate-700">{(result.suggestedChildPrice || 0).toLocaleString('vi-VN')} đ</p>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Đoạn văn mô tả</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#526071]">Đoạn văn mô tả</span>
                   <p className="text-xs text-slate-700 leading-relaxed line-clamp-3 mt-1">
                     {result.description}
                   </p>
@@ -262,7 +262,7 @@ export const AiTourGeneratorModal: React.FC<AiTourGeneratorModalProps> = ({
 
                 {result.includedServices && (
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dịch vụ bao gồm</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#526071]">Dịch vụ bao gồm</span>
                     <p className="text-[11px] text-slate-600 whitespace-pre-line mt-0.5">
                       {result.includedServices}
                     </p>

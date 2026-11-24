@@ -251,9 +251,9 @@ export const VendorBookingManagementPage: React.FC = () => {
             setVerificationResult(null);
             setQrCodeInput('');
           }}
-          className="flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-xs font-bold text-white shadow-lg hover:bg-slate-800 transition"
+          className="flex items-center gap-2 rounded-2xl bg-[#0B3B49] px-5 py-3 text-xs font-bold text-white shadow-lg hover:bg-[#0F5264] transition"
         >
-          <QrCode className="h-4 w-4 text-emerald-400" /> Kiểm Tra Mã QR Check-in
+          <QrCode className="h-4 w-4 text-emerald-700" /> Kiểm Tra Mã QR Check-in
         </button>
       </div>
 
@@ -284,7 +284,7 @@ export const VendorBookingManagementPage: React.FC = () => {
 
         {/* Search input */}
         <div className="relative w-full md:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
           <input
             type="text"
             value={searchQuery}
@@ -312,8 +312,8 @@ export const VendorBookingManagementPage: React.FC = () => {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
           </div>
         ) : filteredBookings.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 space-y-2">
-            <ShoppingBag className="h-10 w-10 text-slate-300 mx-auto" />
+          <div className="text-center py-12 text-[#526071] space-y-2">
+            <ShoppingBag className="h-10 w-10 text-[#475569] mx-auto" />
             <p className="text-xs font-medium">Không tìm thấy đơn đặt tour nào phù hợp.</p>
           </div>
         ) : (
@@ -329,7 +329,7 @@ export const VendorBookingManagementPage: React.FC = () => {
                   />
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="bg-slate-900 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg tracking-wider">
+                      <span className="bg-white text-[#0F172A] text-[11px] font-black px-2.5 py-0.5 rounded-lg tracking-wider">
                         {b.bookingCode}
                       </span>
                       <span
@@ -365,13 +365,13 @@ export const VendorBookingManagementPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs text-slate-600 font-medium">
                       <span className="flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5 text-slate-400" /> {b.contactName || b.userName}
+                        <User className="h-3.5 w-3.5 text-[#526071]" /> {b.contactName || b.userName}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Phone className="h-3.5 w-3.5 text-slate-400" /> {b.contactPhone}
+                        <Phone className="h-3.5 w-3.5 text-[#526071]" /> {b.contactPhone}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Mail className="h-3.5 w-3.5 text-slate-400" /> {b.contactEmail}
+                        <Mail className="h-3.5 w-3.5 text-[#526071]" /> {b.contactEmail}
                       </span>
                     </div>
                   </div>
@@ -439,7 +439,7 @@ export const VendorBookingManagementPage: React.FC = () => {
 
       {/* QR CODE CHECK-IN MODAL */}
       {showQrModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-white backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2 text-slate-900 font-black text-lg">
@@ -447,7 +447,7 @@ export const VendorBookingManagementPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowQrModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-lg font-bold"
+                className="text-[#526071] hover:text-slate-700 text-lg font-bold"
               >
                 ✕
               </button>
@@ -509,7 +509,7 @@ export const VendorBookingManagementPage: React.FC = () => {
 
       {/* REFUND PROCESS MODAL */}
       {selectedRefundBooking && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-white backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 font-black text-slate-900 text-lg">
@@ -517,7 +517,7 @@ export const VendorBookingManagementPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedRefundBooking(null)}
-                className="text-slate-400 hover:text-slate-700 text-lg font-bold"
+                className="text-[#526071] hover:text-slate-700 text-lg font-bold"
               >
                 ✕
               </button>
@@ -560,21 +560,21 @@ export const VendorBookingManagementPage: React.FC = () => {
                     }`}
                   >
                     <div className="text-xs font-black">{item.label}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{item.desc}</div>
+                    <div className="text-[10px] text-[#526071] mt-0.5">{item.desc}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Calculated Refund Amount */}
-            <div className="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-between">
+            <div className="bg-white text-[#0F172A] p-4 rounded-2xl flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Số tiền hoàn trả du khách</span>
-                <div className="text-2xl font-black text-emerald-400">
+                <span className="text-[11px] text-[#526071] uppercase font-bold tracking-wider">Số tiền hoàn trả du khách</span>
+                <div className="text-2xl font-black text-emerald-700">
                   {Math.round(((selectedRefundBooking.totalPrice || 0) * refundPercent) / 100).toLocaleString('vi-VN')} đ
                 </div>
               </div>
-              <span className="bg-emerald-500/20 text-emerald-300 text-xs font-black px-3 py-1 rounded-xl">
+              <span className="bg-emerald-500/20 text-emerald-700 text-xs font-black px-3 py-1 rounded-xl">
                 {refundPercent}% Giá trị
               </span>
             </div>
