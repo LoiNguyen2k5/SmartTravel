@@ -11,8 +11,9 @@ import {
   Star, Clock, Calendar, MapPin, 
   HelpCircle, ShieldCheck, ChevronRight, ChevronLeft, PhoneCall, 
   Send, AlertCircle, Image as ImageIcon, X, Maximize2, Users,
-  Sparkles, Building2, CheckCircle2
+  Sparkles, Building2, CheckCircle2, Plane, Bus
 } from 'lucide-react';
+import { getTourTransportInfo } from '../../utils/tourTransport';
 import { VoucherSelectorModal } from '../../components/booking/VoucherSelectorModal';
 import { VisaRequirementInfo } from '../../components/visa/VisaRequirementInfo';
 import { visaService } from '../../services/visaService';
@@ -103,6 +104,7 @@ export const TourDetailPage: React.FC = () => {
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
   const [visaReqs, setVisaReqs] = useState<VisaRequirementResponse[]>([]);
+  const transportInfo = React.useMemo(() => getTourTransportInfo(tour || MOCK_DETAIL_TOUR), [tour]);
 
   useEffect(() => {
     const targetId = tour?.id || (id ? Number(id) : null);
@@ -981,6 +983,10 @@ export const TourDetailPage: React.FC = () => {
               <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30">
                 {tour.category === 'NUOC_NGOAI' ? 'Tour Quốc Tế' : 'Tour Trong Nước'}
               </span>
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1.5">
+                {transportInfo.mode === 'FLIGHT' ? <Plane className="w-3.5 h-3.5" /> : <Bus className="w-3.5 h-3.5" />}
+                {transportInfo.badgeLabel}: {transportInfo.fromCode} → {transportInfo.toCode}
+              </span>
               <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Bảo hiểm du lịch trọn gói
               </span>
@@ -1011,6 +1017,118 @@ export const TourDetailPage: React.FC = () => {
           
           {/* Left Column: Details & Tabs */}
           <div className="lg:col-span-2 space-y-8">
+
+            {/* Group Flight & Airport Meeting Point Card (Luồng Chuyến Bay Đoàn & Vận Chuyển Trọn Gói) */}
+            <div className="bg-[#0a111d]/90 backdrop-blur-xl rounded-2xl border border-teal-500/30 shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-teal-900/80 via-sky-900/70 to-slate-900/80 px-6 py-4 border-b border-teal-500/25 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+                    {transportInfo.mode === 'FLIGHT' ? <Plane className="h-5 w-5" /> : <Bus className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-black text-white uppercase tracking-wide">
+                      {transportInfo.mode === 'FLIGHT'
+                        ? 'Thông Tin Vận Chuyển & Chuyến Bay Đoàn Khứ Hồi (Đã Gồm Trong Giá Tour)'
+                        : 'Thông Tin Phương Tiện Đoàn Khứ Hồi & Điểm Đón (Đã Gồm Trong Giá Tour)'}
+                    </h3>
+                    <p className="text-[11px] text-teal-300 font-medium">
+                      Đơn vị vận chuyển: {transportInfo.carrier} · {transportInfo.baggageSummary}
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-teal-500/20 text-teal-200 border border-teal-400/30">
+                  {transportInfo.shortCarrierBadge}
+                </span>
+              </div>
+
+              <div className="p-6 space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Outbound Leg */}
+                  <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-black uppercase">
+                        Chiều đi (Ngày 1)
+                      </span>
+                      <span className="text-[11px] font-bold text-sky-300">
+                        {transportInfo.carrier} · {transportInfo.outbound.code}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xl font-black text-white">{transportInfo.fromCode}</div>
+                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.outbound.departTime}</div>
+                      </div>
+                      <div className="flex-1 px-2 text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-teal-400">
+                          <span className="h-[1px] flex-1 bg-teal-500/40" />
+                          {transportInfo.mode === 'FLIGHT' ? <Plane className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
+                          <span className="h-[1px] flex-1 bg-teal-500/40" />
+                        </div>
+                        <div className="text-[10px] font-bold text-teal-300 mt-1">{transportInfo.outbound.duration}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-black text-white">{transportInfo.toCode}</div>
+                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.outbound.arriveTime}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/5">
+                      <span className="truncate max-w-[48%]">{transportInfo.fromName}</span>
+                      <span className="truncate max-w-[48%] text-right">{transportInfo.toName}</span>
+                    </div>
+                  </div>
+
+                  {/* Inbound Leg */}
+                  <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-2.5 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[10px] font-black uppercase">
+                        Chiều về (Ngày {tour.durationDays})
+                      </span>
+                      <span className="text-[11px] font-bold text-sky-300">
+                        {transportInfo.carrier} · {transportInfo.inbound.code}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-xl font-black text-white">{transportInfo.toCode}</div>
+                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.inbound.departTime}</div>
+                      </div>
+                      <div className="flex-1 px-2 text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-sky-400">
+                          <span className="h-[1px] flex-1 bg-sky-500/40" />
+                          {transportInfo.mode === 'FLIGHT' ? <Plane className="h-4 w-4" /> : <Bus className="h-4 w-4" />}
+                          <span className="h-[1px] flex-1 bg-sky-500/40" />
+                        </div>
+                        <div className="text-[10px] font-bold text-sky-300 mt-1">{transportInfo.inbound.duration}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-black text-white">{transportInfo.fromCode}</div>
+                        <div className="text-sm font-extrabold text-amber-400">{transportInfo.inbound.arriveTime}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/5">
+                      <span className="truncate max-w-[48%]">{transportInfo.toName}</span>
+                      <span className="truncate max-w-[48%] text-right">{transportInfo.fromName}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Perforated Divider & Airport Meeting Point / Baggage Instructions */}
+                <div className="border-t border-dashed border-white/15 pt-4 space-y-2 text-xs text-slate-300">
+                  <p>
+                    <strong className="text-white">• Tiêu chuẩn hành lý theo đoàn:</strong> {transportInfo.baggageSummary} (đã bao gồm thuế phí sân bay / phí cầu đường).
+                  </p>
+                  <p>
+                    <strong className="text-teal-300">• Điểm tập trung làm thủ tục khởi hành:</strong> {transportInfo.meetingPoint}
+                  </p>
+                  <p className="text-slate-400">
+                    <strong className="text-slate-200">• Quy trình đón đoàn:</strong> {transportInfo.leaderInstruction}
+                  </p>
+                  <p className="text-slate-400">
+                    <strong className="text-slate-200">• Phương tiện tại điểm đến:</strong> {transportInfo.localTransport}
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Rating Breakdown Card (Matching Screenshot 2) */}
             <div className="bg-[#0a111d]/85 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col md:flex-row items-center gap-8">
@@ -1307,10 +1425,16 @@ export const TourDetailPage: React.FC = () => {
                         </tbody>
                         <tfoot>
                           <tr className="border-t border-white/15 bg-white/[0.04] font-bold text-slate-300 text-xs">
-                            <td className="p-3 border-r border-white/15 uppercase">CHUYẾN BAY DỰ KIẾN</td>
+                            <td className="p-3 border-r border-white/15 uppercase">
+                              {transportInfo.mode === 'FLIGHT' ? 'CHUYẾN BAY ĐOÀN DỰ KIẾN' : 'LỊCH XE ĐOÀN DỰ KIẾN'}
+                            </td>
                             <td colSpan={3} className="p-3 text-left pl-8 space-y-1 font-mono text-[11px]">
-                              <div className="text-slate-300">VJ3674 SGN ENH 14:35 – 19:00</div>
-                              <div className="text-slate-300">VJ3675 ENH SGN 20:00 – 23:05</div>
+                              <div className="text-slate-300">
+                                {transportInfo.outbound.code} {transportInfo.fromCode} → {transportInfo.toCode} {transportInfo.outbound.departTime} – {transportInfo.outbound.arriveTime} ({transportInfo.carrier})
+                              </div>
+                              <div className="text-slate-300">
+                                {transportInfo.inbound.code} {transportInfo.toCode} → {transportInfo.fromCode} {transportInfo.inbound.departTime} – {transportInfo.inbound.arriveTime} ({transportInfo.carrier})
+                              </div>
                             </td>
                           </tr>
                         </tfoot>
@@ -1552,10 +1676,27 @@ export const TourDetailPage: React.FC = () => {
                 
                 {/* Price Display */}
                 <div className="pt-2">
-                  <div className="text-xs text-slate-400 font-medium">Giá từ:</div>
+                  <div className="text-xs text-slate-400 font-medium">
+                    Giá trọn gói ({transportInfo.mode === 'FLIGHT' ? 'Đã gồm vé máy bay khứ hồi' : 'Đã gồm phương tiện khứ hồi'}):
+                  </div>
                   <div className="text-3xl font-black text-rose-400 tracking-tight">
                     {tour.price.toLocaleString('vi-VN')} đ <span className="text-xs font-normal text-slate-400">/ Khách</span>
                   </div>
+                </div>
+
+                {/* Group Flight / Transport & ID Document Match Notice */}
+                <div className="mt-3 rounded-xl bg-teal-500/10 border border-teal-500/25 p-3 space-y-1 text-[11px]">
+                  <div className="font-extrabold text-teal-300 flex items-center gap-1.5">
+                    {transportInfo.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-teal-400" /> : <Bus className="h-3.5 w-3.5 text-teal-400" />}
+                    <span>
+                      {transportInfo.mode === 'FLIGHT'
+                        ? `Vé máy bay đoàn khứ hồi ${transportInfo.fromCode} ⇄ ${transportInfo.toCode} (${transportInfo.shortCarrierBadge})`
+                        : `${transportInfo.badgeLabel}: ${transportInfo.fromCode} ⇄ ${transportInfo.toCode} (${transportInfo.shortCarrierBadge})`}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-300 leading-relaxed">
+                    {transportInfo.idDocumentNotice}
+                  </p>
                 </div>
               </div>
 

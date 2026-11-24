@@ -35,9 +35,12 @@ import {
 
   Package,
 
-  Globe
+  Globe,
+  Plane,
+  Bus
 
 } from 'lucide-react';
+import { getTourTransportInfo } from '../../utils/tourTransport';
 
 import { formatCurrency } from '../../utils/formatters';
 
@@ -133,6 +136,17 @@ export const CheckoutPage: React.FC = () => {
   const [fetchedVendorId, setFetchedVendorId] = useState<number | undefined>(stateData.vendorId);
 
   const [fetchedVendorName, setFetchedVendorName] = useState<string>(stateData.vendorName || 'NewTour Travel Company');
+  const checkoutTransport = React.useMemo(
+    () =>
+      getTourTransportInfo({
+        id: tourId,
+        title: tourTitle,
+        tourCode,
+        category: fetchedCategory as any,
+        requiresVisa: hasVisaConfig,
+      }),
+    [tourId, tourTitle, tourCode, fetchedCategory, hasVisaConfig]
+  );
 
 
 
@@ -1440,6 +1454,28 @@ export const CheckoutPage: React.FC = () => {
 
                     <span>Đơn vị tổ chức: <strong className="text-sky-300 font-bold">{fetchedVendorName || 'NewTour Travel Company'}</strong></span>
 
+                  </div>
+
+                  {/* Group Flight / Transport Summary in Checkout Sidebar */}
+                  <div className="mt-2 rounded-xl bg-teal-500/10 border border-teal-500/25 p-3 space-y-1.5 text-[11px]">
+                    <div className="font-extrabold text-teal-300 flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5">
+                        {checkoutTransport.mode === 'FLIGHT' ? <Plane className="h-3.5 w-3.5 text-teal-400" /> : <Bus className="h-3.5 w-3.5 text-teal-400" />}
+                        {checkoutTransport.badgeLabel} ({checkoutTransport.fromCode} ⇄ {checkoutTransport.toCode})
+                      </span>
+                      <span className="text-[10px] font-bold text-sky-300">
+                        {checkoutTransport.outbound.code}/{checkoutTransport.inbound.code}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-300">
+                      • <strong>Hãng & Hành lý:</strong> {checkoutTransport.carrier} ({checkoutTransport.baggageSummary})
+                    </div>
+                    <div className="text-[10px] text-teal-200/90">
+                      • <strong>Điểm tập trung:</strong> {checkoutTransport.meetingPoint}
+                    </div>
+                    <div className="text-[10px] text-amber-300/90">
+                      • {checkoutTransport.idDocumentNotice}
+                    </div>
                   </div>
 
                 </div>

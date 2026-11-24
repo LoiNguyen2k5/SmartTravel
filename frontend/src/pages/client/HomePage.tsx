@@ -4,12 +4,13 @@ import { posts } from '../../data/blogPosts';
 import { 
   PhoneCall, Calendar,
   CheckCircle2, ArrowRight, Tag,
-  Star, Eye, Users
+  Star, Eye, Users, Plane, Bus
 } from 'lucide-react';
 import { tourScheduleService } from '../../services/tourScheduleService';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
 import { LuxuryHero3D } from '../../components/home/LuxuryHero3D';
+import { getTourTransportInfo } from '../../utils/tourTransport';
 
 const homeBlogPosts = posts.filter(post =>
   [112, 115, 120].includes(post.id)
@@ -174,7 +175,9 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {domesticTours.map((tour) => (
+          {domesticTours.map((tour) => {
+            const transport = getTourTransportInfo(tour);
+            return (
             <div 
               key={tour.id} 
               className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 hover:shadow-[0_16px_40px_rgba(56,189,248,0.15)] transition-all duration-300 flex flex-col justify-between group overflow-hidden"
@@ -186,6 +189,14 @@ export const HomePage: React.FC = () => {
                     alt={tour.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out" 
                   />
+                  <div className={`absolute top-3 left-3 backdrop-blur-md border px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm flex items-center gap-1.5 ${
+                    transport.mode === 'FLIGHT'
+                      ? 'bg-teal-600/90 border-teal-300/30'
+                      : 'bg-indigo-600/90 border-indigo-300/30'
+                  }`}>
+                    {transport.mode === 'FLIGHT' ? <Plane className="h-3 w-3" /> : <Bus className="h-3 w-3" />}
+                    <span>{transport.badgeLabel}</span>
+                  </div>
                   <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm flex items-center gap-1">
                     <Tag className="h-3 w-3 text-cyan-400" />
                     <span>{tour.durationDays} ngày {tour.durationNights > 0 ? `${tour.durationNights} đêm` : ''}</span>
@@ -193,6 +204,19 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 space-y-3.5">
+                  <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-500/10 border border-sky-500/20 px-3 py-1.5 text-[11px]">
+                    <div className="flex items-center gap-1.5 font-extrabold text-sky-300">
+                      <span>{transport.fromCode}</span>
+                      {transport.mode === 'FLIGHT' ? (
+                        <Plane className="h-3.5 w-3.5 text-cyan-400" />
+                      ) : (
+                        <Bus className="h-3.5 w-3.5 text-cyan-400" />
+                      )}
+                      <span>{transport.toCode}</span>
+                    </div>
+                    <span className="text-slate-300 font-semibold truncate">{transport.shortCarrierBadge}</span>
+                  </div>
+
                   <h4 className="font-display font-bold text-sm sm:text-base text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors">
                     {tour.title}
                   </h4>
@@ -231,7 +255,8 @@ export const HomePage: React.FC = () => {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -258,7 +283,9 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {internationalTours.map((tour) => (
+          {internationalTours.map((tour) => {
+            const transport = getTourTransportInfo(tour);
+            return (
             <div 
               key={tour.id} 
               className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-sky-400/40 hover:shadow-[0_16px_40px_rgba(56,189,248,0.15)] transition-all duration-300 flex flex-col justify-between group overflow-hidden"
@@ -270,6 +297,10 @@ export const HomePage: React.FC = () => {
                     alt={tour.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out" 
                   />
+                  <div className="absolute top-3 left-3 bg-teal-600/90 backdrop-blur-md border border-teal-300/30 px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm flex items-center gap-1.5">
+                    <Plane className="h-3 w-3" />
+                    <span>{transport.badgeLabel}</span>
+                  </div>
                   <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm flex items-center gap-1">
                     <Tag className="h-3 w-3 text-cyan-400" />
                     <span>{tour.durationDays} ngày {tour.durationNights > 0 ? `${tour.durationNights} đêm` : ''}</span>
@@ -277,6 +308,15 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 space-y-3.5">
+                  <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-500/10 border border-sky-500/20 px-3 py-1.5 text-[11px]">
+                    <div className="flex items-center gap-1.5 font-extrabold text-sky-300">
+                      <span>{transport.fromCode}</span>
+                      <Plane className="h-3.5 w-3.5 text-cyan-400" />
+                      <span>{transport.toCode}</span>
+                    </div>
+                    <span className="text-slate-300 font-semibold truncate">{transport.shortCarrierBadge}</span>
+                  </div>
+
                   <h4 className="font-display font-bold text-sm sm:text-base text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors">
                     {tour.title}
                   </h4>
@@ -315,7 +355,8 @@ export const HomePage: React.FC = () => {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

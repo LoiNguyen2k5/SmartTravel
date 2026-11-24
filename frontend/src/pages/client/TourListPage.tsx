@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { Tour } from '../../types/tour';
-import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight } from 'lucide-react';
+import { Eye, Star, Calendar, Clock, Filter, RefreshCw, ChevronRight, Plane, Bus } from 'lucide-react';
 import { MOCK_TOURS } from '../../data/mockTours';
 import { tourScheduleService } from '../../services/tourScheduleService';
+import { getTourTransportInfo, TourTransportMode } from '../../utils/tourTransport';
 
 export const TourListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -59,6 +60,10 @@ export const TourListPage: React.FC = () => {
   // Filters state
   const [departure, setDeparture] = useState<string>(() => searchParams.get('departure') || 'Tất cả');
   const [destination, setDestination] = useState<string>(() => searchParams.get('destination') || 'Tất cả');
+  const [transportFilter, setTransportFilter] = useState<'ALL' | TourTransportMode>(() => {
+    const raw = searchParams.get('transport')?.toUpperCase();
+    return raw === 'FLIGHT' || raw === 'LAND_SEA' ? raw : 'ALL';
+  });
   const [durationFilter, setDurationFilter] = useState<string>('ALL');
   const [categoryFilter, setCategoryFilter] = useState<string>(() => parseCategoryFromParams(searchParams));
   const [budgetFilter, setBudgetFilter] = useState<string>('ALL');
@@ -68,6 +73,7 @@ export const TourListPage: React.FC = () => {
   const prevFiltersRef = React.useRef({
     departure,
     destination,
+    transportFilter,
     durationFilter,
     categoryFilter,
     budgetFilter,
@@ -125,6 +131,7 @@ export const TourListPage: React.FC = () => {
     const filterChanged =
       prev.departure !== departure ||
       prev.destination !== destination ||
+      prev.transportFilter !== transportFilter ||
       prev.durationFilter !== durationFilter ||
       prev.categoryFilter !== categoryFilter ||
       prev.budgetFilter !== budgetFilter ||
@@ -134,6 +141,7 @@ export const TourListPage: React.FC = () => {
       prevFiltersRef.current = {
         departure,
         destination,
+        transportFilter,
         durationFilter,
         categoryFilter,
         budgetFilter,
@@ -150,7 +158,7 @@ export const TourListPage: React.FC = () => {
     }
 
     fetchTours();
-  }, [departure, destination, durationFilter, categoryFilter, budgetFilter, sortBy]);
+  }, [departure, destination, transportFilter, durationFilter, categoryFilter, budgetFilter, sortBy]);
 
   // Listen to schedule and custom tour changes
   useEffect(() => {
@@ -195,6 +203,9 @@ export const TourListPage: React.FC = () => {
       if (destination !== 'Tất cả') {
         liveTours = liveTours.filter(t => t.title.toLowerCase().includes(destination.toLowerCase()));
       }
+      if (transportFilter !== 'ALL') {
+        liveTours = liveTours.filter(t => getTourTransportInfo(t).mode === transportFilter);
+      }
       if (durationFilter === '1_DAY') {
         liveTours = liveTours.filter(t => t.durationDays === 1);
       } else if (durationFilter === '1_TO_3') {
@@ -237,6 +248,7 @@ export const TourListPage: React.FC = () => {
 	setCurrentPage(1);
     setDeparture('Tất cả');
     setDestination('Tất cả');
+    setTransportFilter('ALL');
     setDurationFilter('ALL');
     setCategoryFilter('ALL');
     setBudgetFilter('ALL');
@@ -337,6 +349,39 @@ export const TourListPage: React.FC = () => {
                   <option value={destination}>{destination}</option>
                 )}
               </select>
+            </div>
+
+            {/* Phương Tiện Di Chuyển */}
+            <div className="space-y-2 pt-2 border-t border-white/8">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Phương Tiện Di Chuyển</label>
+              <div className="space-y-2 text-sm text-slate-400">
+                {[
+                  { id: 'ALL', label: 'Tất cả phương tiện' },
+                  { id: 'FLIGHT', label: 'Máy bay khứ hồi + Ô tô' },
+                  { id: 'LAND_SEA', label: 'Xe Limousine / Tàu cao tốc' },
+                ].map((opt) => (
+                  <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer text-xs font-medium hover:text-sky-400 text-slate-400">
+                    <input
+                      type="radio"
+                      name="transport"
+                      checked={transportFilter === opt.id}
+                      onChange={() => {
+                        const modeVal = opt.id as 'ALL' | TourTransportMode;
+                        setTransportFilter(modeVal);
+                        const newParams = new URLSearchParams(searchParams);
+                        if (modeVal === 'ALL') {
+                          newParams.delete('transport');
+                        } else {
+                          newParams.set('transport', modeVal);
+                        }
+                        setSearchParams(newParams, { replace: true });
+                      }}
+                      className="text-sky-600 focus:ring-sky-500 rounded-full"
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
             </div>
 
             {/* Khoảng Thời Gian */}
@@ -478,7 +523,9 @@ export const TourListPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {visibleTours.map((tour) => (
+                {visibleTours.map((tour) => {
+                  const transport = getTourTransportInfo(tour);
+                  return (
                   <div 
                     key={tour.id} 
                     className="group overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col hover:-translate-y-1"
@@ -495,10 +542,32 @@ export const TourListPage: React.FC = () => {
                       <div className="absolute top-3 left-3 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full">
                         KH từ {tour.departureLocation || 'TP.Hồ Chí Minh'}
                       </div>
+                      <div className={`absolute top-3 right-3 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 border ${
+                        transport.mode === 'FLIGHT'
+                          ? 'bg-teal-600/90 border-teal-300/30'
+                          : 'bg-indigo-600/90 border-indigo-300/30'
+                      }`}>
+                        {transport.mode === 'FLIGHT' ? <Plane className="h-3 w-3" /> : <Bus className="h-3 w-3" />}
+                        <span>{transport.badgeLabel}</span>
+                      </div>
                     </div>
 
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                       <div className="space-y-2">
+                        {/* Flight / Route Bar */}
+                        <div className="flex items-center justify-between gap-2 rounded-xl bg-sky-500/10 border border-sky-500/20 px-3 py-1.5 text-[11px]">
+                          <div className="flex items-center gap-1.5 font-extrabold text-sky-300">
+                            <span>{transport.fromCode}</span>
+                            {transport.mode === 'FLIGHT' ? (
+                              <Plane className="h-3.5 w-3.5 text-cyan-400" />
+                            ) : (
+                              <Bus className="h-3.5 w-3.5 text-cyan-400" />
+                            )}
+                            <span>{transport.toCode}</span>
+                          </div>
+                          <span className="text-slate-300 font-semibold truncate">{transport.shortCarrierBadge}</span>
+                        </div>
+
                         <h3 
                           onClick={() => navigate(`/tours/${tour.id}`, { state: { fromPage: activePage } })}
                           className="text-xs font-extrabold text-white hover:text-sky-300 cursor-pointer line-clamp-2 leading-snug uppercase transition-colors"
@@ -568,7 +637,8 @@ export const TourListPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-				        ))}
+                  );
+				        })}
 				      </div>
 				    )}
 
