@@ -203,23 +203,6 @@ export const LuxuryHero3D: React.FC<LuxuryHero3DProps> = ({
               <ChevronRight className="h-4 w-4 text-cyan-200 transition-transform group-hover:translate-x-1" />
             </span>
           </button>
-
-          {/* AI Advisor Button */}
-          <button
-            type="button"
-            onClick={() => {
-              // Trigger floating AI assistant widget if available
-              const aiTrigger = document.querySelector('[data-ai-chat-trigger]') as HTMLElement;
-              if (aiTrigger) aiTrigger.click();
-              else navigate('/tours');
-            }}
-            className="group relative overflow-hidden rounded-2xl px-7 py-3.5 text-sm font-semibold text-white/90 bg-white/5 border border-white/15 backdrop-blur-md transition-all duration-300 hover:bg-white/10 hover:border-white/30"
-          >
-            <span className="relative z-10 flex items-center gap-2 text-sky-200">
-              <Sparkles className="h-4 w-4 text-cyan-300" />
-              Tư vấn cùng AI Chatbot
-            </span>
-          </button>
         </div>
 
         {/* =====================================================================
