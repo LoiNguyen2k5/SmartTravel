@@ -27,6 +27,7 @@ const QUICK_PROMPTS = [
 export const AiChatWidget: React.FC = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [mobileSocialOpen, setMobileSocialOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
@@ -163,7 +164,10 @@ export const AiChatWidget: React.FC = () => {
       <div className="floating-hub no-print fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-2 sm:gap-2.5 items-center">
         {/* 1. ROBOT ICON BUTTON (1 icon robot, không text, nằm trên Zalo) */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setMobileSocialOpen(false);
+          }}
           className={`group relative h-11 w-11 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 border border-white/20 focus:outline-none cursor-pointer ${
             isOpen 
               ? 'bg-emerald-700 text-white shadow-emerald-950/50' 
@@ -181,8 +185,8 @@ export const AiChatWidget: React.FC = () => {
           )}
         </button>
 
-        {/* Secondary contact links: compact on mobile & auto-hidden on short landscape viewports */}
-        <div className={`floating-social-links ${isOpen ? 'hidden sm:flex' : 'flex'} flex-col gap-2 sm:gap-2.5 items-center`}>
+        {/* Secondary contact links: collapsible on mobile (<640px) so right-side content isn't covered; always visible on desktop (sm:flex) */}
+        <div className={`floating-social-links ${mobileSocialOpen && !isOpen ? 'flex' : 'hidden'} sm:flex flex-col gap-2 sm:gap-2.5 items-center`}>
         {/* 2. ZALO ICON */}
         <a
           href="https://zalo.me/0941899554"
@@ -236,30 +240,43 @@ export const AiChatWidget: React.FC = () => {
           <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
         </a>
         </div>
+
+        {/* Mobile-only compact toggle for Zalo / FB / IG / Hotline / Map */}
+        {!isOpen && (
+          <button
+            type="button"
+            onClick={() => setMobileSocialOpen((prev) => !prev)}
+            className="sm:hidden h-10 w-10 rounded-2xl bg-[#D95D39] text-white flex items-center justify-center shadow-xl border border-white/25 active:scale-95 transition-all cursor-pointer"
+            title={mobileSocialOpen ? 'Thu gọn kênh liên hệ' : 'Mở kênh liên hệ (Zalo, FB, Hotline, Bản đồ)'}
+            aria-label="Mở kênh liên hệ nhanh"
+          >
+            {mobileSocialOpen ? <X className="h-4 w-4" /> : <Phone className="h-4 w-4 fill-white" />}
+          </button>
+        )}
       </div>
 
       {/* ─── CHAT WINDOW MODAL ─── */}
       {isOpen && (
         <div className="floating-chat-window no-print fixed bottom-[4.5rem] left-3 right-3 sm:bottom-6 sm:left-auto sm:right-24 z-50 flex h-[74dvh] sm:h-[560px] max-h-[calc(100dvh-5.5rem)] sm:max-h-[calc(100dvh-3rem)] w-auto sm:w-[420px] sm:max-w-[calc(100vw-7rem)] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           {/* HEADER */}
-          <div className="flex items-center justify-between border-b border-slate-100 bg-[#0B3B49] p-4 text-white">
-            <div className="flex items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0D9488] text-white shadow-md">
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 bg-[#0B3B49] p-3.5 sm:p-4 text-white">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-2xl bg-[#0D9488] text-white shadow-md">
                 <Bot className="h-5 w-5" />
                 <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0B3B49] bg-emerald-400"></span>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-extrabold text-white">SmartTravel AI</h3>
-                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-300 border border-emerald-500/30">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-nowrap">
+                  <h3 className="text-sm font-extrabold text-white whitespace-nowrap">SmartTravel AI</h3>
+                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">
                     <Sparkles className="h-2.5 w-2.5 text-amber-300" /> Trực Tuyến
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-300">Trợ lý du lịch & thủ tục Visa trực tuyến</p>
+                <p className="text-[11px] text-slate-300 truncate">Trợ lý du lịch &amp; thủ tục Visa</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-slate-300">
+            <div className="flex items-center gap-1 text-slate-300 shrink-0">
               <button
                 onClick={handleClearHistory}
                 className="rounded-xl p-2 hover:bg-white/10 hover:text-white transition"

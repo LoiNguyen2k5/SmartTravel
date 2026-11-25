@@ -934,12 +934,14 @@ export const TourDetailPage: React.FC = () => {
                 <span>Nhấn để xem &amp; chuyển ảnh</span>
               </span>
             </div>
-            <div className="absolute bottom-4 left-4 bg-[#0B3B49]/90 text-white text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/15">
-              Mã tour: <span className="text-[#5EEAD4]">{tour.tourCode || 'N/A'}</span>
-            </div>
-            <div className="absolute bottom-4 right-4 bg-white/95 hover:bg-white text-[#0B3B49] text-xs font-extrabold px-3.5 py-1.5 rounded-lg backdrop-blur-md border border-[#E6E1DA] flex items-center gap-1.5 shadow-sm transition">
-              <ImageIcon className="h-3.5 w-3.5 text-[#0D9488]" />
-              <span>{galleryImages.length} hình ảnh</span>
+            <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-center justify-between gap-2">
+              <div className="bg-[#0B3B49]/90 text-white text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/15 truncate min-w-0">
+                Mã tour: <span className="text-[#5EEAD4]">{tour.tourCode || 'N/A'}</span>
+              </div>
+              <div className="bg-white/95 hover:bg-white text-[#0B3B49] text-[11px] sm:text-xs font-extrabold px-3 sm:px-3.5 py-1.5 rounded-lg backdrop-blur-md border border-[#E6E1DA] flex items-center gap-1.5 shadow-sm transition shrink-0 whitespace-nowrap">
+                <ImageIcon className="h-3.5 w-3.5 text-[#0D9488]" />
+                <span>{galleryImages.length} hình ảnh</span>
+              </div>
             </div>
           </div>
           
@@ -1043,11 +1045,11 @@ export const TourDetailPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Outbound Leg */}
                   <div className="rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] p-4 space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase whitespace-nowrap shrink-0">
                         Chiều đi (Ngày 1)
                       </span>
-                      <span className="text-[11px] font-bold text-[#0F5264]">
+                      <span className="text-[11px] font-bold text-[#0F5264] truncate">
                         {transportInfo.carrier} · {transportInfo.outbound.code}
                       </span>
                     </div>
@@ -1077,11 +1079,11 @@ export const TourDetailPage: React.FC = () => {
 
                   {/* Inbound Leg */}
                   <div className="rounded-xl bg-[#F8FAFC] border border-[#CBD5E1] p-4 space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#E6F4F1] text-[#0B3B49] text-[10px] font-black uppercase whitespace-nowrap shrink-0">
                         Chiều về (Ngày {tour.durationDays})
                       </span>
-                      <span className="text-[11px] font-bold text-[#0F5264]">
+                      <span className="text-[11px] font-bold text-[#0F5264] truncate">
                         {transportInfo.carrier} · {transportInfo.inbound.code}
                       </span>
                     </div>
