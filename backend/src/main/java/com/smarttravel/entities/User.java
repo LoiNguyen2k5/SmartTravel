@@ -27,7 +27,7 @@ public class User extends BaseEntity {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "LONGTEXT")
     private String avatarUrl;
 
     @Builder.Default

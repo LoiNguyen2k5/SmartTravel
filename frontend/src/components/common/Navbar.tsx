@@ -299,8 +299,12 @@ export const Navbar: React.FC = () => {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#99F6E4] bg-[#E6F4F1] hover:bg-[#CCF0E8] text-[#0B3B49] transition focus:outline-none cursor-pointer"
                   aria-expanded={dropdownOpen}
                 >
-                  <div className="h-7 w-7 rounded-full bg-[#0B3B49] text-white flex items-center justify-center text-xs font-bold uppercase">
-                    {user?.fullName?.charAt(0) || 'U'}
+                  <div className="h-7 w-7 rounded-full bg-[#0B3B49] text-white flex items-center justify-center text-xs font-bold uppercase overflow-hidden shrink-0">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user?.fullName || 'Avatar'} className="h-full w-full object-cover" />
+                    ) : (
+                      user?.fullName?.charAt(0) || 'U'
+                    )}
                   </div>
                   <span className="max-w-[115px] truncate text-xs font-extrabold">{user?.fullName}</span>
                   <ChevronDown
@@ -553,8 +557,12 @@ export const Navbar: React.FC = () => {
               {isAuthenticated ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-[#0B3B49] text-white flex items-center justify-center text-sm font-bold uppercase">
-                      {user?.fullName?.charAt(0) || 'U'}
+                    <div className="h-9 w-9 rounded-full bg-[#0B3B49] text-white flex items-center justify-center text-sm font-bold uppercase overflow-hidden shrink-0">
+                      {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user?.fullName || 'Avatar'} className="h-full w-full object-cover" />
+                      ) : (
+                        user?.fullName?.charAt(0) || 'U'
+                      )}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-[#0F172A]">{user?.fullName}</span>

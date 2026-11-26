@@ -32,6 +32,7 @@ import { TransactionSettlementPage } from '../pages/admin/TransactionSettlementP
 import { VoucherManagementPage } from '../pages/admin/VoucherManagementPage';
 import { VendorApprovalPage } from '../pages/admin/VendorApprovalPage';
 import { DestinationManagementPage } from '../pages/admin/DestinationManagementPage';
+import { AdminProfilePage } from '../pages/admin/AdminProfilePage';
 
 // Vendor Pages
 import { VendorDashboardPage } from '../pages/vendor/VendorDashboardPage';
@@ -97,6 +98,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin/vouchers" element={<VoucherManagementPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/vendor-approvals" element={<VendorApprovalPage />} />
+            <Route path="/admin/profile" element={<AdminProfilePage />} />
           </Route>
         </Route>
 

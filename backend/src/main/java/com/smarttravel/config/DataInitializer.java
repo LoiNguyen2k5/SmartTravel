@@ -8,6 +8,7 @@ import com.smarttravel.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,26 @@ public class DataInitializer implements CommandLineRunner {
     private final VisaTemplateRepository visaTemplateRepository;
     private final VisaRequirementRepository visaRequirementRepository;
     private final TourRepository tourRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
         log.info("Khởi tạo dữ liệu mẫu (Seed Data) cho hệ thống SmartTravel...");
+
+        // Đảm bảo cột users.avatar_url hỗ trợ lưu ảnh đại diện tải trực tiếp từ máy (Data URL / LONGTEXT)
+        try {
+            String colType = jdbcTemplate.queryForObject(
+                    "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'avatar_url'",
+                    String.class
+            );
+            if (colType != null && !"longtext".equalsIgnoreCase(colType)) {
+                jdbcTemplate.execute("ALTER TABLE users MODIFY COLUMN avatar_url LONGTEXT");
+                log.info("Đã nâng cấp kiểu cột users.avatar_url từ {} sang LONGTEXT.", colType);
+            }
+        } catch (Exception e) {
+            log.debug("Bỏ qua kiểm tra nâng cấp kiểu cột users.avatar_url: {}", e.getMessage());
+        }
 
         // 1. Tạo các Roles mặc định nếu chưa tồn tại
         Role adminRole = roleRepository.findByName(RoleEnum.ROLE_ADMIN)

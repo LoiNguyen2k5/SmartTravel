@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Building2, CreditCard, ShieldCheck, Save, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ProfileAccountCard } from '../../components/common/ProfileAccountCard';
 
 export const VendorProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -34,12 +35,15 @@ export const VendorProfilePage: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-          <Building2 className="h-8 w-8 text-emerald-600" /> Hồ Sơ Doanh Nghiệp & Ngân Hàng
+          <Building2 className="h-8 w-8 text-emerald-600" /> Hồ Sơ Đại Lý & Tài Khoản
         </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Cập nhật thông tin đại lý tour, giấy phép kinh doanh và tài khoản nhận doanh thu bán tour
+          Cập nhật ảnh đại diện, thông tin cá nhân, bảo mật tài khoản, hồ sơ pháp lý doanh nghiệp và tài khoản nhận doanh thu bán tour
         </p>
       </div>
+
+      {/* SECTION 0: TÀI KHOẢN CÁ NHÂN, AVATAR TẢI TỪ MÁY & ĐỔI MẬT KHẨU */}
+      <ProfileAccountCard roleBadge="Vendor Partner" defaultDisplayName="Nhà Cung Cấp Tour" />
 
       {saved && (
         <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-700 border border-emerald-200">

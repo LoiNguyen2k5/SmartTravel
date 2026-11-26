@@ -12,7 +12,8 @@ import {
   Building2,
   MapPin,
   Menu,
-  X
+  X,
+  UserCircle
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { vendorApplicationService } from '../services/vendorApplicationService';
@@ -60,6 +61,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Giao dịch & Đối soát', path: '/admin/settlements', icon: CreditCard },
     { label: 'Quản lý Khuyến mãi', path: '/admin/vouchers', icon: Ticket },
     { label: 'Tài khoản & Phân quyền', path: '/admin/users', icon: Users },
+    { label: 'Hồ sơ Cá nhân', path: '/admin/profile', icon: UserCircle },
   ];
 
   return (
@@ -135,15 +137,24 @@ export const AdminLayout: React.FC = () => {
 
         {/* User Info & Footer */}
         <div className="space-y-2.5 pt-4 mt-4 border-t border-white/15">
-          <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-[#0D9488] flex items-center justify-center font-bold text-white text-xs shrink-0">
-              AD
+          <Link
+            to="/admin/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="p-2.5 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition flex items-center gap-3"
+            title="Chỉnh sửa hồ sơ Quản trị viên"
+          >
+            <div className="h-9 w-9 rounded-full bg-[#0D9488] flex items-center justify-center font-bold text-white text-xs shrink-0 overflow-hidden border border-[#5EEAD4]/60">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user?.fullName || 'Admin'} className="h-full w-full object-cover" />
+              ) : (
+                (user?.fullName?.trim().charAt(0).toUpperCase() || 'AD')
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <div className="font-bold text-xs text-white truncate">{user?.fullName || 'Administrator'}</div>
               <div className="text-[11px] text-slate-300 truncate">{user?.email || 'admin@smarttravel.com'}</div>
             </div>
-          </div>
+          </Link>
 
           <Link
             to="/"

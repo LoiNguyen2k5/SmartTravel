@@ -45,7 +45,11 @@ public class UserServiceImpl implements UserService {
             user.setPhone(request.getPhone().trim());
         }
         if (request.getAvatarUrl() != null) {
-            user.setAvatarUrl(request.getAvatarUrl().trim());
+            String trimmedAvatar = request.getAvatarUrl().trim();
+            if (trimmedAvatar.length() > 2_000_000) {
+                throw new BadRequestException("Dung lượng ảnh đại diện quá lớn. Vui lòng chọn ảnh nhỏ hơn 5MB.");
+            }
+            user.setAvatarUrl(trimmedAvatar);
         }
 
         User saved = userRepository.save(user);

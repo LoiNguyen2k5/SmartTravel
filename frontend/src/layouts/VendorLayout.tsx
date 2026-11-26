@@ -118,17 +118,28 @@ export const VendorLayout: React.FC = () => {
 
         {/* User Info & Footer Actions */}
         <div className="border-t border-white/15 pt-4 mt-4 space-y-3">
-          <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 flex items-center gap-3">
-            <img
-              src={user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-              alt={user?.fullName}
-              className="h-9 w-9 rounded-full object-cover border-2 border-[#5EEAD4] shrink-0"
-            />
+          <NavLink
+            to="/vendor/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="p-2.5 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition flex items-center gap-3"
+            title="Chỉnh sửa hồ sơ Đại lý & Ảnh đại diện"
+          >
+            <div className="h-9 w-9 rounded-full bg-[#0D9488] flex items-center justify-center font-bold text-white text-xs overflow-hidden border-2 border-[#5EEAD4] shrink-0">
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user?.fullName || 'Vendor'}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                (user?.fullName?.trim().charAt(0).toUpperCase() || 'V')
+              )}
+            </div>
             <div className="overflow-hidden min-w-0">
               <p className="text-xs font-bold text-white truncate">{user?.fullName || 'Nhà Cung Cấp Tour'}</p>
               <p className="text-[10px] text-slate-300 truncate">{user?.email}</p>
             </div>
-          </div>
+          </NavLink>
 
           <div className="grid grid-cols-2 gap-2 pt-1">
             <a
