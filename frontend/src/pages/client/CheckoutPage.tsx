@@ -290,49 +290,17 @@ export const CheckoutPage: React.FC = () => {
 
 
   const deductSeatsIfPending = () => {
-
     if (seatsDeductedRef.current) return;
-
     seatsDeductedRef.current = true;
-
     try {
-
-      const scheduleId = stateData.scheduleId;
-
-      const totalGuests = (adults || 1) + (children || 0);
-
-      const chosenDate = stateData.departureDate;
-
       if (tourId) {
-
-        tourScheduleService.bookSeatsForSchedule(tourId, scheduleId, totalGuests, chosenDate);
-
+        // Backend createBooking đã tự động tăng bookedCount trên TourSchedule trong cùng Transaction;
+        // chỉ đồng bộ lại cache lịch khởi hành từ máy chủ để tránh cộng đúp số chỗ.
+        void tourScheduleService.fetchSchedulesForTour(tourId);
       }
-
-      if (scheduleId) {
-
-        const storedSeatsStr = localStorage.getItem('schedule_seat_counts');
-
-        const storedSeats: Record<number, number> = storedSeatsStr 
-
-          ? JSON.parse(storedSeatsStr) 
-
-          : { 1: 28, 2: 35, 3: 40, 4: 40, 5: 45, 6: 45 };
-
-        const current = storedSeats[scheduleId] !== undefined ? storedSeats[scheduleId] : 35;
-
-        storedSeats[scheduleId] = Math.max(0, current - totalGuests);
-
-        localStorage.setItem('schedule_seat_counts', JSON.stringify(storedSeats));
-
-      }
-
     } catch (e) {
-
-      console.error('Error updating seat count:', e);
-
+      console.error('Error syncing schedule seats:', e);
     }
-
   };
 
 
@@ -396,6 +364,8 @@ export const CheckoutPage: React.FC = () => {
             await bookingService.createBooking({
 
         tourId: tourId,
+
+        tourScheduleId: stateData.scheduleId || undefined,
 
         numberOfAdults: adults,
 
@@ -557,6 +527,8 @@ export const CheckoutPage: React.FC = () => {
             await bookingService.createBooking({
 
         tourId: tourId,
+
+        tourScheduleId: stateData.scheduleId || undefined,
 
         numberOfAdults: adults,
 

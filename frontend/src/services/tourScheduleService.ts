@@ -3,6 +3,7 @@ import { ApiResponse } from '../types/common';
 
 export type TourScheduleStatus =
   | 'ACTIVE'
+  | 'IN_PROGRESS'
   | 'CLOSED_BOOKING'
   | 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'
   | 'COMPLETED';
@@ -17,7 +18,8 @@ export interface TourScheduleItem {
   bookedCount: number;
   note?: string;
   seasonalPriceMultiplier?: number;
-  status?: TourScheduleStatus;
+  status?: TourScheduleStatus | 'OPEN' | 'CANCELLED';
+  completedBookingsCount?: number;
 }
 
 // In-memory cache đồng bộ trực tiếp từ bảng tour_schedules trong CSDL MySQL/Oracle
@@ -133,15 +135,36 @@ export const computeScheduleStatus = (
   isBookable: boolean;
 } => {
   const daysRemaining = getDaysUntilDeparture(schedule.startDate);
+  const daysUntilEnd = schedule.endDate ? getDaysUntilDeparture(schedule.endDate) : daysRemaining;
   const minLeadDays = getBookingCutoffDays(category, visaConfig);
   const minParticipants = schedule.minParticipants || 10;
 
-  if (daysRemaining < 0) {
+  if (schedule.status === 'COMPLETED' || daysUntilEnd < 0) {
     return {
       status: 'COMPLETED',
       daysRemaining,
       minLeadDays,
       reason: 'Đợt khởi hành đã hoàn tất chuyến đi',
+      isBookable: false,
+    };
+  }
+
+  if (schedule.status === 'CANCELLED' || schedule.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS') {
+    return {
+      status: 'CANCELLED_NOT_ENOUGH_PARTICIPANTS',
+      daysRemaining,
+      minLeadDays,
+      reason: 'Đợt khởi hành đã bị hủy',
+      isBookable: false,
+    };
+  }
+
+  if (daysRemaining <= 0 && daysUntilEnd >= 0) {
+    return {
+      status: 'IN_PROGRESS',
+      daysRemaining,
+      minLeadDays,
+      reason: 'Đoàn đang trong hành trình du lịch',
       isBookable: false,
     };
   }
@@ -244,7 +267,12 @@ export const tourScheduleService = {
   ): TourScheduleItem[] => {
     const all = tourScheduleService.getSchedulesForTour(tourId);
     return all
-      .filter((s) => isUpcomingSchedule(s.startDate))
+      .filter((s) => {
+        if (s.status === 'COMPLETED' || s.status === 'CANCELLED' || s.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS') {
+          return false;
+        }
+        return getDaysUntilDeparture(s.startDate) > 0;
+      })
       .sort((a, b) => a.startDate.localeCompare(b.startDate))
       .map((s) => {
         const computed = computeScheduleStatus(s, category, visaConfig);
@@ -273,6 +301,7 @@ export const tourScheduleService = {
 
     return {
       active: all.filter((s) => s.status === 'ACTIVE'),
+      inProgress: all.filter((s) => s.status === 'IN_PROGRESS'),
       closed: all.filter((s) => s.status === 'CLOSED_BOOKING'),
       cancelled: all.filter((s) => s.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS'),
       completed: all.filter((s) => s.status === 'COMPLETED'),
@@ -366,6 +395,31 @@ export const tourScheduleService = {
     const current = schedulesCache[tourId] || [];
     schedulesCache[tourId] = current.filter((s) => s.id !== scheduleId);
     notifyUpdated(tourId);
+  },
+
+  completeSchedule: async (
+    tourId: number,
+    scheduleId: number
+  ): Promise<{ schedule: TourScheduleItem; completedBookingsCount: number } | null> => {
+    const res = await axiosClient.put<any, ApiResponse<TourScheduleItem>>(
+      `/tour-schedules/${scheduleId}/complete`
+    );
+    if (res && res.data) {
+      const updated: TourScheduleItem = {
+        ...res.data,
+        status: 'COMPLETED',
+        minParticipants: res.data.minParticipants || 10,
+        note: res.data.note || 'Khởi hành định kỳ',
+      };
+      const current = schedulesCache[tourId] || [];
+      schedulesCache[tourId] = current.map((s) => (s.id === scheduleId ? updated : s));
+      notifyUpdated(tourId);
+      return {
+        schedule: updated,
+        completedBookingsCount: res.data.completedBookingsCount ?? 0,
+      };
+    }
+    return null;
   },
 
   bookSeatsForSchedule: (tourId: number, scheduleId?: number, guestCount = 1, departureDate?: string): boolean => {

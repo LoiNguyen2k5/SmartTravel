@@ -4,9 +4,12 @@ import com.smarttravel.dto.request.BookingCreateRequest;
 import com.smarttravel.dto.response.BookingResponse;
 import com.smarttravel.entities.*;
 import com.smarttravel.enums.BookingStatus;
+import com.smarttravel.enums.RoleEnum;
 import com.smarttravel.enums.TourCategory;
+import com.smarttravel.enums.TourScheduleStatus;
 import com.smarttravel.enums.VisaApplicationStatus;
 import com.smarttravel.exceptions.BadRequestException;
+import com.smarttravel.exceptions.ForbiddenException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.*;
 import com.smarttravel.services.BookingService;
@@ -34,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final TourRepository tourRepository;
+    private final TourScheduleRepository tourScheduleRepository;
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
     private final VoucherService voucherService;
@@ -62,6 +66,28 @@ public class BookingServiceImpl implements BookingService {
         int minLeadDays = requiresVisa ? (visaProcessingDays + visaBufferDays) : (isInternational ? 7 : 3);
 
         LocalDate departureDate = request.getDepartureDate();
+        TourSchedule resolvedSchedule = null;
+        if (request.getTourScheduleId() != null) {
+            resolvedSchedule = tourScheduleRepository.findById(request.getTourScheduleId())
+                    .orElseThrow(() -> new ResourceNotFoundException("TourSchedule", "id", request.getTourScheduleId()));
+            if (resolvedSchedule.getTour() != null && !resolvedSchedule.getTour().getId().equals(tour.getId())) {
+                throw new BadRequestException("Đợt khởi hành không thuộc tour đã chọn.");
+            }
+            if (departureDate == null) {
+                departureDate = resolvedSchedule.getStartDate();
+            }
+        } else if (departureDate != null && tour.getId() != null) {
+            resolvedSchedule = tourScheduleRepository.findFirstByTourIdAndStartDate(tour.getId(), departureDate)
+                    .orElse(null);
+        }
+
+        if (resolvedSchedule != null) {
+            TourScheduleStatus schStatus = resolvedSchedule.getStatus();
+            if (schStatus == TourScheduleStatus.COMPLETED || schStatus == TourScheduleStatus.CANCELLED) {
+                throw new BadRequestException("Đợt khởi hành này đã kết thúc hoặc đã bị hủy, không thể đặt thêm chỗ.");
+            }
+        }
+
         LocalDate visaDeadline = null;
 
         // 1. Kiểm tra quy định thời gian đặt trước theo cấu hình mẫu Visa thực tế (thay số 15 cứng)
@@ -91,7 +117,18 @@ public class BookingServiceImpl implements BookingService {
         int numChildren = request.getNumberOfChildren() != null ? request.getNumberOfChildren() : 0;
         int totalGuests = numAdults + numChildren;
 
-        // Verify and deduct available slots/seats for the tour
+        // Verify and deduct available slots/seats for the schedule & tour
+        if (resolvedSchedule != null) {
+            int maxP = resolvedSchedule.getMaxParticipants() != null ? resolvedSchedule.getMaxParticipants() : 40;
+            int currentBooked = resolvedSchedule.getBookedCount() != null ? resolvedSchedule.getBookedCount() : 0;
+            int remainingOnSchedule = Math.max(0, maxP - currentBooked);
+            if (remainingOnSchedule < totalGuests) {
+                throw new BadRequestException("Đợt khởi hành này không đủ chỗ cho " + totalGuests + " khách (chỉ còn " + remainingOnSchedule + " chỗ).");
+            }
+            resolvedSchedule.setBookedCount(currentBooked + totalGuests);
+            tourScheduleRepository.save(resolvedSchedule);
+        }
+
         if (tour.getRemainingSeats() != null) {
             if (tour.getRemainingSeats() < totalGuests) {
                 throw new BadRequestException("Số chỗ còn lại của tour không đủ cho " + totalGuests + " khách (chỉ còn " + tour.getRemainingSeats() + " chỗ).");
@@ -155,6 +192,7 @@ public class BookingServiceImpl implements BookingService {
                 .bookingCode(bookingCode)
                 .user(user)
                 .tour(tour)
+                .tourSchedule(resolvedSchedule)
                 .departureDate(departureDate)
                 .numberOfAdults(numAdults)
                 .numberOfChildren(numChildren)
@@ -237,21 +275,63 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", id));
 
-        if (booking.getStatus() == BookingStatus.COMPLETED) {
-            throw new BadRequestException("Không thể hủy tour đã hoàn thành");
+        if (booking.getStatus() == BookingStatus.COMPLETED || booking.getStatus() == BookingStatus.CHECKED_IN) {
+            throw new BadRequestException("Không thể hủy tour đã check-in hoặc đã hoàn thành");
         }
 
+        boolean wasCancelled = booking.getStatus() == BookingStatus.CANCELLED;
         booking.setStatus(BookingStatus.CANCELLED);
         Booking updated = bookingRepository.save(booking);
 
-        // Restore remaining seats when booking is cancelled
-        if (booking.getTour() != null && booking.getTour().getRemainingSeats() != null) {
-            int guests = booking.getNumberOfAdults() + (booking.getNumberOfChildren() != null ? booking.getNumberOfChildren() : 0);
-            Tour tour = booking.getTour();
-            tour.setRemainingSeats(tour.getRemainingSeats() + guests);
-            tourRepository.save(tour);
+        if (!wasCancelled) {
+            restoreBookingSeats(booking);
         }
 
+        return mapToResponse(updated);
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse checkInBooking(Long id, boolean collectRemainingDeposit, String actorEmail) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", id));
+
+        if (actorEmail != null && !actorEmail.isBlank()) {
+            User actor = userRepository.findByEmail(actorEmail)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", actorEmail));
+            boolean isAdmin = actor.getRoles() != null && actor.getRoles().stream()
+                    .anyMatch(r -> r.getName() == RoleEnum.ROLE_ADMIN);
+            boolean isTourVendor = booking.getTour() != null
+                    && booking.getTour().getVendor() != null
+                    && booking.getTour().getVendor().getId().equals(actor.getId());
+            if (!isAdmin && !isTourVendor) {
+                throw new ForbiddenException("Bạn không có quyền check-in đơn đặt tour thuộc đại lý khác.");
+            }
+        }
+
+        BookingStatus current = booking.getStatus();
+        if (current == BookingStatus.CANCELLED) {
+            throw new BadRequestException("Đơn hàng đã bị hủy, không thể thực hiện check-in.");
+        }
+        if (current == BookingStatus.PENDING) {
+            throw new BadRequestException("Đơn hàng chưa thanh toán, không thể thực hiện check-in.");
+        }
+        if (current == BookingStatus.CHECKED_IN) {
+            throw new BadRequestException("Đơn hàng đã được check-in trước đó.");
+        }
+        if (current == BookingStatus.COMPLETED) {
+            throw new BadRequestException("Đơn hàng đã hoàn thành chuyến đi trước đó.");
+        }
+
+        if (current == BookingStatus.DEPOSITED) {
+            if (!collectRemainingDeposit) {
+                throw new BadRequestException("Khách hàng mới đặt cọc 30%. Vui lòng xác nhận đã thu đủ 70% còn lại trước khi Check-in.");
+            }
+            booking.setRemainingAmount(BigDecimal.ZERO);
+        }
+
+        booking.setStatus(BookingStatus.CHECKED_IN);
+        Booking updated = bookingRepository.save(booking);
         return mapToResponse(updated);
     }
 
@@ -261,9 +341,41 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", id));
 
+        BookingStatus previous = booking.getStatus();
+        if (status == BookingStatus.CANCELLED && (previous == BookingStatus.CHECKED_IN || previous == BookingStatus.COMPLETED)) {
+            throw new BadRequestException("Không thể hủy đơn đã check-in hoặc đã hoàn thành.");
+        }
+
         booking.setStatus(status);
         Booking updated = bookingRepository.save(booking);
+
+        if (status == BookingStatus.CANCELLED && previous != BookingStatus.CANCELLED) {
+            restoreBookingSeats(booking);
+        }
+
         return mapToResponse(updated);
+    }
+
+    private void restoreBookingSeats(Booking booking) {
+        int guests = (booking.getNumberOfAdults() != null ? booking.getNumberOfAdults() : 0)
+                + (booking.getNumberOfChildren() != null ? booking.getNumberOfChildren() : 0);
+        if (guests <= 0) return;
+
+        if (booking.getTour() != null && booking.getTour().getRemainingSeats() != null) {
+            Tour tour = booking.getTour();
+            tour.setRemainingSeats(tour.getRemainingSeats() + guests);
+            tourRepository.save(tour);
+        }
+
+        TourSchedule schedule = booking.getTourSchedule();
+        if (schedule == null && booking.getTour() != null && booking.getDepartureDate() != null) {
+            schedule = tourScheduleRepository.findFirstByTourIdAndStartDate(
+                    booking.getTour().getId(), booking.getDepartureDate()).orElse(null);
+        }
+        if (schedule != null && schedule.getBookedCount() != null) {
+            schedule.setBookedCount(Math.max(0, schedule.getBookedCount() - guests));
+            tourScheduleRepository.save(schedule);
+        }
     }
 
     @Override
@@ -309,6 +421,8 @@ public class BookingServiceImpl implements BookingService {
                 .durationNights(tour != null ? tour.getDurationNights() : null)
                 .departureLocation(tour != null ? tour.getDepartureLocation() : null)
                 .departureDate(depDate)
+                .tourScheduleId(b.getTourSchedule() != null ? b.getTourSchedule().getId() : null)
+                .endDate(b.getTourSchedule() != null ? b.getTourSchedule().getEndDate() : null)
                 .userId(b.getUser() != null ? b.getUser().getId() : null)
                 .userName(b.getUser() != null ? b.getUser().getFullName() : null)
                 .numberOfAdults(b.getNumberOfAdults())
@@ -397,12 +511,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         for (Booking b : targets) {
-            Tour tour = b.getTour();
-            if (b.getStatus() != BookingStatus.CANCELLED && tour != null && tour.getRemainingSeats() != null) {
-                int guests = (b.getNumberOfAdults() != null ? b.getNumberOfAdults() : 0)
-                        + (b.getNumberOfChildren() != null ? b.getNumberOfChildren() : 0);
-                tour.setRemainingSeats(tour.getRemainingSeats() + guests);
-                tourRepository.save(tour);
+            if (b.getStatus() != BookingStatus.CANCELLED) {
+                restoreBookingSeats(b);
             }
         }
 

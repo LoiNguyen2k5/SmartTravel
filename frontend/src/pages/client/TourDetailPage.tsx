@@ -241,7 +241,7 @@ export const TourDetailPage: React.FC = () => {
 
   // Reviews state & validation
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [eligibleToReview, setEligibleToReview] = useState<boolean>(true);
+  const [eligibleToReview, setEligibleToReview] = useState<boolean>(false);
   const [newRating, setNewRating] = useState<number>(5);
   const [newComment, setNewComment] = useState<string>('');
   const [newImageUrl, setNewImageUrl] = useState<string>('');
@@ -369,8 +369,18 @@ export const TourDetailPage: React.FC = () => {
           setReviews(localReviews);
         }
 
-        // Always enable review form for authenticated user
-        setEligibleToReview(true);
+        // Kiểm tra điều kiện đánh giá thực tế từ Backend (chỉ tài khoản có đơn COMPLETED của tour mới được đánh giá)
+        const hasToken = Boolean(localStorage.getItem('token') || user);
+        if (hasToken) {
+          try {
+            const eligRes = await reviewService.checkEligibility(tourId);
+            setEligibleToReview(Boolean(eligRes?.success && eligRes?.data));
+          } catch {
+            setEligibleToReview(false);
+          }
+        } else {
+          setEligibleToReview(false);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -470,27 +480,7 @@ export const TourDetailPage: React.FC = () => {
     e.preventDefault();
     if (!tour || !newComment.trim()) return;
     setSubmittingReview(true);
-    const reviewerName = currentUserName || 'Nguyễn Bảo Lợi';
-    const newRevObj: Review = {
-      id: Date.now(),
-      tourId: tour.id,
-      userId: user?.id || 1,
-      userName: reviewerName,
-      rating: newRating,
-      comment: newComment.trim(),
-      imageUrl: newImageUrl.trim() || undefined,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Save to local storage for persistence across reloads
-    try {
-      const storageKey = `smarttravel_reviews_${tour.id}`;
-      const existing = localStorage.getItem(storageKey);
-      const list: Review[] = existing ? JSON.parse(existing) : [];
-      localStorage.setItem(storageKey, JSON.stringify([newRevObj, ...list.filter(item => item.id !== newRevObj.id)]));
-    } catch (err) {
-      console.error(err);
-    }
+    const reviewerName = currentUserName || 'Khách hàng';
 
     try {
       const res = await reviewService.createReview({
@@ -508,19 +498,20 @@ export const TourDetailPage: React.FC = () => {
           const storageKey = `smarttravel_reviews_${tour.id}`;
           const existing = localStorage.getItem(storageKey);
           const list: Review[] = existing ? JSON.parse(existing) : [];
-          localStorage.setItem(storageKey, JSON.stringify([apiRev, ...list.filter(item => item.id !== newRevObj.id && item.id !== apiRev.id)]));
+          localStorage.setItem(storageKey, JSON.stringify([apiRev, ...list.filter(item => item.id !== apiRev.id)]));
         } catch (_) {}
-        setReviews(prev => [apiRev, ...prev.filter(r => r.id !== apiRev.id && r.id !== newRevObj.id)]);
+        setReviews(prev => [apiRev, ...prev.filter(r => r.id !== apiRev.id)]);
+        setNewComment('');
+        setNewImageUrl('');
+        alert('Đăng đánh giá thành công! Cảm ơn phản hồi của bạn.');
       } else {
-        setReviews(prev => [newRevObj, ...prev.filter(r => r.id !== newRevObj.id)]);
+        alert(res.message || 'Không thể gửi đánh giá. Chỉ khách hàng đã hoàn thành chuyến đi (COMPLETED) mới có thể đánh giá.');
       }
-    } catch {
-      setReviews(prev => [newRevObj, ...prev.filter(r => r.id !== newRevObj.id)]);
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message || 'Chỉ khách hàng đã hoàn thành chuyến đi (trạng thái COMPLETED) mới có thể viết đánh giá cho tour này.';
+      alert(errMsg);
     } finally {
-      setNewComment('');
-      setNewImageUrl('');
       setSubmittingReview(false);
-      alert('Đăng đánh giá thành công! Cảm ơn phản hồi của bạn.');
     }
   };
 

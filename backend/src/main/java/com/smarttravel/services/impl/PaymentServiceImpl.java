@@ -1039,7 +1039,7 @@ public class PaymentServiceImpl implements PaymentService {
             boolean isDepositChoice = Boolean.TRUE.equals(booking.getIsDeposit())
                     || (booking.getNotes() != null && booking.getNotes().contains("DAT_COC_30"));
 
-            boolean isAlreadyFullyPaid = (booking.getStatus() == BookingStatus.PAID || booking.getStatus() == BookingStatus.COMPLETED)
+            boolean isAlreadyFullyPaid = (booking.getStatus() == BookingStatus.PAID || booking.getStatus() == BookingStatus.CHECKED_IN || booking.getStatus() == BookingStatus.COMPLETED)
                     && !Boolean.TRUE.equals(booking.getIsDeposit())
                     && (booking.getNotes() == null || !booking.getNotes().contains("DAT_COC_30") || booking.getNotes().contains("TAT_TOAN_70%"))
                     && (booking.getRemainingAmount() == null || booking.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0);
@@ -1051,6 +1051,7 @@ public class PaymentServiceImpl implements PaymentService {
             boolean isPaid = isPaidFromCache 
                     || booking.getStatus() == BookingStatus.DEPOSITED 
                     || booking.getStatus() == BookingStatus.PAID 
+                    || booking.getStatus() == BookingStatus.CHECKED_IN 
                     || booking.getStatus() == BookingStatus.COMPLETED;
 
             Map<String, Object> result = new HashMap<>();

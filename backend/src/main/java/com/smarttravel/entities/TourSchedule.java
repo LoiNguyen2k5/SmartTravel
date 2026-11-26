@@ -1,5 +1,6 @@
 package com.smarttravel.entities;
 
+import com.smarttravel.enums.TourScheduleStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,4 +31,9 @@ public class TourSchedule extends BaseEntity {
     @Column(name = "booked_count", nullable = false)
     @Builder.Default
     private Integer bookedCount = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 30)
+    @Builder.Default
+    private TourScheduleStatus status = TourScheduleStatus.OPEN;
 }

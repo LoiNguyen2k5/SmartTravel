@@ -37,6 +37,7 @@ public class AdminServiceImpl implements AdminService {
         if (b == null || b.getStatus() == null) return false;
         return b.getStatus() == BookingStatus.CONFIRMED
                 || b.getStatus() == BookingStatus.COMPLETED
+                || b.getStatus() == BookingStatus.CHECKED_IN
                 || b.getStatus() == BookingStatus.PAID
                 || b.getStatus() == BookingStatus.DEPOSITED;
     }

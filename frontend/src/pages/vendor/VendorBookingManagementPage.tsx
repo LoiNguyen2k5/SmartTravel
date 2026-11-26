@@ -25,7 +25,13 @@ export const VendorBookingManagementPage: React.FC = () => {
   // QR Check-in verification modal state
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrCodeInput, setQrCodeInput] = useState('');
-  const [verificationResult, setVerificationResult] = useState<{ success: boolean; message: string; booking?: Booking } | null>(null);
+  const [verificationResult, setVerificationResult] = useState<{
+    success: boolean;
+    message: string;
+    booking?: Booking;
+    requiresDepositCollection?: boolean;
+  } | null>(null);
+  const [processingCheckIn, setProcessingCheckIn] = useState(false);
 
   // Refund Modal State
   const [selectedRefundBooking, setSelectedRefundBooking] = useState<Booking | null>(null);
@@ -42,7 +48,13 @@ export const VendorBookingManagementPage: React.FC = () => {
       if (savedStatusesStr) {
         const savedStatuses: Record<number, string> = JSON.parse(savedStatusesStr);
         return bookingList.map((b) => {
-          if (savedStatuses[b.id]) {
+          // Ưu tiên trạng thái thực từ Backend khi đơn đã vào vòng đời Check-in / Hoàn thành / Hủy
+          if (
+            savedStatuses[b.id] &&
+            b.status !== 'CHECKED_IN' &&
+            b.status !== 'COMPLETED' &&
+            b.status !== 'CANCELLED'
+          ) {
             return { ...b, status: savedStatuses[b.id] as any };
           }
           return b;
@@ -118,43 +130,64 @@ export const VendorBookingManagementPage: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (bookingId: number, newStatus: any) => {
-    // 1. Update local state
+  const syncLocalBookingCache = (bookingId: number, updated: Partial<Booking>) => {
     setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
+      prev.map((b) => (b.id === bookingId ? { ...b, ...updated } : b))
     );
-
-    // 2. Persist in localStorage so it stays across logouts/logins
     try {
       const savedStatusesStr = localStorage.getItem('vendor_booking_statuses');
       const savedStatuses: Record<number, string> = savedStatusesStr ? JSON.parse(savedStatusesStr) : {};
-      savedStatuses[bookingId] = newStatus;
-      localStorage.setItem('vendor_booking_statuses', JSON.stringify(savedStatuses));
+      if (updated.status) {
+        savedStatuses[bookingId] = updated.status;
+        localStorage.setItem('vendor_booking_statuses', JSON.stringify(savedStatuses));
+      }
     } catch (e) {
       console.error('Lỗi lưu localStorage:', e);
     }
-
-    // 2.1 Update status in user_created_bookings so customer portal syncs immediately
     try {
       const localStr = localStorage.getItem('user_created_bookings');
       if (localStr) {
         const localList: Booking[] = JSON.parse(localStr);
-        const updatedList = localList.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b));
+        const updatedList = localList.map((b) => (b.id === bookingId ? { ...b, ...updated } : b));
         localStorage.setItem('user_created_bookings', JSON.stringify(updatedList));
       }
     } catch (e) {
       console.error('Lỗi cập nhật user_created_bookings:', e);
     }
+  };
 
-    // 3. Persist to MySQL Backend API
+  const handleUpdateStatus = async (bookingId: number, newStatus: any) => {
     try {
-      await bookingService.updateBookingStatus(bookingId, newStatus);
-    } catch (err) {
+      const res = await bookingService.updateBookingStatus(bookingId, newStatus);
+      syncLocalBookingCache(bookingId, res?.data || { status: newStatus });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Không thể cập nhật trạng thái đơn đặt tour.';
+      alert(msg);
       console.error('Lỗi khi gửi API cập nhật trạng thái:', err);
     }
   };
 
-  const handleVerifyQrCode = (e: React.FormEvent) => {
+  const handleCheckIn = async (booking: Booking, collectRemainingDeposit = false): Promise<boolean> => {
+    setProcessingCheckIn(true);
+    try {
+      const res = await bookingService.checkInBooking(booking.id, collectRemainingDeposit);
+      const updated = res?.data || {
+        ...booking,
+        status: 'CHECKED_IN' as const,
+        remainingAmount: collectRemainingDeposit ? 0 : booking.remainingAmount,
+      };
+      syncLocalBookingCache(booking.id, updated);
+      return true;
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Không thể Check-in đơn đặt tour này.';
+      alert(msg);
+      return false;
+    } finally {
+      setProcessingCheckIn(false);
+    }
+  };
+
+  const handleVerifyQrCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setVerificationResult(null);
 
@@ -169,7 +202,7 @@ export const VendorBookingManagementPage: React.FC = () => {
     );
 
     if (found) {
-      if (found.status === 'CANCELLED') {
+      if (found.status === 'CANCELLED' || (found.status as string) === 'REFUNDED') {
         setVerificationResult({
           success: false,
           message: `CẢNH BÁO: Đơn hàng '${found.bookingCode}' đã bị HỦY / HOÀN TIỀN. Vui lòng không cho du khách làm thủ tục Check-in!`,
@@ -178,34 +211,54 @@ export const VendorBookingManagementPage: React.FC = () => {
         return;
       }
 
+      if (found.status === 'PENDING') {
+        setVerificationResult({
+          success: false,
+          message: `Đơn hàng '${found.bookingCode}' chưa hoàn tất thanh toán (PENDING). Không thể Check-in!`,
+          booking: found,
+        });
+        return;
+      }
+
+      if (found.status === 'CHECKED_IN') {
+        setVerificationResult({
+          success: true,
+          message: `Đơn hàng '${found.bookingCode}' đã được Check-in trước đó (Khách đang tham gia chuyến đi).`,
+          booking: found,
+        });
+        return;
+      }
+
       if (found.status === 'COMPLETED') {
         setVerificationResult({
           success: true,
-          message: `Đơn hàng '${found.bookingCode}' đã được Check-in thành công trước đó (Vé đã dùng).`,
+          message: `Đơn hàng '${found.bookingCode}' đã hoàn thành chuyến đi trước đó (Vé đã sử dụng).`,
           booking: found,
         });
         return;
       }
 
-      if (found.status === 'DEPOSITED' || found.isDeposit) {
+      if (found.status === 'DEPOSITED') {
         const depAmt = (found.depositAmount || Math.round(found.totalPrice * 0.3)).toLocaleString('vi-VN');
         const remAmt = (found.remainingAmount || (found.totalPrice - Math.round(found.totalPrice * 0.3))).toLocaleString('vi-VN');
-        handleUpdateStatus(found.id, 'COMPLETED');
         setVerificationResult({
-          success: true,
-          message: `⚠️ Khách hàng ${found.contactName || found.userName} đã cọc 30% (${depAmt} đ). Vui lòng thu nốt 70% còn lại (${remAmt} đ) nếu chưa thanh toán trực tiếp. Đã hoàn tất check-in lên tour!`,
+          success: false,
+          requiresDepositCollection: true,
+          message: `Khách hàng ${found.contactName || found.userName} mới đặt cọc 30% (${depAmt} đ), còn nợ 70% (${remAmt} đ). Vui lòng thu đủ số tiền còn lại rồi bấm nút xác nhận Check-in bên dưới.`,
           booking: found,
         });
         return;
       }
 
-      // Automatically mark as COMPLETED upon valid check-in
-      handleUpdateStatus(found.id, 'COMPLETED');
-      setVerificationResult({
-        success: true,
-        message: `Xác nhận Check-in thành công! Khách hàng ${found.contactName || found.userName} đã hoàn thành thủ tục lên tour.`,
-        booking: found,
-      });
+      // Valid PAID/CONFIRMED -> transition to CHECKED_IN (not COMPLETED yet)
+      const ok = await handleCheckIn(found, false);
+      if (ok) {
+        setVerificationResult({
+          success: true,
+          message: `Xác nhận Check-in thành công! Khách hàng ${found.contactName || found.userName} đã lên tour (Trạng thái: Đang đi tour). Sau khi kết thúc chuyến đi, hãy bấm "Hoàn thành đợt khởi hành" tại mục Lịch khởi hành.`,
+          booking: { ...found, status: 'CHECKED_IN' },
+        });
+      }
     } else {
       setVerificationResult({
         success: false,
@@ -214,11 +267,24 @@ export const VendorBookingManagementPage: React.FC = () => {
     }
   };
 
+  const handleConfirmDepositAndCheckIn = async (booking: Booking) => {
+    const ok = await handleCheckIn(booking, true);
+    if (ok) {
+      setVerificationResult({
+        success: true,
+        requiresDepositCollection: false,
+        message: `Đã xác nhận thu đủ 70% còn lại và Check-in thành công cho khách ${booking.contactName || booking.userName}! (Trạng thái: Đã Check-in / Đang đi tour).`,
+        booking: { ...booking, status: 'CHECKED_IN', remainingAmount: 0 },
+      });
+    }
+  };
+
   const filteredBookings = bookings.filter((b) => {
     const matchesStatus =
       filterStatus === 'ALL' ||
-      (filterStatus === 'DEPOSITED' && (b.status === 'DEPOSITED' || b.isDeposit)) ||
+      (filterStatus === 'DEPOSITED' && b.status === 'DEPOSITED') ||
       (filterStatus === 'PAID' && (b.status === 'PAID' || b.status === 'CONFIRMED' || b.status === 'DEPOSITED')) ||
+      (filterStatus === 'CHECKED_IN' && b.status === 'CHECKED_IN') ||
       (filterStatus === 'COMPLETED' && b.status === 'COMPLETED') ||
       (filterStatus === 'CANCELLED' && (b.status === 'CANCELLED' || (b.status as string) === 'REFUNDED'));
     const q = searchQuery.toLowerCase();
@@ -264,7 +330,8 @@ export const VendorBookingManagementPage: React.FC = () => {
           {[
             { id: 'ALL', label: 'Tất cả đơn' },
             { id: 'DEPOSITED', label: 'Đã cọc 30%' },
-            { id: 'PAID', label: 'Đã thanh toán (Chờ Check-in)' },
+            { id: 'PAID', label: 'Chờ Check-in' },
+            { id: 'CHECKED_IN', label: 'Đã Check-in (Đang đi)' },
             { id: 'COMPLETED', label: 'Đã hoàn thành tour' },
             { id: 'CANCELLED', label: 'Đã hủy / Hoàn tiền' },
           ].map((tab) => (
@@ -334,10 +401,12 @@ export const VendorBookingManagementPage: React.FC = () => {
                       </span>
                       <span
                         className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg ${
-                          b.status === 'DEPOSITED' || b.isDeposit
+                          b.status === 'DEPOSITED'
                             ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                            : b.status === 'PAID'
+                            : b.status === 'PAID' || b.status === 'CONFIRMED'
                             ? 'bg-emerald-100 text-emerald-700'
+                            : b.status === 'CHECKED_IN'
+                            ? 'bg-cyan-100 text-cyan-800 border border-cyan-300'
                             : b.status === 'COMPLETED'
                             ? 'bg-blue-100 text-blue-700'
                             : b.status === 'CANCELLED'
@@ -347,12 +416,14 @@ export const VendorBookingManagementPage: React.FC = () => {
                             : 'bg-slate-100 text-slate-700'
                         }`}
                       >
-                        {b.status === 'DEPOSITED' || b.isDeposit
+                        {b.status === 'DEPOSITED'
                           ? 'ĐÃ CỌC 30% (CÒN NỢ 70%)'
-                          : b.status === 'PAID'
-                          ? 'ĐÃ THANH TOÁN'
+                          : b.status === 'PAID' || b.status === 'CONFIRMED'
+                          ? 'ĐÃ THANH TOÁN (CHỜ CHECK-IN)'
+                          : b.status === 'CHECKED_IN'
+                          ? 'ĐÃ CHECK-IN (ĐANG ĐI TOUR)'
                           : b.status === 'COMPLETED'
-                          ? 'ĐÃ HOÀN THÀNH'
+                          ? 'ĐÃ HOÀN THÀNH TOUR'
                           : b.status === 'CANCELLED'
                           ? 'ĐÃ HỦY (CHỜ HOÀN TIỀN)'
                           : (b.status as string) === 'REFUNDED'
@@ -386,7 +457,7 @@ export const VendorBookingManagementPage: React.FC = () => {
                     <div className="text-base font-black text-rose-600">
                       {(b.totalPrice || 0).toLocaleString('vi-VN')} đ
                     </div>
-                    {(b.status === 'DEPOSITED' || b.isDeposit) && (
+                    {b.status === 'DEPOSITED' && (
                       <div className="text-[11px] text-amber-700 font-bold space-y-0.5 mt-0.5">
                         <div>Đã cọc 30%: {(b.depositAmount || Math.round(b.totalPrice * 0.3)).toLocaleString('vi-VN')} đ</div>
                         <div className="text-rose-600 font-extrabold">Còn nợ: {(b.remainingAmount || (b.totalPrice - Math.round(b.totalPrice * 0.3))).toLocaleString('vi-VN')} đ</div>
@@ -395,14 +466,41 @@ export const VendorBookingManagementPage: React.FC = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    {b.status === 'PAID' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(b.status === 'PAID' || b.status === 'CONFIRMED') && (
+                      <button
+                        onClick={() => handleCheckIn(b, false)}
+                        disabled={processingCheckIn}
+                        className="flex items-center gap-1 rounded-xl bg-cyan-600 px-3 py-2 text-xs font-bold text-white hover:bg-cyan-500 transition shadow-sm disabled:opacity-50"
+                        title="Xác nhận khách đã check-in lên tour"
+                      >
+                        <QrCode className="h-3.5 w-3.5" /> Check-in
+                      </button>
+                    )}
+
+                    {b.status === 'DEPOSITED' && (
+                      <button
+                        onClick={() => {
+                          const remAmt = (b.remainingAmount || (b.totalPrice - Math.round(b.totalPrice * 0.3))).toLocaleString('vi-VN');
+                          if (window.confirm(`Xác nhận đã thu đủ 70% còn lại (${remAmt} đ) và Check-in cho khách ${b.contactName || b.userName}?`)) {
+                            void handleCheckIn(b, true);
+                          }
+                        }}
+                        disabled={processingCheckIn}
+                        className="flex items-center gap-1 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-500 transition shadow-sm disabled:opacity-50"
+                        title="Thu đủ 70% còn lại và Check-in khách lên tour"
+                      >
+                        <CheckCircle className="h-3.5 w-3.5" /> Thu 70% & Check-in
+                      </button>
+                    )}
+
+                    {b.status === 'CHECKED_IN' && (
                       <button
                         onClick={() => handleUpdateStatus(b.id, 'COMPLETED')}
                         className="flex items-center gap-1 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                        title="Xác nhận khách đã đi tour"
+                        title="Xác nhận khách đã hoàn thành chuyến đi"
                       >
-                        <Check className="h-3.5 w-3.5" /> Hoàn thành
+                        <Check className="h-3.5 w-3.5" /> Hoàn thành tour
                       </button>
                     )}
 
@@ -420,7 +518,7 @@ export const VendorBookingManagementPage: React.FC = () => {
                       </button>
                     )}
 
-                    {b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && (b.status as string) !== 'REFUNDED' && (
+                    {!['CANCELLED', 'CHECKED_IN', 'COMPLETED', 'REFUNDED'].includes(b.status) && (
                       <button
                         onClick={() => handleUpdateStatus(b.id, 'CANCELLED')}
                         className="flex items-center gap-1 rounded-xl bg-slate-100 text-rose-600 px-3 py-2 text-xs font-bold hover:bg-rose-50 transition"
@@ -500,6 +598,17 @@ export const VendorBookingManagementPage: React.FC = () => {
                     <p>Tour: <strong>{verificationResult.booking.tourTitle}</strong></p>
                     <p>Khách hàng: <strong>{verificationResult.booking.contactName} ({verificationResult.booking.contactPhone})</strong></p>
                   </div>
+                )}
+
+                {verificationResult.requiresDepositCollection && verificationResult.booking && (
+                  <button
+                    type="button"
+                    disabled={processingCheckIn}
+                    onClick={() => handleConfirmDepositAndCheckIn(verificationResult.booking!)}
+                    className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 py-2.5 text-xs font-bold text-white hover:bg-amber-500 transition shadow-sm disabled:opacity-50"
+                  >
+                    <CheckCircle className="h-4 w-4" /> Xác Nhận Đã Thu 70% & Check-in
+                  </button>
                 )}
               </div>
             )}

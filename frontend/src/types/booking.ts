@@ -1,4 +1,4 @@
-export type BookingStatusType = 'PENDING' | 'DEPOSITED' | 'CONFIRMED' | 'PAID' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
+export type BookingStatusType = 'PENDING' | 'DEPOSITED' | 'CONFIRMED' | 'PAID' | 'CHECKED_IN' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
 
 export interface Booking {
   id: number;
@@ -25,6 +25,8 @@ export interface Booking {
   contactEmail?: string;
   contactPhone?: string;
   departureDate?: string;
+  tourScheduleId?: number;
+  endDate?: string;
   vendorId?: number;
   vendorName?: string;
   qrCodeUrl?: string;

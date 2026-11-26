@@ -3,19 +3,22 @@ package com.smarttravel.controllers;
 import com.smarttravel.dto.response.ApiResponse;
 import com.smarttravel.entities.Tour;
 import com.smarttravel.entities.TourSchedule;
+import com.smarttravel.enums.TourScheduleStatus;
 import com.smarttravel.exceptions.BadRequestException;
 import com.smarttravel.exceptions.ResourceNotFoundException;
 import com.smarttravel.repositories.TourRepository;
 import com.smarttravel.repositories.TourScheduleRepository;
+import com.smarttravel.services.impl.TourScheduleLifecycleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,12 +31,13 @@ public class TourScheduleController {
 
     private final TourScheduleRepository tourScheduleRepository;
     private final TourRepository tourRepository;
+    private final TourScheduleLifecycleService lifecycleService;
 
     @GetMapping
     @Operation(summary = "Lấy toàn bộ danh sách lịch khởi hành của các tour")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAllSchedules() {
         List<Map<String, Object>> list = tourScheduleRepository.findAllByOrderByStartDateAsc().stream()
-                .map(this::toDto)
+                .map(lifecycleService::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(list));
     }
@@ -42,7 +46,7 @@ public class TourScheduleController {
     @Operation(summary = "Lấy danh sách lịch khởi hành theo mã Tour")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getSchedulesByTour(@PathVariable Long tourId) {
         List<Map<String, Object>> list = tourScheduleRepository.findByTourIdOrderByStartDateAsc(tourId).stream()
-                .map(this::toDto)
+                .map(lifecycleService::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(list));
     }
@@ -73,10 +77,23 @@ public class TourScheduleController {
                 .endDate(LocalDate.parse(endStr))
                 .maxParticipants(maxParticipants)
                 .bookedCount(0)
+                .status(TourScheduleStatus.OPEN)
                 .build();
 
         TourSchedule saved = tourScheduleRepository.save(schedule);
-        return ResponseEntity.status(201).body(ApiResponse.created("Thêm lịch khởi hành thành công", toDto(saved)));
+        return ResponseEntity.status(201).body(ApiResponse.created("Thêm lịch khởi hành thành công", lifecycleService.toDto(saved)));
+    }
+
+    @PutMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
+    @Operation(summary = "Hoàn thành đợt khởi hành (ẩn khỏi danh sách đặt mới và chuyển toàn bộ đơn CHECKED_IN sang COMPLETED)")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> completeSchedule(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String actorEmail = userDetails != null ? userDetails.getUsername() : null;
+        Map<String, Object> result = lifecycleService.completeSchedule(id, actorEmail);
+        return ResponseEntity.ok(ApiResponse.success("Đã hoàn thành đợt khởi hành thành công", result));
     }
 
     @DeleteMapping("/{id}")
@@ -101,19 +118,6 @@ public class TourScheduleController {
         int nextBooked = Math.min(schedule.getMaxParticipants(), schedule.getBookedCount() + Math.max(1, guests));
         schedule.setBookedCount(nextBooked);
         TourSchedule saved = tourScheduleRepository.save(schedule);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật số chỗ thành công", toDto(saved)));
-    }
-
-    private Map<String, Object> toDto(TourSchedule s) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", s.getId());
-        map.put("tourId", s.getTour() != null ? s.getTour().getId() : null);
-        map.put("startDate", s.getStartDate() != null ? s.getStartDate().toString() : null);
-        map.put("endDate", s.getEndDate() != null ? s.getEndDate().toString() : null);
-        map.put("maxParticipants", s.getMaxParticipants());
-        map.put("bookedCount", s.getBookedCount());
-        map.put("minParticipants", 10);
-        map.put("note", "Khởi hành định kỳ");
-        return map;
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật số chỗ thành công", lifecycleService.toDto(saved)));
     }
 }

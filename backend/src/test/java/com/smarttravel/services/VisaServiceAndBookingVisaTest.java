@@ -46,6 +46,7 @@ class VisaServiceAndBookingVisaTest {
     @Mock private VisaStatusLogRepository visaStatusLogRepository;
     @Mock private BookingRepository bookingRepository;
     @Mock private TourRepository tourRepository;
+    @Mock private TourScheduleRepository tourScheduleRepository;
     @Mock private UserRepository userRepository;
     @Mock private VoucherRepository voucherRepository;
     @Mock private VoucherService voucherService;
@@ -85,6 +86,7 @@ class VisaServiceAndBookingVisaTest {
         bookingService = new BookingServiceImpl(
                 bookingRepository,
                 tourRepository,
+                tourScheduleRepository,
                 userRepository,
                 voucherRepository,
                 voucherService,

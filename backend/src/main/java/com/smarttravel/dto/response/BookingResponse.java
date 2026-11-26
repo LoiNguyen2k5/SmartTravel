@@ -27,6 +27,8 @@ public class BookingResponse {
     private Integer durationNights;
     private String departureLocation;
     private LocalDate departureDate;
+    private Long tourScheduleId;
+    private LocalDate endDate;
     private Long userId;
     private String userName;
     private Integer numberOfAdults;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarDays, Plus, Users, Trash2, ShieldAlert, CheckCircle, Clock } from 'lucide-react';
+import { CalendarDays, Plus, Users, Trash2, ShieldAlert, CheckCircle, Clock, Flag } from 'lucide-react';
 import { tourService } from '../../services/tourService';
 import { 
   tourScheduleService, 
@@ -14,7 +14,9 @@ export const VendorSchedulesPage: React.FC = () => {
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [schedules, setSchedules] = useState<TourScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [scheduleFilter, setScheduleFilter] = useState<'ALL' | 'ACTIVE' | 'CLOSED' | 'CANCELLED' | 'COMPLETED'>('ALL');
+  const [scheduleFilter, setScheduleFilter] = useState<'ALL' | 'ACTIVE' | 'IN_PROGRESS' | 'CLOSED' | 'CANCELLED' | 'COMPLETED'>('ALL');
+  const [completingId, setCompletingId] = useState<number | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   // Form state
   const [startDate, setStartDate] = useState('');
@@ -88,6 +90,35 @@ export const VendorSchedulesPage: React.FC = () => {
     }
   };
 
+  const handleCompleteSchedule = async (schedule: TourScheduleItem) => {
+    if (!selectedTourId) return;
+    const confirmed = window.confirm(
+      `Xác nhận hoàn thành đợt khởi hành ${schedule.startDate} ➔ ${schedule.endDate}?\n\n` +
+      `• Đợt khởi hành sẽ tự động ẩn khỏi danh sách đặt mới của khách hàng (giữ lại ở tab "Đã đi" để đối soát).\n` +
+      `• Toàn bộ đơn đã Check-in thuộc đợt này sẽ tự động chuyển sang Hoàn Thành Tour và mở quyền Viết Đánh Giá cho khách.`
+    );
+    if (!confirmed) return;
+
+    setCompletingId(schedule.id);
+    setStatusMessage(null);
+    try {
+      const res = await tourScheduleService.completeSchedule(selectedTourId, schedule.id);
+      // Xóa cache trạng thái localStorage cũ để đồng bộ trạng thái COMPLETED mới từ Backend
+      try {
+        localStorage.removeItem('vendor_booking_statuses');
+      } catch (_) {}
+      await loadSchedulesForTour(selectedTourId);
+      const count = res?.completedBookingsCount ?? 0;
+      setStatusMessage(
+        `Đã hoàn thành đợt khởi hành ${schedule.startDate} ➔ ${schedule.endDate}! Đợt đã ẩn khỏi trang đặt tour của khách và tự động chuyển ${count} đơn đã Check-in sang Hoàn Thành Tour.`
+      );
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Không thể hoàn thành đợt khởi hành.');
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
   const selectedTour = tours.find((t) => t.id === selectedTourId);
   const selectedTourLeadDays = getBookingCutoffDays(selectedTour?.category, {
     requiresVisa: selectedTour?.requiresVisa,
@@ -112,6 +143,7 @@ export const VendorSchedulesPage: React.FC = () => {
   const filteredSchedules = enrichedSchedules.filter((s) => {
     if (scheduleFilter === 'ALL') return true;
     if (scheduleFilter === 'ACTIVE') return s.lifecycle.status === 'ACTIVE';
+    if (scheduleFilter === 'IN_PROGRESS') return s.lifecycle.status === 'IN_PROGRESS';
     if (scheduleFilter === 'CLOSED') return s.lifecycle.status === 'CLOSED_BOOKING';
     if (scheduleFilter === 'CANCELLED') return s.lifecycle.status === 'CANCELLED_NOT_ENOUGH_PARTICIPANTS';
     if (scheduleFilter === 'COMPLETED') return s.lifecycle.status === 'COMPLETED';
@@ -272,6 +304,7 @@ export const VendorSchedulesPage: React.FC = () => {
                   {[
                     { id: 'ALL', label: 'Tất cả' },
                     { id: 'ACTIVE', label: 'Đang mở' },
+                    { id: 'IN_PROGRESS', label: 'Đang đi' },
                     { id: 'CLOSED', label: 'Đã đóng' },
                     { id: 'CANCELLED', label: 'Hủy (<10)' },
                     { id: 'COMPLETED', label: 'Đã đi' },
@@ -290,6 +323,19 @@ export const VendorSchedulesPage: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {statusMessage && (
+                <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800 flex items-start justify-between gap-3">
+                  <span>{statusMessage}</span>
+                  <button
+                    type="button"
+                    onClick={() => setStatusMessage(null)}
+                    className="text-emerald-700 hover:text-emerald-900 font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
 
               {filteredSchedules.length === 0 ? (
                 <div className="text-center py-10 text-slate-400 text-xs">Không có lịch khởi hành nào phù hợp với bộ lọc.</div>
@@ -312,6 +358,11 @@ export const VendorSchedulesPage: React.FC = () => {
                             {status === 'ACTIVE' && (
                               <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1">
                                 <CheckCircle className="h-3 w-3 text-emerald-600" /> Đang mở bán (Còn {Math.max(0, s.lifecycle.daysRemaining - s.lifecycle.minLeadDays)} ngày đặt vé)
+                              </span>
+                            )}
+                            {status === 'IN_PROGRESS' && (
+                              <span className="text-[10px] font-extrabold text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded-full border border-cyan-300 flex items-center gap-1">
+                                <Clock className="h-3 w-3 text-cyan-600" /> Đang đi tour
                               </span>
                             )}
                             {status === 'CLOSED_BOOKING' && (
@@ -363,13 +414,28 @@ export const VendorSchedulesPage: React.FC = () => {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => handleDeleteSchedule(s.id)}
-                          className="p-2.5 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition self-end sm:self-center"
-                          title="Xóa lịch"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-2 self-end sm:self-center">
+                          {status !== 'COMPLETED' && status !== 'CANCELLED_NOT_ENOUGH_PARTICIPANTS' && (
+                            <button
+                              type="button"
+                              disabled={completingId === s.id}
+                              onClick={() => handleCompleteSchedule(s)}
+                              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm disabled:opacity-50"
+                              title="Chốt hoàn thành đợt khởi hành, ẩn khỏi danh sách đặt mới và chuyển đơn đã Check-in sang Hoàn Thành Tour"
+                            >
+                              <Flag className="h-3.5 w-3.5" />
+                              {completingId === s.id ? 'Đang xử lý...' : 'Hoàn thành đợt'}
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => handleDeleteSchedule(s.id)}
+                            className="p-2.5 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                            title="Xóa lịch"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}

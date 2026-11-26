@@ -19,6 +19,12 @@ export const bookingService = {
     return await axiosClient.post(`/bookings/${id}/cancel`);
   },
 
+  checkInBooking: async (id: number, collectRemainingDeposit = false): Promise<ApiResponse<Booking>> => {
+    return await axiosClient.post(`/bookings/${id}/check-in`, null, {
+      params: { collectRemainingDeposit },
+    });
+  },
+
   updateBookingStatus: async (id: number, status: string): Promise<ApiResponse<Booking>> => {
     return await axiosClient.put(`/bookings/${id}/status?status=${status}`);
   },

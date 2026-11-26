@@ -787,6 +787,10 @@ public class EmailServiceImpl implements EmailService {
 
 
 
+                    && booking.getStatus() != BookingStatus.CHECKED_IN
+
+
+
                     && booking.getStatus() != BookingStatus.COMPLETED
 
 
@@ -1586,6 +1590,10 @@ public class EmailServiceImpl implements EmailService {
 
 
                     && booking.getStatus() != BookingStatus.CONFIRMED
+
+
+
+                    && booking.getStatus() != BookingStatus.CHECKED_IN
 
 
 

@@ -19,4 +19,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     long countByStatus(BookingStatus status);
     List<Booking> findAllByOrderByCreatedAtDesc();
     List<Booking> findByStatusAndCreatedAtBefore(BookingStatus status, java.time.LocalDateTime dateTime);
+    List<Booking> findByTourScheduleId(Long tourScheduleId);
+    List<Booking> findByTourIdAndDepartureDate(Long tourId, java.time.LocalDate departureDate);
 }

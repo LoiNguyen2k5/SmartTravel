@@ -274,7 +274,12 @@ export const BookingHistoryPage: React.FC = () => {
         const savedStatuses: Record<number, string> = savedStatusesStr ? JSON.parse(savedStatusesStr) : {};
         rawList = rawList.map((b) => {
           let updated = { ...b };
-          if (savedStatuses[b.id]) {
+          if (
+            savedStatuses[b.id] &&
+            b.status !== 'COMPLETED' &&
+            b.status !== 'CANCELLED' &&
+            b.status !== 'CHECKED_IN'
+          ) {
             updated.status = savedStatuses[b.id] as any;
           }
           if (updated.contactEmail === 'baoloi@smarttravel.com' || updated.contactEmail === 'nguyenbaoloi@gmail.com' || updated.userName === 'Nguyễn Bảo Lợi') {
@@ -501,6 +506,7 @@ export const BookingHistoryPage: React.FC = () => {
   const statusBadges: Record<string, { label: string; style: string }> = {
     DEPOSITED: { label: 'Đã Cọc 30%', style: 'bg-amber-50 text-amber-800 border-amber-300' },
     PAID: { label: 'Đã Thanh Toán Full', style: 'bg-emerald-50 text-emerald-800 border-emerald-300' },
+    CHECKED_IN: { label: 'Đã Check-in (Đang đi tour)', style: 'bg-cyan-50 text-cyan-800 border-cyan-300' },
     COMPLETED: { label: 'Hoàn Thành Tour', style: 'bg-sky-50 text-sky-800 border-sky-300' },
     CANCELLED: { label: 'Đã Hủy Đơn', style: 'bg-rose-50 text-rose-800 border-rose-300' },
     PENDING: { label: 'Chờ Thanh Toán', style: 'bg-slate-100 text-slate-700 border-slate-300' },
@@ -650,7 +656,7 @@ export const BookingHistoryPage: React.FC = () => {
                       )}
 
                       {/* Visa Deadline Warning */}
-                      {requiresVisa && b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && b.status !== 'REFUNDED' && (
+                      {requiresVisa && !['CANCELLED', 'CHECKED_IN', 'COMPLETED', 'REFUNDED'].includes(b.status) && (
                         <div className="mt-3 bg-rose-50 border border-rose-300 rounded-xl p-3 flex items-start gap-3">
                           <div className="h-7 w-7 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
                             <Globe className="h-4 w-4 text-rose-600" />
@@ -676,7 +682,7 @@ export const BookingHistoryPage: React.FC = () => {
                             </button>
                           )}
                           
-                          {['DEPOSITED', 'CONFIRMED', 'PAID', 'COMPLETED'].includes(b.status) && (
+                          {['DEPOSITED', 'CONFIRMED', 'PAID', 'CHECKED_IN', 'COMPLETED'].includes(b.status) && (
                             <>
                               {b.status === 'DEPOSITED' && (
                                 <button
@@ -724,7 +730,7 @@ export const BookingHistoryPage: React.FC = () => {
                           )}
                         </div>
 
-                        {b.status !== 'COMPLETED' && (
+                        {!['CHECKED_IN', 'COMPLETED', 'CANCELLED', 'REFUNDED'].includes(b.status) && (
                           <button
                             onClick={() => handleCancelBooking(b.id)}
                             className="rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-700 hover:bg-rose-500/20 px-4 py-2.5 text-xs font-bold transition flex items-center gap-1 cursor-pointer"

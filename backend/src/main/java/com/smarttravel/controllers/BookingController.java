@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +60,20 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success("Hủy đơn thành công", booking));
     }
 
+    @PostMapping("/{id}/check-in")
+    @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
+    @Operation(summary = "Xác nhận khách hàng Check-in lên tour bằng mã QR (chuyển sang CHECKED_IN)")
+    public ResponseEntity<ApiResponse<BookingResponse>> checkInBooking(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean collectRemainingDeposit,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String actorEmail = userDetails != null ? userDetails.getUsername() : null;
+        BookingResponse booking = bookingService.checkInBooking(id, collectRemainingDeposit, actorEmail);
+        return ResponseEntity.ok(ApiResponse.success("Check-in khách hàng lên tour thành công", booking));
+    }
+
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('VENDOR', 'ADMIN')")
     @Operation(summary = "Cập nhật trạng thái đơn đặt tour")
     public ResponseEntity<ApiResponse<BookingResponse>> updateBookingStatus(
             @PathVariable Long id,

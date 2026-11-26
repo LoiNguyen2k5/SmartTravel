@@ -12,6 +12,7 @@ public interface BookingService {
     List<BookingResponse> getAllBookings();
     BookingResponse getBookingById(Long id, String userEmail);
     BookingResponse cancelBooking(Long id, String userEmail);
+    BookingResponse checkInBooking(Long id, boolean collectRemainingDeposit, String actorEmail);
     BookingResponse updateBookingStatus(Long id, com.smarttravel.enums.BookingStatus status);
     BigDecimal validateAndCalculateVoucher(String voucherCode, BigDecimal originalTotal);
     String resendETicket(String bookingCode, String targetEmail);

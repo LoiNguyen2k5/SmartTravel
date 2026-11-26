@@ -31,9 +31,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public boolean checkEligibility(Long tourId, String userEmail) {
-        if (userEmail == null) return false;
+        if (userEmail == null || tourId == null) return false;
         User user = userRepository.findByEmail(userEmail).orElse(null);
-        return user != null;
+        if (user == null) return false;
+        return bookingRepository.existsByUserIdAndTourIdAndStatus(user.getId(), tourId, BookingStatus.COMPLETED);
     }
 
     @Override
@@ -44,6 +45,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         Tour tour = tourRepository.findById(request.getTourId())
                 .orElseThrow(() -> new ResourceNotFoundException("Tour", "id", request.getTourId()));
+
+        boolean hasCompletedTour = bookingRepository.existsByUserIdAndTourIdAndStatus(
+                user.getId(), tour.getId(), BookingStatus.COMPLETED);
+        if (!hasCompletedTour) {
+            throw new BadRequestException("Chỉ khách hàng đã hoàn thành chuyến đi (trạng thái COMPLETED) mới có thể viết đánh giá cho tour này.");
+        }
 
         Review review = Review.builder()
                 .user(user)

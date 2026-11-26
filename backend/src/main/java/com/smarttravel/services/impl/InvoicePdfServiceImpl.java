@@ -458,6 +458,8 @@ public class InvoicePdfServiceImpl implements InvoicePdfService {
 
                     && booking.getStatus() != BookingStatus.CONFIRMED
 
+                    && booking.getStatus() != BookingStatus.CHECKED_IN
+
                     && booking.getStatus() != BookingStatus.COMPLETED
 
                     && ((booking.getStatus() == BookingStatus.DEPOSITED)
