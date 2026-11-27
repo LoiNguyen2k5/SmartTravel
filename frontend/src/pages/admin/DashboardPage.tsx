@@ -100,16 +100,13 @@ export const DashboardPage: React.FC = () => {
   const successfulBookings = stats?.successfulBookings || 0;
   const aov = successfulBookings > 0 ? grossRevenue / successfulBookings : 0;
 
-  // ── Trạng thái đối soát: đọc localStorage chung với TransactionSettlementPage
-  const getSettledIds = (): number[] => {
-    try { return JSON.parse(localStorage.getItem(SETTLED_VENDORS_KEY) || '[]'); }
-    catch (_) { return []; }
-  };
-  const settledIds = getSettledIds();
+  // ── Trạng thái đối soát: lấy trực tiếp từ Database (Backend)
   const totalVendors = stats?.totalVendors || 0;
-  const settledCount = Math.min(settledIds.length, totalVendors);
+  const settledCount = Math.min(stats?.settledVendors || 0, totalVendors);
   const allSettled = totalVendors > 0 && settledCount >= totalVendors;
   const pendingVendors = Math.max(0, totalVendors - settledCount);
+  const cancelledBookings = stats?.cancelledBookings || 0;
+  const pendingBookingsCount = Math.max(0, (stats?.totalBookings || 0) - successfulBookings - cancelledBookings);
 
   // ── Monthly chart ────────────────────────────────────────────────────────────
   const monthlyEntries = stats?.monthlyRevenue ? Object.entries(stats.monthlyRevenue) : [];
@@ -287,11 +284,11 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="flex justify-between">
               <span className="flex items-center gap-1 text-amber-600"><Clock className="h-3 w-3" /> Chờ xử lý</span>
-              <span className="font-bold">{Math.max(0, (stats?.totalBookings || 0) - successfulBookings)}</span>
+              <span className="font-bold">{pendingBookingsCount}</span>
             </div>
             <div className="flex justify-between">
               <span className="flex items-center gap-1 text-rose-600"><XCircle className="h-3 w-3" /> Đã hủy</span>
-              <span className="font-bold">—</span>
+              <span className="font-bold">{cancelledBookings}</span>
             </div>
           </div>
         </div>
@@ -518,6 +515,7 @@ export const DashboardPage: React.FC = () => {
         isOpen={showSentimentModal}
         onClose={() => setShowSentimentModal(false)}
         tourTitle="Toàn Sàn SmartTravel (Tổng hợp đánh giá khách hàng)"
+        role="ADMIN"
       />
     </div>
   );

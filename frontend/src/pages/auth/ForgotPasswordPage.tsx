@@ -63,8 +63,8 @@ export const ForgotPasswordPage: React.FC = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError('Mật khẩu phải chứa ít nhất 6 ký tự.');
+    if (newPassword.length < 8) {
+      setError('Mật khẩu mới phải chứa ít nhất 8 ký tự.');
       return;
     }
 
@@ -210,9 +210,10 @@ export const ForgotPasswordPage: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mật khẩu mới ít nhất 6 ký tự"
+                  placeholder="Mật khẩu mới tối thiểu 8 ký tự"
                   className="w-full rounded-xl border border-[#E6E1DA] bg-[#FAF8F5] pl-4 pr-10 py-2.5 text-sm text-[#0F172A] placeholder-slate-400 focus:border-rose-400 focus:bg-[#F4F1EC] focus:outline-none transition"
                 />
                 <button

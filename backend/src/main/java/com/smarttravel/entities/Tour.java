@@ -39,6 +39,9 @@ public class Tour extends BaseEntity {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Column(name = "gallery_urls", columnDefinition = "TEXT")
+    private String galleryUrls;
+
     @Column(name = "tour_code", length = 50)
     private String tourCode;
 

@@ -358,6 +358,8 @@ class CoreBusinessServicesTest {
         assertEquals(3L, aStats.getTotalUsers());
         assertEquals(1L, aStats.getTotalVendors());
         assertEquals(3L, aStats.getSuccessfulBookings());
+        assertEquals(1L, aStats.getCancelledBookings());
+        assertEquals(0L, aStats.getSettledVendors());
         assertEquals(new BigDecimal("13000000"), aStats.getTotalGrossRevenue());
         assertEquals(new BigDecimal("1300000.00"), aStats.getTotalPlatformCommission());
 
@@ -365,6 +367,20 @@ class CoreBusinessServicesTest {
         assertEquals(1, settlements.size());
         assertEquals(new BigDecimal("1300000.00"), settlements.get(0).getPlatformFee());
         assertEquals(new BigDecimal("11700000.00"), settlements.get(0).getNetPayout());
+        assertEquals("PENDING", settlements.get(0).getSettlementStatus());
+
+        // Settle vendor payout persisted on User entity
+        when(userRepository.findById(2L)).thenReturn(Optional.of(vendor));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        VendorSettlementResponse settled = adminService.settleVendor(2L);
+        assertEquals("SETTLED", settled.getSettlementStatus());
+        assertEquals(true, vendorService.getVendorDashboardStats("vendor@test.com").get("isSettled"));
+
+        // Vendor business & bank payout profile persisted as JSON on User
+        Map<String, String> savedProfile = vendorService.updateVendorBusinessProfile(
+                "vendor@test.com", Map.of("companyName", "Đại Lý A Travel", "accountNumber", "123456789"));
+        assertEquals("Đại Lý A Travel", savedProfile.get("companyName"));
+        assertEquals("123456789", vendorService.getVendorBusinessProfile("vendor@test.com").get("accountNumber"));
 
         // Admin user status lock protection for root Admin
         when(userRepository.findById(3L)).thenReturn(Optional.of(admin));

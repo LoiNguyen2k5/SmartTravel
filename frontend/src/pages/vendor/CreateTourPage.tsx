@@ -94,7 +94,8 @@ export const CreateTourPage: React.FC = () => {
           <p className="mt-1 text-sm text-slate-600">Thông tin sẽ được lưu trực tiếp vào MySQL Database</p>
         </div>
         <button
-          onClick={() => navigate('/vendor/dashboard')}
+          type="button"
+          onClick={() => navigate('/vendor/tours')}
           className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-800"
         >
           <ArrowLeft className="h-4 w-4" /> Quay lại

@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,6 +51,22 @@ public class VendorController {
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getVendorBookings(@AuthenticationPrincipal UserDetails userDetails) {
         List<BookingResponse> bookings = vendorService.getVendorBookings(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(bookings));
+    }
+
+    @GetMapping("/profile")
+    @Operation(summary = "Lấy thông tin pháp lý doanh nghiệp và tài khoản ngân hàng nhận đối soát của Vendor")
+    public ResponseEntity<ApiResponse<Map<String, String>>> getVendorBusinessProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success(vendorService.getVendorBusinessProfile(userDetails.getUsername())));
+    }
+
+    @PutMapping("/profile")
+    @Operation(summary = "Cập nhật thông tin pháp lý doanh nghiệp và tài khoản ngân hàng nhận đối soát của Vendor")
+    public ResponseEntity<ApiResponse<Map<String, String>>> updateVendorBusinessProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody Map<String, String> profileData
+    ) {
+        Map<String, String> saved = vendorService.updateVendorBusinessProfile(userDetails.getUsername(), profileData);
+        return ResponseEntity.ok(ApiResponse.success("Đã cập nhật hồ sơ doanh nghiệp và tài khoản nhận thanh toán thành công", saved));
     }
 
     @DeleteMapping("/revenue/reset")

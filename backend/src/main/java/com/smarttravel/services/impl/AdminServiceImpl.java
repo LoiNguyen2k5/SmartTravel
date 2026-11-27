@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,6 +74,21 @@ public class AdminServiceImpl implements AdminService {
                 .filter(this::isRevenueBooking)
                 .collect(Collectors.toList());
         long successfulBookings = successfulBookingsList.size();
+        long cancelledBookings = allBookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.CANCELLED || b.getStatus() == BookingStatus.REFUNDED)
+                .count();
+
+        Map<Long, BigDecimal> vendorGrossMap = new HashMap<>();
+        for (Booking b : successfulBookingsList) {
+            if (b.getTour() != null && b.getTour().getVendor() != null) {
+                Long vid = b.getTour().getVendor().getId();
+                vendorGrossMap.merge(vid, getRecognizedRevenue(b), BigDecimal::add);
+            }
+        }
+        long settledVendors = allUsers.stream()
+                .filter(u -> u.getRoles() != null && u.getRoles().stream().anyMatch(r -> r.getName() == RoleEnum.ROLE_VENDOR))
+                .filter(v -> isVendorSettled(v, vendorGrossMap.getOrDefault(v.getId(), BigDecimal.ZERO)))
+                .count();
 
         BigDecimal totalGrossRevenue = successfulBookingsList.stream()
                 .map(this::getRecognizedRevenue)
@@ -127,6 +143,8 @@ public class AdminServiceImpl implements AdminService {
                 .totalPendingTours(totalPendingTours)
                 .totalBookings(totalBookings)
                 .successfulBookings(successfulBookings)
+                .cancelledBookings(cancelledBookings)
+                .settledVendors(settledVendors)
                 .totalGrossRevenue(totalGrossRevenue)
                 .totalPlatformCommission(totalPlatformCommission)
                 .defaultCommissionRate(DEFAULT_COMMISSION_RATE)
@@ -214,36 +232,69 @@ public class AdminServiceImpl implements AdminService {
 
         List<Booking> allBookings = bookingRepository.findAll();
 
-        return vendors.stream().map(vendor -> {
-            List<Tour> vendorTours = tourRepository.findByVendorId(vendor.getId());
-            List<Booking> vendorBookings = allBookings.stream()
-                    .filter(b -> b.getTour() != null && b.getTour().getVendor() != null && b.getTour().getVendor().getId().equals(vendor.getId()))
-                    .collect(Collectors.toList());
+        return vendors.stream()
+                .map(vendor -> buildVendorSettlement(vendor, allBookings))
+                .collect(Collectors.toList());
+    }
 
-            BigDecimal grossRevenue = vendorBookings.stream()
-                    .filter(this::isRevenueBooking)
-                    .map(this::getRecognizedRevenue)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+    @Override
+    @Transactional
+    public VendorSettlementResponse settleVendor(Long vendorId) {
+        User vendor = userRepository.findById(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor", "id", vendorId));
+        List<Booking> allBookings = bookingRepository.findAll();
+        BigDecimal grossRevenue = allBookings.stream()
+                .filter(b -> b.getTour() != null && b.getTour().getVendor() != null && b.getTour().getVendor().getId().equals(vendor.getId()))
+                .filter(this::isRevenueBooking)
+                .map(this::getRecognizedRevenue)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal platformFee = grossRevenue.multiply(BigDecimal.valueOf(DEFAULT_COMMISSION_RATE / 100.0))
-                    .setScale(2, RoundingMode.HALF_UP);
-            BigDecimal netPayout = grossRevenue.subtract(platformFee);
+        vendor.setSettledGrossAmount(grossRevenue);
+        vendor.setLastSettledAt(LocalDateTime.now());
+        userRepository.save(vendor);
+        return buildVendorSettlement(vendor, allBookings);
+    }
 
-            return VendorSettlementResponse.builder()
-                    .vendorId(vendor.getId())
-                    .vendorName(vendor.getFullName())
-                    .vendorEmail(vendor.getEmail())
-                    .vendorPhone(vendor.getPhone())
-                    .totalTours(vendorTours.size())
-                    .totalBookings(vendorBookings.size())
-                    .totalGrossRevenue(grossRevenue)
-                    .commissionRate(DEFAULT_COMMISSION_RATE)
-                    .platformFee(platformFee)
-                    .netPayout(netPayout)
-                    .settlementStatus("PENDING")
-                    .build();
-        }).collect(Collectors.toList());
+    private boolean isVendorSettled(User vendor, BigDecimal currentGrossRevenue) {
+        if (vendor == null) return false;
+        if (currentGrossRevenue == null || currentGrossRevenue.compareTo(BigDecimal.ZERO) <= 0) {
+            return vendor.getLastSettledAt() != null;
+        }
+        return vendor.getSettledGrossAmount() != null
+                && vendor.getSettledGrossAmount().compareTo(currentGrossRevenue) >= 0;
+    }
+
+    private VendorSettlementResponse buildVendorSettlement(User vendor, List<Booking> allBookings) {
+        List<Tour> vendorTours = tourRepository.findByVendorId(vendor.getId());
+        List<Booking> vendorBookings = allBookings.stream()
+                .filter(b -> b.getTour() != null && b.getTour().getVendor() != null && b.getTour().getVendor().getId().equals(vendor.getId()))
+                .collect(Collectors.toList());
+
+        BigDecimal grossRevenue = vendorBookings.stream()
+                .filter(this::isRevenueBooking)
+                .map(this::getRecognizedRevenue)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal platformFee = grossRevenue.multiply(BigDecimal.valueOf(DEFAULT_COMMISSION_RATE / 100.0))
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal netPayout = grossRevenue.subtract(platformFee);
+        String status = isVendorSettled(vendor, grossRevenue) ? "SETTLED" : "PENDING";
+
+        return VendorSettlementResponse.builder()
+                .vendorId(vendor.getId())
+                .vendorName(vendor.getFullName())
+                .vendorEmail(vendor.getEmail())
+                .vendorPhone(vendor.getPhone())
+                .totalTours(vendorTours.size())
+                .totalBookings(vendorBookings.size())
+                .totalGrossRevenue(grossRevenue)
+                .commissionRate(DEFAULT_COMMISSION_RATE)
+                .platformFee(platformFee)
+                .netPayout(netPayout)
+                .settlementStatus(status)
+                .build();
     }
 
     private TourResponse mapToTourResponse(Tour tour) {

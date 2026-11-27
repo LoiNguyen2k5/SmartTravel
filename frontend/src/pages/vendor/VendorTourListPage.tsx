@@ -38,10 +38,9 @@ export const VendorTourListPage: React.FC = () => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa tour "${title}" khỏi hệ thống?`)) {
       try {
         await tourService.deleteTour(tourId);
-        setTours(tours.filter((t) => t.id !== tourId));
-      } catch (err) {
-        alert('Xóa tour thành công!');
-        setTours(tours.filter((t) => t.id !== tourId));
+        setTours((prev) => prev.filter((t) => t.id !== tourId));
+      } catch (err: any) {
+        alert(err?.response?.data?.message || 'Không thể xóa tour. Vui lòng thử lại.');
       }
     }
   };
@@ -238,7 +237,7 @@ export const VendorTourListPage: React.FC = () => {
                       <Edit className="h-3.5 w-3.5" /> Sửa
                     </button>
                     <button
-                      onClick={() => navigate('/vendor/schedules')}
+                      onClick={() => navigate(`/vendor/schedules?tourId=${t.id}`)}
                       className="flex items-center justify-center gap-1 rounded-xl bg-sky-50 text-sky-700 py-2 text-[11px] font-bold hover:bg-sky-100 transition"
                     >
                       <CalendarDays className="h-3.5 w-3.5" /> Lịch Slot

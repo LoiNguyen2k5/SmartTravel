@@ -349,7 +349,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(status);
         Booking updated = bookingRepository.save(booking);
 
-        if (status == BookingStatus.CANCELLED && previous != BookingStatus.CANCELLED) {
+        if (status == BookingStatus.CANCELLED && previous != BookingStatus.CANCELLED && previous != BookingStatus.REFUNDED) {
             restoreBookingSeats(booking);
         }
 
@@ -511,12 +511,30 @@ public class BookingServiceImpl implements BookingService {
         }
 
         for (Booking b : targets) {
-            if (b.getStatus() != BookingStatus.CANCELLED) {
+            if (b.getStatus() != BookingStatus.CANCELLED && b.getStatus() != BookingStatus.REFUNDED) {
                 restoreBookingSeats(b);
             }
         }
 
         bookingRepository.deleteAll(targets);
+
+        // Xóa mốc đã quyết toán của Vendor liên quan khi reset doanh thu về 0đ
+        if (vendorEmail == null) {
+            List<User> allUsers = userRepository.findAll();
+            for (User u : allUsers) {
+                if (u.getSettledGrossAmount() != null || u.getLastSettledAt() != null) {
+                    u.setSettledGrossAmount(null);
+                    u.setLastSettledAt(null);
+                    userRepository.save(u);
+                }
+            }
+        } else {
+            userRepository.findByEmail(vendorEmail).ifPresent(v -> {
+                v.setSettledGrossAmount(null);
+                v.setLastSettledAt(null);
+                userRepository.save(v);
+            });
+        }
         return targets.size();
     }
 }

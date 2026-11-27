@@ -3,6 +3,8 @@ package com.smarttravel.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,6 +35,15 @@ public class User extends BaseEntity {
     @Builder.Default
     @Column(name = "enabled", nullable = false)
     private Boolean enabled = true;
+
+    @Column(name = "settled_gross_amount", precision = 14, scale = 2)
+    private BigDecimal settledGrossAmount;
+
+    @Column(name = "last_settled_at")
+    private LocalDateTime lastSettledAt;
+
+    @Column(name = "vendor_profile_json", columnDefinition = "TEXT")
+    private String vendorProfileJson;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

@@ -10,4 +10,12 @@ export const vendorService = {
   getVendorTours: async (): Promise<ApiResponse<Tour[]>> => {
     return await axiosClient.get('/vendor/tours');
   },
+
+  getBusinessProfile: async (): Promise<ApiResponse<Record<string, string>>> => {
+    return await axiosClient.get('/vendor/profile');
+  },
+
+  updateBusinessProfile: async (data: Record<string, string>): Promise<ApiResponse<Record<string, string>>> => {
+    return await axiosClient.put('/vendor/profile', data);
+  },
 };

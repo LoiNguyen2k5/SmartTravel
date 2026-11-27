@@ -98,6 +98,13 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminService.getVendorSettlements()));
     }
 
+    @PostMapping("/settlements/{vendorId}/settle")
+    @Operation(summary = "Xác nhận quyết toán chi trả doanh thu cho Vendor (lưu DB)")
+    public ResponseEntity<ApiResponse<VendorSettlementResponse>> settleVendor(@PathVariable Long vendorId) {
+        VendorSettlementResponse response = adminService.settleVendor(vendorId);
+        return ResponseEntity.ok(ApiResponse.success("Đã xác nhận quyết toán chi trả cho đối tác thành công", response));
+    }
+
     @GetMapping("/vendor-applications")
     @Operation(summary = "Lấy danh sách hồ sơ đăng ký đối tác Vendor (có thể lọc theo trạng thái)")
     public ResponseEntity<ApiResponse<List<VendorApplicationResponse>>> getVendorApplications(

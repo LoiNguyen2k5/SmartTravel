@@ -346,6 +346,18 @@ VALUES (
     '/images/tours/indonesia-bali/01.jpg',
     -8.4095,
     115.1889
+  ),
+  (
+    20,
+    NOW(),
+    NOW(),
+    'Bangkok & Pattaya',
+    'Bangkok',
+    'Thái Lan',
+    'Thủ đô Bangkok sôi động, Chùa Phật Vàng Wat Traimit, sông Chaophraya và đảo san hô Coral Pattaya',
+    '/images/tours/thai-lan-bangkok-pattaya/01.jpg',
+    13.7563,
+    100.5018
   ) ON DUPLICATE KEY
 UPDATE image_url =
 VALUES(image_url),
@@ -609,7 +621,7 @@ VALUES (
     460,
     'ACTIVE',
     2,
-    2,
+    20,
     '• Vé máy bay khứ hồi SGN - BKK - SGN (hành lý 20kg ký gửi + 7kg xách tay)\n• Khách sạn 4 sao tiêu chuẩn Thái Lan\n• Bữa ăn theo chương trình gồm Buffet 86 tầng Baiyoke Sky\n• Xe máy lạnh đưa đón tham quan suốt tuyến\n• Hướng dẫn viên Việt Nam và Thái Lan nhiệt tình\n• Bảo hiểm du lịch quốc tế',
     '• Tiền Tip cho HDV và tài xế (5 USD/khách/ngày)\n• Chi phí cá nhân: giặt ủi, điện thoại, thức uống ngoài chương trình',
     '• Hủy trước 20 ngày miễn phí\n• Hủy từ 10-19 ngày tính 50%\n• Hủy trong vòng 10 ngày tính 100%',

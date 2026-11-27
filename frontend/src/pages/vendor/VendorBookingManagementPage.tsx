@@ -156,14 +156,16 @@ export const VendorBookingManagementPage: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (bookingId: number, newStatus: any) => {
+  const handleUpdateStatus = async (bookingId: number, newStatus: any): Promise<boolean> => {
     try {
       const res = await bookingService.updateBookingStatus(bookingId, newStatus);
       syncLocalBookingCache(bookingId, res?.data || { status: newStatus });
+      return true;
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Không thể cập nhật trạng thái đơn đặt tour.';
       alert(msg);
       console.error('Lỗi khi gửi API cập nhật trạng thái:', err);
+      return false;
     }
   };
 
@@ -520,7 +522,11 @@ export const VendorBookingManagementPage: React.FC = () => {
 
                     {!['CANCELLED', 'CHECKED_IN', 'COMPLETED', 'REFUNDED'].includes(b.status) && (
                       <button
-                        onClick={() => handleUpdateStatus(b.id, 'CANCELLED')}
+                        onClick={() => {
+                          if (window.confirm(`Bạn có chắc muốn duyệt HỦY đơn đặt tour "${b.bookingCode}" của khách ${b.contactName || b.userName} không?`)) {
+                            void handleUpdateStatus(b.id, 'CANCELLED');
+                          }
+                        }}
                         className="flex items-center gap-1 rounded-xl bg-slate-100 text-rose-600 px-3 py-2 text-xs font-bold hover:bg-rose-50 transition"
                         title="Duyệt hủy tour"
                       >
@@ -704,8 +710,9 @@ export const VendorBookingManagementPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    handleUpdateStatus(selectedRefundBooking.id, 'REFUNDED' as any);
+                  onClick={async () => {
+                    const ok = await handleUpdateStatus(selectedRefundBooking.id, 'REFUNDED' as any);
+                    if (!ok) return;
                     setRefundSuccessMsg(
                       `Đã xác nhận hoàn tiền thành công ${Math.round(
                         ((selectedRefundBooking.totalPrice || 0) * refundPercent) / 100

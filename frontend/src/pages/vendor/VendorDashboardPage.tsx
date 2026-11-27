@@ -7,6 +7,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { tourService } from '../../services/tourService';
 import { bookingService } from '../../services/bookingService';
+import { vendorService } from '../../services/vendorService';
 import { Tour } from '../../types/tour';
 import { Booking } from '../../types/booking';
 import { AdminSentimentModal } from '../../components/admin/AdminSentimentModal';
@@ -80,6 +81,7 @@ export const VendorDashboardPage: React.FC = () => {
   const [filterMonths, setFilterMonths] = useState<number>(6);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [showSentimentModal, setShowSentimentModal] = useState<boolean>(false);
+  const [dbSettled, setDbSettled] = useState<boolean>(false);
 
   const applyStatusOverrides = (list: Booking[]): Booking[] => {
     try {
@@ -99,10 +101,14 @@ export const VendorDashboardPage: React.FC = () => {
     const isDemoVendor = currentUser?.email === 'vendor@smarttravel.com';
 
     try {
-      const [toursRes, bookingsRes] = await Promise.all([
+      const [toursRes, bookingsRes, statsRes] = await Promise.all([
         tourService.getMyTours(),
         bookingService.getVendorBookings(),
+        vendorService.getDashboardStats().catch(() => null),
       ]);
+      if (statsRes?.data) {
+        setDbSettled(Boolean(statsRes.data.isSettled));
+      }
       const loadedTours = toursRes.success && toursRes.data ? toursRes.data : [];
       setTours(loadedTours);
       const myTourIds = new Set(loadedTours.map((t) => t.id));
@@ -156,20 +162,7 @@ export const VendorDashboardPage: React.FC = () => {
     }
   };
 
-  // Vendor ID cố định cho demo (thực tế lấy từ auth context)
-  const VENDOR_ID = 1;
-  const SETTLED_VENDORS_KEY = 'smart_travel_settled_vendor_ids';
-
-  const isAdminSettled = (): boolean => {
-    try {
-      const raw = localStorage.getItem(SETTLED_VENDORS_KEY);
-      if (!raw) return false;
-      const ids: number[] = JSON.parse(raw);
-      const savedUserStr = localStorage.getItem('user');
-      const currentUser = savedUserStr ? JSON.parse(savedUserStr) : null;
-      return ids.includes(currentUser?.id) || ids.includes(VENDOR_ID) || ids.includes(2);
-    } catch (_) { return false; }
-  };
+  const isAdminSettled = (): boolean => dbSettled;
 
   useEffect(() => { fetchVendorData(); }, []);
 
@@ -205,7 +198,7 @@ export const VendorDashboardPage: React.FC = () => {
     const cancellationRate = bookings.length > 0 ? (cancelled.length / bookings.length) * 100 : 0;
     const totalGuests = bookings.reduce((s, b) => s + (b.numberOfAdults || 0) + (b.numberOfChildren || 0), 0);
     return { grossRevenue, netRevenue, commission, gatewayFee, netPayout, pendingSettlement, adminSettled, aov, cancellationRate, totalGuests, counts: { confirmed: confirmed.length, pending: pending.length, completed: completed.length, cancelled: cancelled.length, total: bookings.length } };
-  }, [bookings]);
+  }, [bookings, dbSettled]);
 
   const chartData = useMemo(() => {
     return Array.from({ length: filterMonths }, (_, i) => {
@@ -232,8 +225,9 @@ export const VendorDashboardPage: React.FC = () => {
 
   const exportCSV = () => {
     const headers = ['Ma dat tour', 'Tour', 'Khach', 'SDT', 'Tong tien', 'Trang thai', 'Ngay dat'];
+    const escapeCell = (val: unknown) => `"${String(val ?? '').replace(/"/g, '""')}"`;
     const rows = bookings.map((b) => [b.bookingCode || b.id, b.tourTitle || '', b.contactName || b.userName || '', b.contactPhone || '', b.totalPrice || 0, b.status || '', b.createdAt || '']);
-    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const csv = [headers, ...rows].map((r) => r.map(escapeCell).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

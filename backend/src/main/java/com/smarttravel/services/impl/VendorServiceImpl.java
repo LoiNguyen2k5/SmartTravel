@@ -1,5 +1,7 @@
 package com.smarttravel.services.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smarttravel.dto.response.BookingResponse;
 import com.smarttravel.dto.response.TourResponse;
 import com.smarttravel.entities.Booking;
@@ -13,10 +15,12 @@ import com.smarttravel.services.TourService;
 import com.smarttravel.services.VendorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class VendorServiceImpl implements VendorService {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final TourRepository tourRepository;
     private final UserRepository userRepository;
@@ -65,12 +71,54 @@ public class VendorServiceImpl implements VendorService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        boolean isSettled = totalRevenue.compareTo(BigDecimal.ZERO) > 0
+                && vendor.getSettledGrossAmount() != null
+                && vendor.getSettledGrossAmount().compareTo(totalRevenue) >= 0;
+
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalTours", totalTours);
         stats.put("totalBookings", vendorBookings.size());
         stats.put("totalRevenue", totalRevenue);
+        stats.put("isSettled", isSettled);
+        stats.put("settledGrossAmount", vendor.getSettledGrossAmount() != null ? vendor.getSettledGrossAmount() : BigDecimal.ZERO);
 
         return stats;
+    }
+
+    @Override
+    public Map<String, String> getVendorBusinessProfile(String vendorEmail) {
+        User vendor = userRepository.findByEmail(vendorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
+        if (vendor.getVendorProfileJson() == null || vendor.getVendorProfileJson().isBlank()) {
+            return new LinkedHashMap<>();
+        }
+        try {
+            return OBJECT_MAPPER.readValue(vendor.getVendorProfileJson(), new TypeReference<Map<String, String>>() {});
+        } catch (Exception e) {
+            return new LinkedHashMap<>();
+        }
+    }
+
+    @Override
+    @Transactional
+    public Map<String, String> updateVendorBusinessProfile(String vendorEmail, Map<String, String> profileData) {
+        User vendor = userRepository.findByEmail(vendorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", vendorEmail));
+        Map<String, String> sanitized = new LinkedHashMap<>();
+        if (profileData != null) {
+            for (Map.Entry<String, String> entry : profileData.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    sanitized.put(entry.getKey().trim(), entry.getValue().trim());
+                }
+            }
+        }
+        try {
+            vendor.setVendorProfileJson(OBJECT_MAPPER.writeValueAsString(sanitized));
+            userRepository.save(vendor);
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể lưu hồ sơ doanh nghiệp đại lý", e);
+        }
+        return sanitized;
     }
 
     @Override

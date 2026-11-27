@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { CalendarDays, Plus, Users, Trash2, ShieldAlert, CheckCircle, Clock, Flag } from 'lucide-react';
 import { tourService } from '../../services/tourService';
 import { 
@@ -10,8 +11,10 @@ import {
 import { Tour } from '../../types/tour';
 
 export const VendorSchedulesPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const initialTourIdParam = Number(searchParams.get('tourId') || 0) || null;
   const [tours, setTours] = useState<Tour[]>([]);
-  const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
+  const [selectedTourId, setSelectedTourId] = useState<number | null>(initialTourIdParam);
   const [schedules, setSchedules] = useState<TourScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [scheduleFilter, setScheduleFilter] = useState<'ALL' | 'ACTIVE' | 'IN_PROGRESS' | 'CLOSED' | 'CANCELLED' | 'COMPLETED'>('ALL');
@@ -44,7 +47,9 @@ export const VendorSchedulesPage: React.FC = () => {
       const res = await tourService.getMyTours();
       if (res.data && res.data.length > 0) {
         setTours(res.data);
-        setSelectedTourId(res.data[0].id);
+        setSelectedTourId((prev) =>
+          prev && res.data!.some((t) => t.id === prev) ? prev : res.data![0].id
+        );
       }
     } catch (err) {
       console.error('Lỗi tải danh sách tour:', err);
@@ -61,6 +66,10 @@ export const VendorSchedulesPage: React.FC = () => {
   const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!startDate || !endDate || !selectedTourId) return;
+    if (endDate < startDate) {
+      alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày khởi hành!');
+      return;
+    }
 
     try {
       await tourScheduleService.addSchedule(selectedTourId, {
@@ -75,18 +84,23 @@ export const VendorSchedulesPage: React.FC = () => {
       setEndDate('');
       setMinSeats(10);
       setSeasonalNote('Khởi hành định kỳ');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Lỗi thêm lịch khởi hành:', err);
+      alert(err?.response?.data?.message || 'Không thể thêm lịch khởi hành.');
     }
   };
 
-  const handleDeleteSchedule = async (id: number) => {
+  const handleDeleteSchedule = async (schedule: TourScheduleItem) => {
     if (!selectedTourId) return;
+    if (!window.confirm(`Bạn có chắc muốn xóa lịch khởi hành ${schedule.startDate} ➔ ${schedule.endDate} không?`)) {
+      return;
+    }
     try {
-      await tourScheduleService.deleteSchedule(selectedTourId, id);
+      await tourScheduleService.deleteSchedule(selectedTourId, schedule.id);
       await loadSchedulesForTour(selectedTourId);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Lỗi xóa lịch khởi hành:', err);
+      alert(err?.response?.data?.message || 'Không thể xóa lịch khởi hành.');
     }
   };
 
@@ -206,7 +220,9 @@ export const VendorSchedulesPage: React.FC = () => {
                   <div>
                     <p className="text-xs font-black text-slate-900 line-clamp-1">{selectedTour.title}</p>
                     <p className="text-[11px] text-slate-500">
-                      {(selectedTour.category as any) === 'NUOC_NGOAI' ? 'Quốc Tế (Chốt 15N)' : 'Trong Nước (Chốt 3N)'} | Giá: {selectedTour.price.toLocaleString('vi-VN')}đ
+                      {(selectedTour.category as any) === 'NUOC_NGOAI'
+                        ? `Quốc Tế (Chốt ${selectedTourLeadDays}N)`
+                        : `Trong Nước (Chốt ${selectedTourLeadDays}N)`} | Giá: {selectedTour.price.toLocaleString('vi-VN')}đ
                     </p>
                   </div>
                 </div>
@@ -429,7 +445,8 @@ export const VendorSchedulesPage: React.FC = () => {
                           )}
 
                           <button
-                            onClick={() => handleDeleteSchedule(s.id)}
+                            type="button"
+                            onClick={() => handleDeleteSchedule(s)}
                             className="p-2.5 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
                             title="Xóa lịch"
                           >

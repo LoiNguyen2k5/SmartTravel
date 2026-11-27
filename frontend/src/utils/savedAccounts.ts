@@ -9,17 +9,21 @@ export const getSavedAccounts = (): SavedAccount[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      // Dữ liệu mẫu ban đầu nếu chưa có tài khoản nào được lưu
+      // Dữ liệu mẫu ban đầu khớp với seed_data.sql và nút test nhanh trên trang Login
       return [
-        { email: 'admin@smarttravel.com', password: '123456' },
-        { email: 'vendor@smarttravel.com', password: '123456' },
-        { email: 'user@smarttravel.com', password: '123456' },
+        { email: 'admin@smarttravel.com', password: '12345678' },
+        { email: 'vendor@smarttravel.com', password: '12345678' },
+        { email: 'user@smarttravel.com', password: '12345678' },
       ];
     }
     const parsed: SavedAccount[] = JSON.parse(raw);
     return parsed.map((acc) => ({
       ...acc,
-      password: acc.password === 'password123' ? '123456' : acc.password,
+      password:
+        acc.password === 'password123' ||
+        (acc.password === '123456' && acc.email.endsWith('@smarttravel.com'))
+          ? '12345678'
+          : acc.password,
     }));
   } catch (e) {
     return [];

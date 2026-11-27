@@ -10,4 +10,6 @@ public interface VendorService {
     Map<String, Object> getVendorDashboardStats(String vendorEmail);
     List<TourResponse> getVendorTours(String vendorEmail);
     List<BookingResponse> getVendorBookings(String vendorEmail);
+    Map<String, String> getVendorBusinessProfile(String vendorEmail);
+    Map<String, String> updateVendorBusinessProfile(String vendorEmail, Map<String, String> profileData);
 }

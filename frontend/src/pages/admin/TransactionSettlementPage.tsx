@@ -29,30 +29,7 @@ export const TransactionSettlementPage: React.FC = () => {
     isOpen: boolean;
     vendor: VendorSettlement | null;
   }>({ isOpen: false, vendor: null });
-
-  // Persistent storage key for settled vendor payouts
-  const SETTLED_VENDORS_STORAGE_KEY = 'smart_travel_settled_vendor_ids';
-
-  const getSettledVendorIds = (): number[] => {
-    try {
-      const raw = localStorage.getItem(SETTLED_VENDORS_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      return [];
-    }
-  };
-
-  const saveSettledVendorId = (vendorId: number) => {
-    try {
-      const ids = getSettledVendorIds();
-      if (!ids.includes(vendorId)) {
-        ids.push(vendorId);
-        localStorage.setItem(SETTLED_VENDORS_STORAGE_KEY, JSON.stringify(ids));
-      }
-    } catch (e) {
-      console.error('Error saving settled vendor ID', e);
-    }
-  };
+  const [settlingVendorId, setSettlingVendorId] = useState<number | null>(null);
 
   const fetchData = async () => {
     try {
@@ -63,7 +40,6 @@ export const TransactionSettlementPage: React.FC = () => {
       ]);
       if (paymentsRes.data) setPayments(paymentsRes.data);
       if (settlementsRes.data) {
-        const settledIds = getSettledVendorIds();
         const mergedSettlements = settlementsRes.data.map(s => {
           const totalGross = Number(s.totalGrossRevenue) || 0;
           const commRate = s.commissionRate || 10;
@@ -76,7 +52,7 @@ export const TransactionSettlementPage: React.FC = () => {
             totalGrossRevenue: totalGross,
             platformFee,
             netPayout,
-            settlementStatus: (settledIds.includes(s.vendorId) || s.settlementStatus === 'SETTLED') ? 'SETTLED' : (s.settlementStatus || 'PENDING')
+            settlementStatus: s.settlementStatus || 'PENDING'
           };
         });
         setSettlements(mergedSettlements);
@@ -108,10 +84,17 @@ export const TransactionSettlementPage: React.FC = () => {
     s.vendorPhone?.includes(searchTerm)
   );
 
-  const handleConfirmPayout = (vendorId: number) => {
-    saveSettledVendorId(vendorId);
-    setSettlements(prev => prev.map(s => s.vendorId === vendorId ? { ...s, settlementStatus: 'SETTLED' } : s));
-    setPayoutModal({ isOpen: false, vendor: null });
+  const handleConfirmPayout = async (vendorId: number) => {
+    setSettlingVendorId(vendorId);
+    try {
+      await adminService.settleVendor(vendorId);
+      setSettlements(prev => prev.map(s => s.vendorId === vendorId ? { ...s, settlementStatus: 'SETTLED' } : s));
+      setPayoutModal({ isOpen: false, vendor: null });
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Không thể xác nhận quyết toán. Vui lòng thử lại.');
+    } finally {
+      setSettlingVendorId(null);
+    }
   };
 
   return (
@@ -167,7 +150,7 @@ export const TransactionSettlementPage: React.FC = () => {
 
         <div className="rounded-2xl border border-[#E6E1DA] bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">Tổng Chi Trả Cho Vendor (90%)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#526071]">Tổng Chi Trả Cho Vendor (88.5%)</span>
             <div className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 p-2.5 text-indigo-400">
               <ArrowDownRight className="h-6 w-6" />
             </div>
@@ -175,7 +158,7 @@ export const TransactionSettlementPage: React.FC = () => {
           <div className="mt-3 text-2xl font-black text-indigo-400">
             {formatCurrency(totalNetPayouts)}
           </div>
-          <div className="mt-1 text-xs text-[#526071]">Thực nhận của các nhà cung cấp</div>
+          <div className="mt-1 text-xs text-[#526071]">Thực nhận sau 10% hoa hồng &amp; 1.5% phí GW</div>
         </div>
       </div>
 
@@ -415,8 +398,12 @@ export const TransactionSettlementPage: React.FC = () => {
                 <span className="text-[#526071]">Phí sàn khấu trừ (10%):</span>
                 <span className="font-bold text-amber-700">-{formatCurrency(payoutModal.vendor.platformFee)}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-[#526071]">Phí cổng thanh toán (1.5%):</span>
+                <span className="font-bold text-amber-700">-{formatCurrency(Math.round(payoutModal.vendor.totalGrossRevenue * 0.015))}</span>
+              </div>
               <div className="border-t border-[#E6E1DA] pt-2 flex justify-between text-sm">
-                <span className="font-extrabold text-[#0F172A]">Số tiền chi trả Vendor:</span>
+                <span className="font-extrabold text-[#0F172A]">Số tiền chi trả Vendor (88.5%):</span>
                 <span className="font-black text-emerald-700">{formatCurrency(payoutModal.vendor.netPayout)}</span>
               </div>
             </div>
@@ -429,10 +416,11 @@ export const TransactionSettlementPage: React.FC = () => {
                 Hủy bỏ
               </button>
               <button
+                disabled={settlingVendorId !== null}
                 onClick={() => handleConfirmPayout(payoutModal.vendor!.vendorId)}
-                className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition active:scale-95"
+                className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition active:scale-95 disabled:opacity-50"
               >
-                Xác Nhận Đã Chi Trả
+                {settlingVendorId !== null ? 'Đang lưu...' : 'Xác Nhận Đã Chi Trả'}
               </button>
             </div>
           </div>

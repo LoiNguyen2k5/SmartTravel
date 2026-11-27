@@ -33,6 +33,7 @@ public class DataInitializer implements CommandLineRunner {
     private final VisaTemplateRepository visaTemplateRepository;
     private final VisaRequirementRepository visaRequirementRepository;
     private final TourRepository tourRepository;
+    private final DestinationRepository destinationRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -64,46 +65,46 @@ public class DataInitializer implements CommandLineRunner {
         Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
                 .orElseGet(() -> roleRepository.save(new Role(null, RoleEnum.ROLE_USER)));
 
-        // 2. Tạo tài khoản mẫu Admin
+        // 2. Tạo tài khoản mẫu Admin (đồng bộ mật khẩu 12345678 với seed_data.sql & nút test nhanh)
         if (!userRepository.existsByEmail("admin@smarttravel.com")) {
             User admin = User.builder()
                     .email("admin@smarttravel.com")
-                    .password(passwordEncoder.encode("password123"))
+                    .password(passwordEncoder.encode("12345678"))
                     .fullName("System Administrator")
                     .phone("0901234567")
                     .enabled(true)
                     .roles(Set.of(adminRole))
                     .build();
             userRepository.save(admin);
-            log.info("Tạo tài khoản Admin mẫu: admin@smarttravel.com / password123");
+            log.info("Tạo tài khoản Admin mẫu: admin@smarttravel.com / 12345678");
         }
 
         // 3. Tạo tài khoản mẫu Vendor
         if (!userRepository.existsByEmail("vendor@smarttravel.com")) {
             User vendor = User.builder()
                     .email("vendor@smarttravel.com")
-                    .password(passwordEncoder.encode("password123"))
+                    .password(passwordEncoder.encode("12345678"))
                     .fullName("Vietravel Official")
                     .phone("0908888999")
                     .enabled(true)
                     .roles(Set.of(vendorRole))
                     .build();
             userRepository.save(vendor);
-            log.info("Tạo tài khoản Vendor mẫu: vendor@smarttravel.com / password123");
+            log.info("Tạo tài khoản Vendor mẫu: vendor@smarttravel.com / 12345678");
         }
 
         // 4. Tạo tài khoản mẫu Customer (User)
         if (!userRepository.existsByEmail("user@smarttravel.com")) {
             User customer = User.builder()
                     .email("user@smarttravel.com")
-                    .password(passwordEncoder.encode("password123"))
+                    .password(passwordEncoder.encode("12345678"))
                     .fullName("Nguyễn Văn Du Khách")
                     .phone("0912345678")
                     .enabled(true)
                     .roles(Set.of(userRole))
                     .build();
             userRepository.save(customer);
-            log.info("Tạo tài khoản User mẫu: user@smarttravel.com / password123");
+            log.info("Tạo tài khoản User mẫu: user@smarttravel.com / 12345678");
         }
 
         // 5. Tạo đơn đăng ký đại lý mẫu (PENDING_REVIEW) nếu chưa có hồ sơ nào
@@ -197,15 +198,55 @@ public class DataInitializer implements CommandLineRunner {
         // Tách các mục CCCD 2 mặt / CT07 gộp chung trong DB cũ thành các tệp riêng biệt (idempotent)
         migrateCombinedIdCardDocuments();
 
-        // Tự động gắn mẫu Visa cho các tour quốc tế sẵn có trong DB nếu chưa gắn (không áp cho Thái Lan/Singapore miễn visa)
+        // Tự động gắn mẫu Visa cho các tour quốc tế sẵn có trong DB nếu chưa gắn (và tự sửa tour ASEAN miễn visa như Thái Lan bị gắn nhầm)
         List<VisaTemplate> allTemplates = visaTemplateRepository.findAll();
         List<Tour> tours = tourRepository.findAll();
+        Destination thailandDest = null;
         for (Tour t : tours) {
-            if (t.getCategory() != TourCategory.NUOC_NGOAI || t.getVisaTemplate() != null) {
+            if (t.getCategory() != TourCategory.NUOC_NGOAI) {
+                continue;
+            }
+            String titleLower = (t.getTitle() != null ? t.getTitle() : "").toLowerCase(Locale.ROOT);
+            boolean isThailandTour = titleLower.contains("thái lan") || titleLower.contains("bangkok") || titleLower.contains("pattaya");
+            boolean isVisaFreeAsean = isThailandTour || titleLower.contains("singapore") || titleLower.contains("malaysia")
+                    || titleLower.contains("bali") || titleLower.contains("indonesia");
+
+            if (isVisaFreeAsean) {
+                boolean dirty = false;
+                if (t.getVisaTemplate() != null) {
+                    t.setVisaTemplate(null);
+                    dirty = true;
+                }
+                if (isThailandTour && (t.getDestination() == null || !"Thái Lan".equalsIgnoreCase(t.getDestination().getCountry()))) {
+                    if (thailandDest == null) {
+                        thailandDest = destinationRepository.findAll().stream()
+                                .filter(d -> "Thái Lan".equalsIgnoreCase(d.getCountry()) || "Bangkok & Pattaya".equalsIgnoreCase(d.getName()))
+                                .findFirst()
+                                .orElseGet(() -> destinationRepository.save(Destination.builder()
+                                        .name("Bangkok & Pattaya")
+                                        .city("Bangkok")
+                                        .country("Thái Lan")
+                                        .description("Thủ đô Bangkok sôi động, Chùa Phật Vàng Wat Traimit, sông Chaophraya và đảo san hô Coral Pattaya")
+                                        .imageUrl("/images/tours/thai-lan-bangkok-pattaya/01.jpg")
+                                        .latitude(13.7563)
+                                        .longitude(100.5018)
+                                        .build()));
+                    }
+                    t.setDestination(thailandDest);
+                    dirty = true;
+                }
+                if (dirty) {
+                    tourRepository.save(t);
+                    log.info("Đã chuẩn hóa tour miễn Visa ASEAN: {}", t.getTitle());
+                }
+                continue;
+            }
+
+            if (t.getVisaTemplate() != null) {
                 continue;
             }
             String haystack = ((t.getDestination() != null && t.getDestination().getCountry() != null ? t.getDestination().getCountry() : "")
-                    + " " + (t.getTitle() != null ? t.getTitle() : "")).toLowerCase(Locale.ROOT);
+                    + " " + titleLower).toLowerCase(Locale.ROOT);
 
             VisaTemplate matched = null;
             for (VisaTemplate tpl : allTemplates) {

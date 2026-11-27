@@ -22,6 +22,8 @@ public class AdminStatsResponse {
     private long totalPendingTours;
     private long totalBookings;
     private long successfulBookings;
+    private long cancelledBookings;
+    private long settledVendors;
     private BigDecimal totalGrossRevenue;
     private BigDecimal totalPlatformCommission;
     private Double defaultCommissionRate;

@@ -17,4 +17,5 @@ public interface AdminService {
     List<TourResponse> getAllToursForAdmin(TourStatus status);
     List<PaymentResponse> getAllPayments();
     List<VendorSettlementResponse> getVendorSettlements();
+    VendorSettlementResponse settleVendor(Long vendorId);
 }

@@ -86,8 +86,10 @@ export const UserManagementPage: React.FC = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const countVendors = users.filter(u => u.roles?.some(r => typeof r === 'string' ? r.includes('VENDOR') : (r as any).name?.includes('VENDOR'))).length;
-  const countCustomers = users.filter(u => u.roles?.some(r => typeof r === 'string' ? r.includes('USER') : (r as any).name?.includes('USER'))).length;
+  const userHasRole = (u: User, role: string) =>
+    u.roles?.some(r => typeof r === 'string' ? r.includes(role) : (r as any).name?.includes(role));
+  const countVendors = users.filter(u => userHasRole(u, 'VENDOR')).length;
+  const countCustomers = users.filter(u => userHasRole(u, 'USER') && !userHasRole(u, 'VENDOR') && !userHasRole(u, 'ADMIN')).length;
   const countBanned = users.filter(u => u.enabled === false).length;
 
   return (
@@ -376,7 +378,7 @@ export const UserManagementPage: React.FC = () => {
               <button
                 onClick={() => handleToggleStatus(confirmModal.user!, confirmModal.nextState)}
                 disabled={actionLoadingId !== null}
-                className={`px-5 py-2 rounded-xl text-sm font-bold text-[#0F172A] shadow-md transition active:scale-95 ${
+                className={`px-5 py-2 rounded-xl text-sm font-bold text-white shadow-md transition active:scale-95 ${
                   confirmModal.nextState ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'
                 }`}
               >

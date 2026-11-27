@@ -86,6 +86,7 @@ export interface TourCreateRequest {
   durationNights: number;
   departureLocation: string;
   thumbnailUrl?: string;
+  gallery?: string[];
   destinationId?: number;
   category?: TourCategory;
   tourCode?: string;

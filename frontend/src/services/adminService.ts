@@ -39,6 +39,10 @@ export const adminService = {
     return await axiosClient.get('/admin/settlements');
   },
 
+  settleVendor: async (vendorId: number): Promise<ApiResponse<VendorSettlement>> => {
+    return await axiosClient.post(`/admin/settlements/${vendorId}/settle`);
+  },
+
   resetRevenue: async (): Promise<ApiResponse<number>> => {
     return await axiosClient.delete('/admin/revenue/reset');
   },

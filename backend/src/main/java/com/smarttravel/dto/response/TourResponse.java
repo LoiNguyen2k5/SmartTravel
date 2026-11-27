@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -25,6 +26,7 @@ public class TourResponse {
     private Integer durationNights;
     private String departureLocation;
     private String thumbnailUrl;
+    private List<String> gallery;
     private String tourCode;
     private TourCategory category;
     private String includedServices;

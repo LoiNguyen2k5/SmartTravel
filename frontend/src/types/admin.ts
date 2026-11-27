@@ -8,6 +8,8 @@ export interface AdminStats {
   totalPendingTours: number;
   totalBookings: number;
   successfulBookings: number;
+  cancelledBookings?: number;
+  settledVendors?: number;
   totalGrossRevenue: number;
   totalPlatformCommission: number;
   defaultCommissionRate: number;

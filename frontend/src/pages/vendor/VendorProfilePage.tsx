@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { Building2, CreditCard, ShieldCheck, Save, CheckCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Building2, CreditCard, ShieldCheck, Save, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ProfileAccountCard } from '../../components/common/ProfileAccountCard';
+import { vendorService } from '../../services/vendorService';
 
 export const VendorProfilePage: React.FC = () => {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const isDemo = user?.email === 'vendor@smarttravel.com';
 
@@ -24,10 +27,51 @@ export const VendorProfilePage: React.FC = () => {
   const [accountHolder, setAccountHolder] = useState(isDemo ? 'CONG TY TNHH DU LICH SMARTTRAVEL PARTNER' : (user?.fullName?.toUpperCase() || ''));
   const [bankBranch, setBankBranch] = useState(isDemo ? 'Chi nhánh TP.Hồ Chí Minh' : '');
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    vendorService.getBusinessProfile().then((res) => {
+      const p = res?.data;
+      if (p && Object.keys(p).length > 0) {
+        if (p.companyName !== undefined) setCompanyName(p.companyName);
+        if (p.businessLicense !== undefined) setBusinessLicense(p.businessLicense);
+        if (p.taxCode !== undefined) setTaxCode(p.taxCode);
+        if (p.phone !== undefined) setPhone(p.phone);
+        if (p.email !== undefined) setEmail(p.email);
+        if (p.address !== undefined) setAddress(p.address);
+        if (p.representative !== undefined) setRepresentative(p.representative);
+        if (p.bankName !== undefined) setBankName(p.bankName);
+        if (p.accountNumber !== undefined) setAccountNumber(p.accountNumber);
+        if (p.accountHolder !== undefined) setAccountHolder(p.accountHolder);
+        if (p.bankBranch !== undefined) setBankBranch(p.bankBranch);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setSaving(true);
+    setErrorMsg('');
+    setSaved(false);
+    try {
+      await vendorService.updateBusinessProfile({
+        companyName,
+        businessLicense,
+        taxCode,
+        phone,
+        email,
+        address,
+        representative,
+        bankName,
+        accountNumber,
+        accountHolder,
+        bankBranch,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 4000);
+    } catch (err: any) {
+      setErrorMsg(err?.response?.data?.message || 'Không thể lưu hồ sơ doanh nghiệp lên hệ thống.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -45,9 +89,15 @@ export const VendorProfilePage: React.FC = () => {
       {/* SECTION 0: TÀI KHOẢN CÁ NHÂN, AVATAR TẢI TỪ MÁY & ĐỔI MẬT KHẨU */}
       <ProfileAccountCard roleBadge="Vendor Partner" defaultDisplayName="Nhà Cung Cấp Tour" />
 
+      {errorMsg && (
+        <div className="flex items-center gap-2 rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-700 border border-rose-200">
+          <AlertCircle className="h-5 w-5 text-rose-600" /> {errorMsg}
+        </div>
+      )}
+
       {saved && (
         <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-700 border border-emerald-200">
-          <CheckCircle className="h-5 w-5 text-emerald-600" /> Đã cập nhật thông tin hồ sơ doanh nghiệp thành công!
+          <CheckCircle className="h-5 w-5 text-emerald-600" /> Đã lưu thông tin hồ sơ doanh nghiệp &amp; tài khoản nhận thanh toán vào cơ sở dữ liệu!
         </div>
       )}
 
@@ -207,9 +257,10 @@ export const VendorProfilePage: React.FC = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 hover:bg-emerald-500 transition"
+            disabled={saving}
+            className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 hover:bg-emerald-500 transition disabled:opacity-50"
           >
-            <Save className="h-4 w-4" /> Lưu Hồ Sơ Doanh Nghiệp
+            <Save className="h-4 w-4" /> {saving ? 'Đang lưu...' : 'Lưu Hồ Sơ Doanh Nghiệp'}
           </button>
         </div>
       </form>

@@ -102,12 +102,14 @@ export const EditTourPage: React.FC = () => {
     try {
       await tourService.updateTour(Number(id), {
         title: title.trim(),
+        tourCode: tourCode.trim() || undefined,
         price,
         childPrice,
         durationDays,
         durationNights,
         departureLocation: departureLocation.trim(),
         thumbnailUrl: thumbnailUrl.trim(),
+        gallery: galleryImages,
         category: category as any,
         description: description.trim(),
         visaTemplateId: category === 'NUOC_NGOAI' ? visaTemplateId : null,

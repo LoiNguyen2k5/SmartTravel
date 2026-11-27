@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -38,6 +39,8 @@ public class TourCreateRequest {
     private String departureLocation;
 
     private String thumbnailUrl;
+
+    private List<String> gallery;
 
     private String tourCode;
 

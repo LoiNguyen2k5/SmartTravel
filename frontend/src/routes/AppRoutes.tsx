@@ -21,7 +21,6 @@ import { BecomeVendorPage } from '../pages/client/BecomeVendorPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { RegisterPage } from '../pages/auth/RegisterPage';
 import { ForgotPasswordPage } from '../pages/auth/ForgotPasswordPage';
-import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
 
 // Admin Pages
@@ -61,7 +60,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/reset-password" element={<Navigate to="/forgot-password" replace />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Route>
 

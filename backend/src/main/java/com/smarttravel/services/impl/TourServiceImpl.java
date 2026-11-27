@@ -79,6 +79,7 @@ public class TourServiceImpl implements TourService {
                 .durationNights(request.getDurationNights())
                 .departureLocation(request.getDepartureLocation())
                 .thumbnailUrl(request.getThumbnailUrl())
+                .galleryUrls(serializeGallery(request.getGallery()))
                 .tourCode(request.getTourCode())
                 .category(category)
                 .includedServices(request.getIncludedServices())
@@ -118,6 +119,7 @@ public class TourServiceImpl implements TourService {
         if (request.getDurationNights() != null) tour.setDurationNights(request.getDurationNights());
         if (request.getDepartureLocation() != null) tour.setDepartureLocation(request.getDepartureLocation());
         if (request.getThumbnailUrl() != null) tour.setThumbnailUrl(request.getThumbnailUrl());
+        if (request.getGallery() != null) tour.setGalleryUrls(serializeGallery(request.getGallery()));
         if (request.getTourCode() != null) tour.setTourCode(request.getTourCode());
         if (request.getCategory() != null) tour.setCategory(request.getCategory());
         if (request.getIncludedServices() != null) tour.setIncludedServices(request.getIncludedServices());
@@ -284,6 +286,7 @@ public class TourServiceImpl implements TourService {
                 .durationNights(tour.getDurationNights())
                 .departureLocation(tour.getDepartureLocation())
                 .thumbnailUrl(tour.getThumbnailUrl())
+                .gallery(parseGallery(tour.getGalleryUrls()))
                 .tourCode(tour.getTourCode() != null ? tour.getTourCode() : "TOUR-" + tour.getId())
                 .category(tour.getCategory() != null ? tour.getCategory() : TourCategory.DOMESTIC)
                 .includedServices(tour.getIncludedServices())
@@ -397,5 +400,24 @@ public class TourServiceImpl implements TourService {
                 baggage,
                 meetingPoint
         };
+    }
+
+    private String serializeGallery(List<String> gallery) {
+        if (gallery == null || gallery.isEmpty()) return null;
+        String joined = gallery.stream()
+                .filter(s -> s != null && !s.isBlank())
+                .map(String::trim)
+                .distinct()
+                .collect(Collectors.joining("\n"));
+        return joined.isEmpty() ? null : joined;
+    }
+
+    private List<String> parseGallery(String galleryUrls) {
+        if (galleryUrls == null || galleryUrls.isBlank()) return null;
+        List<String> list = java.util.Arrays.stream(galleryUrls.split("\\r?\\n"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        return list.isEmpty() ? null : list;
     }
 }

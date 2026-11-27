@@ -8,8 +8,8 @@ export const UnauthorizedPage: React.FC = () => {
       <div className="rounded-full bg-rose-500/15 border border-rose-500/30 p-6 text-rose-400 mb-4 shadow-[0_0_24px_rgba(244,63,94,0.25)]">
         <ShieldAlert className="h-12 w-12" />
       </div>
-      <h1 className="text-3xl font-extrabold text-white">403 - Truy cập bị từ chối</h1>
-      <p className="mt-2 text-sm text-slate-400 max-w-md">
+      <h1 className="text-3xl font-extrabold text-[#0B3B49]">403 - Truy cập bị từ chối</h1>
+      <p className="mt-2 text-sm text-[#526071] max-w-md">
         Tài khoản của bạn không có đủ quyền hạn để truy cập vào trang này. Vui lòng liên hệ Administrator nếu bạn tin rằng đây là sự nhầm lẫn.
       </p>
       <Link

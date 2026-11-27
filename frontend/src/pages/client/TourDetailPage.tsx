@@ -393,6 +393,13 @@ export const TourDetailPage: React.FC = () => {
   const singleRoomSurchargeUnit = tour?.singleRoomSurcharge || (tour?.category === 'NUOC_NGOAI' ? 3500000 : 950000);
   const singleRoomSurchargeTotal = singleRoomRequired ? singleRoomSurchargeUnit * Math.max(1, adults) : 0;
 
+  useEffect(() => {
+    if (voucherDiscount > 0) {
+      setVoucherDiscount(0);
+      setVoucherMsg({ text: 'Số lượng khách hoặc phòng đơn vừa thay đổi, vui lòng bấm "Áp dụng" lại mã giảm giá.', type: 'error' });
+    }
+  }, [adults, children, singleRoomRequired]);
+
   const getRoomAllocationText = () => {
     if (singleRoomRequired) {
       return `${adults} Phòng Đơn riêng biệt (01 người/phòng - Có phụ thu phòng đơn)`;
@@ -1437,12 +1444,15 @@ export const TourDetailPage: React.FC = () => {
                   <div className="space-y-2 pt-2">
                     <h3 className="font-black text-[#0F172A] text-sm uppercase">GIÁ TOUR BAO GỒM</h3>
                     <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                      <li>Vé máy bay khứ hồi Hồ Chí Minh – Ân Thi – Hồ Chí Minh bao gồm 07kg hành lý xách tay + 20kg hành lý ký gửi.</li>
-                      <li>Phí an ninh, phí xăng dầu, thuế sân bay 2 nước.</li>
-                      <li>Xe du lịch và vé tham quan theo chương trình.</li>
-                      <li>Các bữa ăn chính theo chương trình. <i className="text-[#526071]">(mức ăn 40 RMB/khách/bữa)</i></li>
-                      <li>Khách sạn tiêu chuẩn 4 sao địa phương. <i className="text-[#526071]">(02 người/phòng)</i></li>
-                      <li>Trưởng đoàn và HDV địa phương phục vụ suốt tuyến theo chương trình.</li>
+                      <li>
+                        {transportInfo.mode === 'FLIGHT'
+                          ? `Vé máy bay đoàn khứ hồi ${transportInfo.fromName} – ${transportInfo.toName} (${transportInfo.carrier}) kèm ${transportInfo.baggageSummary}.`
+                          : `Phương tiện đoàn khứ hồi ${transportInfo.fromName} – ${transportInfo.toName} (${transportInfo.carrier}), ${transportInfo.baggageSummary}.`}
+                      </li>
+                      <li>Thuế, phí an ninh, phí cầu đường và vé tham quan theo chương trình.</li>
+                      <li>Các bữa ăn chính tiêu chuẩn theo lịch trình tour.</li>
+                      <li>Lưu trú khách sạn tiêu chuẩn 3–4 sao <i className="text-[#526071]">(02 người/phòng; lẻ nam/nữ ghép phòng hoặc phụ thu phòng đơn)</i>.</li>
+                      <li>Trưởng đoàn và Hướng dẫn viên chuyên nghiệp phục vụ suốt tuyến cùng bảo hiểm du lịch trọn gói.</li>
                     </ul>
                   </div>
 
@@ -1454,26 +1464,22 @@ export const TourDetailPage: React.FC = () => {
                       <div className="space-y-2">
                         <h3 className="font-black text-[#0F172A] text-sm uppercase">GIÁ TOUR KHÔNG BAO GỒM</h3>
                         <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                          <li>Chi phí làm hộ chiếu.</li>
-                          <li>Phụ thu phòng đơn: 4.500.000 VND/khách/tour <i className="text-[#526071]">(Không áp dụng Lễ, Tết)</i></li>
-                          <li>Chi phí làm visa tái nhập cảnh Việt Nam đối với khách Việt kiều, người nước ngoài.</li>
-                          <li>Hành lý quá cước trên các chuyến bay.</li>
-                          <li>Các dịch vụ sản phẩm không đề cập trong chương trình, show diễn.</li>
-                          <li>Các chi phí cá nhân như: điện thoại, internet, giặt ủi, thức ăn, nước uống trong phòng khách sạn, ...</li>
-                          <li>Tiền TIP cho Hướng Dẫn Viên, lái xe: 30 USD/khách/tour.</li>
-                          <li>Thuế VAT</li>
+                          <li>Chi phí làm hộ chiếu và lệ phí Lãnh sự quán nộp trực tiếp (nếu tour yêu cầu Visa).</li>
+                          <li>Phụ thu phòng đơn: {singleRoomSurchargeUnit.toLocaleString('vi-VN')} VND/khách/tour <i className="text-[#526071]">(khi khách yêu cầu ở phòng riêng)</i>.</li>
+                          <li>Hành lý quá cước, dịch vụ ngoài chương trình và chi phí cá nhân (điện thoại, giặt ủi, minibar...).</li>
+                          <li>Tiền bồi dưỡng (TIP) cho Hướng dẫn viên và tài xế địa phương theo quy định từng tuyến.</li>
                         </ul>
                       </div>
 
                       {/* ĐIỀU KIỆN HỦY */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-[#0F172A] text-sm uppercase">ĐIỀU KIỆN HỦY (Không áp dụng cho Lễ, Tết)</h3>
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">ĐIỀU KIỆN ĐẶT CỌC &amp; HỦY TOUR</h3>
                         <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                          <li>Ngay sau khi đăng ký tour, Quý khách vui lòng đóng cọc 60% tổng giá tour, phần còn lại vui lòng thanh toán trước 15 ngày tour khởi hành.</li>
-                          <li>Hủy tour ngay sau khi Đại Sứ Quán, Lãnh Sự Quán đã cấp visa: Chi phí hủy tour là 100% trên tổng giá tour.</li>
-                          <li>Hủy tour sau khi đăng ký: Phí hủy tour là 60% cọc và chi phí visa và vé máy bay nếu có.</li>
-                          <li>Hủy tour trước 15 ngày khởi hành: Phí hủy tour là 90% trên tổng giá tour.</li>
-                          <li>Hủy tour sau thời gian trên: Phí hủy tour là 100% trên tổng giá tour.</li>
+                          <li>Quý khách có thể chọn thanh toán 100% trọn gói hoặc đặt cọc trước <strong>30% tổng giá trị đơn</strong> để giữ chỗ; 70% còn lại thanh toán trực tuyến tại mục Lịch sử đặt tour hoặc khi Check-in.</li>
+                          <li>Đơn chưa thanh toán (PENDING) được hệ thống tự động giữ chỗ trong vòng <strong>03 phút</strong>, sau đó tự động hủy và hoàn lại chỗ trống.</li>
+                          <li>Hủy tour trước 30 ngày khởi hành: miễn phí hủy (hoàn 100% theo quy trình đối soát).</li>
+                          <li>Hủy tour từ 15 đến 29 ngày trước khởi hành: áp dụng phí 50% tổng giá trị đơn (và chi phí Visa/vé đã xuất nếu có).</li>
+                          <li>Hủy tour trong vòng 07 ngày trước khởi hành hoặc sau khi đã Check-in: không hỗ trợ hoàn tiền.</li>
                         </ul>
                         <p className="text-[11px] italic text-[#526071] pt-1">
                           Thời gian hủy tour và thanh toán được tính theo ngày làm việc, không tính Thứ 7, Chủ Nhật và các ngày Lễ, Tết.
@@ -1484,10 +1490,9 @@ export const TourDetailPage: React.FC = () => {
                       <div className="space-y-2">
                         <h3 className="font-black text-[#0F172A] text-sm uppercase">CHÍNH SÁCH TRẺ EM, EM BÉ</h3>
                         <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                          <li>Em bé: Dưới 02 tuổi <i className="text-[#526071]">(ngủ chung giường với bố, mẹ)</i></li>
-                          <li>Trẻ em: Từ 02 đến dưới 10 tuổi <i className="text-[#526071]">(ngủ chung giường với bố, mẹ)</i></li>
-                          <li>Trẻ em từ 10 tuổi trở lên được tính như người lớn.</li>
-                          <li>Trẻ em ngủ giường riêng tính 100% giá tour.</li>
+                          <li>Em bé: Dưới 02 tuổi <i className="text-[#526071]">(ngủ chung giường với bố, mẹ)</i>.</li>
+                          <li>Trẻ em: Từ 02 đến dưới 12 tuổi <i className="text-[#526071]">(giá vé ưu đãi {childPriceVal.toLocaleString('vi-VN')} đ/khách, ngủ chung giường với bố, mẹ)</i>.</li>
+                          <li>Từ 12 tuổi trở lên tính giá vé người lớn ({tour.price.toLocaleString('vi-VN')} đ/khách).</li>
                         </ul>
                       </div>
 
@@ -1495,28 +1500,19 @@ export const TourDetailPage: React.FC = () => {
                       <div className="space-y-2">
                         <h3 className="font-black text-[#0F172A] text-sm uppercase">QUY ĐỊNH MUA TOUR VÀ THANH TOÁN</h3>
                         <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                          <li>Khách hàng điền phiếu đăng ký và cung cấp hồ sơ xin visa trước ngày khởi hành ít nhất 15 ngày.</li>
-                          <li>Đóng tiền cọc tour 60% tổng giá tour <i className="text-[#526071]">(gồm phí visa + vé máy bay)</i>.</li>
-                          <li>Khách có quốc tịch được miễn visa hoặc đã có visa, chúng tôi sẽ trừ lại 500.000 VND/khách.</li>
+                          <li>Hạn đặt chỗ tối thiểu trước ngày khởi hành: <strong>{selectedSchedule.minLeadDays} ngày</strong> {tour.requiresVisa ? '(bao gồm thời gian Đại lý sơ duyệt và Lãnh sự quán xét duyệt Visa)' : tour.category === 'NUOC_NGOAI' ? '(chốt dịch vụ và xuất vé đoàn quốc tế)' : '(chốt phương tiện và lưu trú)'}.</li>
+                          <li>Hỗ trợ thanh toán 100% hoặc đặt cọc 30% qua VietQR (MBBank), Ví MoMo hoặc Thẻ quốc tế Visa/MasterCard/JCB (3D-Secure OTP).</li>
+                          <li>Khách đã có Visa còn hạn có thể bỏ chọn mục Ủy quyền làm Visa tại bước thanh toán để không bị cộng phí dịch vụ Visa.</li>
                         </ul>
                       </div>
 
                       {/* LƯU Ý */}
                       <div className="space-y-2">
-                        <h3 className="font-black text-[#0F172A] text-sm uppercase">LƯU Ý</h3>
+                        <h3 className="font-black text-[#0F172A] text-sm uppercase">LƯU Ý CHUNG</h3>
                         <ul className="list-disc pl-5 space-y-1.5 text-[#475569]">
-                          <li>Trẻ em dưới 16 tuổi phải có bố mẹ đi cùng. Trường hợp trẻ em đi với người nhà <i className="text-[#526071]">(không phải Bố Mẹ)</i>, phải nộp kèm giấy đồng ý cho con đi du lịch được chính quyền địa phương xác nhận <i className="text-[#526071]">(do Bố Mẹ ủy quyền cho người thân dẫn đi du lịch)</i>.</li>
-                          <li>Quý khách có yêu cầu ở phòng đơn, vui lòng thanh toán thêm tiền phụ thu.</li>
-                          <li>Thứ tự các điểm tham quan và lộ trình chuyến đi có thể thay đổi tùy theo tình hình thực tế <i className="text-[#526071]">(thời tiết, giao thông, ...)</i> nhưng vẫn đảm bảo đầy đủ các điểm tham quan như lúc đầu.</li>
-                          <li>Chương trình có các điểm shopping: Cửa hàng thuốc, đá quý, tơ lụa.</li>
-                          <li>Nếu quý khách mang quốc tịch khác, hoặc nhiều quốc tịch. Xin vui lòng chủ động báo lại chúng tôi trước khi chốt tour.</li>
-                          <li>Trường hợp quý khách ngoại quốc <i className="text-[#526071]">(không phải Việt Kiều)</i>, phía Trung Quốc sẽ phụ thu 100 USD/khách.</li>
-                          <li>Khách từ 70 đến dưới 75 tuổi yêu cầu ký cam kết sức khỏe với Công ty.</li>
-                          <li>Quý khách từ 75 tuổi trở lên yêu cầu phải có giấy xác nhận đầy đủ sức khỏe đi du lịch nước ngoài của bác sĩ + giấy cam kết sức khỏe với Công ty và phải có người thân dưới 60 tuổi <i className="text-[#526071]">(đầy đủ sức khỏe)</i> đi theo. Ngoài ra, khách trên 75 tuổi vui lòng đóng thêm phí bảo hiểm cao cấp.</li>
-                          <li>Không nhận khách từ 80 tuổi trở lên.</li>
-                          <li>Quý khách mang thai xin vui lòng báo cho Công ty khi đăng ký tour để được tư vấn thêm thông tin. Không nhận khách mang thai từ 05 tháng trở lên vì lý do an toàn.</li>
-                          <li>Giá tour không bao gồm visa tái nhập Việt Nam đối với khách Việt Kiều & Ngoại kiều.</li>
-                          <li>Giá Công ty đưa ra là giá trung bình áp dụng cho 01 khách cho đoàn ghép lẻ từ 20 khách.</li>
+                          <li>Trẻ em dưới 16 tuổi đi cùng người thân không phải bố/mẹ cần mang theo giấy ủy quyền có xác nhận của địa phương.</li>
+                          <li>Thứ tự các điểm tham quan có thể linh hoạt điều chỉnh theo thời tiết, giao thông nhưng vẫn đảm bảo đầy đủ chương trình.</li>
+                          <li>Quý khách mang thai từ 05 tháng trở lên hoặc trên 75 tuổi vui lòng thông báo trước với CSKH SmartTravel (Hotline 0941 899 554) để được tư vấn điều kiện sức khỏe phù hợp.</li>
                         </ul>
                       </div>
 

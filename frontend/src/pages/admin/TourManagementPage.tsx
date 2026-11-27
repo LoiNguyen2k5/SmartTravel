@@ -81,7 +81,9 @@ export const TourManagementPage: React.FC = () => {
       tour.tourCode?.toLowerCase().includes(searchTerm.toLowerCase());
 
     let matchesTab = true;
-    if (selectedTab !== 'ALL') {
+    if (selectedTab === TourStatus.ACTIVE) {
+      matchesTab = tour.status === TourStatus.ACTIVE || (tour.status as any) === 'APPROVED';
+    } else if (selectedTab !== 'ALL') {
       matchesTab = tour.status === selectedTab;
     }
 
@@ -470,6 +472,7 @@ export const TourManagementPage: React.FC = () => {
         onClose={() => setShowSentimentModal(false)}
         tourId={sentimentModalTour?.id}
         tourTitle={sentimentModalTour?.title}
+        role="ADMIN"
       />
     </div>
   );
