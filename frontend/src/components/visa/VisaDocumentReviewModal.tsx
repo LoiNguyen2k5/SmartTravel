@@ -17,31 +17,31 @@ interface Props {
 const STATUS_META: Record<VisaApplicationStatus, { label: string; badgeClass: string }> = {
   PENDING_DOCS: {
     label: 'Chờ khách tải bản mềm',
-    badgeClass: 'bg-slate-700/70 text-slate-200 border-slate-600',
+    badgeClass: 'bg-slate-100 text-slate-700 border-slate-300',
   },
   REVIEWING: {
     label: 'Đại lý đang sơ duyệt bản mềm',
-    badgeClass: 'bg-cyan-500/20 text-cyan-200 border-cyan-500/40',
+    badgeClass: 'bg-cyan-100 text-cyan-900 border-cyan-300',
   },
   NEED_MORE_DOCS: {
     label: 'Bước 1 — Yêu cầu khách bổ sung / nộp lại bản mềm',
-    badgeClass: 'bg-amber-500/20 text-amber-200 border-amber-500/40',
+    badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
   },
   SUBMITTED: {
     label: 'Bước 2 — Đại lý đã mang nộp tại ĐSQ (Offline)',
-    badgeClass: 'bg-sky-500/20 text-sky-200 border-sky-500/40',
+    badgeClass: 'bg-sky-100 text-sky-900 border-sky-300',
   },
   PROCESSING: {
     label: 'Bước 3 — ĐSQ đang xét duyệt (Chờ trả hộ chiếu)',
-    badgeClass: 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40',
+    badgeClass: 'bg-indigo-100 text-indigo-900 border-indigo-300',
   },
   APPROVED: {
     label: 'Bước 4 — Đã cấp Visa ✅ (Đã chốt kết quả)',
-    badgeClass: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40',
+    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
   },
   REJECTED: {
     label: 'Bước 5 — Từ chối cấp Visa ❌ (Đã chốt kết quả)',
-    badgeClass: 'bg-rose-500/20 text-rose-200 border-rose-500/40',
+    badgeClass: 'bg-rose-100 text-rose-900 border-rose-300',
   },
 };
 
@@ -59,44 +59,44 @@ const PROGRESS_STEPS: {
     step: 1,
     status: 'NEED_MORE_DOCS',
     label: '1. Yêu cầu khách bổ sung / nộp lại bản mềm',
-    baseClass: 'bg-amber-500/10 text-amber-300 border-amber-500/25 hover:bg-amber-500/20',
-    activeClass: 'bg-amber-500/25 text-amber-100 border-amber-400 ring-2 ring-amber-400/30',
-    pillClass: 'bg-amber-400/25 text-amber-100 border-amber-300/40',
+    baseClass: 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100',
+    activeClass: 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/40 shadow-sm',
+    pillClass: 'bg-white/25 text-white border-white/40',
   },
   {
     step: 2,
     status: 'SUBMITTED',
     label: '2. Xác nhận Đại lý đã mang nộp tại ĐSQ (Offline)',
     showSendIcon: true,
-    baseClass: 'bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-500/25',
-    activeClass: 'bg-sky-500/30 text-sky-100 border-sky-400 ring-2 ring-sky-400/30',
-    pillClass: 'bg-sky-400/25 text-sky-100 border-sky-300/40',
+    baseClass: 'bg-sky-50 text-sky-900 border-sky-300 hover:bg-sky-100',
+    activeClass: 'bg-sky-600 text-white border-sky-700 ring-2 ring-sky-400/40 shadow-sm',
+    pillClass: 'bg-white/25 text-white border-white/40',
   },
   {
     step: 3,
     status: 'PROCESSING',
     label: '3. ĐSQ đang xét duyệt hồ sơ (Chờ trả hộ chiếu)',
-    baseClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30 hover:bg-indigo-500/25',
-    activeClass: 'bg-indigo-500/30 text-indigo-100 border-indigo-400 ring-2 ring-indigo-400/30',
-    pillClass: 'bg-indigo-400/25 text-indigo-100 border-indigo-300/40',
+    baseClass: 'bg-indigo-50 text-indigo-900 border-indigo-300 hover:bg-indigo-100',
+    activeClass: 'bg-indigo-600 text-white border-indigo-700 ring-2 ring-indigo-400/40 shadow-sm',
+    pillClass: 'bg-white/25 text-white border-white/40',
   },
   {
     step: 4,
     status: 'APPROVED',
     label: '4. Ghi nhận kết quả ĐSQ trả về: Đã cấp Visa ✅',
     isFinal: true,
-    baseClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25 font-bold',
-    activeClass: 'bg-emerald-500/30 text-emerald-100 border-emerald-400 ring-2 ring-emerald-400/30 font-bold',
-    pillClass: 'bg-emerald-400/25 text-emerald-100 border-emerald-300/40',
+    baseClass: 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100 font-bold',
+    activeClass: 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-400/40 font-bold shadow-sm',
+    pillClass: 'bg-white/25 text-white border-white/40',
   },
   {
     step: 5,
     status: 'REJECTED',
     label: '5. Ghi nhận kết quả ĐSQ trả về: Từ chối cấp Visa ❌',
     isFinal: true,
-    baseClass: 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500/25 font-bold',
-    activeClass: 'bg-rose-500/30 text-rose-100 border-rose-400 ring-2 ring-rose-400/30 font-bold',
-    pillClass: 'bg-rose-400/25 text-rose-100 border-rose-300/40',
+    baseClass: 'bg-rose-50 text-rose-900 border-rose-300 hover:bg-rose-100 font-bold',
+    activeClass: 'bg-rose-600 text-white border-rose-700 ring-2 ring-rose-400/40 font-bold shadow-sm',
+    pillClass: 'bg-white/25 text-white border-white/40',
   },
 ];
 
@@ -116,7 +116,7 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
   const isFinalized = application.status === 'APPROVED' || application.status === 'REJECTED';
   const currentMeta = STATUS_META[application.status] || {
     label: application.status,
-    badgeClass: 'bg-slate-700 text-slate-200 border-slate-600',
+    badgeClass: 'bg-slate-100 text-slate-700 border-slate-300',
   };
 
   useEffect(() => {
@@ -153,16 +153,16 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-2.5 sm:p-4">
-      <div className="bg-[#131d30] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92dvh] overflow-hidden flex flex-col border border-slate-700/60">
-        {/* Header */}
-        <div className="flex justify-between items-start gap-3 sm:gap-4 p-4 sm:p-6 border-b border-slate-700/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2.5 sm:p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92dvh] overflow-hidden flex flex-col border border-[#E6E1DA]">
+        {/* Header — Deep Ocean brand strip */}
+        <div className="flex justify-between items-start gap-3 sm:gap-4 p-4 sm:p-6 bg-gradient-to-r from-[#0B3B49] via-[#0F4C5C] to-[#0D9488] text-white">
           <div className="min-w-0">
-            <h2 className="text-base sm:text-xl font-bold text-white leading-snug">
+            <h2 className="text-base sm:text-xl font-black text-white leading-snug">
               Sơ Duyệt & Theo Dõi Ủy Quyền Visa — {application.customerName || `Booking #${application.bookingId}`}
             </h2>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="text-xs text-slate-400">Đang ở bước:</span>
+              <span className="text-xs text-[#CCFBF1] font-medium">Đang ở bước:</span>
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${currentMeta.badgeClass}`}
               >
@@ -170,8 +170,8 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                 {currentMeta.label}
               </span>
               {application.visaDeadline && (
-                <span className="text-xs text-amber-300">
-                  • Hạn nộp: {new Date(application.visaDeadline).toLocaleDateString('vi-VN')}
+                <span className="text-xs font-bold text-amber-950 bg-amber-200 px-2.5 py-0.5 rounded-full">
+                  Hạn nộp: {new Date(application.visaDeadline).toLocaleDateString('vi-VN')}
                 </span>
               )}
             </div>
@@ -179,51 +179,51 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-full transition-colors shrink-0"
+            className="p-2 text-white/80 hover:text-white hover:bg-white/15 rounded-full transition-colors shrink-0 cursor-pointer"
           >
-            <X size={24} />
+            <X size={22} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-[#0c1424] flex flex-col lg:flex-row gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#FAF8F5] flex flex-col lg:flex-row gap-6">
           {/* Left Column: Documents List */}
           <div className="flex-1 space-y-4">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <h3 className="text-xs font-extrabold text-[#0B3B49] uppercase tracking-wider">
               Bước 1: Nhân viên Đại lý kiểm tra tính hợp lệ của từng bản mềm
             </h3>
 
             {localDocs.length === 0 ? (
-              <div className="text-center py-8 bg-[#131d30] rounded-xl border border-slate-700/50">
-                <AlertCircle className="mx-auto text-yellow-500 mb-2" size={32} />
-                <p className="text-slate-300 text-sm">Khách hàng chưa tải bản mềm giấy tờ nào lên hệ thống.</p>
+              <div className="text-center py-10 bg-white rounded-xl border border-[#E6E1DA]">
+                <AlertCircle className="mx-auto text-amber-500 mb-2" size={32} />
+                <p className="text-[#475569] font-medium text-sm">Khách hàng chưa tải bản mềm giấy tờ nào lên hệ thống.</p>
               </div>
             ) : (
               localDocs.map((doc) => (
-                <div key={doc.id} className="bg-[#131d30] rounded-xl border border-slate-700/50 overflow-hidden shadow-sm">
-                  <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/50">
+                <div key={doc.id} className="bg-white rounded-xl border border-[#E6E1DA] overflow-hidden shadow-sm">
+                  <div className="p-4 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-sky-500/10 text-sky-400 rounded-lg">
+                      <div className="p-2.5 bg-[#E6F4F1] text-[#0D9488] rounded-xl border border-[#99F6E4]">
                         <FileText size={20} />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{doc.documentName}</h4>
+                        <h4 className="font-bold text-[#0F172A] text-sm">{doc.documentName}</h4>
                         <div className="mt-1 flex items-center gap-2 flex-wrap">
                           {doc.status === 'APPROVED' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                               <CheckCircle size={13} /> Bản mềm đạt chuẩn
                             </span>
                           ) : doc.status === 'REJECTED' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
                               <XCircle size={13} /> Yêu cầu chụp/tải lại
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
                               <Clock size={13} /> Chờ Đại lý kiểm tra
                             </span>
                           )}
                           {doc.reviewedBy && (
-                            <span className="text-[11px] text-slate-400">bởi {doc.reviewedBy}</span>
+                            <span className="text-[11px] text-slate-500">bởi {doc.reviewedBy}</span>
                           )}
                         </div>
                       </div>
@@ -234,7 +234,7 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => visaService.openDocumentInNewTab(doc.id)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-sky-400 bg-sky-500/10 hover:bg-sky-500/20 rounded-lg transition-colors border border-sky-500/20"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#0B3B49] bg-[#E6F4F1] hover:bg-[#CCFBF1] rounded-lg transition-colors border border-[#0D9488]/30 cursor-pointer"
                         >
                           <Eye size={14} /> Mở tệp bảo mật
                         </button>
@@ -245,10 +245,10 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => setActiveDocId(activeDocId === doc.id ? null : doc.id)}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border cursor-pointer ${
                             activeDocId === doc.id
-                              ? 'bg-sky-500 text-white border-sky-400'
-                              : 'text-slate-300 bg-white/5 hover:bg-white/10 border-white/10'
+                              ? 'bg-[#0B3B49] text-white border-[#0B3B49]'
+                              : 'text-[#0F172A] bg-slate-100 hover:bg-slate-200 border-slate-300'
                           }`}
                         >
                           {doc.status === 'PENDING' ? 'Kiểm tra' : 'Đổi kết quả'}
@@ -258,29 +258,29 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                   </div>
 
                   {!isFinalized && activeDocId === doc.id && (
-                    <div className="p-4 bg-slate-800/50 border-t border-slate-700/50">
-                      <label className="block text-xs font-medium text-slate-300 mb-2">
+                    <div className="p-4 bg-[#FAF8F5] border-t border-[#E6E1DA]">
+                      <label className="block text-xs font-bold text-[#475569] mb-2">
                         Ghi chú yêu cầu khách chụp/bổ sung lại (bắt buộc nếu từ chối bản mềm)
                       </label>
                       <textarea
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         placeholder="VD: Ảnh chụp hộ chiếu bị lóa góc dưới, vui lòng scan hoặc chụp rõ nét lại..."
-                        className="w-full px-3 py-2 border border-slate-700/50 rounded-md text-xs bg-[#131d30] text-white placeholder-slate-500 mb-3"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-[#0D9488] mb-3"
                         rows={2}
                       />
-                      <div className="flex gap-3 justify-end">
+                      <div className="flex gap-2.5 justify-end">
                         <button
                           type="button"
                           onClick={() => handleDocumentAction(doc.id, 'REJECTED')}
-                          className="flex items-center gap-1 px-4 py-2 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 border border-rose-500/30 rounded-xl font-bold text-xs transition-colors"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300 rounded-xl font-bold text-xs transition-colors cursor-pointer"
                         >
                           <XCircle size={15} /> Yêu cầu khách tải lại
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDocumentAction(doc.id, 'APPROVED')}
-                          className="flex items-center gap-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs transition-colors shadow-lg shadow-emerald-600/20"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition-colors shadow-sm cursor-pointer"
                         >
                           <CheckCircle size={15} /> Xác nhận bản mềm đạt
                         </button>
@@ -289,7 +289,7 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                   )}
 
                   {doc.status === 'REJECTED' && doc.vendorFeedback && (
-                    <div className="p-3 bg-red-500/10 text-xs text-red-300 border-t border-red-500/20">
+                    <div className="p-3 bg-rose-50 text-xs text-rose-800 border-t border-rose-200">
                       <strong>Yêu cầu bổ sung:</strong> {doc.vendorFeedback}
                     </div>
                   )}
@@ -300,10 +300,10 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
 
           {/* Right Column: Agency Offline Workflow Update */}
           <div className="w-full lg:w-96 space-y-4">
-            <div className="bg-[#131d30] p-5 rounded-xl border border-slate-700/50 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 text-sky-400">
-                <Building2 size={18} />
-                <h3 className="text-xs font-bold uppercase tracking-wider">
+            <div className="bg-white p-5 rounded-xl border border-[#E6E1DA] shadow-sm space-y-4">
+              <div className="flex items-center gap-2 text-[#0B3B49]">
+                <Building2 size={18} className="text-[#0D9488]" />
+                <h3 className="text-xs font-extrabold uppercase tracking-wider">
                   Bước 2: Đại lý cập nhật tiến độ nộp ĐSQ & Kết quả
                 </h3>
               </div>
@@ -317,20 +317,20 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
               </div>
 
               {isFinalized ? (
-                <div className="p-3 rounded-xl bg-slate-800/70 border border-slate-600/60 text-xs text-slate-300 flex items-start gap-2">
-                  <Lock size={15} className="text-slate-400 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-slate-100 border border-slate-300 text-xs text-slate-700 flex items-start gap-2">
+                  <Lock size={15} className="text-slate-500 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
                     Hồ sơ đã ghi nhận kết quả cuối cùng từ ĐSQ (Bước 4 hoặc Bước 5) và đã được <strong>khóa</strong>. Không thể thay đổi tiến độ nữa.
                   </p>
                 </div>
               ) : (
-                <p className="text-[11px] text-slate-400 leading-relaxed">
+                <p className="text-[11px] text-[#526071] leading-relaxed">
                   Sau khi bấm chọn một bước tiến độ bên dưới, hệ thống sẽ lưu, gửi Email cho khách và tự động đóng cửa sổ này. Bước 4 & 5 là kết quả cuối, sau khi chọn sẽ khóa hồ sơ.
                 </p>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1">
                   Mã biên nhận nộp hồ sơ VFS / KVAC / ĐSQ (nếu có)
                 </label>
                 <input
@@ -339,12 +339,12 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                   disabled={isFinalized || isUpdatingStatus}
                   onChange={(e) => setReceiptCode(e.target.value)}
                   placeholder="VD: VFS-JP-2026-08912"
-                  className="w-full px-3 py-2 border border-slate-700/50 rounded-lg text-xs bg-slate-800/60 text-white placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#0D9488] text-[#0F172A] placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1">
                   Ghi chú gửi tới Email & Tracker của khách hàng
                 </label>
                 <textarea
@@ -352,13 +352,13 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                   disabled={isFinalized || isUpdatingStatus}
                   onChange={(e) => setAppNotes(e.target.value)}
                   placeholder="VD: Đại lý đã nộp bộ hồ sơ đoàn tại VFS sáng nay, dự kiến 7 ngày làm việc có kết quả..."
-                  className="w-full px-3 py-2 border border-slate-700/50 rounded-lg text-xs bg-slate-800/60 text-white placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:border-[#0D9488] text-[#0F172A] placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   rows={3}
                 />
               </div>
 
               <div className="pt-2 space-y-2">
-                <p className="text-xs font-bold text-slate-300">
+                <p className="text-xs font-extrabold text-[#0F172A]">
                   Chuyển bước tiến độ (Do Đại lý thao tác):
                 </p>
 
@@ -372,13 +372,13 @@ export const VisaDocumentReviewModal: React.FC<Props> = ({
                       type="button"
                       disabled={disabled}
                       onClick={() => handleStatusAction(step.status)}
-                      className={`w-full text-left px-3.5 py-2.5 border rounded-lg transition-all font-semibold text-xs flex items-center justify-between gap-2 ${
+                      className={`w-full text-left px-3.5 py-2.5 border rounded-xl transition-all font-semibold text-xs flex items-center justify-between gap-2 ${
                         isCurrent ? step.activeClass : step.baseClass
                       } ${
                         disabled
                           ? isCurrent
                             ? 'cursor-not-allowed'
-                            : 'opacity-40 cursor-not-allowed hover:bg-transparent'
+                            : 'opacity-45 cursor-not-allowed'
                           : 'cursor-pointer'
                       }`}
                     >

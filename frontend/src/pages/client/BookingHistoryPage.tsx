@@ -879,22 +879,22 @@ export const BookingHistoryPage: React.FC = () => {
 
         {/* VISA TRACKER MODAL */}
         {selectedVisaBooking && createPortal(
-          <div className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 animate-in fade-in">
-            <div className="bg-white border border-[#CBD5E1] rounded-2xl sm:rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-card text-[#0F172A] overflow-y-auto max-h-[92dvh]">
+          <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4 animate-in fade-in">
+            <div className="bg-white border border-[#E6E1DA] rounded-2xl sm:rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl text-[#0F172A] overflow-y-auto max-h-[92dvh]">
               <div className="flex items-center justify-between border-b border-[#E6E1DA] pb-3 mb-4">
-                <div className="flex items-center gap-2 text-blue-400 font-bold text-base">
-                  <Globe className="h-5 w-5" /> Quản lý Hồ sơ Visa
+                <div className="flex items-center gap-2 text-[#0B3B49] font-extrabold text-base">
+                  <Globe className="h-5 w-5 text-[#0D9488]" /> Quản lý Hồ sơ Visa
                 </div>
                 <button 
                   onClick={() => { setSelectedVisaBooking(null); setVisaApp(null); }} 
-                  className="p-1 rounded-lg text-[#526071] hover:text-[#0F172A] hover:bg-[#F4F1EC] transition font-bold"
+                  className="p-1.5 rounded-lg text-[#526071] hover:text-[#0F172A] hover:bg-[#F4F1EC] transition font-bold cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
               {loadingVisa ? (
-                <div className="py-12 flex justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-400 border-t-transparent"></div></div>
+                <div className="py-12 flex justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0D9488] border-t-transparent"></div></div>
               ) : visaApp ? (
                 <div className="text-[#0F172A]">
                   <MyVisaTracker 
@@ -912,7 +912,7 @@ export const BookingHistoryPage: React.FC = () => {
                 </div>
               ) : visaReqs.length > 0 ? (
                 <div className="text-center py-12 text-[#526071] space-y-4">
-                  <Globe className="h-12 w-12 mx-auto mb-3 text-blue-400 opacity-80" />
+                  <Globe className="h-12 w-12 mx-auto mb-3 text-[#0D9488] opacity-85" />
                   <p className="text-[#0F172A] text-lg font-bold">Hồ sơ ủy quyền xin Visa chưa được khởi tạo.</p>
                   <p className="text-sm">Tour này cần cung cấp {visaReqs.length} loại giấy tờ bản mềm để chuyên viên Đại lý sơ duyệt.</p>
                   <button 
@@ -927,7 +927,7 @@ export const BookingHistoryPage: React.FC = () => {
                           setLoadingVisa(false);
                        }
                     }}
-                    className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                    className="mt-4 bg-[#0B3B49] hover:bg-[#0F5264] text-white font-bold py-2.5 px-6 rounded-xl transition shadow-md cursor-pointer"
                   >
                     Tạo Hồ Sơ Xin Visa Ngay
                   </button>
