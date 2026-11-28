@@ -34,20 +34,20 @@ const getDeadlineBadge = (app: VisaApplicationResponse) => {
   const dl = calcDeadline(app);
   if (!dl) return null;
   const diffDays = Math.ceil((dl.getTime() - Date.now()) / 86400000);
-  if (diffDays < 0) return { label: `Trễ ${Math.abs(diffDays)} ngày!`, color: "bg-red-500/20 text-red-300 border-red-500/30" };
-  if (diffDays <= 3) return { label: `Còn ${diffDays} ngày`, color: "bg-orange-500/20 text-orange-300 border-orange-500/30" };
-  if (diffDays <= 7) return { label: `Còn ${diffDays} ngày`, color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" };
-  return { label: `Còn ${diffDays} ngày`, color: "bg-slate-700 text-slate-300 border-slate-600" };
+  if (diffDays < 0) return { label: `Trễ ${Math.abs(diffDays)} ngày!`, color: "bg-rose-100 text-rose-800 border-rose-300" };
+  if (diffDays <= 3) return { label: `Còn ${diffDays} ngày`, color: "bg-orange-100 text-orange-800 border-orange-300" };
+  if (diffDays <= 7) return { label: `Còn ${diffDays} ngày`, color: "bg-amber-100 text-amber-900 border-amber-300" };
+  return { label: `Còn ${diffDays} ngày`, color: "bg-slate-100 text-slate-700 border-slate-300" };
 };
 
 const STATUS_MAP: Record<VisaApplicationStatus, { label: string; color: string }> = {
-  PENDING_DOCS:   { label: "Chờ tải bản mềm",                    color: "bg-slate-700/60 text-slate-300 border-slate-600" },
-  REVIEWING:      { label: "Chờ Đại lý sơ duyệt",                color: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30" },
-  NEED_MORE_DOCS: { label: "Bước 1 • Chờ khách bổ sung",         color: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  SUBMITTED:      { label: "Bước 2 • Đại lý đã nộp ĐSQ",         color: "bg-sky-500/15 text-sky-300 border-sky-500/30" },
-  PROCESSING:     { label: "Bước 3 • Chờ kết quả từ ĐSQ",        color: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" },
-  APPROVED:       { label: "Bước 4 • ĐSQ đã cấp Visa ✅",        color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
-  REJECTED:       { label: "Bước 5 • ĐSQ từ chối Visa ❌",       color: "bg-red-500/15 text-red-300 border-red-500/30" },
+  PENDING_DOCS:   { label: "Chờ tải bản mềm",                    color: "bg-slate-100 text-slate-700 border-slate-300" },
+  REVIEWING:      { label: "Chờ Đại lý sơ duyệt",                color: "bg-cyan-100 text-cyan-800 border-cyan-300" },
+  NEED_MORE_DOCS: { label: "Bước 1 • Chờ khách bổ sung",         color: "bg-amber-100 text-amber-800 border-amber-300" },
+  SUBMITTED:      { label: "Bước 2 • Đại lý đã nộp ĐSQ",         color: "bg-sky-100 text-sky-800 border-sky-300" },
+  PROCESSING:     { label: "Bước 3 • Chờ kết quả từ ĐSQ",        color: "bg-indigo-100 text-indigo-800 border-indigo-300" },
+  APPROVED:       { label: "Bước 4 • ĐSQ đã cấp Visa ✅",        color: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+  REJECTED:       { label: "Bước 5 • ĐSQ từ chối Visa ❌",       color: "bg-rose-100 text-rose-800 border-rose-300" },
 };
 
 type Tab = "applications" | "templates";
@@ -185,37 +185,79 @@ export const VendorVisaPage: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-3">
-          <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg">
-            <Globe className="h-5 w-5 text-[#0F172A]" />
+          <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0B3B49] to-[#0D9488] flex items-center justify-center shadow-md shadow-[#0B3B49]/20">
+            <Globe className="h-5 w-5 text-white" />
           </span>
           Quản Lý Dịch Vụ Ủy Quyền Hồ Sơ Visa
         </h1>
-        <p className="text-[#526071] text-sm mt-2">
+        <p className="text-[#475569] text-sm mt-2">
           Chuyên viên Đại lý sơ duyệt bản mềm trực tuyến, đại diện đoàn nộp trực tiếp tại ĐSQ/LSQ và ghi nhận kết quả trả về
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {[
-          { label: "Sơ duyệt / Bổ sung", value: stats.waiting, Icon: Clock, col: "from-yellow-500/20 to-amber-600/20 border-yellow-500/30", txt: "text-yellow-300" },
-          { label: "Đã nộp ĐSQ (Offline)", value: stats.processing, Icon: CalendarDays, col: "from-sky-500/20 to-blue-600/20 border-sky-500/30", txt: "text-sky-300" },
-          { label: "Sắp tới hạn nộp", value: stats.urgent, Icon: AlertOctagon, col: "from-orange-500/20 to-red-600/20 border-orange-500/30", txt: "text-orange-300" },
-          { label: "ĐSQ đã cấp Visa", value: stats.approved, Icon: CheckCircle2, col: "from-emerald-500/20 to-teal-600/20 border-emerald-500/30", txt: "text-emerald-300" },
-          { label: "ĐSQ từ chối Visa", value: stats.rejected, Icon: XCircle, col: "from-red-500/20 to-rose-600/20 border-red-500/30", txt: "text-red-300" },
+          {
+            label: "Sơ duyệt / Bổ sung",
+            value: stats.waiting,
+            Icon: Clock,
+            card: "bg-amber-50/90 border-amber-300 hover:border-amber-400",
+            iconWrap: "bg-amber-500 text-white shadow-sm shadow-amber-500/30",
+            num: "text-amber-800",
+            lbl: "text-amber-950/80",
+          },
+          {
+            label: "Đã nộp ĐSQ (Offline)",
+            value: stats.processing,
+            Icon: CalendarDays,
+            card: "bg-sky-50/90 border-sky-300 hover:border-sky-400",
+            iconWrap: "bg-sky-600 text-white shadow-sm shadow-sky-600/30",
+            num: "text-sky-800",
+            lbl: "text-sky-950/80",
+          },
+          {
+            label: "Sắp tới hạn nộp",
+            value: stats.urgent,
+            Icon: AlertOctagon,
+            card: "bg-orange-50/90 border-orange-300 hover:border-orange-400",
+            iconWrap: "bg-orange-600 text-white shadow-sm shadow-orange-600/30",
+            num: "text-orange-800",
+            lbl: "text-orange-950/80",
+          },
+          {
+            label: "ĐSQ đã cấp Visa",
+            value: stats.approved,
+            Icon: CheckCircle2,
+            card: "bg-emerald-50/90 border-emerald-300 hover:border-emerald-400",
+            iconWrap: "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30",
+            num: "text-emerald-800",
+            lbl: "text-emerald-950/80",
+          },
+          {
+            label: "ĐSQ từ chối Visa",
+            value: stats.rejected,
+            Icon: XCircle,
+            card: "bg-rose-50/90 border-rose-300 hover:border-rose-400",
+            iconWrap: "bg-rose-600 text-white shadow-sm shadow-rose-600/30",
+            num: "text-rose-800",
+            lbl: "text-rose-950/80",
+          },
         ].map(s => (
-          <div key={s.label} className={`bg-gradient-to-br ${s.col} border rounded-2xl p-4 flex items-center gap-3`}>
-            <s.Icon className={`h-8 w-8 ${s.txt} shrink-0`} />
-            <div>
-              <p className={`text-2xl font-black ${s.txt}`}>{s.value}</p>
-              <p className="text-[11px] text-[#526071] leading-tight">{s.label}</p>
+          <div key={s.label} className={`${s.card} border rounded-2xl p-4 flex items-center gap-3.5 shadow-sm transition-colors`}>
+            <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${s.iconWrap}`}>
+              <s.Icon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-2xl font-black leading-none ${s.num}`}>{s.value}</p>
+              <p className={`text-xs font-semibold leading-snug mt-1 ${s.lbl}`}>{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white border border-slate-700/50 rounded-xl p-1 w-fit">
+      <div className="flex flex-wrap gap-1.5 bg-white border border-slate-200 rounded-xl p-1.5 w-fit shadow-sm">
         {([
           { key: "applications" as Tab, label: "Sơ Duyệt & Theo Dõi Hồ Sơ", Icon: FileText },
           { key: "templates" as Tab, label: "Thư Viện Mẫu Visa Quốc Gia", Icon: BookOpen },
@@ -223,10 +265,10 @@ export const VendorVisaPage: React.FC = () => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
               activeTab === tab.key
-                ? "bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
+                ? "bg-[#0B3B49] text-white shadow-md shadow-[#0B3B49]/20"
+                : "text-slate-600 hover:text-[#0B3B49] hover:bg-slate-100"
             }`}
           >
             <tab.Icon className="h-4 w-4" />
@@ -240,20 +282,20 @@ export const VendorVisaPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#526071]" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Tìm theo mã booking, tên khách, tên tour..."
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-700/50 rounded-xl text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-sky-500/60"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-[#0F172A] placeholder-slate-400 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 shadow-sm"
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-[#526071] shrink-0" />
+              <Filter className="h-4 w-4 text-slate-600 shrink-0" />
               <select
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value)}
-                className="bg-white border border-slate-700/50 rounded-xl text-sm text-[#0F172A] py-2.5 px-3 focus:outline-none focus:border-sky-500/60"
+                className="bg-white border border-slate-300 rounded-xl text-sm font-semibold text-[#0F172A] py-2.5 px-3.5 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20 shadow-sm cursor-pointer"
               >
                 <option value="ALL">Tất cả trạng thái</option>
                 <option value="PENDING_DOCS">Chờ tải bản mềm</option>
@@ -267,26 +309,26 @@ export const VendorVisaPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-700/50 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[780px]">
                 <thead>
-                  <tr className="border-b border-slate-700/50">
+                  <tr className="bg-slate-100/90 border-b border-slate-200">
                     {["Mã Booking", "Khách Hàng", "Tour", "Bản Mềm", "Hạn Nộp Hồ Sơ", "Trạng Thái", "Thao Tác"].map(h => (
-                      <th key={h} className="px-4 py-3.5 text-left text-[11px] font-bold text-[#526071] uppercase tracking-wider whitespace-nowrap">
+                      <th key={h} className="px-4 py-3.5 text-left text-[11px] font-extrabold text-slate-700 uppercase tracking-wider whitespace-nowrap">
                         {h}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-700/30">
+                <tbody className="divide-y divide-slate-200">
                   {loadingApps ? (
-                    <tr><td colSpan={7} className="text-center py-12 text-[#526071]">Đang tải dữ liệu từ máy chủ...</td></tr>
+                    <tr><td colSpan={7} className="text-center py-12 text-slate-600 font-medium">Đang tải dữ liệu từ máy chủ...</td></tr>
                   ) : filteredApps.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center py-16">
-                        <Globe className="mx-auto h-10 w-10 text-slate-600 mb-3" />
-                        <p className="text-[#526071] font-medium">Chưa có hồ sơ ủy quyền Visa nào</p>
+                        <Globe className="mx-auto h-10 w-10 text-slate-400 mb-3" />
+                        <p className="text-slate-700 font-semibold">Chưa có hồ sơ ủy quyền Visa nào</p>
                         <p className="text-slate-500 text-sm mt-1">Hồ sơ của khách đặt các tour quốc tế thuộc quản lý của Đại lý bạn sẽ hiển thị tại đây</p>
                       </td>
                     </tr>
@@ -297,41 +339,41 @@ export const VendorVisaPage: React.FC = () => {
                     const docsApproved = app.documents.filter(d => d.status === "APPROVED").length;
                     const docsTotal = app.documents.length;
                     return (
-                      <tr key={app.id} className="hover:bg-[#FAF8F5] transition-colors">
+                      <tr key={app.id} className="hover:bg-slate-50/90 transition-colors">
                         <td className="px-4 py-4">
-                          <span className="font-mono text-[#0D9488] font-bold text-sm">
+                          <span className="font-mono text-[#0B3B49] bg-[#E6F4F1] border border-[#0D9488]/25 px-2.5 py-1 rounded-lg font-extrabold text-xs">
                             #{app.bookingCode || app.bookingId}
                           </span>
                         </td>
                         <td className="px-4 py-4">
-                          <p className="font-semibold text-[#0F172A] text-sm">{app.customerName || "Khách hàng"}</p>
-                          {app.contactEmail && <p className="text-xs text-[#526071] mt-0.5">{app.contactEmail}</p>}
+                          <p className="font-bold text-[#0F172A] text-sm">{app.customerName || "Khách hàng"}</p>
+                          {app.contactEmail && <p className="text-xs text-slate-500 mt-0.5">{app.contactEmail}</p>}
                         </td>
                         <td className="px-4 py-4 max-w-[180px]">
-                          <p className="text-sm text-[#334155] line-clamp-2 leading-snug">{app.tourTitle || "—"}</p>
+                          <p className="text-sm font-medium text-slate-800 line-clamp-2 leading-snug">{app.tourTitle || "—"}</p>
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
+                            <div className="w-16 bg-slate-200 rounded-full h-2 overflow-hidden">
                               <div
-                                className="h-full bg-emerald-400 rounded-full transition-all"
+                                className="h-full bg-emerald-600 rounded-full transition-all"
                                 style={{ width: docsTotal > 0 ? `${(docsApproved / docsTotal) * 100}%` : "0%" }}
                               />
                             </div>
-                            <span className="text-xs text-[#526071] whitespace-nowrap">{docsApproved}/{docsTotal}</span>
+                            <span className="text-xs font-bold text-slate-700 whitespace-nowrap">{docsApproved}/{docsTotal}</span>
                           </div>
                           {app.documents.some(d => d.status === "REJECTED") && (
-                            <span className="text-[11px] text-red-400 mt-1 block">Cần khách bổ sung lại</span>
+                            <span className="text-[11px] font-semibold text-rose-600 mt-1 block">Cần khách bổ sung lại</span>
                           )}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           {dl ? (
                             <div>
-                              <p className="text-sm text-[#475569]">
+                              <p className="text-sm font-semibold text-slate-800">
                                 {dl.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })}
                               </p>
                               {dlBadge && (
-                                <span className={`text-[11px] font-bold mt-1 inline-block px-2 py-0.5 rounded-full border ${dlBadge.color}`}>
+                                <span className={`text-[11px] font-bold mt-1 inline-block px-2.5 py-0.5 rounded-full border ${dlBadge.color}`}>
                                   {dlBadge.label}
                                 </span>
                               )}
@@ -339,7 +381,7 @@ export const VendorVisaPage: React.FC = () => {
                           ) : <span className="text-slate-500 text-sm">—</span>}
                         </td>
                         <td className="px-4 py-4">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${cfg.color}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${cfg.color}`}>
                             {cfg.label}
                           </span>
                         </td>
@@ -347,14 +389,14 @@ export const VendorVisaPage: React.FC = () => {
                           {app.status === "APPROVED" || app.status === "REJECTED" ? (
                             <button
                               onClick={() => setSelectedApp(app)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 text-[#475569] border border-slate-600/50 rounded-lg text-xs font-bold transition-all"
+                              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
                             >
                               <Lock className="h-3.5 w-3.5" /> Xem hồ sơ (Đã chốt)
                             </button>
                           ) : (
                             <button
                               onClick={() => setSelectedApp(app)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-[#0B3B49] border border-sky-500/20 rounded-lg text-xs font-bold transition-all"
+                              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0B3B49] hover:bg-[#0F5264] text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer"
                             >
                               <Eye className="h-3.5 w-3.5" /> Kiểm tra & Cập nhật
                             </button>
@@ -367,7 +409,7 @@ export const VendorVisaPage: React.FC = () => {
               </table>
             </div>
             {filteredApps.length > 0 && (
-              <div className="px-4 py-3 border-t border-slate-700/30 text-xs text-[#526071]">
+              <div className="px-4 py-3 bg-slate-50/70 border-t border-slate-200 text-xs font-medium text-slate-600">
                 Hiển thị {filteredApps.length}/{applications.length} hồ sơ thuộc tour của Đại lý
               </div>
             )}
@@ -378,13 +420,13 @@ export const VendorVisaPage: React.FC = () => {
       {/* Tab: Thư viện mẫu */}
       {activeTab === "templates" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[#526071] text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-slate-600 text-sm">
               Quản lý mẫu hồ sơ Visa theo quốc gia trên Database (tách bạch Phí dịch vụ Đại lý và Lệ phí Lãnh sự).
             </p>
             <button
               onClick={() => { setEditingTemplate(null); setShowTemplateForm(true); }}
-              className="flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-400 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-sky-500/25"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#0B3B49] hover:bg-[#0F5264] text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-[#0B3B49]/20 cursor-pointer"
             >
               <Plus className="h-4 w-4" /> Thêm Mẫu Mới
             </button>
@@ -399,17 +441,17 @@ export const VendorVisaPage: React.FC = () => {
           )}
 
           {loadingTemplates ? (
-            <div className="text-center py-12 text-[#526071] text-sm">Đang tải thư viện mẫu Visa...</div>
+            <div className="text-center py-12 text-slate-600 text-sm">Đang tải thư viện mẫu Visa...</div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {templates.map(t => (
-                <div key={t.id} className="bg-white border border-slate-700/50 rounded-2xl overflow-hidden">
-                  <div className="flex items-center justify-between p-5 border-b border-slate-700/30">
+                <div key={t.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="flex items-center justify-between p-5 border-b border-slate-200">
                     <div className="flex items-center gap-3">
                       <span className="text-4xl">{t.flagEmoji}</span>
                       <div>
                         <h3 className="font-black text-[#0F172A] text-base">{t.country}</h3>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#526071]">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-600">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" /> {t.processingDays} ngày ĐSQ + {t.bufferDays ?? 3} ngày sơ duyệt
                           </span>
@@ -418,7 +460,7 @@ export const VendorVisaPage: React.FC = () => {
                             <span className="text-emerald-700 font-bold">DV: {fmtCurrency(t.visaFee)}</span>
                           </span>
                           {(t.consularFee ?? 0) > 0 && (
-                            <span className="text-amber-800">Lãnh sự: {fmtCurrency(t.consularFee ?? 0)}</span>
+                            <span className="text-amber-800 font-semibold">Lãnh sự: {fmtCurrency(t.consularFee ?? 0)}</span>
                           )}
                           {t.tourCount !== undefined && (
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {t.tourCount} tour</span>
@@ -426,42 +468,42 @@ export const VendorVisaPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       <button
                         onClick={() => { setEditingTemplate(t); setShowTemplateForm(true); }}
-                        className="p-2 text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] rounded-lg transition"
+                        className="p-2 text-slate-600 hover:text-[#0B3B49] hover:bg-slate-100 rounded-lg transition cursor-pointer"
                       >
                         <Edit3 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteTemplate(t.id)}
-                        className="p-2 text-[#526071] hover:text-red-400 hover:bg-red-500/5 rounded-lg transition"
+                        className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => setExpandedTemplate(expandedTemplate === t.id ? null : t.id)}
-                        className="p-2 text-[#526071] hover:text-[#0F172A] hover:bg-[#FAF8F5] rounded-lg transition"
+                        className="p-2 text-slate-600 hover:text-[#0B3B49] hover:bg-slate-100 rounded-lg transition cursor-pointer"
                       >
                         {expandedTemplate === t.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
                   {expandedTemplate === t.id && (
-                    <div className="p-5 space-y-2.5">
+                    <div className="p-5 space-y-2.5 bg-slate-50/50">
                       {t.notes && (
-                        <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl p-3 text-xs text-[#0B3B49]">
+                        <div className="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-900">
                           <strong>Hướng dẫn nộp tại ĐSQ/Trung tâm thị thực:</strong> {t.notes}
                         </div>
                       )}
-                      <p className="text-xs font-bold text-[#526071] uppercase tracking-wider">
+                      <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                         Danh mục giấy tờ ({t.documents.length})
                       </p>
                       {t.documents.map((doc, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-700/30">
+                        <div key={i} className="flex items-start gap-3 p-3 bg-white rounded-xl border border-slate-200">
                           <span
                             className={`mt-0.5 h-5 w-5 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
-                              doc.isMandatory ? "bg-red-500/20 text-red-300" : "bg-slate-700 text-slate-400"
+                              doc.isMandatory ? "bg-rose-100 text-rose-700 border border-rose-300" : "bg-slate-100 text-slate-600 border border-slate-300"
                             }`}
                           >
                             {doc.isMandatory ? "!" : "o"}
@@ -470,12 +512,12 @@ export const VendorVisaPage: React.FC = () => {
                             <p className="text-sm font-semibold text-[#0F172A]">
                               {doc.documentName}
                               {doc.isMandatory && (
-                                <span className="ml-2 text-[10px] font-black text-red-400 border border-red-500/30 rounded px-1">
+                                <span className="ml-2 text-[10px] font-black text-rose-700 bg-rose-50 border border-rose-300 rounded px-1.5 py-0.5">
                                   BẮT BUỘC
                                 </span>
                               )}
                             </p>
-                            <p className="text-xs text-[#526071] mt-0.5">{doc.description}</p>
+                            <p className="text-xs text-slate-600 mt-0.5">{doc.description}</p>
                           </div>
                         </div>
                       ))}
